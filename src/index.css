@@ -23,8 +23,63 @@
 }
 
 @keyframes float {
-  0% { transform: translateX(-20%) translateY(0); }
-  100% { transform: translateX(120%) translateY(-10%); }
+  0% { transform: translate(-20%, 0) rotate(0deg); }
+  50% { transform: translate(50%, -20%) rotate(5deg); }
+  100% { transform: translate(120%, -10%) rotate(-5deg); }
+}
+
+@keyframes bokeh-float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+  33% { transform: translate(30px, -50px) scale(1.1); opacity: 0.5; }
+  66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.2; }
+}
+
+@keyframes draw-line {
+  0% { stroke-dashoffset: 1000; opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { stroke-dashoffset: 0; opacity: 0.3; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.4)); }
+  50% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.8)); }
+}
+
+@keyframes float-mist {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.1; }
+  50% { transform: translate(100px, -50px) scale(1.2); opacity: 0.2; }
+}
+
+@keyframes nebula-pulse {
+  0%, 100% { opacity: 0.2; filter: blur(40px) scale(1); }
+  50% { opacity: 0.4; filter: blur(60px) scale(1.1); }
+}
+
+@keyframes logo-glow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.4)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 40px rgba(168, 85, 247, 0.8)); transform: scale(1.1); }
+}
+
+@keyframes shooting-star {
+  0% { transform: translate(-100%, -100%) scale(0); opacity: 0; }
+  10% { opacity: 1; transform: translate(-80%, -80%) scale(1); }
+  100% { transform: translate(100vw, 100vh) scale(1); opacity: 0; }
+}
+
+@keyframes galaxy-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.mist-layer {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(168, 85, 247, 0.1) 0%, transparent 70%);
+  filter: blur(100px);
+  animation: float-mist 60s infinite linear;
+  pointer-events: none;
 }
 
 /* Ensure full viewport */

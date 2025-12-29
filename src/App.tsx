@@ -1,44 +1,24 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { 
   Activity, 
   Search, 
   Database, 
   Cpu, 
-  Zap, 
-  BarChart3, 
   Mic2, 
   Play, 
   Pause, 
   Settings, 
   Network,
-  Share2,
   X,
-  Globe,
-  Music,
-  Maximize2,
-  Minimize2,
   Disc,
-  Command,
   ChevronRight,
   ChevronLeft,
-  Volume2,
   Layers,
-  Code,
   PenTool,
-  Sliders,
-  Headphones,
   Sparkles,
   Download,
-  Heart,
   RefreshCw,
-  Filter,
-  Wifi,
-  Radio,
-  Hand,
-  Users,
-  Fingerprint,
   Award,
-  BookOpen
 } from 'lucide-react';
 
 // --- TYPES ---
@@ -174,16 +154,101 @@ const BTSLogo = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const ShootingStar = () => {
+  const style = useMemo(() => ({
+    top: `${Math.random() * 50}%`,
+    left: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 20}s`,
+    duration: `${2 + Math.random() * 3}s`
+  }), []);
+
+  return (
+    <div 
+      className="absolute w-[2px] h-[2px] bg-white rounded-full animate-[shooting-star_linear_infinite]"
+      style={{
+        top: style.top,
+        left: style.left,
+        animationDelay: style.delay,
+        animationDuration: style.duration,
+        boxShadow: '0 0 10px 2px white'
+      }}
+    >
+      <div className="absolute top-1/2 left-0 w-[150px] h-[1px] bg-gradient-to-r from-white to-transparent -translate-y-1/2 rotate-[-45deg] origin-left opacity-40" />
+    </div>
+  );
+};
+
 const Whalien = () => (
-  <div className="absolute w-96 h-48 opacity-30 animate-[float_60s_linear_infinite] pointer-events-none mix-blend-screen" style={{ top: '20%', left: '-20%' }}>
-     <svg viewBox="0 0 200 100" className="w-full h-full fill-purple-500/50 blur-lg">
-        {/* Abstract Whale Shape */}
-        <path d="M20,50 Q60,20 120,50 T200,50 Q160,80 100,70 T20,50 Z" />
+  <div className="absolute w-[600px] h-[300px] opacity-40 animate-[float_80s_linear_infinite] pointer-events-none mix-blend-screen" style={{ top: '15%', left: '-30%' }}>
+     <svg viewBox="0 0 400 200" className="w-full h-full">
+        {/* The "Whalien" Constellation Lines */}
+        <path 
+           d="M40,100 L100,60 L180,50 L280,70 L360,100 L320,140 L240,150 L140,140 L40,100 M100,60 L140,90 L240,100 L320,140 M180,50 L200,80 L240,100" 
+           fill="none" 
+           stroke="#A855F7" 
+           strokeWidth="0.8" 
+           strokeDasharray="1000"
+           className="animate-[draw-line_15s_ease-out_infinite_alternate] opacity-60"
+        />
+        {/* Constellation Stars (Nodes) */}
+        {[
+          [40,100], [100,60], [180,50], [280,70], [360,100], 
+          [320,140], [240,150], [140,140], [140,90], [240,100], [200,80]
+        ].map(([x, y], idx) => (
+           <circle 
+              key={idx} 
+              cx={x} cy={y} r="1.5" 
+              fill="white" 
+              className="animate-pulse shadow-[0_0_10px_white]" 
+              style={{ animationDelay: `${idx * 0.3}s` }}
+           />
+        ))}
+        {/* Soft body glow */}
+        <path 
+           d="M40,100 Q100,40 200,50 T360,100 Q300,160 200,150 T40,100" 
+           fill="url(#whaleGradient)" 
+           className="opacity-20 blur-xl"
+        />
+        <defs>
+           <radialGradient id="whaleGradient">
+              <stop offset="0%" stopColor="#A855F7" />
+              <stop offset="100%" stopColor="transparent" />
+           </radialGradient>
+        </defs>
      </svg>
-     {/* Sparkling trail */}
-     <div className="absolute top-1/2 left-0 w-full h-2 bg-gradient-to-r from-transparent via-purple-400 to-transparent blur-md opacity-50" />
   </div>
 );
+
+const PurpleOcean = () => {
+  const bubbles = useMemo(() => {
+    return [...Array(20)].map((_, i) => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      size: Math.random() * 200 + 100,
+      delay: Math.random() * 10,
+      duration: Math.random() * 20 + 20,
+    }));
+  }, []);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+      {bubbles.map((b, i) => (
+        <div 
+          key={i}
+          className="absolute rounded-full bg-purple-600/20 blur-[80px] animate-[bokeh-float_infinite_ease-in-out]"
+          style={{
+            left: b.left,
+            top: b.top,
+            width: `${b.size}px`,
+            height: `${b.size}px`,
+            animationDelay: `${b.delay}s`,
+            animationDuration: `${b.duration}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 const NoiseOverlay = () => (
   <div className="pointer-events-none fixed inset-0 z-[100] opacity-[0.04] mix-blend-overlay"
@@ -198,29 +263,48 @@ interface UniverseProps {
 
 const Universe3D: React.FC<UniverseProps> = ({ mode }) => {
   const stars = useMemo(() => {
-    return [...Array(600)].map((_, i) => ({
+    const colors = ['#ffffff', '#A855F7', '#D8B4FE', '#818CF8', '#C084FC']; // Borahae Palette
+    return [...Array(800)].map((_, i) => ({
       theta: Math.random() * 2 * Math.PI,
       phi: Math.acos((Math.random() * 2) - 1),
-      r: 400 + Math.random() * 800,
-      size: Math.random() * 2 + 0.5,
-      color: i % 8 === 0 ? '#ffffff' : '#A855F7', // Mostly Purple Ocean
+      r: 300 + Math.random() * 1000,
+      size: Math.random() * 2.5 + 0.5,
+      color: i % 12 === 0 ? '#ffffff' : colors[Math.floor(Math.random() * colors.length)],
       delay: Math.random() * 5
     }));
   }, []);
 
   return (
-    <div className="absolute inset-0 bg-[#020005] overflow-hidden perspective-[1000px]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(88,28,135,0.3),_rgba(0,0,0,1)_90%)]" />
+    <div className="absolute inset-0 bg-[#020005] overflow-hidden perspective-[1200px]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(88,28,135,0.4),_rgba(0,0,0,1)_95%)]" />
       
+      {/* DEEP COSMIC NEBULAS */}
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] bg-[radial-gradient(circle_at_20%_30%,_#4c1d95_0%,_transparent_60%)] animate-[nebula-pulse_30s_infinite_alternate]" />
+        <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] bg-[radial-gradient(circle_at_80%_70%,_#1e1b4b_0%,_transparent_60%)] animate-[nebula-pulse_35s_infinite_alternate_reverse]" />
+        <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] bg-[radial-gradient(circle_at_50%_50%,_rgba(168,85,247,0.1)_0%,_transparent_50%)] animate-[galaxy-spin_120s_infinite_linear]" />
+      </div>
+
+      {/* SHOOTING STARS */}
+      <ShootingStar />
+      <ShootingStar />
+      <ShootingStar />
+
+      <div className="mist-layer opacity-20" />
+      <div className="mist-layer opacity-15 blur-[180px]" style={{ animationDelay: '-45s' }} />
+
+      {/* THE PURPLE OCEAN (Bokeh Layer) */}
+      <PurpleOcean />
+
       {/* The Space Whale Swimming in Background */}
       <Whalien />
 
       <div 
-        className={`absolute inset-0 flex items-center justify-center transform-style-3d transition-transform duration-[2000ms] ease-in-out
-          ${mode === 'warp' ? 'scale-[5] translate-z-[1000px]' : mode === 'dashboard' ? 'scale-[0.9] rotate-x-10' : 'scale-100'}
+        className={`absolute inset-0 flex items-center justify-center transform-style-3d transition-all duration-[2500ms] cubic-bezier(0.4, 0, 0.2, 1)
+          ${mode === 'warp' ? 'scale-[8] translate-z-[2000px] blur-sm opacity-50' : mode === 'dashboard' ? 'scale-[0.95] rotate-x-5' : 'scale-100'}
         `}
       >
-        <div className={`relative w-[1000px] h-[1000px] transform-style-3d ${mode === 'landing' ? 'animate-[spin_60s_linear_infinite]' : 'animate-[spin_240s_linear_infinite]'}`}>
+        <div className={`relative w-[1200px] h-[1200px] transform-style-3d ${mode === 'landing' ? 'animate-[spin_100s_linear_infinite]' : 'animate-[spin_300s_linear_infinite]'}`}>
           
           {/* THE 7 MEMBERS (Central Constellation) */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0">
@@ -283,11 +367,12 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
   const intervalRef = useRef<number | null>(null);
 
   const startHold = () => {
+    console.log("Holding started...");
     setHolding(true);
-    // Use window.setInterval to avoid NodeJS/DOM timer type conflicts in TS
     intervalRef.current = window.setInterval(() => {
       setProgress(p => {
         if (p >= 100) {
+          console.log("Progress 100%!");
           if (intervalRef.current) clearInterval(intervalRef.current);
           setTimeout(onSync, 500); 
           return 100;
@@ -304,78 +389,104 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
   };
 
   return (
-    <div className={`absolute inset-0 z-50 flex flex-col items-center justify-center transition-opacity duration-500 ${holding ? 'backdrop-blur-sm' : ''}`}>
-      <div className={`text-center mb-16 animate-in fade-in slide-in-from-top-4 duration-1000 ${holding ? 'opacity-50 scale-90' : 'opacity-100'}`}>
-        <h1 className="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-purple-900/20 tracking-tighter drop-shadow-[0_0_30px_rgba(168,85,247,0.5)]">
-          MIKROKOSMOS
+    <div className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden">
+      {/* Dynamic Cosmic Dust */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-30">
+        {[...Array(50)].map((_, i) => (
+          <div 
+            key={i}
+            className="absolute rounded-full bg-white animate-pulse"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 3}px`,
+              height: `${Math.random() * 3}px`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${2 + Math.random() * 5}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Background Mist for Title */}
+      <div className="absolute top-[10%] w-full flex justify-center pointer-events-none">
+        <div className="w-[600px] h-[300px] bg-purple-500/5 blur-[120px] rounded-full animate-pulse" />
+      </div>
+
+      <div className={`absolute top-[12%] text-center z-10 transition-all duration-1000 ${holding ? 'opacity-20 scale-90 blur-xl translate-y-[-50px]' : 'opacity-100'}`}>
+        <h1 className="text-5xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-purple-900/20 tracking-[0.3em] drop-shadow-[0_0_60px_rgba(168,85,247,0.6)] uppercase leading-tight">
+          BTS Neural Archive
         </h1>
-        <p className="text-purple-300 tracking-[0.5em] text-xs mt-4 uppercase">
-          Neural Archive v7.0
+        <p className="text-purple-300 tracking-[1.2em] text-[10px] mt-6 uppercase opacity-40 font-mono">
+          Universal Connection • Established 2013
         </p>
       </div>
 
-      <div className="relative w-96 h-96 flex items-center justify-center">
-         {/* THE 7 HANDS ORBITING */}
-         {MEMBER_DATA.map((m, i) => {
-            const angle = (i / 7) * Math.PI * 2 - Math.PI / 2; 
-            const radius = holding ? 70 : 160; // Move hands inward on hold
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-            
-            return (
-               <div 
-                  key={m.id}
-                  className="absolute transition-all duration-500 ease-out flex flex-col items-center gap-2"
-                  style={{ transform: `translate(${x}px, ${y}px)` }}
-               >
-                  <div className={`
-                     p-3 rounded-full bg-black/50 border backdrop-blur-md transition-all duration-300
-                     ${holding ? 'border-white shadow-[0_0_20px_white]' : `border-white/10 shadow-[0_0_15px_${m.color}]`}
-                  `}
-                  style={{ borderColor: holding ? 'white' : m.color }}
-                  >
-                     <Hand 
-                        size={24} 
-                        className={`transition-colors duration-300 ${holding ? 'text-white' : 'text-white/50'}`} 
-                        style={{ color: holding ? 'white' : m.color }}
-                     />
-                  </div>
-                  <span className={`text-[9px] font-bold tracking-widest text-white/50 uppercase transition-opacity duration-300 ${holding ? 'opacity-0' : 'opacity-100'}`}>
-                     {m.name}
-                  </span>
-               </div>
-            )
-         })}
-
-         {/* CENTRAL CORE (YOU) */}
+      <div className="relative flex items-center justify-center z-20 mt-32">
+         {/* THE SUPERNOVA GATEWAY */}
          <button 
             onMouseDown={startHold}
             onMouseUp={stopHold}
             onTouchStart={startHold}
             onTouchEnd={stopHold}
             className={`
-               relative w-32 h-32 bg-white/5 rounded-full flex items-center justify-center border border-white/10 backdrop-blur-md transition-all duration-300 cursor-pointer
-               ${holding ? 'scale-110 border-purple-500 shadow-[0_0_60px_rgba(168,85,247,0.6)]' : 'hover:scale-105 hover:border-white/30'}
+               relative w-56 h-56 rounded-full flex items-center justify-center transition-all duration-1000 cursor-pointer z-20
+               ${holding ? 'scale-[2] shadow-[0_0_150px_rgba(255,255,255,0.9)]' : 'hover:scale-110 hover:shadow-[0_0_50px_rgba(168,85,247,0.4)]'}
             `}
          >
+            {/* The "Supernova" Layers */}
+            <div className={`absolute inset-[-100%] rounded-full transition-all duration-1000 blur-[80px] 
+              ${holding ? 'bg-white opacity-40 scale-150' : 'bg-purple-600/10 opacity-20 scale-100 animate-pulse'}`} 
+            />
+            <div className={`absolute inset-[-50%] rounded-full transition-all duration-1000 blur-[40px] 
+              ${holding ? 'bg-white opacity-70 scale-125' : 'bg-purple-500/20 opacity-30 animate-pulse'}`} 
+            />
+            <div className={`absolute inset-0 rounded-full transition-all duration-1000 blur-[20px] 
+              ${holding ? 'bg-white opacity-90 scale-110' : 'bg-purple-400/40 opacity-40'}`} 
+            />
+            
+            {/* BTS Logo - The Eye of the Galaxy */}
+            <div className={`relative z-10 transition-all duration-1000 ${holding ? 'scale-150 rotate-[720deg]' : 'animate-[logo-glow_6s_infinite]'}`}>
+              <BTSLogo className="w-16 h-16 text-white" />
+            </div>
+
+            {/* Orbiting Connection Points */}
+            {!holding && MEMBER_DATA.map((m, i) => {
+              const angle = (i / 7) * Math.PI * 2;
+              const dist = 140;
+              const x = Math.cos(angle) * dist;
+              const y = Math.sin(angle) * dist;
+              return (
+                <div 
+                  key={m.id}
+                  className="absolute w-2 h-2 rounded-full shadow-[0_0_15px_currentColor] animate-pulse"
+                  style={{ 
+                    transform: `translate(${x}px, ${y}px)`,
+                    backgroundColor: m.color,
+                    color: m.color,
+                    animationDelay: `${i * 0.5}s`
+                  }}
+                />
+              )
+            })}
+
             {/* Progress Ring */}
-            <svg className="absolute inset-0 w-full h-full -rotate-90">
-               <circle cx="64" cy="64" r="62" stroke="rgba(255,255,255,0.1)" strokeWidth="2" fill="none"/>
+            <svg className="absolute inset-0 w-full h-full -rotate-90 scale-[1.4]">
+               <circle cx="112" cy="112" r="110" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none"/>
                <circle 
-                  cx="64" cy="64" r="62" 
-                  stroke="#A855F7" strokeWidth="2" fill="none"
-                  strokeDasharray="389" 
-                  strokeDashoffset={389 - (389 * progress) / 100}
+                  cx="112" cy="112" r="110" 
+                  stroke="white" strokeWidth="2" fill="none"
+                  strokeDasharray="691" 
+                  strokeDashoffset={691 - (691 * progress) / 100}
                   className="transition-all duration-100 ease-linear"
+                  style={{ filter: 'drop-shadow(0 0-15px white)' }}
                />
             </svg>
-            
-            <div className="relative z-10 flex flex-col items-center gap-1">
-               {progress >= 100 ? <Sparkles className="animate-spin text-white" size={32}/> : <Fingerprint size={32} className={`transition-colors ${holding ? 'text-white' : 'text-purple-400'}`} />}
-               <span className="text-[8px] tracking-widest text-white/50 mt-2">{holding ? 'CONNECTING...' : 'HOLD TO SYNC'}</span>
-            </div>
-            
-            {!holding && <div className="absolute inset-0 rounded-full border border-purple-500/30 animate-ping" />}
+
+            {/* White-out Flash on Complete */}
+            {progress >= 100 && (
+              <div className="fixed inset-0 bg-white z-[100] animate-in fade-in duration-700 blur-sm" />
+            )}
          </button>
       </div>
     </div>
@@ -394,14 +505,18 @@ interface GlassHUDProps {
 
 const GlassHUD: React.FC<GlassHUDProps> = ({ title, icon: Icon, children, className = "", onClose, headerAction }) => (
   <div className={`
-    bg-[#050505]/60 backdrop-blur-xl border border-white/10 rounded-2xl flex flex-col overflow-hidden
-    shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-colors
+    relative bg-[#080312]/70 backdrop-blur-2xl border border-white/10 rounded-2xl flex flex-col overflow-hidden
+    shadow-[0_0_40px_rgba(0,0,0,0.6),inset_0_0_20px_rgba(168,85,247,0.05)] transition-all duration-500
+    hover:border-purple-500/30 group/hud
     ${className}
   `}>
-    <div className="px-5 py-4 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
+    {/* Inner Nebula Texture */}
+    <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(circle_at_50%_0%,_#A855F7_0%,_transparent_70%)] group-hover/hud:opacity-[0.06] transition-opacity" />
+    
+    <div className="px-5 py-4 border-b border-white/5 bg-white/[0.03] flex items-center justify-between relative z-10">
       <div className="flex items-center gap-3">
-        {Icon && <Icon size={16} className="text-purple-400" />}
-        <span className="text-[10px] font-bold tracking-[0.2em] text-white/80 uppercase">{title}</span>
+        {Icon && <Icon size={16} className="text-purple-400 group-hover/hud:animate-pulse" />}
+        <span className="text-[10px] font-bold tracking-[0.3em] text-white/70 uppercase group-hover/hud:text-white transition-colors">{title}</span>
       </div>
       <div className="flex gap-2">
         {headerAction}
@@ -412,7 +527,7 @@ const GlassHUD: React.FC<GlassHUDProps> = ({ title, icon: Icon, children, classN
         )}
       </div>
     </div>
-    <div className="p-5 flex-1 overflow-auto custom-scrollbar relative">
+    <div className="p-5 flex-1 overflow-auto custom-scrollbar relative z-10">
       {children}
     </div>
   </div>
@@ -703,8 +818,10 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
 
   const handleSync = () => {
+    console.log("Sync complete! Triggering Warp mode...");
     setMode('warp');
     setTimeout(() => {
+      console.log("Warp complete! Opening Dashboard.");
       setMode('dashboard');
     }, 2000);
   };
@@ -740,13 +857,16 @@ export default function App() {
                   key={item.id}
                   onClick={() => setActiveSection(item.id)}
                   className={`
-                    p-3 rounded-xl transition-all duration-300 relative group
+                    p-3 rounded-xl transition-all duration-500 relative group
                     ${activeSection === item.id 
-                      ? 'bg-purple-600 text-white shadow-[0_0_20px_#9333ea]' 
-                      : 'text-white/40 hover:text-white hover:bg-white/10'}
+                      ? 'bg-purple-600/20 text-purple-300 shadow-[0_0_25px_rgba(147,51,234,0.4)] border border-purple-500/50' 
+                      : 'text-white/30 hover:text-white/60 hover:bg-white/5'}
                   `}
                 >
-                  <item.icon size={20} />
+                  <item.icon size={20} className={activeSection === item.id ? "animate-[pulse-glow_3s_infinite]" : ""} />
+                  {activeSection === item.id && (
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-8 bg-purple-500 rounded-r-full shadow-[0_0_15px_#9333ea]" />
+                  )}
                 </button>
               ))}
             </nav>
