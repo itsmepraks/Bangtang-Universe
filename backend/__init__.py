@@ -1,3 +1,0 @@
-"""BTS Universe backend package."""
-
-
