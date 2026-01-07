@@ -221,7 +221,7 @@ const Whalien = () => (
 
 const PurpleOcean = () => {
   const bubbles = useMemo(() => {
-    return [...Array(20)].map((_, i) => ({
+    return [...Array(20)].map(() => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
       size: Math.random() * 200 + 100,
@@ -362,96 +362,35 @@ interface LandingRitualProps {
 }
 
 const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
-  const [holding, setHolding] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const intervalRef = useRef<number | null>(null);
-
-  const startHold = () => {
-    console.log("Holding started...");
-    setHolding(true);
-    intervalRef.current = window.setInterval(() => {
-      setProgress(p => {
-        if (p >= 100) {
-          console.log("Progress 100%!");
-          if (intervalRef.current) clearInterval(intervalRef.current);
-          setTimeout(onSync, 500); 
-          return 100;
-        }
-        return p + 2;
-      });
-    }, 20); 
-  };
-
-  const stopHold = () => {
-    setHolding(false);
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setProgress(0);
-  };
-
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden">
-      {/* Dynamic Cosmic Dust */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-30">
-        {[...Array(50)].map((_, i) => (
-          <div 
-            key={i}
-            className="absolute rounded-full bg-white animate-pulse"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 3}px`,
-              height: `${Math.random() * 3}px`,
-              animationDelay: `${Math.random() * 10}s`,
-              animationDuration: `${2 + Math.random() * 5}s`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Background Mist for Title */}
-      <div className="absolute top-[10%] w-full flex justify-center pointer-events-none">
-        <div className="w-[600px] h-[300px] bg-purple-500/5 blur-[120px] rounded-full animate-pulse" />
-      </div>
-
-      <div className={`absolute top-[12%] text-center z-10 transition-all duration-1000 ${holding ? 'opacity-20 scale-90 blur-xl translate-y-[-50px]' : 'opacity-100'}`}>
-        <h1 className="text-5xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-purple-100 to-purple-900/20 tracking-[0.3em] drop-shadow-[0_0_60px_rgba(168,85,247,0.6)] uppercase leading-tight">
+    <div className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden select-none">
+      <div className="absolute top-[15%] text-center z-10 animate-in fade-in slide-in-from-top-10 duration-1000">
+        <h1 className="text-4xl md:text-6xl font-extralight text-white tracking-[0.5em] drop-shadow-[0_0_50px_rgba(168,85,247,0.5)] uppercase leading-tight">
           BTS Neural Archive
         </h1>
-        <p className="text-purple-300 tracking-[1.2em] text-[10px] mt-6 uppercase opacity-40 font-mono">
+        <p className="text-purple-300/40 tracking-[1em] text-[9px] mt-6 uppercase font-mono font-bold">
           Universal Connection • Established 2013
         </p>
       </div>
 
-      <div className="relative flex items-center justify-center z-20 mt-32">
-         {/* THE SUPERNOVA GATEWAY */}
+      <div className="relative flex flex-col items-center justify-center z-20 mt-20 gap-12 group">
+         {/* THE GATEWAY LOGO */}
          <button 
-            onMouseDown={startHold}
-            onMouseUp={stopHold}
-            onTouchStart={startHold}
-            onTouchEnd={stopHold}
-            className={`
-               relative w-56 h-56 rounded-full flex items-center justify-center transition-all duration-1000 cursor-pointer z-20
-               ${holding ? 'scale-[2] shadow-[0_0_150px_rgba(255,255,255,0.9)]' : 'hover:scale-110 hover:shadow-[0_0_50px_rgba(168,85,247,0.4)]'}
-            `}
+            onClick={onSync}
+            className="relative w-48 h-48 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none ring-0 focus:ring-0 select-none hover:scale-110 active:scale-95 group/logo"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
          >
-            {/* The "Supernova" Layers */}
-            <div className={`absolute inset-[-100%] rounded-full transition-all duration-1000 blur-[80px] 
-              ${holding ? 'bg-white opacity-40 scale-150' : 'bg-purple-600/10 opacity-20 scale-100 animate-pulse'}`} 
-            />
-            <div className={`absolute inset-[-50%] rounded-full transition-all duration-1000 blur-[40px] 
-              ${holding ? 'bg-white opacity-70 scale-125' : 'bg-purple-500/20 opacity-30 animate-pulse'}`} 
-            />
-            <div className={`absolute inset-0 rounded-full transition-all duration-1000 blur-[20px] 
-              ${holding ? 'bg-white opacity-90 scale-110' : 'bg-purple-400/40 opacity-40'}`} 
-            />
+            {/* Ambient Cosmic Glow */}
+            <div className="absolute inset-[-100%] rounded-full bg-purple-600/10 opacity-20 blur-[100px] animate-pulse group-hover/logo:opacity-40 transition-opacity duration-700" />
+            <div className="absolute inset-[-40%] rounded-full bg-purple-500/20 opacity-30 blur-[60px] group-hover/logo:scale-125 transition-transform duration-1000" />
             
-            {/* BTS Logo - The Eye of the Galaxy */}
-            <div className={`relative z-10 transition-all duration-1000 ${holding ? 'scale-150 rotate-[720deg]' : 'animate-[logo-glow_6s_infinite]'}`}>
-              <BTSLogo className="w-16 h-16 text-white" />
+            {/* BTS Logo */}
+            <div className="relative z-10 animate-[logo-glow_8s_infinite] group-hover/logo:drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] transition-all duration-700">
+              <BTSLogo className="w-20 h-20 text-white" />
             </div>
 
             {/* Orbiting Connection Points */}
-            {!holding && MEMBER_DATA.map((m, i) => {
+            {MEMBER_DATA.map((m, i) => {
               const angle = (i / 7) * Math.PI * 2;
               const dist = 140;
               const x = Math.cos(angle) * dist;
@@ -459,36 +398,61 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               return (
                 <div 
                   key={m.id}
-                  className="absolute w-2 h-2 rounded-full shadow-[0_0_15px_currentColor] animate-pulse"
+                  className="absolute w-1.5 h-1.5 rounded-full opacity-40 transition-all duration-1000 group-hover/logo:opacity-100 group-hover/logo:scale-150"
                   style={{ 
                     transform: `translate(${x}px, ${y}px)`,
                     backgroundColor: m.color,
-                    color: m.color,
-                    animationDelay: `${i * 0.5}s`
+                    boxShadow: `0 0 15px ${m.color}`,
+                    transitionDelay: `${i * 50}ms`
                   }}
                 />
               )
             })}
+         </button>
 
-            {/* Progress Ring */}
-            <svg className="absolute inset-0 w-full h-full -rotate-90 scale-[1.4]">
-               <circle cx="112" cy="112" r="110" stroke="rgba(255,255,255,0.03)" strokeWidth="1" fill="none"/>
-               <circle 
-                  cx="112" cy="112" r="110" 
-                  stroke="white" strokeWidth="2" fill="none"
-                  strokeDasharray="691" 
-                  strokeDashoffset={691 - (691 * progress) / 100}
-                  className="transition-all duration-100 ease-linear"
-                  style={{ filter: 'drop-shadow(0 0-15px white)' }}
-               />
-            </svg>
-
-            {/* White-out Flash on Complete */}
-            {progress >= 100 && (
-              <div className="fixed inset-0 bg-white z-[100] animate-in fade-in duration-700 blur-sm" />
-            )}
+         {/* Call to Action Text */}
+         <button 
+            onClick={onSync}
+            className="flex flex-col items-center gap-4 group/text cursor-pointer hover:scale-105 transition-all duration-500"
+         >
+            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent group-hover/text:w-24 transition-all duration-1000" />
+            <span className="text-[10px] text-white/40 tracking-[0.8em] font-mono uppercase group-hover:text-white group-hover:tracking-[1em] transition-all duration-700 animate-pulse">
+               Go to Dashboard
+            </span>
+            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent group-hover/text:w-24 transition-all duration-1000" />
          </button>
       </div>
+    </div>
+  );
+};
+
+const FloatingParticles = () => {
+  const particles = useMemo(() => {
+    return [...Array(15)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      delay: Math.random() * 5,
+      duration: 10 + Math.random() * 10,
+      size: Math.random() * 3 + 1
+    }));
+  }, []);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {particles.map((p, i) => (
+        <div 
+          key={i}
+          className="absolute rounded-full bg-white/20 animate-[float-particle_infinite_ease-in-out]"
+          style={{
+            left: p.left,
+            top: p.top,
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+          }}
+        />
+      ))}
     </div>
   );
 };
@@ -501,68 +465,76 @@ interface GlassHUDProps {
   className?: string;
   onClose?: () => void;
   headerAction?: React.ReactNode;
+  accentColor?: string;
 }
 
-const GlassHUD: React.FC<GlassHUDProps> = ({ title, icon: Icon, children, className = "", onClose, headerAction }) => (
+const GlassHUD: React.FC<GlassHUDProps> = ({ title, icon: Icon, children, className = "", onClose, headerAction, accentColor = "#A855F7" }) => (
   <div className={`
-    relative bg-[#080312]/70 backdrop-blur-2xl border border-white/10 rounded-2xl flex flex-col overflow-hidden
-    shadow-[0_0_40px_rgba(0,0,0,0.6),inset_0_0_20px_rgba(168,85,247,0.05)] transition-all duration-500
-    hover:border-purple-500/30 group/hud
+    relative glass-panel rounded-3xl flex flex-col overflow-hidden
+    transition-all duration-700 hover:border-[${accentColor}]/30 group/hud
     ${className}
-  `}>
-    {/* Inner Nebula Texture */}
-    <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(circle_at_50%_0%,_#A855F7_0%,_transparent_70%)] group-hover/hud:opacity-[0.06] transition-opacity" />
+  `}
+  style={{ '--accent-color': accentColor } as React.CSSProperties}>
+    {/* Soft Inner Glow */}
+    <div className="absolute inset-0 opacity-[0.02] pointer-events-none transition-opacity duration-700 group-hover/hud:opacity-[0.08]" 
+         style={{ background: `radial-gradient(circle at 50% 0%, ${accentColor} 0%, transparent 70%)` }} />
     
-    <div className="px-5 py-4 border-b border-white/5 bg-white/[0.03] flex items-center justify-between relative z-10">
-      <div className="flex items-center gap-3">
-        {Icon && <Icon size={16} className="text-purple-400 group-hover/hud:animate-pulse" />}
-        <span className="text-[10px] font-bold tracking-[0.3em] text-white/70 uppercase group-hover/hud:text-white transition-colors">{title}</span>
+    <div className="px-6 py-5 border-b border-white/5 bg-white/[0.01] flex items-center justify-between relative z-10">
+      <div className="flex items-center gap-4">
+        {Icon && <Icon size={18} className="group-hover/hud:animate-pulse transition-colors duration-500" style={{ color: accentColor }} />}
+        <span className="text-[11px] font-bold tracking-[0.4em] text-white/40 uppercase group-hover/hud:text-white transition-colors duration-500">{title}</span>
       </div>
       <div className="flex gap-2">
         {headerAction}
         {onClose && (
-          <button onClick={onClose} className="p-1 hover:bg-white/10 rounded-full transition-colors text-white/50 hover:text-white">
+          <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-full transition-all text-white/40 hover:text-white">
             <X size={16} />
           </button>
         )}
       </div>
     </div>
-    <div className="p-5 flex-1 overflow-auto custom-scrollbar relative z-10">
+    <div className="p-6 flex-1 overflow-auto pretty-scrollbar relative z-10">
       {children}
     </div>
   </div>
 );
 
 // --- MODULE: SONIC LAB ---
-const SonicAnalyzer = ({ playing, togglePlay }: { playing: boolean; togglePlay: () => void }) => (
-  <div className="h-full flex flex-col gap-6">
-    <div className="flex-1 bg-black/20 border border-white/5 rounded-xl flex items-end justify-center px-6 pb-6 gap-1.5 relative overflow-hidden group">
-      <div className="absolute inset-0 bg-gradient-to-t from-purple-900/20 to-transparent" />
-      {[...Array(32)].map((_, i) => (
+const SonicAnalyzer = ({ playing, togglePlay, accentColor = "#A855F7" }: { playing: boolean; togglePlay: () => void; accentColor?: string }) => (
+  <div className="h-full flex flex-col gap-8">
+    <div className="flex-1 bg-black/20 border border-white/5 rounded-[2.5rem] flex items-end justify-center px-10 pb-10 gap-2 relative overflow-hidden group shadow-inner">
+      <div className="absolute inset-0 transition-opacity duration-1000 opacity-20 group-hover:opacity-40" 
+           style={{ background: `linear-gradient(to top, ${accentColor} 0%, transparent 100%)` }} />
+      <FloatingParticles />
+      {[...Array(24)].map((_, i) => (
         <div 
           key={i} 
-          className="flex-1 bg-gradient-to-t from-purple-500 to-purple-300 rounded-t-[2px] transition-all duration-75 ease-out shadow-[0_0_15px_rgba(168,85,247,0.3)]"
+          className="flex-1 rounded-full transition-all duration-500 ease-out shadow-[0_0_15px_rgba(255,255,255,0.1)]"
           style={{ 
-            height: playing ? `${Math.random() * 80 + 10}%` : `${15 + Math.sin(i * 0.5) * 10}%`,
-            opacity: playing ? 1 : 0.4
+            height: playing ? `${Math.random() * 75 + 15}%` : `${15 + Math.sin(i * 0.4) * 10}%`,
+            background: `linear-gradient(to top, ${accentColor} 0%, white 100%)`,
+            filter: 'blur(0.5px)',
+            opacity: playing ? 0.9 : 0.2,
+            transitionDelay: `${i * 20}ms`
           }}
         />
       ))}
       <button 
         onClick={togglePlay}
-        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 backdrop-blur-sm"
+        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-700 bg-black/20 backdrop-blur-[4px]"
       >
-        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform">
-          {playing ? <Pause className="fill-black text-black" size={24} /> : <Play className="fill-black text-black ml-1" size={24} />}
+        <div className="w-24 h-24 bg-white/10 border border-white/20 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-white/20 transition-all duration-500 backdrop-blur-xl">
+          {playing ? <Pause className="fill-white text-white" size={32} /> : <Play className="fill-white text-white ml-2" size={32} />}
         </div>
       </button>
     </div>
     
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-4 gap-6 px-2">
       {['Energy', 'Valence', 'BPM', 'Dance'].map(s => (
-        <div key={s} className="bg-white/5 rounded-xl p-3 text-center border border-white/5 hover:border-purple-500/30 transition-colors cursor-pointer">
-          <div className="text-[9px] text-white/40 uppercase tracking-wider mb-1">{s}</div>
-          <div className="text-xl font-bold text-white font-mono">0.85</div>
+        <div key={s} className="bg-white/[0.01] rounded-[1.5rem] p-5 text-center border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all duration-700 cursor-pointer group relative overflow-hidden">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-700" style={{ backgroundColor: accentColor }} />
+          <div className="text-[9px] text-white/30 uppercase tracking-[0.3em] mb-2 group-hover:text-white/60 transition-colors relative z-10">{s}</div>
+          <div className="text-3xl font-light text-white/90 font-mono tracking-tighter relative z-10">0.85</div>
         </div>
       ))}
     </div>
@@ -570,7 +542,7 @@ const SonicAnalyzer = ({ playing, togglePlay }: { playing: boolean; togglePlay: 
 );
 
 // --- MODULE: RAG GRAPH ---
-const RAGNetwork = () => {
+const RAGNetwork = ({ accentColor = "#A855F7" }: { accentColor?: string }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
@@ -590,42 +562,50 @@ const RAGNetwork = () => {
   }
 
   return (
-    <div className="h-full flex flex-col gap-6">
-      <div className="flex gap-2">
-        <div className="flex-1 bg-white/5 border border-white/10 rounded-lg flex items-center px-3 py-2 gap-2">
-          <Search size={14} className="text-white/40"/>
+    <div className="h-full flex flex-col gap-8">
+      <div className="flex gap-4 p-2 bg-white/[0.02] rounded-2xl border border-white/5">
+        <div className="flex-1 flex items-center px-4 gap-3">
+          <Search size={16} className="text-white/20"/>
           <input 
             value={query}
             onChange={e => setQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
             type="text" 
-            placeholder="Query the Archive..." 
-            className="bg-transparent border-none text-xs text-white focus:outline-none w-full placeholder:text-white/20"
+            placeholder="Search the Archive..." 
+            className="bg-transparent border-none text-[13px] text-white focus:outline-none w-full placeholder:text-white/10 font-light tracking-wide"
           />
         </div>
-        <button onClick={handleSearch} className="bg-purple-600 px-4 rounded-lg text-white hover:bg-purple-500 transition-colors">
-          {searching ? <RefreshCw className="animate-spin" size={14}/> : <ChevronRight size={14}/>}
+        <button 
+          onClick={handleSearch} 
+          className="px-6 py-3 rounded-xl text-white font-bold text-[10px] tracking-widest transition-all duration-500 hover:scale-105 active:scale-95 shadow-lg flex items-center gap-2"
+          style={{ backgroundColor: accentColor }}
+        >
+          {searching ? <RefreshCw className="animate-spin" size={14}/> : 'EXECUTE'}
         </button>
       </div>
 
-      <div className="flex-1 flex flex-col gap-4">
+      <div className="flex-1 flex flex-col gap-4 overflow-hidden">
         {results.length > 0 ? (
-          <div className="space-y-2 overflow-y-auto">
+          <div className="space-y-3 overflow-y-auto pretty-scrollbar pr-2">
             {results.map(r => (
-              <div key={r.id} className="p-3 bg-white/5 border border-white/5 rounded-lg hover:border-purple-500/30 transition-all animate-in slide-in-from-bottom-2 cursor-pointer group">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-xs text-white group-hover:text-purple-300">{r.title}</span>
-                  <span className="text-[10px] bg-green-500/20 text-green-400 px-1.5 rounded font-mono">{r.score}%</span>
+              <div key={r.id} className="p-5 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.05] hover:border-white/20 transition-all duration-500 animate-in slide-in-from-bottom-4 cursor-pointer group">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="font-bold text-sm text-white/80 group-hover:text-white transition-colors tracking-tight">{r.title}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full border font-mono transition-colors" 
+                        style={{ color: accentColor, borderColor: `${accentColor}40`, backgroundColor: `${accentColor}10` }}>
+                    {r.score}% Match
+                  </span>
                 </div>
-                <div className="text-[10px] text-white/50">{r.context}</div>
+                <div className="text-[11px] text-white/40 group-hover:text-white/60 transition-colors leading-relaxed">{r.context}</div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex-1 border border-white/5 rounded-lg flex items-center justify-center relative overflow-hidden bg-black/20">
-             <div className="text-center space-y-2">
-                <Network size={32} className="text-white/20 mx-auto" />
-                <p className="text-[10px] text-white/30 font-mono">WAITING FOR QUERY</p>
+          <div className="flex-1 border border-white/5 rounded-[2rem] flex items-center justify-center relative overflow-hidden bg-black/20">
+             <div className="absolute inset-0 opacity-[0.03]" style={{ background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 70%)` }} />
+             <div className="text-center space-y-4 relative z-10">
+                <Network size={40} className="text-white/10 mx-auto group-hover:scale-110 transition-transform duration-1000" />
+                <p className="text-[10px] text-white/20 font-mono tracking-[0.5em] uppercase">SYSTEM IDLE • READY FOR ANALYSIS</p>
              </div>
           </div>
         )}
@@ -635,38 +615,56 @@ const RAGNetwork = () => {
 };
 
 // --- MODULE: DATA HUB ---
-const DataHub = () => (
-  <div className="h-full flex flex-col gap-4">
-    <div className="flex justify-between items-center">
-      <div className="flex gap-2">
-        <span className="px-2 py-1 bg-white/5 rounded text-[10px] text-white/50">245 Records</span>
-        <span className="px-2 py-1 bg-purple-500/10 text-purple-400 rounded text-[10px]">Updated Today</span>
+const DataHub = ({ accentColor = "#A855F7" }: { accentColor?: string }) => (
+  <div className="h-full flex flex-col gap-8">
+    <div className="flex justify-between items-center px-4">
+      <div className="flex gap-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-[9px] text-white/20 font-mono tracking-widest uppercase">Database Status</span>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-[10px] font-bold text-white/60 tracking-[0.2em] uppercase">245 Records</span>
+          </div>
+        </div>
+        <div className="w-[1px] h-8 bg-white/5 mx-2" />
+        <div className="flex flex-col gap-1">
+          <span className="text-[9px] text-white/20 font-mono tracking-widest uppercase">Last Update</span>
+          <span className="text-[10px] font-bold text-purple-300/80 tracking-[0.2em] uppercase">Synchronized Today</span>
+        </div>
       </div>
-      <button className="flex items-center gap-2 text-[10px] text-white/60 hover:text-white transition-colors">
-        <Download size={12}/> Export CSV
+      <button className="flex items-center gap-3 px-6 py-2.5 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold text-white/40 hover:text-white hover:border-white/30 tracking-[0.2em] uppercase transition-all duration-700 hover:scale-105 group">
+        <Download size={14} className="group-hover:translate-y-0.5 transition-transform" /> Export Neural Archive
       </button>
     </div>
-    <div className="flex-1 border border-white/10 rounded-xl overflow-hidden bg-black/20">
-      <table className="w-full text-left text-[10px] text-white/70">
-        <thead className="bg-white/5 text-white/40 sticky top-0 backdrop-blur-md">
+    <div className="flex-1 border border-white/5 rounded-[2.5rem] overflow-hidden bg-black/10 backdrop-blur-xl shadow-2xl relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-white/[0.01] to-transparent pointer-events-none" />
+      <table className="w-full text-left text-[12px] text-white/60 border-collapse">
+        <thead className="bg-white/[0.03] text-white/20 uppercase tracking-[0.3em] font-black sticky top-0 backdrop-blur-3xl border-b border-white/5 z-20">
           <tr>
-            <th className="p-3 font-medium">Title</th>
-            <th className="p-3 font-medium">Album</th>
-            <th className="p-3 font-medium">BPM</th>
-            <th className="p-3 font-medium">Sentiment</th>
+            <th className="px-8 py-6">Composition</th>
+            <th className="px-8 py-6">Source Album</th>
+            <th className="px-8 py-6 text-center">BPM</th>
+            <th className="px-8 py-6 text-right">Emotional Index</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">
+        <tbody className="divide-y divide-white/[0.02]">
           {SONG_DATABASE.map(s => (
-            <tr key={s.id} className="hover:bg-white/5 transition-colors cursor-pointer group">
-              <td className="p-3 font-medium text-white group-hover:text-purple-300">{s.title}</td>
-              <td className="p-3">{s.album}</td>
-              <td className="p-3 font-mono">{s.bpm}</td>
-              <td className="p-3">
-                <span className={`px-1.5 py-0.5 rounded ${
-                  s.sentiment === 'Joy' ? 'bg-yellow-500/10 text-yellow-400' : 
-                  s.sentiment === 'Fear' ? 'bg-red-500/10 text-red-400' : 
-                  'bg-blue-500/10 text-blue-400'
+            <tr key={s.id} className="hover:bg-white/[0.03] transition-all duration-700 cursor-pointer group">
+              <td className="px-8 py-6">
+                <div className="flex flex-col">
+                  <span className="font-bold text-white/80 group-hover:text-white transition-colors tracking-tight text-sm">{s.title}</span>
+                  <span className="text-[9px] text-white/20 uppercase tracking-widest mt-1 font-mono">Archive ID: {s.id.toString().padStart(3, '0')}</span>
+                </div>
+              </td>
+              <td className="px-8 py-6 text-white/40 group-hover:text-white/60 transition-colors font-light tracking-wide">{s.album}</td>
+              <td className="px-8 py-6 text-center">
+                <span className="font-mono text-[13px] text-white/30 group-hover:text-white/80 transition-colors" style={{ color: s.bpm > 130 ? accentColor : '' }}>{s.bpm}</span>
+              </td>
+              <td className="px-8 py-6 text-right">
+                <span className={`px-4 py-1.5 rounded-full border text-[9px] font-black tracking-[0.2em] uppercase transition-all duration-700 group-hover:scale-110 inline-block ${
+                  s.sentiment === 'Joy' ? 'bg-yellow-500/5 border-yellow-500/20 text-yellow-400/60 group-hover:bg-yellow-500/10 group-hover:text-yellow-400' : 
+                  s.sentiment === 'Fear' ? 'bg-red-500/5 border-red-500/20 text-red-400/60 group-hover:bg-red-500/10 group-hover:text-red-400' : 
+                  'bg-blue-500/5 border-blue-500/20 text-blue-400/60 group-hover:bg-blue-500/10 group-hover:text-blue-400'
                 }`}>
                   {s.sentiment}
                 </span>
@@ -690,79 +688,112 @@ const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
   if (!member) return null;
 
   return (
-    <div className="absolute inset-0 z-50 bg-[#050010]/95 backdrop-blur-3xl animate-in fade-in slide-in-from-bottom-10 duration-500 flex flex-col">
+    <div className="absolute inset-0 z-[100] bg-[#020005]/80 backdrop-blur-[60px] animate-in fade-in duration-1000 flex flex-col overflow-hidden">
+      {/* Dynamic Member Aura */}
+      <div className="absolute inset-0 pointer-events-none opacity-40">
+        <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] opacity-30 blur-[150px] animate-pulse" 
+             style={{ background: `radial-gradient(circle at 30% 30%, ${member.color} 0%, transparent 60%)` }} />
+        <div className="absolute bottom-[-20%] right-[-20%] w-[140%] h-[140%] opacity-20 blur-[150px] animate-pulse" 
+             style={{ background: `radial-gradient(circle at 70% 70%, ${member.color} 0%, transparent 60%)`, animationDelay: '-5s' }} />
+        <FloatingParticles />
+      </div>
+
       {/* Top Bar */}
-      <div className="h-20 flex items-center justify-between px-10 border-b border-white/10">
-        <div className="flex items-center gap-4">
-          <button onClick={onClose} className="p-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors">
-            <ChevronLeft size={20} className="text-white"/>
+      <div className="h-24 flex items-center justify-between px-16 border-b border-white/5 relative z-10 bg-black/20">
+        <div className="flex items-center gap-8">
+          <button onClick={onClose} className="p-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-all duration-500 hover:scale-110 group border border-white/5 hover:border-white/20">
+            <ChevronLeft size={24} className="text-white group-hover:text-purple-300 transition-colors" />
           </button>
-          <h1 className="text-xl font-bold tracking-widest text-white uppercase">Artist DNA Archive</h1>
+          <div>
+            <h1 className="text-2xl font-light tracking-[0.4em] text-white uppercase drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">Artist Profile Archive</h1>
+            <div className="text-[9px] text-white/30 font-mono tracking-[0.5em] mt-2 uppercase">Subject ID: {member.id.toUpperCase()} • Connection Stable</div>
+          </div>
         </div>
-        <div className="flex gap-2">
-           <span className="px-3 py-1 rounded-full border border-white/10 text-xs text-white/60">{member.role}</span>
+        <div className="flex gap-4">
+           <span className="px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold tracking-widest text-white/60 uppercase">{member.role}</span>
         </div>
       </div>
 
-      <div className="flex-1 p-10 overflow-y-auto">
-        <div className="max-w-6xl mx-auto grid grid-cols-12 gap-10">
+      <div className="flex-1 p-16 overflow-y-auto pretty-scrollbar relative z-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-12 gap-16 items-start">
           
           {/* Left Column: ID Card */}
-          <div className="col-span-4 space-y-8">
-             <div className="relative aspect-[3/4] rounded-3xl overflow-hidden border border-white/10 shadow-2xl group">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80" />
-                <div className="absolute inset-0 flex items-center justify-center bg-[#111]">
-                   {/* Placeholder for Artist Image */}
-                   <span className="text-6xl font-bold text-white/10">{member.id.toUpperCase()}</span>
+          <div className="col-span-5 space-y-12 animate-in slide-in-from-left-12 duration-1000">
+             <div className="relative aspect-[3/4.2] rounded-[3rem] overflow-hidden border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] group">
+                {/* Image Placeholder with Member Aura */}
+                <div className="absolute inset-0 bg-[#0a0a0f]" />
+                <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-1000" 
+                     style={{ background: `radial-gradient(circle at center, ${member.color} 0%, transparent 80%)` }} />
+                
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
+                   <BTSLogo className="w-32 h-32 text-white/5 mb-8 group-hover:scale-110 transition-transform duration-1000" />
+                   <span className="text-[120px] font-black text-white/5 tracking-tighter group-hover:text-white/[0.08] transition-colors duration-1000">{member.id.toUpperCase()}</span>
                 </div>
-                <div className="absolute bottom-0 left-0 p-8">
-                   <h2 className="text-6xl font-bold text-white mb-2 tracking-tighter">{member.name}</h2>
-                   <p className="text-purple-300 font-mono">{member.full}</p>
+
+                <div className="absolute bottom-0 left-0 w-full p-12 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
+                   <h2 className="text-7xl font-light text-white mb-4 tracking-tighter drop-shadow-2xl">{member.name}</h2>
+                   <p className="text-2xl font-light tracking-[0.2em] opacity-60" style={{ color: member.color }}>{member.full}</p>
+                   <div className="mt-8 flex gap-3">
+                      <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-bold tracking-widest text-white/40 uppercase">Mic: {member.mic}</div>
+                   </div>
                 </div>
              </div>
              
-             <div className="p-6 bg-white/5 rounded-2xl border border-white/10 hover:border-purple-500/30 transition-colors">
-                <div className="flex items-center gap-3 mb-4 text-purple-400">
-                   <PenTool size={20}/>
-                   <span className="text-xs font-bold tracking-widest uppercase">KOMCA Credits</span>
+             <div className="p-8 bg-white/[0.02] backdrop-blur-2xl rounded-[2.5rem] border border-white/5 hover:border-white/20 transition-all duration-700 shadow-2xl group">
+                <div className="flex items-center gap-4 mb-6" style={{ color: member.color }}>
+                   <PenTool size={22} className="group-hover:animate-bounce" />
+                   <span className="text-[11px] font-black tracking-[0.4em] uppercase opacity-60">KOMCA Credits</span>
                 </div>
-                <div className="text-5xl font-bold text-white">{member.komca}</div>
-                <div className="text-xs text-white/40 mt-2">Registered Songs</div>
+                <div className="flex items-end gap-4">
+                   <div className="text-7xl font-light text-white tracking-tighter">{member.komca}</div>
+                   <div className="text-[10px] text-white/30 mb-3 font-mono tracking-widest uppercase">Verified Productions</div>
+                </div>
+                <div className="mt-8 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                   <div className="h-full bg-current transition-all duration-1000 w-[70%]" style={{ backgroundColor: member.color, width: `${(member.komca / 220) * 100}%` }} />
+                </div>
              </div>
           </div>
 
           {/* Right Column: Data */}
-          <div className="col-span-8 space-y-8">
+          <div className="col-span-7 space-y-16 animate-in slide-in-from-right-12 duration-1000">
              {/* Bio */}
-             <div>
-                <h3 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-4">Profile Analysis</h3>
-                <p className="text-xl text-white/90 leading-relaxed font-light border-l-2 border-purple-500 pl-6">
+             <div className="space-y-6">
+                <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.5em]">Subject Profile Analysis</h3>
+                <p className="text-3xl text-white/80 leading-[1.6] font-extralight border-l-4 pl-12 transition-all duration-1000 hover:border-white/40" style={{ borderColor: member.color }}>
                    {member.bio}
                 </p>
              </div>
 
              {/* Solo Discography */}
-             <div>
-                <h3 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-4">Key Productions & Solos</h3>
-                <div className="grid grid-cols-3 gap-4">
-                   {member.soloTracks.map(track => (
-                      <div key={track} className="p-4 bg-white/5 rounded-xl border border-white/5 hover:bg-white/10 hover:border-purple-500/50 transition-all cursor-pointer group">
-                         <Disc className="text-white/20 mb-3 group-hover:text-purple-400 transition-colors" size={24}/>
-                         <div className="font-bold text-white">{track}</div>
-                         <div className="text-xs text-white/40 mt-1">Single</div>
+             <div className="space-y-8">
+                <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.5em]">Neural Discography Link</h3>
+                <div className="grid grid-cols-2 gap-6">
+                   {member.soloTracks.map((track, i) => (
+                      <div key={track} className="p-6 bg-white/[0.02] rounded-[2rem] border border-white/5 hover:bg-white/[0.05] hover:border-white/20 transition-all duration-700 cursor-pointer group flex items-center gap-6">
+                         <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                            <Disc className="text-white/20 group-hover:text-white transition-colors" style={{ color: i === 0 ? member.color : '' }} size={28}/>
+                         </div>
+                         <div>
+                            <div className="font-bold text-lg text-white group-hover:text-purple-200 transition-colors tracking-tight">{track}</div>
+                            <div className="text-[10px] text-white/30 mt-1 uppercase tracking-widest font-mono">Archive Record 0{i+1}</div>
+                         </div>
                       </div>
                    ))}
                 </div>
              </div>
 
              {/* Achievements */}
-             <div>
-                <h3 className="text-sm font-bold text-white/40 uppercase tracking-widest mb-4">Achievements</h3>
-                <div className="flex flex-col gap-3">
-                   {member.achievements.map(ach => (
-                      <div key={ach} className="flex items-center gap-4 p-4 bg-gradient-to-r from-white/5 to-transparent rounded-xl border-l-4 border-purple-500">
-                         <Award className="text-yellow-400" size={20}/>
-                         <span className="text-white font-medium">{ach}</span>
+             <div className="space-y-8">
+                <h3 className="text-[11px] font-black text-white/30 uppercase tracking-[0.5em]">Milestone Archive</h3>
+                <div className="grid grid-cols-1 gap-4">
+                   {member.achievements.map((ach, i) => (
+                      <div key={ach} 
+                           className="flex items-center gap-8 p-6 bg-gradient-to-r from-white/[0.03] to-transparent rounded-[1.5rem] border-l-4 group transition-all duration-500 hover:translate-x-2"
+                           style={{ borderColor: member.color, animationDelay: `${i * 0.2}s` }}>
+                         <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center">
+                            <Award className="text-white/40 group-hover:text-yellow-400 transition-colors" size={20}/>
+                         </div>
+                         <span className="text-lg text-white/70 font-light tracking-wide group-hover:text-white transition-colors">{ach}</span>
                       </div>
                    ))}
                 </div>
@@ -818,19 +849,14 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
 
   const handleSync = () => {
-    console.log("Sync complete! Triggering Warp mode...");
-    setMode('warp');
-    setTimeout(() => {
-      console.log("Warp complete! Opening Dashboard.");
-      setMode('dashboard');
-    }, 2000);
+    setMode('dashboard');
   };
 
   return (
-    <div className="relative w-screen h-screen bg-black text-white font-sans overflow-hidden selection:bg-purple-500/50">
+    <div className="relative w-screen h-screen bg-[#020005] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white">
       <NoiseOverlay />
 
-      {/* 1. UNIVERSE LAYER */}
+      {/* 1. UNIVERSE LAYER - PERSISTENT */}
       <Universe3D mode={mode} />
 
       {/* 2. LANDING */}
@@ -838,102 +864,120 @@ export default function App() {
 
       {/* 3. DASHBOARD */}
       {mode === 'dashboard' && !activeMemberId && (
-        <div className="absolute inset-0 z-10 flex animate-in fade-in duration-1000">
+        <div className="absolute inset-0 z-10 flex animate-in fade-in zoom-in-95 duration-1000">
           
+          {/* Dashboard Background Elements */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute top-[10%] right-[5%] w-[50%] h-[50%] bg-[radial-gradient(circle_at_center,_#3b0764_0%,_transparent_70%)] opacity-30 blur-[120px] animate-pulse" />
+            <div className="absolute bottom-[10%] left-[5%] w-[40%] h-[40%] bg-[radial-gradient(circle_at_center,_#1e1b4b_0%,_transparent_70%)] opacity-25 blur-[120px] animate-pulse" style={{ animationDelay: '-5s' }} />
+            <FloatingParticles />
+          </div>
+
           {/* Sidebar */}
-          <div className="w-20 bg-[#0A051A]/80 backdrop-blur-xl border-r border-white/10 flex flex-col items-center py-8 gap-8 z-50">
-            <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center border border-white/20 shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-              <BTSLogo className="w-5 h-5 text-white" />
+          <div className="w-28 bg-black/40 backdrop-blur-3xl border-r border-white/5 flex flex-col items-center py-12 gap-12 z-50 shadow-2xl relative">
+            <div className="w-16 h-16 bg-white/[0.03] border border-white/10 rounded-[1.5rem] flex items-center justify-center shadow-inner group cursor-pointer hover:border-purple-500/50 transition-all duration-700 hover:bg-white/[0.05]">
+              <BTSLogo className="w-8 h-8 text-white group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(168,85,247,0.8)] transition-all duration-700" />
             </div>
             
-            <nav className="flex flex-col gap-6 w-full px-3">
+            <nav className="flex flex-col gap-10 w-full px-5 mt-4">
               {[
-                { id: 'overview', icon: Layers, label: 'Dash' },
+                { id: 'overview', icon: Layers, label: 'Control' },
                 { id: 'sonic', icon: Activity, label: 'Sonic' },
-                { id: 'rag', icon: Network, label: 'Graph' },
-                { id: 'data', icon: Database, label: 'Data' },
+                { id: 'rag', icon: Network, label: 'Archive' },
+                { id: 'data', icon: Database, label: 'Records' },
               ].map(item => (
                 <button 
                   key={item.id}
                   onClick={() => setActiveSection(item.id)}
                   className={`
-                    p-3 rounded-xl transition-all duration-500 relative group
+                    p-5 rounded-3xl transition-all duration-1000 relative group
                     ${activeSection === item.id 
-                      ? 'bg-purple-600/20 text-purple-300 shadow-[0_0_25px_rgba(147,51,234,0.4)] border border-purple-500/50' 
-                      : 'text-white/30 hover:text-white/60 hover:bg-white/5'}
+                      ? 'bg-purple-600/15 text-purple-300 shadow-[0_0_30px_rgba(168,85,247,0.1)] border border-purple-500/30' 
+                      : 'text-white/10 hover:text-white/40 hover:bg-white/[0.03] border border-transparent'}
                   `}
                 >
-                  <item.icon size={20} className={activeSection === item.id ? "animate-[pulse-glow_3s_infinite]" : ""} />
+                  <item.icon size={24} className={activeSection === item.id ? "animate-[pulse-glow_4s_infinite]" : "group-hover:scale-110 transition-transform duration-700"} />
                   {activeSection === item.id && (
-                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1 h-8 bg-purple-500 rounded-r-full shadow-[0_0_15px_#9333ea]" />
+                    <div className="absolute -left-5 top-1/2 -translate-y-1/2 w-2 h-12 bg-purple-500 rounded-r-full shadow-[0_0_30px_rgba(168,85,247,0.8)]" />
                   )}
+                  {/* Tooltip */}
+                  <div className="absolute left-full ml-6 px-4 py-2 bg-purple-900/90 backdrop-blur-2xl border border-white/10 rounded-xl text-[10px] font-bold tracking-[0.3em] text-white opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-500 translate-x-[-20px] group-hover:translate-x-0 shadow-2xl z-[100] uppercase">
+                    {item.label}
+                  </div>
                 </button>
               ))}
             </nav>
 
-            <div className="mt-auto flex flex-col gap-4">
-               <button className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-                  <Settings size={18} className="text-white/50"/>
+            <div className="mt-auto flex flex-col gap-8 mb-6">
+               <button className="w-14 h-14 rounded-[1.25rem] bg-white/[0.02] border border-white/5 hover:border-white/30 flex items-center justify-center transition-all duration-700 group hover:bg-white/[0.05]">
+                  <Settings size={22} className="text-white/20 group-hover:text-white transition-all duration-700 group-hover:rotate-90" />
                </button>
             </div>
           </div>
 
           {/* Content Area */}
-          <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex-1 flex flex-col min-w-0 relative z-10">
              
              {/* Header */}
-             <header className="h-20 flex items-center justify-between px-8 bg-gradient-to-b from-[#020005]/80 to-transparent pointer-events-auto">
-                <div>
-                   <h1 className="text-2xl font-bold tracking-tight text-white drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">
-                      {activeSection === 'overview' ? 'MISSION CONTROL' : activeSection === 'sonic' ? 'SONIC LAB' : activeSection === 'rag' ? 'KNOWLEDGE GRAPH' : 'DATA HUB'}
+             <header className="h-28 flex items-center justify-between px-16 bg-gradient-to-b from-black/40 to-transparent pointer-events-auto border-b border-white/[0.03]">
+                <div className="animate-in slide-in-from-left-10 duration-1000">
+                   <h1 className="text-4xl font-extralight tracking-[0.3em] text-white drop-shadow-[0_0_30px_rgba(168,85,247,0.4)] uppercase">
+                      {activeSection === 'overview' ? 'Mission Control' : activeSection === 'sonic' ? 'Sonic Lab' : activeSection === 'rag' ? 'Archive Graph' : 'Records Hub'}
                    </h1>
-                   <div className="flex items-center gap-2 text-[10px] text-purple-300 font-mono tracking-widest mt-1">
-                      <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"/> SYSTEM ONLINE
+                   <div className="flex items-center gap-4 text-[10px] text-purple-300/60 font-mono tracking-[0.4em] mt-3 font-bold">
+                      <span className="flex h-2 w-2 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500 shadow-[0_0_15px_rgba(74,222,128,0.6)]"></span>
+                      </span>
+                      SYSTEM OPERATIONAL • ARCHIVE SYNCHRONIZED
                    </div>
                 </div>
 
-                {/* Member Selectors */}
-                <div className="flex gap-3 bg-black/20 backdrop-blur-xl border border-white/10 p-2 rounded-full shadow-2xl">
+                {/* Member Selectors - Prettier and softer */}
+                <div className="flex gap-4 bg-white/[0.02] backdrop-blur-3xl border border-white/10 px-8 py-4 rounded-[2.5rem] shadow-2xl animate-in slide-in-from-right-10 duration-1000">
                    {MEMBER_DATA.map(m => (
                       <button 
                          key={m.id}
                          onClick={() => setActiveMemberId(m.id)}
-                         className="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-bold transition-all border border-transparent hover:border-white/50 hover:bg-white/10 text-white/60 hover:text-white"
+                         className="w-12 h-12 rounded-[1rem] flex items-center justify-center text-[11px] font-bold transition-all duration-700 border border-transparent hover:border-white/20 hover:bg-white/[0.04] text-white/20 hover:text-white relative group overflow-hidden"
                          style={{ color: m.color }}
                       >
-                         {m.name}
+                         <span className="relative z-10 transition-all duration-700 group-hover:scale-125 group-hover:text-white">{m.name}</span>
+                         <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-[0.1] transition-opacity duration-700" />
+                         <div className="absolute bottom-[-18px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-current opacity-0 group-hover:opacity-100 blur-[3px] transition-all duration-700 group-hover:translate-y-[-8px] shadow-[0_0_15px_currentColor]" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-current/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                       </button>
                    ))}
                 </div>
              </header>
 
              {/* Main Views */}
-             <main className="flex-1 p-8 overflow-hidden relative">
+             <main className="flex-1 p-12 overflow-hidden relative">
                 
                 {/* OVERVIEW MODE */}
                 {activeSection === 'overview' && (
-                   <div className="grid grid-cols-12 gap-6 h-full">
-                      <div className="col-span-8 flex flex-col gap-6">
-                         <GlassHUD title="Live Waveform" icon={Activity} className="h-64">
+                   <div className="grid grid-cols-12 gap-8 h-full">
+                      <div className="col-span-8 flex flex-col gap-8">
+                         <GlassHUD title="Live Waveform Analysis" icon={Activity} className="h-72">
                             <SonicAnalyzer playing={playing} togglePlay={() => setPlaying(!playing)} />
                          </GlassHUD>
-                         <div className="flex-1 grid grid-cols-2 gap-6">
-                            <GlassHUD title="Recent Queries" icon={Search} className="h-full">
-                               <div className="space-y-2">
-                                  {['Themes of "Love"', 'BPM > 120', 'Songwriter: RM'].map((q, i) => (
-                                     <div key={i} className="p-3 bg-white/5 rounded border border-white/5 text-xs text-white/70 flex justify-between">
-                                        <span>{q}</span>
-                                        <ChevronRight size={14} className="text-white/30"/>
+                         <div className="flex-1 grid grid-cols-2 gap-8">
+                            <GlassHUD title="Recent Neural Queries" icon={Search} className="h-full">
+                               <div className="space-y-4">
+                                  {['Themes of "Love"', 'BPM > 120', 'Lyricist Analysis'].map((q, i) => (
+                                     <div key={i} className="px-6 py-5 bg-white/[0.02] rounded-3xl border border-white/[0.03] text-[12px] text-white/50 flex justify-between items-center hover:bg-white/[0.04] hover:border-purple-500/20 transition-all duration-700 cursor-pointer group">
+                                        <span className="group-hover:text-white transition-colors duration-500 tracking-wider font-medium">{q}</span>
+                                        <ChevronRight size={18} className="text-white/10 group-hover:text-purple-400 transition-all duration-700 translate-x-[-8px] group-hover:translate-x-0"/>
                                      </div>
                                   ))}
                                </div>
                             </GlassHUD>
-                            <GlassHUD title="System Status" icon={Cpu} className="h-full">
-                               <div className="space-y-4 pt-2">
-                                  {['Vector Index', 'Audio Engine', 'Lyrics Model'].map(s => (
-                                     <div key={s} className="flex justify-between items-center">
-                                        <span className="text-xs text-white/60">{s}</span>
-                                        <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded">ACTIVE</span>
+                            <GlassHUD title="Neural Sub-Systems" icon={Cpu} className="h-full">
+                               <div className="space-y-8 pt-4">
+                                  {['Vector Engine', 'Harmonic Processor', 'Archive Link'].map(s => (
+                                     <div key={s} className="flex justify-between items-center px-4">
+                                        <span className="text-[11px] text-white/40 font-black tracking-[0.3em] uppercase">{s}</span>
+                                        <span className="text-[9px] font-black tracking-[0.2em] bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-1.5 rounded-full shadow-[0_0_20px_rgba(34,197,94,0.1)]">ONLINE</span>
                                      </div>
                                   ))}
                                </div>
@@ -941,7 +985,7 @@ export default function App() {
                          </div>
                       </div>
                       <div className="col-span-4">
-                         <GlassHUD title="Neural Lyricist" icon={Mic2} className="h-full">
+                         <GlassHUD title="Neural Lyricist AI" icon={Mic2} className="h-full">
                             <LyricistAI />
                          </GlassHUD>
                       </div>
@@ -950,8 +994,8 @@ export default function App() {
 
                 {/* SONIC MODE */}
                 {activeSection === 'sonic' && (
-                   <div className="h-full max-w-5xl mx-auto">
-                      <GlassHUD title="Audio Vector Analysis" icon={Activity} className="h-full">
+                   <div className="h-full max-w-5xl mx-auto flex flex-col animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                      <GlassHUD title="High-Fidelity Vector Analysis" icon={Activity} className="flex-1">
                          <SonicAnalyzer playing={playing} togglePlay={() => setPlaying(!playing)} />
                       </GlassHUD>
                    </div>
@@ -959,8 +1003,8 @@ export default function App() {
 
                 {/* GRAPH MODE */}
                 {activeSection === 'rag' && (
-                   <div className="h-full max-w-4xl mx-auto">
-                      <GlassHUD title="Knowledge Graph Explorer" icon={Network} className="h-full">
+                   <div className="h-full max-w-4xl mx-auto flex flex-col animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                      <GlassHUD title="Knowledge Archive Explorer" icon={Network} className="flex-1">
                          <RAGNetwork />
                       </GlassHUD>
                    </div>
@@ -968,8 +1012,8 @@ export default function App() {
 
                 {/* DATA MODE */}
                 {activeSection === 'data' && (
-                   <div className="h-full max-w-6xl mx-auto">
-                      <GlassHUD title="Raw Discography Data" icon={Database} className="h-full">
+                   <div className="h-full max-w-6xl mx-auto flex flex-col animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                      <GlassHUD title="Global Discography Archive" icon={Database} className="flex-1">
                          <DataHub />
                       </GlassHUD>
                    </div>
