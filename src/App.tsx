@@ -847,6 +847,7 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('overview'); // overview, rag, sonic, data
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleSync = () => {
     setMode('dashboard');
@@ -875,7 +876,9 @@ export default function App() {
 
           {/* Sidebar */}
           <div className="w-28 bg-black/40 backdrop-blur-3xl border-r border-white/5 flex flex-col items-center py-12 gap-12 z-50 shadow-2xl relative">
-            <div className="w-16 h-16 bg-white/[0.03] border border-white/10 rounded-[1.5rem] flex items-center justify-center shadow-inner group cursor-pointer hover:border-purple-500/50 transition-all duration-700 hover:bg-white/[0.05]">
+            <div 
+              onClick={() => setMode('landing')}
+              className="w-16 h-16 bg-white/[0.03] border border-white/10 rounded-[1.5rem] flex items-center justify-center shadow-inner group cursor-pointer hover:border-purple-500/50 transition-all duration-700 hover:bg-white/[0.05]">
               <BTSLogo className="w-8 h-8 text-white group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(168,85,247,0.8)] transition-all duration-700" />
             </div>
             
@@ -909,7 +912,9 @@ export default function App() {
             </nav>
 
             <div className="mt-auto flex flex-col gap-8 mb-6">
-               <button className="w-14 h-14 rounded-[1.25rem] bg-white/[0.02] border border-white/5 hover:border-white/30 flex items-center justify-center transition-all duration-700 group hover:bg-white/[0.05]">
+               <button 
+                 onClick={() => setShowSettings(true)}
+                 className="w-14 h-14 rounded-[1.25rem] bg-white/[0.02] border border-white/5 hover:border-white/30 flex items-center justify-center transition-all duration-700 group hover:bg-white/[0.05]">
                   <Settings size={22} className="text-white/20 group-hover:text-white transition-all duration-700 group-hover:rotate-90" />
                </button>
             </div>
@@ -951,8 +956,8 @@ export default function App() {
                 </div>
              </header>
 
-             {/* Main Views */}
-             <main className="flex-1 p-12 overflow-hidden relative">
+            {/* Main Views */}
+            <main className="flex-1 p-12 pb-24 overflow-y-auto relative pretty-scrollbar">
                 
                 {/* OVERVIEW MODE */}
                 {activeSection === 'overview' && (
@@ -1027,6 +1032,68 @@ export default function App() {
       {/* 4. MEMBER DETAIL OVERLAY (FULL SCREEN) */}
       {activeMemberId && (
          <MemberDNA memberId={activeMemberId} onClose={() => setActiveMemberId(null)} />
+      )}
+
+      {/* 5. SETTINGS OVERLAY */}
+      {showSettings && (
+        <div className="absolute inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center animate-in fade-in duration-300">
+            <div className="w-[500px] max-w-[90vw] h-[600px] max-h-[90vh]">
+                <GlassHUD title="System Configuration" icon={Settings} onClose={() => setShowSettings(false)}>
+                    <div className="space-y-8">
+                        {/* Audio Section */}
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest">Audio Interface</h3>
+                            <div className="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-colors">
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-bold text-white/90">Dolby Atmos (Virtual)</span>
+                                    <span className="text-[10px] text-white/40 uppercase tracking-wider">Spatial Audio Engine</span>
+                                </div>
+                                <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e] animate-pulse" />
+                            </div>
+                        </div>
+
+                        {/* Graphics Section */}
+                        <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest">Visual Processing</h3>
+                            <div className="grid grid-cols-3 gap-3">
+                                {['Eco', 'Balanced', 'Ultra'].map((mode, i) => (
+                                    <button key={mode} className={`
+                                        py-3 rounded-xl border text-[10px] font-bold tracking-widest uppercase transition-all duration-300
+                                        ${i === 2 
+                                            ? 'bg-purple-500/20 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]' 
+                                            : 'bg-white/5 border-white/5 text-white/40 hover:bg-white/10 hover:text-white/60'}
+                                    `}>
+                                        {mode}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Notifications */}
+                         <div className="space-y-4">
+                            <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest">Neural Link</h3>
+                            <div className="space-y-3">
+                                {['System Alerts', 'Background Sync', 'Haptic Feedback'].map((item) => (
+                                    <div key={item} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
+                                        <span className="text-sm text-white/60 group-hover:text-white transition-colors">{item}</span>
+                                        <div className="w-10 h-5 bg-purple-900/40 rounded-full relative border border-white/10 transition-colors group-hover:border-purple-500/50">
+                                            <div className="absolute right-1 top-1 bottom-1 w-3 bg-purple-400 rounded-full shadow-lg" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                         {/* System Info */}
+                         <div className="pt-6 border-t border-white/5 text-center">
+                            <p className="text-[10px] text-white/20 font-mono uppercase tracking-[0.2em]">
+                                BTS Universe v2.4.0 • Build 2024.03.09
+                            </p>
+                         </div>
+                    </div>
+                </GlassHUD>
+            </div>
+        </div>
       )}
 
     </div>
