@@ -1,357 +1,368 @@
-# Contributing to BTS Neural Archive
+# 💜 Contributing to BTS Neural Archive
 
-First off, thank you for considering contributing to the BTS Neural Archive! 💜
+First off, thank you for considering contributing to the BTS Neural Archive! This project is a labor of love, combining data visualization with the artistry and emotion of BTS's music.
 
-## Table of Contents
+## 🌟 Code of Conduct
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Workflow](#development-workflow)
-- [Coding Standards](#coding-standards)
-- [Project Architecture](#project-architecture)
-- [Commit Guidelines](#commit-guidelines)
-- [Pull Request Process](#pull-request-process)
+### Our Pledge
 
-## Code of Conduct
+In the spirit of BTS's message of self-love and acceptance, we pledge to make participation in this project a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
-This project follows the principles of respect, inclusivity, and collaboration inspired by BTS and ARMY values. Be kind, be respectful, and help create a positive environment for everyone.
+### Expected Behavior
 
-## Getting Started
+- Be respectful and inclusive
+- Welcome newcomers warmly
+- Accept constructive criticism gracefully
+- Focus on what's best for the community
+- Show empathy towards others
 
-### Prerequisites
+## 🚀 Getting Started
 
-Before you begin, ensure you have the following installed:
-- Node.js (v18 or higher)
-- npm or yarn
-- Git
-- A code editor (VS Code recommended)
+### Development Setup
 
-### Setting Up Your Development Environment
-
-1. **Fork the repository** to your GitHub account
-
-2. **Clone your fork locally:**
+1. **Fork the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/BTS-universe.git
+   # Click the 'Fork' button on GitHub
+   ```
+
+2. **Clone your fork**
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/BTS-universe.git
    cd BTS-universe
    ```
 
-3. **Add the upstream repository:**
+3. **Add upstream remote**
    ```bash
    git remote add upstream https://github.com/itsmepraks/BTS-universe.git
    ```
 
-4. **Install dependencies:**
+4. **Install dependencies**
    ```bash
    npm install
    ```
 
-5. **Start the development server:**
+5. **Start development server**
    ```bash
    npm run dev
    ```
 
-6. **Open your browser** and navigate to `http://localhost:5173`
+### Development Workflow
 
-## Development Workflow
+1. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-new-feature
+   ```
 
-### Creating a Feature Branch
+2. **Make your changes**
+   - Write clean, readable code
+   - Follow existing code style
+   - Add comments for complex logic
 
-Always create a new branch for your work:
+3. **Test thoroughly**
+   - Test across different screen sizes
+   - Check for console errors
+   - Verify animations are smooth
 
-```bash
-git checkout -b feature/your-feature-name
-# or
-git checkout -b fix/bug-description
-```
+4. **Commit your changes**
+   ```bash
+   git commit -m "feat: add amazing new feature"
+   ```
 
-Branch naming conventions:
-- `feature/` - New features
-- `fix/` - Bug fixes
-- `docs/` - Documentation updates
-- `refactor/` - Code refactoring
-- `style/` - UI/styling changes
-- `test/` - Adding or updating tests
+5. **Push to your fork**
+   ```bash
+   git push origin feature/amazing-new-feature
+   ```
 
-### Keeping Your Fork Updated
+6. **Open a Pull Request**
+   - Describe your changes clearly
+   - Reference any related issues
+   - Include screenshots if applicable
 
-Regularly sync your fork with the upstream repository:
-
-```bash
-git fetch upstream
-git checkout main
-git merge upstream/main
-```
-
-## Coding Standards
-
-### TypeScript
-
-- **Use TypeScript** for all new code
-- Define proper interfaces and types
-- Avoid using `any` - use `unknown` if type is truly unknown
-- Enable strict mode in TypeScript config
-
-Example:
-```typescript
-interface Member {
-  id: string;
-  name: string;
-  full: string;
-  color: string;
-  role: string;
-}
-
-const getMember = (id: string): Member | undefined => {
-  return MEMBER_DATA.find(m => m.id === id);
-};
-```
-
-### React Components
-
-- Use **functional components** with hooks
-- Prefer **named exports** for components
-- Use `React.FC` or explicit typing for props
-- Memoize expensive computations with `useMemo`
-- Memoize callbacks with `useCallback`
-
-Example:
-```typescript
-interface ButtonProps {
-  label: string;
-  onClick: () => void;
-  variant?: 'primary' | 'secondary';
-}
-
-const Button: React.FC<ButtonProps> = ({ label, onClick, variant = 'primary' }) => {
-  return (
-    <button onClick={onClick} className={`btn-${variant}`}>
-      {label}
-    </button>
-  );
-};
-```
-
-### Styling
-
-- Use **Tailwind CSS** utility classes
-- Follow the existing color palette (Borahae purple theme)
-- Maintain responsive design principles
-- Use CSS modules or styled-components for complex styles
-
-Color palette:
-```css
---purple-primary: #A855F7
---purple-light: #D8B4FE
---purple-accent: #818CF8
---deep-space: #020005
-```
-
-### File Organization
-
-Keep files organized and modular:
-
-```
-src/
-├── components/        # Reusable components
-│   ├── Universe/      # Universe-related components
-│   ├── Dashboard/     # Dashboard modules
-│   └── UI/            # Generic UI components
-├── types/             # TypeScript type definitions
-├── utils/             # Utility functions
-├── hooks/             # Custom React hooks
-├── constants/         # Constants and config
-└── data/              # Static data
-```
-
-### Code Quality
-
-- **ESLint**: Ensure no linting errors before committing
-  ```bash
-  npm run lint
-  ```
-
-- **Type checking**: Run TypeScript compiler
-  ```bash
-  tsc --noEmit
-  ```
-
-- **Formatting**: Use consistent formatting (Prettier recommended)
-
-## Project Architecture
-
-### Key Concepts
-
-1. **Component Hierarchy:**
-   - `App.tsx` - Main application orchestrator
-   - `Universe3D` - Persistent background layer
-   - `LandingRitual` - Entry experience
-   - Dashboard modules (SonicLab, RAG, DataHub, etc.)
-
-2. **State Management:**
-   - Local state with `useState` for component-specific data
-   - Consider Context API for deeply nested state
-   - Memoization for performance optimization
-
-3. **Animation Philosophy:**
-   - Smooth, cosmic-themed transitions
-   - Use CSS animations for performance
-   - Maintain 60fps for scrolling and interactions
-
-## Commit Guidelines
+## 📝 Commit Message Convention
 
 We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
-### Commit Message Format
-
 ```
-<type>(<scope>): <subject>
+<type>(<scope>): <description>
 
-<body>
+[optional body]
 
-<footer>
+[optional footer]
 ```
 
 ### Types
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, no code change)
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation changes
+- **style**: Code style changes (formatting, missing semi-colons, etc.)
+- **refactor**: Code refactoring without feature changes
+- **perf**: Performance improvements
+- **test**: Adding or updating tests
+- **chore**: Maintenance tasks
 
 ### Examples
 
 ```bash
-feat(sonic-lab): add real-time BPM detection
-
-Implement live BPM analysis using Web Audio API. The waveform
-now updates dynamically based on actual audio input.
-
-Closes #23
-```
-
-```bash
-fix(member-profile): correct KOMCA credit calculation
-
-The previous calculation was using outdated data. Updated to
-reflect current KOMCA registry information.
-```
-
-```bash
+feat(sonic-lab): add real-time spectrum analyzer
+fix(member-dna): correct KOMCA credit display for J-Hope
 docs(readme): update installation instructions
-
-Added troubleshooting section for common setup issues.
+style(app): improve glass panel border styling
+refactor(universe): extract star generation to utility function
+perf(waveform): optimize animation frame rate
 ```
 
-## Pull Request Process
+## 🎨 Code Style Guidelines
 
-### Before Submitting
+### TypeScript
 
-1. **Test your changes thoroughly**
-   - Run `npm run dev` and manually test
-   - Check responsive behavior
-   - Test in multiple browsers if possible
+- Use TypeScript for all new files
+- Define interfaces for all props and state
+- Avoid `any` type - use `unknown` if necessary
+- Use meaningful variable and function names
 
-2. **Run quality checks:**
-   ```bash
-   npm run lint
-   npm run build
-   ```
+```typescript
+// ✅ Good
+interface MemberProfileProps {
+  memberId: string;
+  onClose: () => void;
+  accentColor?: string;
+}
 
-3. **Update documentation** if needed
-   - Update README.md for new features
-   - Add JSDoc comments for new functions
-   - Update AESTHETIC_PLAN.md for design changes
+const MemberProfile: React.FC<MemberProfileProps> = ({ memberId, onClose }) => {
+  // Implementation
+};
 
-### Submitting Your PR
+// ❌ Avoid
+function Thing(props: any) {
+  // Implementation
+}
+```
 
-1. **Push your branch** to your fork:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
+### React Components
 
-2. **Create a Pull Request** on GitHub with:
-   - Clear, descriptive title
-   - Detailed description of changes
-   - Screenshots/videos for UI changes
-   - Reference to related issues
+- Use functional components with hooks
+- Keep components focused and single-purpose
+- Extract reusable logic into custom hooks
+- Use `useMemo` and `useCallback` for expensive operations
 
-3. **PR Description Template:**
-   ```markdown
-   ## Description
-   Brief description of what this PR does
+```typescript
+// ✅ Good - Memoized expensive calculation
+const stars = useMemo(() => {
+  return [...Array(800)].map(() => ({
+    x: Math.random() * 1000,
+    y: Math.random() * 1000,
+    color: COLORS[Math.floor(Math.random() * COLORS.length)]
+  }));
+}, []);
 
-   ## Type of Change
-   - [ ] Bug fix
-   - [ ] New feature
-   - [ ] Breaking change
-   - [ ] Documentation update
+// ❌ Avoid - Recalculated on every render
+const stars = [...Array(800)].map(() => ({ ... }));
+```
 
-   ## Changes Made
-   - Change 1
-   - Change 2
+### CSS & Styling
 
-   ## Screenshots (if applicable)
-   [Add screenshots here]
+- Use Tailwind CSS utility classes
+- Keep custom CSS minimal
+- Use CSS variables for colors when needed
+- Maintain the cosmic/glassmorphic aesthetic
 
-   ## Testing
-   How has this been tested?
+```tsx
+// ✅ Good - Tailwind utilities with consistent styling
+<div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 hover:border-purple-500/30 transition-all duration-700">
+  {/* Content */}
+</div>
 
-   ## Checklist
-   - [ ] Code follows project style guidelines
-   - [ ] Self-review completed
-   - [ ] Documentation updated
-   - [ ] No console errors
-   ```
+// ❌ Avoid - Inline styles (unless dynamic)
+<div style={{ background: 'rgba(255,255,255,0.05)', padding: '32px' }}>
+  {/* Content */}
+</div>
+```
 
-### Review Process
+### Naming Conventions
 
-- PRs require at least one review
-- Address all review comments
-- Keep discussions professional and constructive
-- Update your PR based on feedback
+- **Components**: PascalCase (`MemberProfile`, `SonicAnalyzer`)
+- **Files**: Same as component name (`MemberProfile.tsx`)
+- **Functions**: camelCase (`handleClick`, `formatDuration`)
+- **Constants**: UPPER_SNAKE_CASE (`MEMBER_DATA`, `SONG_DATABASE`)
+- **Interfaces**: PascalCase with descriptive names (`MemberProfileProps`)
 
-## Areas for Contribution
+## 🎯 Areas to Contribute
 
-### High Priority
-- Performance optimization for 3D starfield
-- Accessibility improvements (ARIA labels, keyboard navigation)
-- Mobile responsiveness enhancements
-- Loading states and error handling
+### 🐛 Bug Fixes
 
-### Feature Ideas
-- Actual Spotify API integration for real music data
-- User preferences/settings persistence
-- Light/dark mode toggle (while maintaining aesthetic)
-- Enhanced search algorithms
-- Member profile photo integration
-- Real-time lyrics display
+- Report bugs with detailed reproduction steps
+- Include screenshots or screen recordings
+- Check if the issue exists in the latest version
 
-### Documentation
-- Component API documentation
-- Architecture diagrams
-- Tutorial videos or GIFs
-- Translation of UI text
+### ✨ New Features
 
-## Questions?
+Before implementing a new feature:
+1. Open an issue to discuss it
+2. Wait for approval/feedback
+3. Keep the feature aligned with the project's aesthetic
 
-Feel free to:
-- Open an issue for questions
-- Start a discussion in GitHub Discussions
-- Reach out to [@itsmepraks](https://github.com/itsmepraks)
+Ideas for features:
+- Mobile responsive optimizations
+- Spotify API integration for real track data
+- Interactive BTS timeline
+- Lyric analysis visualization
+- Fan art gallery integration
+- Accessibility improvements
 
-## Recognition
+### 📚 Documentation
 
-Contributors will be acknowledged in:
-- README.md contributors section
-- Release notes for significant contributions
+- Improve README clarity
+- Add code comments
+- Create tutorials or guides
+- Fix typos and grammatical errors
+
+### 🎨 Design Improvements
+
+- Enhance animations
+- Improve color schemes
+- Optimize loading states
+- Add micro-interactions
+
+### ⚡ Performance Optimization
+
+- Reduce bundle size
+- Optimize animations (use `transform` and `opacity`)
+- Implement code splitting
+- Add lazy loading for heavy components
+
+## 🧪 Testing Guidelines
+
+### Manual Testing Checklist
+
+- [ ] Test on Chrome, Firefox, Safari, and Edge
+- [ ] Test responsive behavior (mobile, tablet, desktop)
+- [ ] Verify animations are smooth (60fps)
+- [ ] Check for console errors/warnings
+- [ ] Test keyboard navigation
+- [ ] Verify color contrast for accessibility
+- [ ] Test with slow internet connection
+
+### Performance Testing
+
+- Use Chrome DevTools Performance tab
+- Aim for consistent 60fps during animations
+- Keep bundle size reasonable (< 500KB gzipped)
+- Lighthouse score should be > 90
+
+## 🎨 Design System
+
+### Color Palette
+
+```css
+/* Primary Colors */
+--purple-primary: #A855F7;
+--purple-light: #D8B4FE;
+--purple-dark: #7E22CE;
+
+/* Background */
+--bg-space: #020005;
+--bg-nebula: rgba(88, 28, 135, 0.4);
+
+/* Member Colors */
+--rm-blue: #2563EB;
+--jin-pink: #EC4899;
+--suga-green: #10B981;
+--jhope-red: #EF4444;
+--jimin-gold: #F59E0B;
+--v-green: #22c55e;
+--jk-purple: #8B5CF6;
+
+/* UI Elements */
+--glass-bg: rgba(255, 255, 255, 0.02);
+--glass-border: rgba(255, 255, 255, 0.05);
+--text-primary: rgba(255, 255, 255, 0.9);
+--text-secondary: rgba(255, 255, 255, 0.4);
+```
+
+### Animation Principles
+
+1. **Smooth and Slow**: Use durations of 500-1000ms for most transitions
+2. **Easing**: Prefer `ease-out` for entrances, `ease-in-out` for continuous
+3. **Performance**: Animate only `transform` and `opacity` when possible
+4. **Purposeful**: Every animation should enhance UX, not distract
+
+### Typography
+
+- **Headers**: Thin/Light weights with wide letter-spacing
+- **Body**: Regular weight with comfortable line-height
+- **Labels**: Small caps with wide tracking for futuristic feel
+- **Mono**: Use for technical data (BPM, IDs, metrics)
+
+## 🔍 Code Review Process
+
+### What We Look For
+
+1. **Code Quality**
+   - Readable and maintainable
+   - Follows project conventions
+   - No unnecessary complexity
+
+2. **TypeScript**
+   - Proper type definitions
+   - No type errors
+   - Minimal use of `any`
+
+3. **Performance**
+   - No performance regressions
+   - Efficient algorithms
+   - Proper memoization
+
+4. **Aesthetics**
+   - Matches existing design language
+   - Smooth animations
+   - Consistent spacing and sizing
+
+5. **Accessibility**
+   - Keyboard navigable
+   - Proper ARIA labels
+   - Sufficient color contrast
+
+## 🎓 Learning Resources
+
+### React & TypeScript
+- [React Documentation](https://react.dev/)
+- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
+- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
+
+### CSS & Animations
+- [Tailwind CSS Docs](https://tailwindcss.com/docs)
+- [CSS Tricks - Animation Guide](https://css-tricks.com/almanac/properties/a/animation/)
+- [Glassmorphism Design](https://hype4.academy/tools/glassmorphism-generator)
+
+### Performance
+- [Web.dev Performance](https://web.dev/performance/)
+- [React Performance Optimization](https://react.dev/learn/render-and-commit)
+
+## 💬 Communication
+
+### Questions?
+
+- **GitHub Issues**: For bugs and feature requests
+- **GitHub Discussions**: For questions and ideas
+- **Pull Request Comments**: For code-specific discussions
+
+### Response Time
+
+This is a personal project, so responses may take a few days. Please be patient! 💜
+
+## 🙏 Thank You!
+
+Every contribution, no matter how small, is valuable. Whether you're fixing a typo, adding a feature, or just sharing feedback - thank you for being part of this project!
+
+*"작은 것들을 위한 시 (A poem for small things)"* — BTS
 
 ---
 
-Thank you for contributing to the BTS Neural Archive! Together, we create something beautiful. 💜
+<div align="center">
 
-*"You've shown me I have reasons, I should love myself" - BTS, Answer: Love Myself*
+**Made with 💜 for BTS & ARMY**
+
+*Let's create something beautiful together*
+
+</div>
