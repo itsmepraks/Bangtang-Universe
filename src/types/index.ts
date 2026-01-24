@@ -1,200 +1,374 @@
 /**
  * BTS Neural Archive - Type Definitions
- * Centralized type definitions for type safety and code maintainability
+ * 
+ * Centralized TypeScript type definitions for the entire application.
+ * This improves code organization, type safety, and maintainability.
  */
 
 // ==================== MEMBER TYPES ====================
 
+/**
+ * Represents a BTS member with complete profile information
+ */
 export interface Member {
+  /** Unique identifier (lowercase) */
   id: string;
+  /** Stage name (uppercase) */
   name: string;
+  /** Full legal name */
   full: string;
+  /** Signature color (hex code) */
   color: string;
+  /** Role/position in the group */
   role: string;
+  /** Microphone color */
   mic: string;
+  /** Number of KOMCA (Korea Music Copyright Association) credits */
   komca: number;
+  /** Biography/description */
   bio: string;
+  /** Array of solo track titles */
   soloTracks: string[];
+  /** Array of achievement descriptions */
   achievements: string[];
 }
 
+/**
+ * Valid member IDs
+ */
 export type MemberId = 'rm' | 'jin' | 'suga' | 'jh' | 'jm' | 'v' | 'jk';
 
-// ==================== MUSIC TYPES ====================
+// ==================== SONG/MUSIC TYPES ====================
 
+/**
+ * Represents a song in the database with metadata
+ */
 export interface Song {
+  /** Unique song identifier */
   id: number;
+  /** Song title */
   title: string;
+  /** Album name */
   album: string;
+  /** Beats per minute */
   bpm: number;
+  /** Energy level (0-1) */
   energy: number;
+  /** Valence/positivity (0-1) */
   valence: number;
+  /** Emotional sentiment category */
   sentiment: SongSentiment;
 }
 
+/**
+ * Valid sentiment categories for songs
+ */
 export type SongSentiment = 
-  | 'Gratitude'
-  | 'Determination'
-  | 'Fear'
-  | 'Longing'
-  | 'Joy'
-  | 'Pain'
-  | 'Comfort'
-  | 'Destiny'
-  | 'Celebration'
+  | 'Joy' 
+  | 'Gratitude' 
+  | 'Determination' 
+  | 'Fear' 
+  | 'Longing' 
+  | 'Pain' 
+  | 'Comfort' 
+  | 'Destiny' 
+  | 'Celebration' 
   | 'Confidence';
 
-// ==================== UI TYPES ====================
+// ==================== UI COMPONENT TYPES ====================
 
+/**
+ * Application mode states
+ */
 export type AppMode = 'landing' | 'warp' | 'dashboard';
 
-export type DashboardSection = 'overview' | 'rag' | 'sonic' | 'data';
+/**
+ * Dashboard section identifiers
+ */
+export type DashboardSection = 'overview' | 'sonic' | 'rag' | 'data';
 
-export interface NavigationItem {
-  id: DashboardSection;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  label: string;
-}
-
-// ==================== COMPONENT PROP TYPES ====================
-
-export interface UniverseProps {
-  mode: AppMode;
-}
-
-export interface LandingRitualProps {
-  onSync: () => void;
-}
-
+/**
+ * Props for Glass HUD component
+ */
 export interface GlassHUDProps {
+  /** Panel title */
   title: string;
-  icon?: React.ComponentType<{ size?: number; className?: string }>;
+  /** Optional icon component */
+  icon?: React.ElementType;
+  /** Panel content */
   children: React.ReactNode;
+  /** Additional CSS classes */
   className?: string;
+  /** Close handler function */
   onClose?: () => void;
+  /** Additional header actions */
   headerAction?: React.ReactNode;
+  /** Accent color (hex code) */
   accentColor?: string;
-}
-
-export interface SonicAnalyzerProps {
-  playing: boolean;
-  togglePlay: () => void;
-  accentColor?: string;
-}
-
-export interface RAGNetworkProps {
-  accentColor?: string;
-}
-
-export interface DataHubProps {
-  accentColor?: string;
-}
-
-export interface MemberDNAProps {
-  memberId: string;
-  onClose: () => void;
-}
-
-export interface SettingsOverlayProps {
-  onClose: () => void;
-}
-
-// ==================== SEARCH TYPES ====================
-
-export interface SearchResult {
-  id: number;
-  title: string;
-  score: number;
-  context: string;
 }
 
 // ==================== ANIMATION TYPES ====================
 
-export interface ParticleProps {
-  left: string;
-  top: string;
-  delay: number;
-  duration: number;
-  size: number;
-}
-
-export interface BokehProps {
-  left: string;
-  top: string;
-  size: number;
-  delay: number;
-  duration: number;
-}
-
-export interface StarProps {
+/**
+ * Star configuration for 3D universe
+ */
+export interface Star {
+  /** Spherical coordinate: azimuthal angle */
   theta: number;
+  /** Spherical coordinate: polar angle */
   phi: number;
+  /** Radial distance from center */
   r: number;
+  /** Star size in pixels */
   size: number;
+  /** Star color (hex) */
   color: string;
+  /** Animation delay in seconds */
   delay: number;
+}
+
+/**
+ * Bokeh bubble configuration
+ */
+export interface BokehBubble {
+  /** Horizontal position (percentage) */
+  left: string;
+  /** Vertical position (percentage) */
+  top: string;
+  /** Bubble size in pixels */
+  size: number;
+  /** Animation delay in seconds */
+  delay: number;
+  /** Animation duration in seconds */
+  duration: number;
+}
+
+/**
+ * Floating particle configuration
+ */
+export interface FloatingParticle {
+  /** Horizontal position (percentage) */
+  left: string;
+  /** Vertical position (percentage) */
+  top: string;
+  /** Animation delay in seconds */
+  delay: number;
+  /** Animation duration in seconds */
+  duration: number;
+  /** Particle size in pixels */
+  size: number;
+}
+
+// ==================== SEARCH/RAG TYPES ====================
+
+/**
+ * Search result from RAG network
+ */
+export interface SearchResult {
+  /** Result identifier */
+  id: number;
+  /** Song or content title */
+  title: string;
+  /** Match score (0-100) */
+  score: number;
+  /** Context or explanation of match */
+  context: string;
+}
+
+/**
+ * Search state
+ */
+export interface SearchState {
+  /** Current search query */
+  query: string;
+  /** Array of search results */
+  results: SearchResult[];
+  /** Loading/searching state */
+  searching: boolean;
+}
+
+// ==================== SONIC LAB TYPES ====================
+
+/**
+ * Audio metrics for songs
+ */
+export interface AudioMetrics {
+  /** Energy level (0-1) */
+  energy: number;
+  /** Valence/positivity (0-1) */
+  valence: number;
+  /** Beats per minute */
+  bpm: number;
+  /** Danceability score (0-1) */
+  dance: number;
+}
+
+/**
+ * Props for Sonic Analyzer component
+ */
+export interface SonicAnalyzerProps {
+  /** Whether audio is currently playing */
+  playing: boolean;
+  /** Function to toggle play state */
+  togglePlay: () => void;
+  /** Accent color for visualizations */
+  accentColor?: string;
+}
+
+// ==================== LYRICIST AI TYPES ====================
+
+/**
+ * State for lyric generation
+ */
+export interface LyricGeneratorState {
+  /** Generated text */
+  text: string;
+  /** Whether generation is in progress */
+  generating: boolean;
 }
 
 // ==================== SETTINGS TYPES ====================
 
-export interface AudioSettings {
-  volume: number;
-  quality: 'low' | 'medium' | 'high';
-  spatialAudio: boolean;
-}
-
-export interface GraphicsSettings {
-  particleDensity: 'low' | 'medium' | 'high';
-  animationSpeed: number;
-  reducedMotion: boolean;
-  performanceMode: boolean;
-}
-
+/**
+ * Application settings/preferences
+ */
 export interface AppSettings {
-  audio: AudioSettings;
-  graphics: GraphicsSettings;
+  /** Audio settings */
+  audio: {
+    /** Master volume (0-1) */
+    volume: number;
+    /** Audio effects enabled */
+    effectsEnabled: boolean;
+  };
+  /** Graphics settings */
+  graphics: {
+    /** Particle count */
+    particleCount: number;
+    /** Animation quality level */
+    quality: 'low' | 'medium' | 'high';
+    /** Reduced motion mode */
+    reducedMotion: boolean;
+  };
+  /** Theme settings */
+  theme: {
+    /** Primary accent color */
+    accentColor: string;
+    /** Background opacity */
+    backgroundOpacity: number;
+  };
 }
 
 // ==================== UTILITY TYPES ====================
 
 /**
- * Makes all properties of T optional recursively
+ * CSS custom properties interface
  */
-export type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+export interface CSSProperties extends React.CSSProperties {
+  '--accent-color'?: string;
+  '--member-color'?: string;
+  [key: string]: any;
+}
+
+/**
+ * Position coordinates
+ */
+export interface Position {
+  x: number;
+  y: number;
+  z?: number;
+}
+
+/**
+ * Animation timing
+ */
+export interface AnimationTiming {
+  /** Duration in milliseconds */
+  duration: number;
+  /** Delay in milliseconds */
+  delay?: number;
+  /** Easing function */
+  easing?: string;
+}
+
+// ==================== COMPONENT PROP TYPES ====================
+
+/**
+ * Props for Universe3D component
+ */
+export interface UniverseProps {
+  /** Current application mode */
+  mode: AppMode;
+}
+
+/**
+ * Props for Landing Ritual component
+ */
+export interface LandingRitualProps {
+  /** Callback when sync is triggered */
+  onSync: () => void;
+}
+
+/**
+ * Props for Member DNA component
+ */
+export interface MemberDNAProps {
+  /** ID of the member to display */
+  memberId: string;
+  /** Close handler function */
+  onClose: () => void;
+}
+
+/**
+ * Props for RAG Network component
+ */
+export interface RAGNetworkProps {
+  /** Accent color for UI elements */
+  accentColor?: string;
+}
+
+/**
+ * Props for Data Hub component
+ */
+export interface DataHubProps {
+  /** Accent color for UI elements */
+  accentColor?: string;
+}
+
+// ==================== CONSTANTS TYPE ====================
+
+/**
+ * Color palette constants
+ */
+export interface ColorPalette {
+  /** Primary purple */
+  primary: string;
+  /** Deep space background */
+  background: string;
+  /** Borahae variations */
+  borahae: string[];
+  /** Member colors mapped by ID */
+  members: Record<MemberId, string>;
+}
+
+// ==================== EXPORT HELPERS ====================
+
+/**
+ * Type guard to check if a value is a valid MemberId
+ */
+export const isMemberId = (value: any): value is MemberId => {
+  return ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'].includes(value);
 };
 
 /**
- * CSS custom properties type for styled components
+ * Type guard to check if a value is a valid AppMode
  */
-export type CSSCustomProperties = {
-  [key: `--${string}`]: string | number;
-} & React.CSSProperties;
+export const isAppMode = (value: any): value is AppMode => {
+  return ['landing', 'warp', 'dashboard'].includes(value);
+};
 
-// ==================== CONSTANTS ====================
-
-export const MEMBER_IDS: ReadonlyArray<MemberId> = [
-  'rm',
-  'jin',
-  'suga',
-  'jh',
-  'jm',
-  'v',
-  'jk',
-] as const;
-
-export const BORAHAE_COLORS = {
-  primary: '#A855F7',
-  light: '#D8B4FE',
-  indigo: '#818CF8',
-  violet: '#C084FC',
-  dark: '#581c87',
-  background: '#020005',
-} as const;
-
-export const DASHBOARD_SECTIONS: ReadonlyArray<DashboardSection> = [
-  'overview',
-  'sonic',
-  'rag',
-  'data',
-] as const;
+/**
+ * Type guard to check if a value is a valid DashboardSection
+ */
+export const isDashboardSection = (value: any): value is DashboardSection => {
+  return ['overview', 'sonic', 'rag', 'data'].includes(value);
+};
