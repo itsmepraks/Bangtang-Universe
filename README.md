@@ -1,75 +1,166 @@
-# React + TypeScript + Vite
+# 🌌 BTS Neural Archive
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> *"You are my galaxy, my cosmos, my universe."*
 
-Currently, two official plugins are available:
+An immersive, cosmic-themed web application that serves as a digital archive and analytical hub for BTS's musical universe. Built with React, TypeScript, and Vite, this project combines data visualization, music analysis, and artistic presentation in a unique purple-ocean aesthetic inspired by *Mikrokosmos* and *Whalien 52*.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## ✨ Features
 
-## React Compiler
+### 🎵 Sonic Analysis Lab
+- **Live Waveform Visualization**: Real-time audio frequency analysis with dynamic visualizations
+- **Music Metrics Dashboard**: Track BPM, energy, valence, and emotional sentiment across the discography
+- **Interactive Player Controls**: Play, pause, and analyze tracks with smooth animations
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+### 🔍 RAG (Retrieval-Augmented Generation) Archive
+- **Semantic Search Engine**: Find songs, lyrics, and themes across the BTS catalog
+- **Neural Network Visualization**: Visual graph representation of song connections and relationships
+- **Context-Aware Results**: Intelligent matching based on themes, emotions, and lyrical content
 
-Note: This will impact Vite dev & build performances.
+### 📊 Data Hub
+- **Comprehensive Database**: 245+ records of BTS discography with detailed metadata
+- **Advanced Filtering**: Sort and filter by album, BPM, energy levels, and emotional indices
+- **Export Functionality**: Download archive data for further analysis
 
-## Expanding the ESLint configuration
+### 👤 Member DNA Profiles
+- **Individual Artist Profiles**: Deep-dive into each member's contributions and achievements
+- **KOMCA Credit Tracking**: Verified production and composition credits
+- **Solo Discography**: Complete catalog of individual releases and features
+- **Milestone Archives**: Key achievements and career highlights
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 🎨 Aesthetic Features
+- **3D Cosmic Universe**: Fully animated starfield with "Borahae" color palette
+- **Purple Ocean Effect**: Layered bokeh lights representing ARMY bombs
+- **Whalien 52 Constellation**: Animated whale constellation swimming through space
+- **Glass Morphism UI**: Modern glassmorphic panels with soft glows and nebula textures
+- **Shooting Stars & Particles**: Dynamic floating elements for immersive atmosphere
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🚀 Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn package manager
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/itsmepraks/BTS-universe.git
+
+# Navigate to project directory
+cd BTS-universe
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Available Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# Development server with hot reload
+npm run dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Type-check and build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Lint codebase
+npm run lint
 ```
+
+## 🛠️ Tech Stack
+
+- **Frontend Framework**: React 19.2
+- **Language**: TypeScript 5.9
+- **Build Tool**: Vite 7.2
+- **Styling**: Tailwind CSS 4.1
+- **Icons**: Lucide React
+- **Linting**: ESLint with TypeScript support
+- **Compiler**: React Compiler (Babel plugin)
+
+## 📁 Project Structure
+
+```
+BTS-universe/
+├── src/
+│   ├── App.tsx              # Main application component
+│   ├── App.css              # Component styles
+│   ├── index.css            # Global styles & Tailwind
+│   ├── main.tsx             # Application entry point
+│   └── assets/              # Static assets
+├── public/                  # Public static files
+├── AESTHETIC_PLAN.md        # Design philosophy & roadmap
+├── package.json             # Dependencies & scripts
+├── tsconfig.json            # TypeScript configuration
+├── vite.config.ts           # Vite configuration
+└── README.md                # This file
+```
+
+## 🎨 Design Philosophy
+
+The application is designed around the cosmic and emotional themes found in BTS's music, particularly:
+
+- **Mikrokosmos**: The idea that every individual is their own small cosmos
+- **Whalien 52**: Themes of connection, loneliness, and finding your frequency
+- **Purple Ocean**: ARMY's signature purple color representing unity and support
+
+The UI balances functional data visualization with dreamy, emotional aesthetics - creating a "digital memory" or "cosmic archive" feel.
+
+## 🌟 Key Components
+
+### Universe3D
+The persistent 3D background featuring:
+- 800+ dynamically positioned stars with "Borahae" color variations
+- Animated nebula layers
+- The seven members as a central constellation
+- The ARMY represented as the purple ocean of stars
+
+### Landing Ritual
+The entry experience featuring:
+- Animated BTS logo as the gateway
+- Orbital member connection points
+- Smooth warp transition to dashboard
+
+### Dashboard Modules
+- **Mission Control**: Overview with live analytics
+- **Sonic Lab**: Music analysis and visualization
+- **Archive Graph**: RAG-powered search interface
+- **Records Hub**: Complete database browser
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Development Guidelines
+- Follow the existing code style and component patterns
+- Maintain TypeScript type safety
+- Test across different screen sizes
+- Keep accessibility in mind
+- Update documentation as needed
+
+## 📝 License
+
+This project is a personal portfolio piece and is not licensed for commercial use.
+
+## 🙏 Acknowledgments
+
+- **BTS** for the incredible music and inspiration
+- **ARMY** for the purple ocean
+- The React and TypeScript communities for excellent tools and resources
+
+## 📧 Contact
+
+**Prakriti Bista**
+- GitHub: [@itsmepraks](https://github.com/itsmepraks)
+- Website: [praks.me](https://praks.me)
+- Location: Washington DC
+
+---
+
+*Made with 💜 for BTS & ARMY*
+
+**"어떤 빛이 맞는 빛일까 (Which light would be the right one?)"** - Mikrokosmos
