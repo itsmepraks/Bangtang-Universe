@@ -1,239 +1,357 @@
 # Contributing to BTS Neural Archive
 
-Thank you for your interest in contributing to the BTS Neural Archive! This document provides guidelines and information for contributors.
+First off, thank you for considering contributing to the BTS Neural Archive! 💜
 
-## 🌟 Getting Started
+## Table of Contents
+
+- [Code of Conduct](#code-of-conduct)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Coding Standards](#coding-standards)
+- [Project Architecture](#project-architecture)
+- [Commit Guidelines](#commit-guidelines)
+- [Pull Request Process](#pull-request-process)
+
+## Code of Conduct
+
+This project follows the principles of respect, inclusivity, and collaboration inspired by BTS and ARMY values. Be kind, be respectful, and help create a positive environment for everyone.
+
+## Getting Started
 
 ### Prerequisites
-- Node.js v18 or higher
+
+Before you begin, ensure you have the following installed:
+- Node.js (v18 or higher)
+- npm or yarn
 - Git
 - A code editor (VS Code recommended)
-- Basic knowledge of React, TypeScript, and Tailwind CSS
 
 ### Setting Up Your Development Environment
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally:
+1. **Fork the repository** to your GitHub account
+
+2. **Clone your fork locally:**
    ```bash
-   git clone https://github.com/YOUR-USERNAME/BTS-universe.git
+   git clone https://github.com/YOUR_USERNAME/BTS-universe.git
    cd BTS-universe
    ```
 
-3. **Add the upstream remote**:
+3. **Add the upstream repository:**
    ```bash
    git remote add upstream https://github.com/itsmepraks/BTS-universe.git
    ```
 
-4. **Install dependencies**:
+4. **Install dependencies:**
    ```bash
    npm install
    ```
 
-5. **Start the development server**:
+5. **Start the development server:**
    ```bash
    npm run dev
    ```
 
-## 🎯 How to Contribute
+6. **Open your browser** and navigate to `http://localhost:5173`
 
-### Reporting Bugs
-- Check if the bug has already been reported in Issues
-- If not, create a new issue with:
-  - Clear, descriptive title
-  - Steps to reproduce
-  - Expected vs actual behavior
-  - Screenshots if applicable
-  - Your environment (browser, OS, etc.)
+## Development Workflow
 
-### Suggesting Enhancements
-- Check if the enhancement has already been suggested
-- Create an issue with:
-  - Clear description of the feature
-  - Use cases and benefits
-  - Mockups or examples if applicable
+### Creating a Feature Branch
 
-### Code Contributions
+Always create a new branch for your work:
 
-#### Branch Naming Convention
-- `feat/description` - New features
-- `fix/description` - Bug fixes
-- `refactor/description` - Code refactoring
-- `docs/description` - Documentation updates
-- `style/description` - UI/styling changes
+```bash
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/bug-description
+```
 
-#### Making Changes
+Branch naming conventions:
+- `feature/` - New features
+- `fix/` - Bug fixes
+- `docs/` - Documentation updates
+- `refactor/` - Code refactoring
+- `style/` - UI/styling changes
+- `test/` - Adding or updating tests
 
-1. **Create a branch** from `main`:
-   ```bash
-   git checkout -b feat/your-feature-name
-   ```
+### Keeping Your Fork Updated
 
-2. **Make your changes** following the code style guidelines
+Regularly sync your fork with the upstream repository:
 
-3. **Test your changes** thoroughly:
-   ```bash
-   npm run build
-   npm run lint
-   ```
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+```
 
-4. **Commit your changes** with a descriptive message:
-   ```bash
-   git commit -m "feat: add new sonic visualization mode"
-   ```
-
-5. **Push to your fork**:
-   ```bash
-   git push origin feat/your-feature-name
-   ```
-
-6. **Create a Pull Request** on GitHub
-
-## 📝 Code Style Guidelines
+## Coding Standards
 
 ### TypeScript
-- Use TypeScript for all new code
-- Define interfaces for component props and data structures
-- Avoid `any` type - use proper typing
-- Use type inference where appropriate
 
+- **Use TypeScript** for all new code
+- Define proper interfaces and types
+- Avoid using `any` - use `unknown` if type is truly unknown
+- Enable strict mode in TypeScript config
+
+Example:
 ```typescript
-// ✅ Good
-interface MemberProps {
+interface Member {
   id: string;
   name: string;
+  full: string;
   color: string;
+  role: string;
 }
 
-// ❌ Avoid
-const member: any = { ... }
+const getMember = (id: string): Member | undefined => {
+  return MEMBER_DATA.find(m => m.id === id);
+};
 ```
 
 ### React Components
-- Use functional components with hooks
-- Keep components focused and single-purpose
-- Extract reusable logic into custom hooks
-- Use meaningful component and prop names
 
+- Use **functional components** with hooks
+- Prefer **named exports** for components
+- Use `React.FC` or explicit typing for props
+- Memoize expensive computations with `useMemo`
+- Memoize callbacks with `useCallback`
+
+Example:
 ```typescript
-// ✅ Good
-const MemberProfile: React.FC<MemberProfileProps> = ({ member }) => {
-  // Component logic
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary';
 }
 
-// ❌ Avoid
-function Comp(props: any) {
-  // Component logic
-}
+const Button: React.FC<ButtonProps> = ({ label, onClick, variant = 'primary' }) => {
+  return (
+    <button onClick={onClick} className={`btn-${variant}`}>
+      {label}
+    </button>
+  );
+};
 ```
 
 ### Styling
-- Use Tailwind CSS utility classes
-- Keep custom CSS minimal
-- Use CSS variables for theme colors
+
+- Use **Tailwind CSS** utility classes
+- Follow the existing color palette (Borahae purple theme)
 - Maintain responsive design principles
+- Use CSS modules or styled-components for complex styles
 
-```tsx
-// ✅ Good
-<div className="flex items-center gap-4 p-6 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
-
-// ❌ Avoid inline styles unless absolutely necessary
-<div style={{ display: 'flex', padding: '24px' }}>
+Color palette:
+```css
+--purple-primary: #A855F7
+--purple-light: #D8B4FE
+--purple-accent: #818CF8
+--deep-space: #020005
 ```
 
 ### File Organization
-- One component per file (unless tightly coupled)
-- Group related utilities and helpers
-- Keep files under 500 lines when possible
-- Use barrel exports for cleaner imports
 
-## 🎨 Design Principles
+Keep files organized and modular:
 
-### Aesthetic Guidelines
-- Maintain the cosmic, dreamy "Mikrokosmos" theme
-- Use the "Borahae" purple color palette consistently
-- Balance functional UI with artistic presentation
-- Ensure smooth animations and transitions
-
-### Color Palette
-- Primary Purple: `#A855F7`
-- Light Purple: `#D8B4FE`
-- Indigo: `#818CF8`
-- Dark Purple: `#581c87`
-- Background: `#020005`
-
-### Performance
-- Optimize heavy animations using `useMemo` and `useCallback`
-- Lazy load heavy components
-- Keep bundle size reasonable
-- Test on lower-end devices
-
-## 🧪 Testing Guidelines
-
-- Test on multiple browsers (Chrome, Firefox, Safari)
-- Verify responsive behavior on different screen sizes
-- Check accessibility (keyboard navigation, screen readers)
-- Ensure no console errors or warnings
-
-## 📋 Pull Request Process
-
-1. **Update documentation** if needed
-2. **Ensure all tests pass** and code is linted
-3. **Provide clear PR description**:
-   - What changes were made
-   - Why the changes were needed
-   - Screenshots/videos if UI changes
-   - Related issues (if any)
-
-4. **Be responsive to feedback**
-5. **Keep PR focused** - one feature/fix per PR
-
-### PR Title Format
 ```
-type: short description
-
-Types: feat, fix, refactor, docs, style, perf, test, chore
+src/
+├── components/        # Reusable components
+│   ├── Universe/      # Universe-related components
+│   ├── Dashboard/     # Dashboard modules
+│   └── UI/            # Generic UI components
+├── types/             # TypeScript type definitions
+├── utils/             # Utility functions
+├── hooks/             # Custom React hooks
+├── constants/         # Constants and config
+└── data/              # Static data
 ```
 
-Examples:
-- `feat: add dark mode toggle`
-- `fix: resolve waveform animation lag`
-- `docs: update installation instructions`
+### Code Quality
 
-## 🎵 Data Contributions
+- **ESLint**: Ensure no linting errors before committing
+  ```bash
+  npm run lint
+  ```
 
-### Adding Songs
-When adding new songs to the database:
-- Include accurate metadata (BPM, album, year)
-- Verify emotional sentiment classifications
-- Maintain consistent formatting
-- Source from official releases
+- **Type checking**: Run TypeScript compiler
+  ```bash
+  tsc --noEmit
+  ```
 
-### Member Information
-- Keep KOMCA credits updated
-- Include verified achievements only
-- Maintain professional tone in bios
+- **Formatting**: Use consistent formatting (Prettier recommended)
 
-## 🤝 Code of Conduct
+## Project Architecture
 
-- Be respectful and inclusive
-- Provide constructive feedback
-- Help others learn and grow
-- Celebrate contributions of all sizes
+### Key Concepts
 
-## 💜 Recognition
+1. **Component Hierarchy:**
+   - `App.tsx` - Main application orchestrator
+   - `Universe3D` - Persistent background layer
+   - `LandingRitual` - Entry experience
+   - Dashboard modules (SonicLab, RAG, DataHub, etc.)
 
-Contributors will be recognized in:
-- GitHub contributors list
-- Special acknowledgment section (for major contributions)
+2. **State Management:**
+   - Local state with `useState` for component-specific data
+   - Consider Context API for deeply nested state
+   - Memoization for performance optimization
 
-## 📞 Questions?
+3. **Animation Philosophy:**
+   - Smooth, cosmic-themed transitions
+   - Use CSS animations for performance
+   - Maintain 60fps for scrolling and interactions
 
-- Open a GitHub Discussion for general questions
-- Create an issue for bug reports or feature requests
-- Check existing documentation first
+## Commit Guidelines
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+### Commit Message Format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, no code change)
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Adding or updating tests
+- `chore`: Maintenance tasks
+
+### Examples
+
+```bash
+feat(sonic-lab): add real-time BPM detection
+
+Implement live BPM analysis using Web Audio API. The waveform
+now updates dynamically based on actual audio input.
+
+Closes #23
+```
+
+```bash
+fix(member-profile): correct KOMCA credit calculation
+
+The previous calculation was using outdated data. Updated to
+reflect current KOMCA registry information.
+```
+
+```bash
+docs(readme): update installation instructions
+
+Added troubleshooting section for common setup issues.
+```
+
+## Pull Request Process
+
+### Before Submitting
+
+1. **Test your changes thoroughly**
+   - Run `npm run dev` and manually test
+   - Check responsive behavior
+   - Test in multiple browsers if possible
+
+2. **Run quality checks:**
+   ```bash
+   npm run lint
+   npm run build
+   ```
+
+3. **Update documentation** if needed
+   - Update README.md for new features
+   - Add JSDoc comments for new functions
+   - Update AESTHETIC_PLAN.md for design changes
+
+### Submitting Your PR
+
+1. **Push your branch** to your fork:
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+2. **Create a Pull Request** on GitHub with:
+   - Clear, descriptive title
+   - Detailed description of changes
+   - Screenshots/videos for UI changes
+   - Reference to related issues
+
+3. **PR Description Template:**
+   ```markdown
+   ## Description
+   Brief description of what this PR does
+
+   ## Type of Change
+   - [ ] Bug fix
+   - [ ] New feature
+   - [ ] Breaking change
+   - [ ] Documentation update
+
+   ## Changes Made
+   - Change 1
+   - Change 2
+
+   ## Screenshots (if applicable)
+   [Add screenshots here]
+
+   ## Testing
+   How has this been tested?
+
+   ## Checklist
+   - [ ] Code follows project style guidelines
+   - [ ] Self-review completed
+   - [ ] Documentation updated
+   - [ ] No console errors
+   ```
+
+### Review Process
+
+- PRs require at least one review
+- Address all review comments
+- Keep discussions professional and constructive
+- Update your PR based on feedback
+
+## Areas for Contribution
+
+### High Priority
+- Performance optimization for 3D starfield
+- Accessibility improvements (ARIA labels, keyboard navigation)
+- Mobile responsiveness enhancements
+- Loading states and error handling
+
+### Feature Ideas
+- Actual Spotify API integration for real music data
+- User preferences/settings persistence
+- Light/dark mode toggle (while maintaining aesthetic)
+- Enhanced search algorithms
+- Member profile photo integration
+- Real-time lyrics display
+
+### Documentation
+- Component API documentation
+- Architecture diagrams
+- Tutorial videos or GIFs
+- Translation of UI text
+
+## Questions?
+
+Feel free to:
+- Open an issue for questions
+- Start a discussion in GitHub Discussions
+- Reach out to [@itsmepraks](https://github.com/itsmepraks)
+
+## Recognition
+
+Contributors will be acknowledged in:
+- README.md contributors section
+- Release notes for significant contributions
 
 ---
 
-Thank you for contributing to the BTS Neural Archive! Together, we're building something beautiful. 💜
+Thank you for contributing to the BTS Neural Archive! Together, we create something beautiful. 💜
 
-*"We are not seven, we are one."*
+*"You've shown me I have reasons, I should love myself" - BTS, Answer: Love Myself*
