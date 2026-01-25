@@ -363,29 +363,67 @@ interface LandingRitualProps {
 
 const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
   return (
-    <div className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden select-none">
-      <div className="absolute top-[15%] text-center z-10 animate-in fade-in slide-in-from-top-10 duration-1000">
-        <h1 className="text-4xl md:text-6xl font-extralight text-white tracking-[0.5em] drop-shadow-[0_0_50px_rgba(168,85,247,0.5)] uppercase leading-tight">
+    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-hidden select-none">
+      {/* Title Section - Top */}
+      <div className="absolute top-[10%] text-center z-10 animate-in fade-in slide-in-from-top-10 duration-1000">
+        <h1 className="text-5xl md:text-7xl font-black text-white tracking-[0.15em] drop-shadow-[0_0_50px_rgba(168,85,247,0.5)] uppercase leading-tight" style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace', letterSpacing: '0.15em' }}>
           BTS Neural Archive
         </h1>
-        <p className="text-purple-300/40 tracking-[1em] text-[9px] mt-6 uppercase font-mono font-bold">
-          Universal Connection • Established 2013
-        </p>
       </div>
 
-      <div className="relative flex flex-col items-center justify-center z-20 mt-20 gap-12 group">
+      {/* Decorative Elements - Fill space */}
+      <div className="absolute inset-0 pointer-events-none z-5">
+        {/* Subtle corner accents */}
+        <div className="absolute top-[20%] left-[15%] w-1 h-1 bg-purple-400/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '0s' }} />
+        <div className="absolute top-[25%] right-[18%] w-1 h-1 bg-purple-300/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-[25%] left-[20%] w-1 h-1 bg-purple-400/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-[20%] right-[15%] w-1 h-1 bg-purple-300/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '3s' }} />
+      </div>
+
+      {/* Centered Logo Section - Moved down */}
+      <div className="relative flex flex-col items-center justify-center z-20 translate-y-8 gap-10 group">
          {/* THE GATEWAY LOGO */}
          <button 
             onClick={onSync}
             className="relative w-48 h-48 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none ring-0 focus:ring-0 select-none hover:scale-110 active:scale-95 group/logo"
             style={{ WebkitTapHighlightColor: 'transparent' }}
          >
-            {/* Ambient Cosmic Glow */}
-            <div className="absolute inset-[-100%] rounded-full bg-purple-600/10 opacity-20 blur-[100px] animate-pulse group-hover/logo:opacity-40 transition-opacity duration-700" />
-            <div className="absolute inset-[-40%] rounded-full bg-purple-500/20 opacity-30 blur-[60px] group-hover/logo:scale-125 transition-transform duration-1000" />
+            {/* Centered container for all glow effects - prevents cursor library interference */}
+            <div 
+               className="absolute pointer-events-none z-0"
+               style={{
+                  left: '50%',
+                  top: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '1px',
+                  height: '1px'
+               }}
+            >
+               {/* Ambient Cosmic Glow - Properly centered */}
+               <div 
+                  className="absolute rounded-full bg-purple-600/10 opacity-20 blur-[100px] animate-pulse group-hover/logo:opacity-40 transition-opacity duration-700" 
+                  style={{ 
+                     width: '600px',
+                     height: '600px',
+                     left: '-300px',
+                     top: '-300px',
+                     zIndex: 0
+                  }} 
+               />
+               <div 
+                  className="absolute rounded-full bg-purple-500/20 opacity-30 blur-[60px] group-hover/logo:scale-125 transition-transform duration-1000" 
+                  style={{ 
+                     width: '300px',
+                     height: '300px',
+                     left: '-150px',
+                     top: '-150px',
+                     zIndex: 1
+                  }} 
+               />
+            </div>
             
-            {/* BTS Logo */}
-            <div className="relative z-10 animate-[logo-glow_8s_infinite] group-hover/logo:drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] transition-all duration-700">
+            {/* BTS Logo - Perfectly centered in middle of circles and 7 orbiting dots */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 animate-[logo-glow_8s_infinite] group-hover/logo:drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] transition-all duration-700">
               <BTSLogo className="w-20 h-20 text-white" />
             </div>
 
@@ -398,9 +436,9 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               return (
                 <div 
                   key={m.id}
-                  className="absolute w-1.5 h-1.5 rounded-full opacity-40 transition-all duration-1000 group-hover/logo:opacity-100 group-hover/logo:scale-150"
+                  className="absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full opacity-40 transition-all duration-1000 group-hover/logo:opacity-100 group-hover/logo:scale-150"
                   style={{ 
-                    transform: `translate(${x}px, ${y}px)`,
+                    transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
                     backgroundColor: m.color,
                     boxShadow: `0 0 15px ${m.color}`,
                     transitionDelay: `${i * 50}ms`
@@ -410,10 +448,10 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
             })}
          </button>
 
-         {/* Call to Action Text */}
+         {/* Call to Action Text - With space below circles */}
          <button 
             onClick={onSync}
-            className="flex flex-col items-center gap-4 group/text cursor-pointer hover:scale-105 transition-all duration-500"
+            className="flex flex-col items-center gap-4 group/text cursor-pointer hover:scale-105 transition-all duration-500 mt-4"
          >
             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent group-hover/text:w-24 transition-all duration-1000" />
             <span className="text-[10px] text-white/40 tracking-[0.8em] font-mono uppercase group-hover:text-white group-hover:tracking-[1em] transition-all duration-700 animate-pulse">
