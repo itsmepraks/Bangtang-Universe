@@ -63,16 +63,16 @@ export interface Song {
 /**
  * Valid sentiment categories for songs
  */
-export type SongSentiment = 
-  | 'Joy' 
-  | 'Gratitude' 
-  | 'Determination' 
-  | 'Fear' 
-  | 'Longing' 
-  | 'Pain' 
-  | 'Comfort' 
-  | 'Destiny' 
-  | 'Celebration' 
+export type SongSentiment =
+  | 'Joy'
+  | 'Gratitude'
+  | 'Determination'
+  | 'Fear'
+  | 'Longing'
+  | 'Pain'
+  | 'Comfort'
+  | 'Destiny'
+  | 'Celebration'
   | 'Confidence';
 
 // ==================== UI COMPONENT TYPES ====================
@@ -266,7 +266,7 @@ export interface AppSettings {
 export interface CSSProperties extends React.CSSProperties {
   '--accent-color'?: string;
   '--member-color'?: string;
-  [key: string]: any;
+  [key: string]: string | number | undefined;
 }
 
 /**
@@ -355,20 +355,20 @@ export interface ColorPalette {
 /**
  * Type guard to check if a value is a valid MemberId
  */
-export const isMemberId = (value: any): value is MemberId => {
-  return ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'].includes(value);
+export const isMemberId = (value: unknown): value is MemberId => {
+  return typeof value === 'string' && ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'].includes(value);
 };
 
 /**
  * Type guard to check if a value is a valid AppMode
  */
-export const isAppMode = (value: any): value is AppMode => {
-  return ['landing', 'warp', 'dashboard'].includes(value);
+export const isAppMode = (value: unknown): value is AppMode => {
+  return typeof value === 'string' && ['landing', 'warp', 'dashboard'].includes(value);
 };
 
 /**
  * Type guard to check if a value is a valid DashboardSection
  */
-export const isDashboardSection = (value: any): value is DashboardSection => {
-  return ['overview', 'sonic', 'rag', 'data'].includes(value);
+export const isDashboardSection = (value: unknown): value is DashboardSection => {
+  return typeof value === 'string' && ['overview', 'sonic', 'rag', 'data'].includes(value);
 };
