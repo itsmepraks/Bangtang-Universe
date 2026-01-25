@@ -1,0 +1,51 @@
+# Auto-detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Explicitly declare text files for consistent line endings
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.xml text eol=lf
+*.svg text eol=lf
+
+# Shell scripts should always use LF
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Denote binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.avif binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.mp4 binary
+*.mp3 binary
+*.wav binary
+*.ogg binary
+*.pdf binary
+*.zip binary
+
+# Diff settings for specific file types
+*.md diff=markdown
+*.json diff=json
+
+# Export-ignore (files not included in git archive)
+.gitignore export-ignore
+.gitattributes export-ignore
+.editorconfig export-ignore
+.github export-ignore
