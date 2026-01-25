@@ -37,7 +37,7 @@ An immersive, cosmic-themed web application that serves as a digital archive and
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
+- Node.js (v18 or higher) - see `.nvmrc` for exact version
 - npm or yarn package manager
 
 ### Installation
@@ -91,9 +91,16 @@ BTS-universe/
 │   ├── App.css              # Component styles
 │   ├── index.css            # Global styles & Tailwind
 │   ├── main.tsx             # Application entry point
+│   ├── constants/           # Color schemes and constants
+│   ├── types/               # TypeScript type definitions
+│   ├── utils/               # Helper functions and utilities
 │   └── assets/              # Static assets
 ├── public/                  # Public static files
+├── .github/                 # GitHub templates and workflows
 ├── AESTHETIC_PLAN.md        # Design philosophy & roadmap
+├── CONTRIBUTING.md          # Contribution guidelines
+├── CHANGELOG.md             # Project version history
+├── SECURITY.md              # Security policy
 ├── package.json             # Dependencies & scripts
 ├── tsconfig.json            # TypeScript configuration
 ├── vite.config.ts           # Vite configuration
@@ -142,9 +149,20 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 - Keep accessibility in mind
 - Update documentation as needed
 
+### Code Quality
+This project maintains high standards through:
+- Comprehensive TypeScript type definitions
+- ESLint configuration for code quality
+- Consistent coding standards via EditorConfig
+- Automated CI/CD workflows
+
 ## 📝 License
 
 This project is a personal portfolio piece and is not licensed for commercial use.
+
+## 🔒 Security
+
+Please report security vulnerabilities responsibly. See [SECURITY.md](SECURITY.md) for details.
 
 ## 🙏 Acknowledgments
 
