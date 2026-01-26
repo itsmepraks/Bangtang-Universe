@@ -11,16 +11,16 @@
 export const BORAHAE_COLORS = {
   /** Primary purple - Main accent color */
   PRIMARY: '#A855F7',
-  
+
   /** Light purple - Soft highlights */
   LIGHT: '#D8B4FE',
-  
+
   /** Indigo purple - Cool tones */
   INDIGO: '#818CF8',
-  
+
   /** Violet purple - Warm tones */
   VIOLET: '#C084FC',
-  
+
   /** Dark purple - Deep shadows */
   DARK: '#7E22CE',
 } as const;
@@ -32,22 +32,22 @@ export const BORAHAE_COLORS = {
 export const MEMBER_COLORS = {
   /** RM - Blue (Leader, intellectual) */
   RM: '#2563EB',
-  
+
   /** Jin - Pink (Visual, warmth) */
   JIN: '#EC4899',
-  
+
   /** SUGA - Green (Producer, growth) */
   SUGA: '#10B981',
-  
+
   /** J-Hope - Red (Main Dancer, energy) */
   J_HOPE: '#EF4444',
-  
+
   /** Jimin - Gold (Lead Vocalist, elegance) */
   JIMIN: '#F59E0B',
-  
+
   /** V - Green (Visual, natural) */
   V: '#22c55e',
-  
+
   /** Jungkook - Purple (Golden Maknae, versatility) */
   JUNGKOOK: '#8B5CF6',
 } as const;
@@ -58,10 +58,10 @@ export const MEMBER_COLORS = {
 export const UNIVERSE_COLORS = {
   /** Deep space background */
   SPACE: '#020005',
-  
+
   /** Nebula effect */
   NEBULA: 'rgba(88, 28, 135, 0.4)',
-  
+
   /** Star colors (white and purple variations) */
   STARS: ['#ffffff', '#A855F7', '#D8B4FE', '#818CF8', '#C084FC'],
 } as const;
@@ -72,16 +72,16 @@ export const UNIVERSE_COLORS = {
 export const UI_COLORS = {
   /** Glass panel background */
   GLASS_BG: 'rgba(255, 255, 255, 0.02)',
-  
+
   /** Glass panel border */
   GLASS_BORDER: 'rgba(255, 255, 255, 0.05)',
-  
+
   /** Text primary color */
   TEXT_PRIMARY: 'rgba(255, 255, 255, 0.9)',
-  
+
   /** Text secondary color */
   TEXT_SECONDARY: 'rgba(255, 255, 255, 0.4)',
-  
+
   /** Text muted color */
   TEXT_MUTED: 'rgba(255, 255, 255, 0.2)',
 } as const;
@@ -117,7 +117,7 @@ export const getMemberColor = (memberId: string): string => {
     'v': MEMBER_COLORS.V,
     'jk': MEMBER_COLORS.JUNGKOOK,
   };
-  
+
   return colorMap[memberId.toLowerCase()] || BORAHAE_COLORS.PRIMARY;
 };
 
@@ -128,7 +128,7 @@ export const getMemberColor = (memberId: string): string => {
  */
 export const getSentimentColor = (sentiment: string): string => {
   const sentimentKey = sentiment.toUpperCase().replace(/\s+/g, '_');
-  return (SENTIMENT_COLORS as any)[sentimentKey] || BORAHAE_COLORS.PRIMARY;
+  return SENTIMENT_COLORS[sentimentKey as keyof typeof SENTIMENT_COLORS] || BORAHAE_COLORS.PRIMARY;
 };
 
 /**

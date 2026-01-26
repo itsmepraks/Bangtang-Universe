@@ -5,7 +5,7 @@
  * calculations, and common operations throughout the application.
  */
 
-import type { Position, Star, BokehBubble, FloatingParticle } from '../types';
+import type { Position3D, Star, BokehBubble, FloatingParticle } from '../types';
 
 // ==================== ANIMATION HELPERS ====================
 
@@ -28,7 +28,7 @@ export const randomDelay = (max: number = 5): number => Math.random() * max;
  * @param min - Minimum duration in seconds
  * @param max - Maximum duration in seconds
  */
-export const randomDuration = (min: number, max: number): number => 
+export const randomDuration = (min: number, max: number): number =>
   min + Math.random() * (max - min);
 
 /**
@@ -57,7 +57,7 @@ export const generateStars = (
 /**
  * Converts spherical coordinates to Cartesian coordinates
  */
-export const sphericalToCartesian = (star: Star): Position => ({
+export const sphericalToCartesian = (star: Star): Position3D => ({
   x: star.r * Math.sin(star.phi) * Math.cos(star.theta),
   y: star.r * Math.sin(star.phi) * Math.sin(star.theta),
   z: star.r * Math.cos(star.phi),
@@ -128,9 +128,9 @@ export const hexWithAlpha = (hex: string, alpha: number): string => {
 export const lightenColor = (hex: string, percent: number): string => {
   const rgb = hexToRgb(hex);
   if (!rgb) return hex;
-  
+
   const increase = (val: number) => Math.min(255, Math.floor(val + (255 - val) * percent / 100));
-  
+
   return rgbToHex(increase(rgb.r), increase(rgb.g), increase(rgb.b));
 };
 
@@ -140,9 +140,9 @@ export const lightenColor = (hex: string, percent: number): string => {
 export const darkenColor = (hex: string, percent: number): string => {
   const rgb = hexToRgb(hex);
   if (!rgb) return hex;
-  
+
   const decrease = (val: number) => Math.max(0, Math.floor(val * (1 - percent / 100)));
-  
+
   return rgbToHex(decrease(rgb.r), decrease(rgb.g), decrease(rgb.b));
 };
 
@@ -151,13 +151,13 @@ export const darkenColor = (hex: string, percent: number): string => {
 /**
  * Clamps a value between min and max
  */
-export const clamp = (value: number, min: number, max: number): number => 
+export const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
 
 /**
  * Linear interpolation between two values
  */
-export const lerp = (start: number, end: number, t: number): number => 
+export const lerp = (start: number, end: number, t: number): number =>
   start + (end - start) * t;
 
 /**
@@ -176,13 +176,13 @@ export const map = (
 /**
  * Calculates distance between two points
  */
-export const distance = (x1: number, y1: number, x2: number, y2: number): number => 
+export const distance = (x1: number, y1: number, x2: number, y2: number): number =>
   Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
 /**
  * Calculates angle between two points in radians
  */
-export const angleBetween = (x1: number, y1: number, x2: number, y2: number): number => 
+export const angleBetween = (x1: number, y1: number, x2: number, y2: number): number =>
   Math.atan2(y2 - y1, x2 - x1);
 
 // ==================== STRING HELPERS ====================
@@ -190,25 +190,25 @@ export const angleBetween = (x1: number, y1: number, x2: number, y2: number): nu
 /**
  * Capitalizes first letter of a string
  */
-export const capitalize = (str: string): string => 
+export const capitalize = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
 /**
  * Converts string to title case
  */
-export const toTitleCase = (str: string): string => 
+export const toTitleCase = (str: string): string =>
   str.split(' ').map(capitalize).join(' ');
 
 /**
  * Truncates string to specified length
  */
-export const truncate = (str: string, maxLength: number, suffix: string = '...'): string => 
+export const truncate = (str: string, maxLength: number, suffix: string = '...'): string =>
   str.length > maxLength ? str.substring(0, maxLength - suffix.length) + suffix : str;
 
 /**
  * Formats a number with commas as thousands separators
  */
-export const formatNumber = (num: number): string => 
+export const formatNumber = (num: number): string =>
   num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 // ==================== TIME HELPERS ====================
@@ -225,12 +225,13 @@ export const formatDuration = (seconds: number): string => {
 /**
  * Debounce function to limit execution rate
  */
-export const debounce = <T extends (...args: any[]) => any>(
+export const debounce = <T extends (...args: unknown[]) => void>(
   func: T,
   wait: number
 ): ((...args: Parameters<T>) => void) => {
-  let timeout: NodeJS.Timeout | null = null;
-  
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let timeout: any = null;
+
   return (...args: Parameters<T>) => {
     if (timeout) clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
@@ -240,12 +241,12 @@ export const debounce = <T extends (...args: any[]) => any>(
 /**
  * Throttle function to limit execution frequency
  */
-export const throttle = <T extends (...args: any[]) => any>(
+export const throttle = <T extends (...args: unknown[]) => void>(
   func: T,
   limit: number
 ): ((...args: Parameters<T>) => void) => {
   let inThrottle: boolean = false;
-  
+
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args);
@@ -304,7 +305,7 @@ export const shuffle = <T>(array: T[]): T[] => {
 /**
  * Gets a random item from an array
  */
-export const randomItem = <T>(array: T[]): T => 
+export const randomItem = <T>(array: T[]): T =>
   array[Math.floor(Math.random() * array.length)];
 
 /**
@@ -326,7 +327,8 @@ export const chunk = <T>(array: T[], size: number): T[][] => {
 export const requestAnimFrame = (() => {
   return (
     window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).webkitRequestAnimationFrame ||
     ((callback: FrameRequestCallback) => window.setTimeout(callback, 1000 / 60))
   );
 })();
@@ -337,7 +339,8 @@ export const requestAnimFrame = (() => {
 export const cancelAnimFrame = (() => {
   return (
     window.cancelAnimationFrame ||
-    window.webkitCancelAnimationFrame ||
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).webkitCancelAnimationFrame ||
     clearTimeout
   );
 })();
@@ -353,41 +356,41 @@ export default {
   sphericalToCartesian,
   generateBokehBubbles,
   generateFloatingParticles,
-  
+
   // Color
   hexToRgb,
   rgbToHex,
   hexWithAlpha,
   lightenColor,
   darkenColor,
-  
+
   // Math
   clamp,
   lerp,
   map,
   distance,
   angleBetween,
-  
+
   // String
   capitalize,
   toTitleCase,
   truncate,
   formatNumber,
-  
+
   // Time
   formatDuration,
   debounce,
   throttle,
-  
+
   // DOM
   isInViewport,
   scrollToElement,
-  
+
   // Array
   shuffle,
   randomItem,
   chunk,
-  
+
   // Performance
   requestAnimFrame,
   cancelAnimFrame,
