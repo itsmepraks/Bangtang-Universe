@@ -3,14 +3,14 @@
  * Reusable animation helpers and generators
  */
 
-import type { ParticleProps, BokehProps, StarProps } from '../types';
+import type { FloatingParticle, BokehBubble, Star } from '../types';
 
 /**
  * Generates random particle properties for floating animations
  * @param count Number of particles to generate
  * @returns Array of particle configuration objects
  */
-export function generateParticles(count: number): ParticleProps[] {
+export function generateParticles(count: number): FloatingParticle[] {
   return Array.from({ length: count }, () => ({
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
@@ -25,7 +25,7 @@ export function generateParticles(count: number): ParticleProps[] {
  * @param count Number of bokeh lights to generate
  * @returns Array of bokeh configuration objects
  */
-export function generateBokehLights(count: number): BokehProps[] {
+export function generateBokehLights(count: number): BokehBubble[] {
   return Array.from({ length: count }, () => ({
     left: `${Math.random() * 100}%`,
     top: `${Math.random() * 100}%`,
@@ -41,7 +41,7 @@ export function generateBokehLights(count: number): BokehProps[] {
  * @param colors Array of color values for stars
  * @returns Array of star configuration objects with 3D coordinates
  */
-export function generateStars(count: number, colors: string[]): StarProps[] {
+export function generateStars(count: number, colors: string[]): Star[] {
   return Array.from({ length: count }, (_, i) => ({
     theta: Math.random() * 2 * Math.PI,
     phi: Math.acos(Math.random() * 2 - 1),

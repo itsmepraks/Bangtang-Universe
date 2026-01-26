@@ -5,7 +5,7 @@
  * calculations, and common operations throughout the application.
  */
 
-import type { Position, Star, BokehBubble, FloatingParticle } from '../types';
+import type { Position3D, Star, BokehBubble, FloatingParticle } from '../types';
 
 // ==================== ANIMATION HELPERS ====================
 
@@ -57,7 +57,7 @@ export const generateStars = (
 /**
  * Converts spherical coordinates to Cartesian coordinates
  */
-export const sphericalToCartesian = (star: Star): Position => ({
+export const sphericalToCartesian = (star: Star): Position3D => ({
   x: star.r * Math.sin(star.phi) * Math.cos(star.theta),
   y: star.r * Math.sin(star.phi) * Math.sin(star.theta),
   z: star.r * Math.cos(star.phi),

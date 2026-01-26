@@ -272,7 +272,7 @@ export interface CSSProperties extends React.CSSProperties {
 /**
  * Position coordinates
  */
-export interface Position {
+export interface Position3D {
   x: number;
   y: number;
   z?: number;
