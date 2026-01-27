@@ -1,159 +1,196 @@
 # 🏗️ BTS Neural Archive - Architecture Documentation
 
-> A deep dive into the architecture, component hierarchy, and design patterns powering the cosmic BTS universe.
+> Comprehensive guide to the project architecture, design patterns, and implementation details
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [High-Level Architecture](#high-level-architecture)
+- [Architecture Layers](#architecture-layers)
 - [Component Hierarchy](#component-hierarchy)
 - [Data Flow](#data-flow)
-- [State Management](#state-management)
 - [Design Patterns](#design-patterns)
+- [Core Systems](#core-systems)
 - [Performance Optimizations](#performance-optimizations)
-- [Visual System](#visual-system)
-- [Future Enhancements](#future-enhancements)
+- [Future Architecture](#future-architecture)
 
 ---
 
 ## Overview
 
-The BTS Neural Archive is built as a single-page application (SPA) using React 19.2 with TypeScript 5.9. The architecture follows a component-based design with clear separation of concerns, emphasizing:
-
-- **Cosmic Theme**: 3D starfield, purple ocean bokeh, glass morphism UI
-- **Data Visualization**: Sonic analysis, emotional sentiment tracking
-- **Semantic Search**: RAG (Retrieval-Augmented Generation) powered archive
-- **Member Profiles**: Individual artist DNA with KOMCA credits
+The BTS Neural Archive is built as a single-page application (SPA) with a cosmic theme, featuring:
+- **3D starfield visualization** (800+ rendered stars)
+- **Glass morphism UI** with Borahae purple aesthetic
+- **RAG-powered semantic search** for BTS discography
+- **Real-time audio analysis** and waveform visualization
+- **Member profile system** with KOMCA credit tracking
 
 ### Technology Stack
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **UI Framework** | React 19.2 | Component-based architecture, concurrent features |
-| **Language** | TypeScript 5.9 | Type safety, better DX, fewer runtime errors |
-| **Build Tool** | Vite 7.2 | Lightning-fast HMR, optimized production builds |
-| **Styling** | Tailwind CSS 4.1 | Utility-first styling, Borahae color system |
-| **Optimization** | React Compiler | Automatic memoization, 30-40% performance boost |
-| **Icons** | Lucide React | Consistent, beautiful icon system |
+```
+┌─────────────────────────────────────────────────┐
+│           BTS Neural Archive Stack              │
+├─────────────────────────────────────────────────┤
+│  React 19.2  │  TypeScript 5.9  │  Vite 7.2    │
+│  Tailwind 4.1 │  React Compiler  │  Lucide Icons│
+└─────────────────────────────────────────────────┘
+```
+
+### Design Philosophy
+
+The application follows a **cosmic metaphor**:
+- **Universe**: The entire application space
+- **Stars**: Individual songs, members, and data points
+- **Constellations**: Grouped content (7 members, album clusters)
+- **Purple Ocean**: The ARMY fanbase (bokeh effect)
+- **Whalien 52**: Connection and search themes
 
 ---
 
-## High-Level Architecture
+## Architecture Layers
+
+The application follows a layered architecture pattern:
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     BTS Neural Archive                       │
-│                     (Single Page App)                        │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ├─────────────────────────────────┐
-                              │                                 │
-                       ┌──────▼──────┐                  ┌──────▼──────┐
-                       │   App.tsx   │                  │ index.html  │
-                       │   (Main)    │                  │  (Entry)    │
-                       └──────┬──────┘                  └─────────────┘
-                              │
-              ┌───────────────┼───────────────┐
-              │               │               │
-       ┌──────▼──────┐ ┌─────▼─────┐  ┌─────▼─────┐
-       │  Universe3D │ │  Landing  │  │ Dashboard │
-       │ (Background)│ │  Ritual   │  │ (Main UI) │
-       └─────────────┘ └───────────┘  └─────┬─────┘
-                                             │
-                     ┌───────────────────────┼───────────────────────┐
-                     │                       │                       │
-              ┌──────▼──────┐        ┌──────▼──────┐        ┌──────▼──────┐
-              │  Sonic Lab  │        │ Archive RAG │        │  Data Hub   │
-              │  (Analysis) │        │  (Search)   │        │ (Database)  │
-              └─────────────┘        └─────────────┘        └─────────────┘
+┌──────────────────────────────────────────────────┐
+│              PRESENTATION LAYER                  │
+│  ┌────────┐  ┌─────────┐  ┌──────────┐         │
+│  │ Landing│  │Dashboard│  │Components│         │
+│  └────────┘  └─────────┘  └──────────┘         │
+├──────────────────────────────────────────────────┤
+│              APPLICATION LAYER                   │
+│  ┌─────────┐  ┌─────────┐  ┌──────────┐        │
+│  │  State  │  │ Routing │  │ Business │        │
+│  │ Manager │  │         │  │  Logic   │        │
+│  └─────────┘  └─────────┘  └──────────┘        │
+├──────────────────────────────────────────────────┤
+│              UTILITY LAYER                       │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
+│  │Animations│  │  Helpers │  │  Colors  │      │
+│  └──────────┘  └──────────┘  └──────────┘      │
+├──────────────────────────────────────────────────┤
+│              DATA LAYER (Future)                 │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
+│  │   API    │  │  Cache   │  │  Store   │      │
+│  └──────────┘  └──────────┘  └──────────┘      │
+└──────────────────────────────────────────────────┘
 ```
+
+### Layer Responsibilities
+
+#### Presentation Layer
+- **Purpose**: Render UI and handle user interactions
+- **Components**: Landing, Dashboard, Universe3D, GlassPanel
+- **Concerns**: Visual presentation, user input, animations
+- **Dependencies**: Application layer for state, Utility layer for helpers
+
+#### Application Layer
+- **Purpose**: Business logic and state management
+- **Components**: App state, mode transitions, section navigation
+- **Concerns**: State management, workflow orchestration, data transformation
+- **Dependencies**: Data layer (future), Utility layer
+
+#### Utility Layer
+- **Purpose**: Reusable functions and constants
+- **Components**: Animation helpers, math utilities, color system
+- **Concerns**: Pure functions, calculations, transformations
+- **Dependencies**: None (self-contained)
+
+#### Data Layer (Future)
+- **Purpose**: Data fetching, caching, and persistence
+- **Components**: API clients, local storage, state persistence
+- **Concerns**: Data fetching, caching strategy, offline support
+- **Dependencies**: External APIs (Spotify, OpenAI, etc.)
 
 ---
 
 ## Component Hierarchy
 
-### Application Structure
-
-The app follows a hierarchical component structure:
+### Main Application Structure
 
 ```
-App (Main Application State)
-├── Universe3D (Persistent 3D Background)
-│   ├── StarField (800+ Stars)
-│   ├── BokehLayer (Purple Ocean Effect)
-│   ├── NebulaOverlay (Cosmic Ambiance)
-│   ├── WhaleConstellation (Whalien 52)
-│   └── FloatingParticles (Ambient Motion)
+App (Root Component)
+├── Universe3D (Background Layer)
+│   ├── StarField (800+ stars)
+│   ├── BokehLayer (Purple Ocean effect)
+│   ├── NebulaLayer (Cosmic atmosphere)
+│   └── ConstellationLayer (Member positions)
 │
 ├── LandingRitual (Entry Experience)
-│   ├── BTSLogo (Animated Gateway)
-│   ├── MemberConstellation (7 Orbital Points)
-│   ├── SyncButton (Hold to Enter)
-│   └── WarpEffect (Transition Animation)
+│   ├── BTSLogo (Animated gateway)
+│   ├── MemberHands (7 member connection points)
+│   ├── SyncButton (Hold to enter)
+│   └── WarpTransition (Portal effect)
 │
 └── Dashboard (Main Application)
-    ├── Navigation (Top Bar)
-    │   ├── NavItems (Mission, Sonic, Archive, Data)
-    │   └── SettingsToggle
+    ├── NavigationBar
+    │   ├── SectionTabs (Overview, Sonic, RAG, Data)
+    │   └── SettingsButton
     │
-    ├── MissionControl (Overview)
+    ├── MissionControl (Overview Section)
     │   ├── StatsOverview
-    │   ├── RecentActivity
-    │   └── QuickLinks
+    │   ├── QuickActions
+    │   └── RecentActivity
     │
     ├── SonicLab (Audio Analysis)
     │   ├── AudioPlayer
     │   ├── WaveformVisualizer
-    │   ├── MetricsDisplay (BPM, Energy, Valence)
-    │   └── EmotionalAnalysis
+    │   ├── MetricsPanel (BPM, Energy, Valence)
+    │   └── SentimentAnalysis
     │
     ├── ArchiveGraph (RAG Search)
     │   ├── SearchBar
-    │   ├── NeuralNetworkViz (Graph Visualization)
+    │   ├── NeuralNetworkViz
     │   ├── SearchResults
     │   └── ContextPanel
     │
     ├── DataHub (Database Browser)
-    │   ├── FilterControls
-    │   ├── SongTable (245+ Records)
-    │   ├── SortingOptions
-    │   └── ExportButton
+    │   ├── SongTable
+    │   ├── FilterPanel
+    │   ├── ExportButton
+    │   └── Pagination
     │
-    └── MemberDNA (Profile Modal)
-        ├── MemberHeader (Name, Color, Role)
-        ├── SoloTracks (Discography)
-        ├── KOMCACredits (Productions)
-        └── Achievements (Milestones)
+    └── MemberDNA (Conditional)
+        ├── MemberProfile
+        ├── KOMCACredits
+        ├── SoloDiscography
+        └── Achievements
 ```
+
+### Component Categories
+
+#### **Layout Components**
+- `App.tsx` - Root component with mode state management
+- `Universe3D` - Persistent 3D background layer
+- `GlassPanel` - Reusable glassmorphism container
+
+#### **Feature Components**
+- `LandingRitual` - Entry animation and transition
+- `SonicLab` - Audio analysis interface
+- `ArchiveGraph` - RAG search interface
+- `DataHub` - Database browser
+- `MemberDNA` - Member profile viewer
+
+#### **Visual Components**
+- `StarField` - 3D star rendering
+- `BokehLayer` - Purple ocean bokeh effect
+- `WaveformVisualizer` - Audio frequency visualization
+- `ConstellationLayer` - Member positioning
+
+#### **Utility Components**
+- Color system (`src/constants/colors.ts`)
+- Animation helpers (`src/utils/animations.ts`)
+- General helpers (`src/utils/helpers.ts`)
 
 ---
 
 ## Data Flow
 
-### Application Mode States
+### State Management Architecture
 
-The app operates in three distinct modes:
-
-```
-┌──────────────┐
-│   landing    │ ──── User arrives, sees BTS logo and constellation
-└──────┬───────┘
-       │ (Hold SYNC button)
-       ▼
-┌──────────────┐
-│     warp     │ ──── Transition animation (stars zooming, warp effect)
-└──────┬───────┘
-       │ (Animation complete)
-       ▼
-┌──────────────┐
-│  dashboard   │ ──── Main application UI with all modules
-└──────────────┘
-```
-
-### State Management Pattern
+The application uses **React local state** with **mode-based architecture**:
 
 ```typescript
-// Main App State (in App.tsx)
+// App state structure
 interface AppState {
   mode: 'landing' | 'warp' | 'dashboard';
   activeSection: 'overview' | 'sonic' | 'rag' | 'data';
@@ -161,996 +198,964 @@ interface AppState {
   playing: boolean;
   showSettings: boolean;
 }
-
-// State flows down as props:
-App → Universe3D (mode)
-App → Dashboard (activeSection)
-App → MemberDNA (activeMemberId)
-App → SonicLab (playing)
-
-// Events bubble up via callbacks:
-LandingRitual → onSync() → App (changes mode)
-Dashboard → setActiveSection() → App (navigation)
-MemberDNA → onClose() → App (close modal)
 ```
 
-### Data Sources
+### State Flow Diagram
 
-1. **Compile-Time Data** (Static)
-   - Member information (stored in constants)
-   - Color palette (BORAHAE_COLORS, MEMBER_COLORS)
-   - Song database (245+ records in JSON/constants)
-
-2. **Runtime Data** (Dynamic)
-   - Audio analysis metrics (generated via Web Audio API)
-   - User preferences (theme, settings)
-   - Search queries and results
-
-3. **Future: API Data** (Planned)
-   - Real-time KOMCA credit updates
-   - Spotify integration for audio previews
-   - RAG backend for semantic search
-
----
-
-## State Management
-
-### Current Approach: useState + Props
-
-We use React's built-in state management without external libraries:
-
-```typescript
-// Parent component (App.tsx) owns state
-const [mode, setMode] = useState<AppMode>('landing');
-const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
-const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
-const [playing, setPlaying] = useState(false);
-
-// Pass down via props drilling
-<Dashboard 
-  activeSection={activeSection}
-  onSectionChange={setActiveSection}
-  onMemberClick={setActiveMemberId}
-/>
-
-// Why this works for our project:
-// ✅ Small to medium component tree (not deeply nested)
-// ✅ State is mostly at top level
-// ✅ React Compiler auto-optimizes prop updates
-// ✅ No complex shared state between distant components
+```
+User Interaction
+    │
+    ├─► Component Event Handler
+    │       │
+    │       ├─► Update Local State (useState)
+    │       │       │
+    │       │       └─► Trigger Re-render
+    │       │               │
+    │       │               └─► Update UI
+    │       │
+    │       └─► Call Utility Function
+    │               │
+    │               └─► Calculate/Transform Data
+    │                       │
+    │                       └─► Return Result
+    │                               │
+    │                               └─► Update Component
+    │
+    └─► CSS Animation/Transition
 ```
 
-### When to Consider Context/Redux
+### Data Sources (Current)
 
-For future scaling, consider:
-- **Context API** when state is needed by many distant components
-- **Zustand/Jotai** for more complex state (user auth, playlists)
-- **React Query** when integrating with backend APIs
+1. **Static Data** (`src/data/` - future)
+   - BTS discography (245+ songs)
+   - Member profiles
+   - Album metadata
 
-Currently, props + React Compiler provides excellent performance.
+2. **Generated Data** (Runtime)
+   - Star positions (generated on mount)
+   - Bokeh bubbles (random configurations)
+   - Particle positions
+
+3. **User State** (React State)
+   - Current mode (landing/dashboard)
+   - Active section
+   - Selected member
+   - Audio playback state
+
+### Data Flow Patterns
+
+#### Pattern 1: Prop Drilling
+```tsx
+// Simple, hierarchical data passing
+<App mode={mode}>
+  <Universe3D mode={mode} />
+  <Dashboard mode={mode}>
+    <SonicLab playing={playing} />
+  </Dashboard>
+</App>
+```
+
+#### Pattern 2: Component Composition
+```tsx
+// Flexible UI composition
+<GlassPanel 
+  title="Sonic Analysis" 
+  icon={Music}
+  accentColor={BORAHAE_COLORS.PRIMARY}
+>
+  <AudioPlayer />
+  <Waveform />
+</GlassPanel>
+```
+
+#### Pattern 3: Utility Functions
+```tsx
+// Pure functions for calculations
+const stars = generateStars(800, UNIVERSE_COLORS.STARS);
+const memberColor = getMemberColor('rm');
+const position = calculateOrbitalPosition(0, 7, 200);
+```
 
 ---
 
 ## Design Patterns
 
-### 1. Composition Pattern
+### 1. **Composition Over Inheritance**
 
-Components are composed from smaller, reusable pieces:
+We favor component composition:
 
 ```tsx
-// Reusable GlassPanel component
-function GlassPanel({ title, icon: Icon, children, accentColor }) {
+// Good: Composition with GlassPanel
+<GlassPanel title="Profile" icon={User}>
+  <MemberInfo />
+  <SoloTracks />
+</GlassPanel>
+
+// Instead of: Class inheritance hierarchy
+class MemberPanel extends GlassPanel { /* ... */ }
+```
+
+**Why?**
+- More flexible and reusable
+- Easier to test and maintain
+- Aligns with React's philosophy
+- Better TypeScript support
+
+### 2. **Pure Functions for Utilities**
+
+All utility functions are pure (no side effects):
+
+```typescript
+// Pure function - same input always gives same output
+export const getMemberColor = (id: string): string => {
+  return MEMBER_COLORS[id] || BORAHAE_COLORS.PRIMARY;
+};
+
+// Pure calculation
+export const sphericalToCartesian = (theta, phi, r): Position3D => ({
+  x: r * Math.sin(phi) * Math.cos(theta),
+  y: r * Math.sin(phi) * Math.sin(theta),
+  z: r * Math.cos(phi),
+});
+```
+
+**Benefits:**
+- Predictable behavior
+- Easy to test
+- Can be memoized
+- No hidden dependencies
+
+### 3. **Separation of Concerns**
+
+Clear boundaries between different responsibilities:
+
+```
+├── UI (Components)      → What users see
+├── Logic (Utils)        → How things work
+├── Data (Types)         → What things are
+└── Style (Tailwind)     → How things look
+```
+
+### 4. **Constants and Configuration**
+
+Centralized configuration prevents magic numbers:
+
+```typescript
+// Colors centralized in constants/colors.ts
+export const BORAHAE_COLORS = { PRIMARY: '#A855F7', /* ... */ };
+
+// Not scattered throughout components
+// ❌ <div style={{ color: '#A855F7' }}>
+// ✅ <div style={{ color: BORAHAE_COLORS.PRIMARY }}>
+```
+
+### 5. **Type-Driven Development**
+
+Types guide implementation:
+
+```typescript
+// Define types first
+interface Member {
+  id: string;
+  name: string;
+  color: string;
+  komca: number;
+  /* ... */
+}
+
+// Implementation follows types
+function renderMember(member: Member) {
+  // TypeScript ensures we use correct properties
+  return <div style={{ color: member.color }}>{member.name}</div>;
+}
+```
+
+---
+
+## Core Systems
+
+### 1. **3D Cosmic Universe System**
+
+**Architecture:**
+```
+Universe3D Component
+├── Star Generation
+│   ├── Spherical Coordinates (θ, φ, r)
+│   ├── Uniform Distribution Algorithm
+│   └── Color Assignment (Borahae palette)
+│
+├── Coordinate Transformation
+│   ├── Spherical → Cartesian conversion
+│   └── Screen projection (perspective transform)
+│
+└── Rendering
+    ├── CSS 3D transforms
+    ├── Animation keyframes (twinkle, float)
+    └── Layer composition (stars, nebula, bokeh)
+```
+
+**Implementation Details:**
+
+```typescript
+// Step 1: Generate stars with spherical coordinates
+const stars = generateStars(800, UNIVERSE_COLORS.STARS);
+// Each star: { theta, phi, r, size, color, delay }
+
+// Step 2: Convert to Cartesian for rendering
+stars.forEach(star => {
+  const { x, y, z } = sphericalToCartesian(star.theta, star.phi, star.r);
+  
+  // Step 3: Apply to DOM with CSS 3D transform
+  element.style.transform = `translate3d(${x}px, ${y}px, ${z}px)`;
+});
+```
+
+**Why Spherical Coordinates?**
+- Uniform distribution across a sphere
+- Natural for cosmic/space visualization
+- Efficient calculation of orbital positions
+- Easy to animate rotation (just change theta)
+
+### 2. **Color System Architecture**
+
+**Hierarchy:**
+```
+Color Constants (constants/colors.ts)
+├── BORAHAE_COLORS (Purple palette)
+├── MEMBER_COLORS (7 member colors)
+├── UNIVERSE_COLORS (Space, nebula, stars)
+├── UI_COLORS (Glass, text, borders)
+└── SENTIMENT_COLORS (10 emotion colors)
+    │
+    ├─► Helper: getMemberColor(id)
+    ├─► Helper: getSentimentColor(sentiment)
+    └─► Helper: withAlpha(hex, alpha)
+```
+
+**Type Safety:**
+```typescript
+// Constants are typed as const for literal types
+export const BORAHAE_COLORS = {
+  PRIMARY: '#A855F7',
+  // ...
+} as const;
+
+// Type: { readonly PRIMARY: '#A855F7', ... }
+// Not: { PRIMARY: string }
+
+// This enables autocomplete and prevents typos
+```
+
+**Usage Pattern:**
+```tsx
+// 1. Import color or helper
+import { getMemberColor, withAlpha } from '@/constants/colors';
+
+// 2. Get color dynamically
+const color = getMemberColor(memberId);
+
+// 3. Apply with transparency
+const style = {
+  backgroundColor: withAlpha(color, 0.1),
+  borderColor: color,
+};
+```
+
+### 3. **Animation System**
+
+**Architecture:**
+```
+Animation System
+├── Generation (utils/animations.ts)
+│   ├── generateStars() → Star[]
+│   ├── generateBokehLights() → BokehBubble[]
+│   └── generateParticles() → FloatingParticle[]
+│
+├── Calculation (utils/helpers.ts)
+│   ├── sphericalToCartesian() → Position3D
+│   ├── calculateOrbitalPosition() → {x, y, angle}
+│   └── easeInOutCubic() → eased value
+│
+└── Application (CSS + React)
+    ├── CSS Keyframe Animations (@keyframes)
+    ├── CSS Transitions (transition property)
+    └── React State Animations (useState + useEffect)
+```
+
+**Animation Flow:**
+
+```typescript
+// 1. Generate animation data
+const stars = generateStars(800, colors);
+
+// 2. Transform for rendering
+const positions = stars.map(star => 
+  sphericalToCartesian(star.theta, star.phi, star.r)
+);
+
+// 3. Apply to DOM
+positions.forEach((pos, i) => {
+  elements[i].style.transform = `translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px)`;
+  elements[i].style.animationDelay = `${stars[i].delay}s`;
+});
+
+// 4. CSS handles actual animation
+```
+
+**Performance Optimization:**
+- Generate once, render many times (useMemo)
+- Use CSS transforms (GPU accelerated)
+- Stagger animations (prevent simultaneous starts)
+- RequestAnimationFrame for smooth updates
+
+### 4. **Mode Management System**
+
+The application has **three modes**:
+
+```typescript
+type AppMode = 'landing' | 'warp' | 'dashboard';
+
+const ModeTransitions = {
+  'landing → warp':     'User holds sync button',
+  'warp → dashboard':   'Warp animation completes',
+  'dashboard → *':      'Navigation within dashboard',
+};
+```
+
+**Mode Architecture:**
+
+```
+┌─────────────┐
+│   LANDING   │  Entry state with BTS logo
+│  (Initial)  │  ← User arrives
+└──────┬──────┘
+       │ Hold sync button
+       ▼
+┌─────────────┐
+│    WARP     │  Transition animation
+│ (Transient) │  Portal effect, star acceleration
+└──────┬──────┘
+       │ Animation completes
+       ▼
+┌─────────────┐
+│  DASHBOARD  │  Main application
+│   (Final)   │  Multiple sections within
+└─────────────┘
+```
+
+**Implementation:**
+```tsx
+function App() {
+  const [mode, setMode] = useState<AppMode>('landing');
+  
+  // Landing: Show BTS logo, awaiting user sync
+  if (mode === 'landing') {
+    return <LandingRitual onSync={() => setMode('warp')} />;
+  }
+  
+  // Warp: Transition effect
+  if (mode === 'warp') {
+    return <WarpTransition onComplete={() => setMode('dashboard')} />;
+  }
+  
+  // Dashboard: Full application
+  return <Dashboard />;
+}
+```
+
+### 5. **RAG (Retrieval-Augmented Generation) System**
+
+**Architecture (Future Implementation):**
+
+```
+RAG Search Flow
+├── User Input
+│   └── Search query: "songs about hope"
+│
+├── Embedding Generation
+│   ├── Convert query to vector embedding
+│   └── Use text-embedding model (OpenAI)
+│
+├── Vector Search
+│   ├── Query vector database (Pinecone/Weaviate)
+│   ├── Find similar song lyrics/themes
+│   └── Return top-k matches with scores
+│
+├── Context Assembly
+│   ├── Retrieve full song metadata
+│   ├── Gather lyrics and analysis
+│   └── Prepare context for LLM
+│
+└── Response Generation
+    ├── Send context + query to LLM (GPT-4)
+    ├── Generate natural language response
+    └── Display with matched songs
+```
+
+**Data Structure:**
+```typescript
+interface RAGSearchResult {
+  id: number;
+  title: string;
+  score: number;        // Similarity score (0-100)
+  context: string;      // Matched lyrics/theme
+  metadata: {
+    album: string;
+    sentiment: string;
+    bpm: number;
+  };
+}
+```
+
+---
+
+## Design Patterns
+
+### Pattern 1: **Component Composition Pattern**
+
+Used for flexible UI assembly:
+
+```tsx
+// Composable GlassPanel
+function GlassPanel({ title, icon, children, onClose }) {
   return (
     <div className="glass-panel">
-      <div className="panel-header">
-        {Icon && <Icon style={{ color: accentColor }} />}
-        <h2>{title}</h2>
-      </div>
-      <div className="panel-content">
-        {children}
-      </div>
+      <Header title={title} icon={icon} onClose={onClose} />
+      <Content>{children}</Content>
     </div>
   );
 }
 
-// Used throughout the app
-<GlassPanel title="Sonic Lab" icon={Waveform} accentColor="#A855F7">
-  <SonicAnalyzer />
+// Usage - compose different content
+<GlassPanel title="Sonic Lab" icon={Music}>
+  <AudioControls />
+  <Waveform />
 </GlassPanel>
 
-<GlassPanel title="Member DNA" icon={User} accentColor={getMemberColor(id)}>
-  <MemberProfile />
+<GlassPanel title="Member Profile" icon={User}>
+  <MemberInfo />
+  <SoloTracks />
 </GlassPanel>
 ```
 
-### 2. Render Props / Slot Pattern
+### Pattern 2: **Hook-Based State Pattern**
 
-For flexible, customizable components:
+Encapsulate stateful logic in custom hooks:
 
 ```tsx
-function DataHub({ headerAction, filters }) {
+// Custom hook for audio playback
+function useAudioPlayer(audioUrl: string) {
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  
+  const togglePlay = () => setPlaying(!playing);
+  const seek = (time: number) => setCurrentTime(time);
+  
+  return { playing, currentTime, duration, togglePlay, seek };
+}
+
+// Component uses the hook
+function AudioPlayer({ url }) {
+  const audio = useAudioPlayer(url);
   return (
-    <GlassPanel 
-      title="Data Hub"
-      headerAction={
-        <ExportButton onClick={exportData} />
-      }
-    >
-      {filters}
-      <SongTable />
-    </GlassPanel>
+    <div>
+      <PlayButton onClick={audio.togglePlay} />
+      <Timeline current={audio.currentTime} total={audio.duration} />
+    </div>
   );
 }
 ```
 
-### 3. Utility-First Design
+### Pattern 3: **Factory Pattern for Generators**
 
-All shared logic is extracted into utility functions:
-
-```
-src/utils/
-├── helpers.ts      # General utilities (color, math, string)
-├── animations.ts   # Animation generation (stars, bokeh, particles)
-└── [future]        # Audio analysis, search algorithms
-```
-
-### 4. Type-Driven Development
-
-Everything is strongly typed:
+Generate complex objects with factory functions:
 
 ```typescript
-// Centralized types (src/types.ts)
-interface Member { id: string; name: string; color: string; ... }
-interface Song { id: number; title: string; bpm: number; ... }
-interface Star { theta: number; phi: number; r: number; ... }
-
-// Functions are fully typed
-function getMemberColor(memberId: string): string { ... }
-function generateStars(count: number, colors: string[]): Star[] { ... }
-
-// Props are typed
-interface MemberDNAProps {
-  memberId: string;
-  onClose: () => void;
-}
-```
-
----
-
-## Performance Optimizations
-
-### 1. React Compiler (Automatic)
-
-The React Compiler automatically optimizes:
-- Component memoization (like React.memo but automatic)
-- Hook dependencies (useMemo/useCallback inserted automatically)
-- Conditional rendering optimization
-- Event handler stability
-
-**Result**: 30-40% faster re-renders without manual optimization
-
-### 2. Code Splitting (Planned)
-
-For production optimization:
-
-```typescript
-// Lazy load heavy components
-const SonicLab = lazy(() => import('./components/SonicLab'));
-const ArchiveRAG = lazy(() => import('./components/ArchiveRAG'));
-
-// Render with Suspense
-<Suspense fallback={<LoadingSpinner />}>
-  <SonicLab />
-</Suspense>
-```
-
-### 3. Animation Performance
-
-3D universe optimizations:
-
-```typescript
-// Stars are generated once, not on every render
-const stars = useMemo(
-  () => generateStars(800, UNIVERSE_COLORS.STARS),
-  [] // Empty deps = generate only once
-);
-
-// Use CSS transforms instead of position changes (GPU-accelerated)
-style={{
-  transform: `translate3d(${x}px, ${y}px, ${z}px)`,
-  willChange: 'transform' // Hint to browser for optimization
-}}
-
-// requestAnimationFrame for smooth 60fps
-function animate() {
-  updatePositions();
-  requestAnimFrame(animate);
-}
-```
-
-### 4. Virtual Scrolling (Future)
-
-For the 245+ song database:
-- Render only visible rows
-- Recycle DOM elements as user scrolls
-- Consider react-window or react-virtualized
-
----
-
-## Visual System
-
-### Cosmic Theme Architecture
-
-The visual system is layered for depth and immersion:
-
-```
-Layer 1 (Deepest):  Deep Space Background (#020005)
-Layer 2:            Nebula Overlay (rgba(88, 28, 135, 0.4))
-Layer 3:            3D Star Field (800+ stars with z-depth)
-Layer 4:            Purple Ocean Bokeh (20-30 out-of-focus lights)
-Layer 5:            Whale Constellation (Whalien 52 theme)
-Layer 6:            Floating Particles (Subtle ambient motion)
-Layer 7 (Top):      Glass Morphism UI (blurred transparent panels)
-```
-
-### 3D Starfield Implementation
-
-**Coordinate System:**
-
-```typescript
-// Spherical coordinates for uniform distribution
-interface Star {
-  theta: number;  // Azimuthal angle (0 to 2π) - horizontal rotation
-  phi: number;    // Polar angle (0 to π) - vertical angle from axis
-  r: number;      // Radius (distance from center, 300-1300px)
-  size: number;   // Visual size (0.5-3px)
-  color: string;  // Borahae purple variations or white
-  delay: number;  // Animation delay for twinkling (0-5s)
+// Factory: creates configured objects
+export function generateStars(count: number, colors: string[]): Star[] {
+  return Array.from({ length: count }, (_, i) => ({
+    theta: Math.random() * 2 * Math.PI,
+    phi: Math.acos((Math.random() * 2) - 1),
+    r: 300 + Math.random() * 1000,
+    size: Math.random() * 2.5 + 0.5,
+    color: i % 12 === 0 ? '#ffffff' : randomItem(colors),
+    delay: Math.random() * 5,
+  }));
 }
 
-// Why spherical coordinates?
-// - Ensures uniform distribution across the sphere surface
-// - Prevents pole clustering (common mistake with random x,y,z)
-// - Easy to control density by adjusting radius range
-// - Natural for rotations and orbital movements
+// Usage: Create 800 configured stars
+const stars = generateStars(800, UNIVERSE_COLORS.STARS);
 ```
 
-**Rendering Strategy:**
+### Pattern 4: **Immutable State Updates**
 
-```typescript
-// 1. Generate stars once on mount (memoized)
-const stars = useMemo(() => generateStars(800, UNIVERSE_COLORS.STARS), []);
+Always create new objects/arrays:
 
-// 2. Convert to Cartesian for rendering
-stars.map(star => {
-  const { x, y, z } = sphericalToCartesian(star.theta, star.phi, star.r);
+```tsx
+// ✅ Correct: Immutable update
+const addSongToPlaylist = (song: Song) => {
+  setPlaylist(prevPlaylist => [...prevPlaylist, song]);
+};
+
+// ❌ Wrong: Mutating state
+const addSongToPlaylist = (song: Song) => {
+  playlist.push(song); // Direct mutation!
+  setPlaylist(playlist);
+};
+```
+
+### Pattern 5: **Memoization Pattern** (React Compiler)
+
+With React Compiler, memoization is automatic:
+
+```tsx
+// You write clean code
+function StarField({ count }: { count: number }) {
+  const stars = generateStars(count, UNIVERSE_COLORS.STARS);
+  const positions = stars.map(s => sphericalToCartesian(s.theta, s.phi, s.r));
   
   return (
-    <div
-      key={index}
-      className="star"
-      style={{
-        // Use transform for GPU acceleration
-        transform: `translate3d(${x}px, ${y}px, ${z}px)`,
-        // Scale based on z-depth for perspective
-        transform: `scale(${1 - z / 2000})`,
-        backgroundColor: star.color,
-        width: star.size,
-        height: star.size,
-      }}
-    />
+    <div>
+      {positions.map((pos, i) => (
+        <Star key={i} position={pos} color={stars[i].color} />
+      ))}
+    </div>
   );
-});
+}
+
+// React Compiler automatically adds
+// useMemo for stars, positions, and map callback
+// when count doesn't change
+```
+
+---
+
+## Core Systems
+
+### Universe 3D System
+
+**Rendering Pipeline:**
+
+```
+1. Generation Phase (Once on mount)
+   ├── generateStars(800, colors)
+   ├── generateBokehLights(30)
+   └── generateFloatingParticles(50)
+
+2. Transformation Phase (On each frame)
+   ├── sphericalToCartesian(theta, phi, r)
+   └── Apply camera/perspective transform
+
+3. Render Phase (60 FPS)
+   ├── Update DOM with new positions
+   ├── Apply CSS 3D transforms
+   └── Trigger CSS animations/transitions
+
+4. Animation Phase (Continuous)
+   ├── CSS keyframe animations (twinkle, float)
+   ├── RequestAnimationFrame for smooth updates
+   └── Staggered timing for organic feel
+```
+
+**Coordinate System:**
+```
+           Y (up)
+           │
+           │
+           │
+           └──────── X (right)
+          /
+         /
+        Z (toward viewer)
+
+Stars are distributed in a 3D sphere using:
+- θ (theta): Azimuthal angle (0 to 2π) - horizontal rotation
+- φ (phi): Polar angle (0 to π) - vertical angle
+- r: Radius (300 to 1300px) - distance from center
 ```
 
 ### Member Constellation System
 
-**Orbital Positioning:**
+**7-Member Circular Arrangement:**
 
 ```typescript
-// 7 BTS members arranged in perfect circle
-const memberIds = ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'];
-
-memberIds.forEach((id, index) => {
-  const { x, y, angle } = calculateOrbitalPosition(
-    index,        // 0-6
-    7,            // Total members
-    200           // Distance from center (radius)
-  );
+// Algorithm: Evenly distribute 7 members around circle
+const calculateMemberPositions = () => {
+  const members = ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'];
   
-  // Position calculation:
-  // angle = (index / totalMembers) * 2π
-  // x = cos(angle) * distance
-  // y = sin(angle) * distance
-  
-  // Evenly spaced: 51.4° between each member
-});
+  return members.map((id, index) => {
+    const angle = (index / 7) * Math.PI * 2; // 360° / 7
+    const distance = 200; // pixels from center
+    
+    return {
+      id,
+      x: Math.cos(angle) * distance,
+      y: Math.sin(angle) * distance,
+      color: getMemberColor(id),
+    };
+  });
+};
 ```
 
-**Member Data Structure:**
-
-```typescript
-interface Member {
-  id: string;              // 'rm', 'jin', etc.
-  name: string;            // 'RM', 'JIN', etc.
-  full: string;            // Full legal name
-  color: string;           // Signature color (#2563EB for RM)
-  role: string;            // Leader, Visual, Producer, etc.
-  mic: string;             // Microphone color
-  komca: number;           // Number of KOMCA credits
-  bio: string;             // Biography
-  soloTracks: string[];    // List of solo songs
-  achievements: string[];  // Career highlights
-}
+**Visual Layout:**
+```
+           RM (0°)
+              │
+    Jin ──────┼────── Jungkook
+   (51°)      │      (309°)
+              │
+  SUGA ───────●────── V
+  (103°)   (center)   (257°)
+              │
+  J-Hope ─────┼────── Jimin
+   (154°)     │      (206°)
 ```
 
 ### Glass Morphism System
 
-**Design Principles:**
-
+**CSS Implementation:**
 ```css
-/* Standard glass panel appearance */
+/* Base glass effect */
 .glass-panel {
-  /* Semi-transparent white background */
-  background: rgba(255, 255, 255, 0.02);
-  
-  /* Subtle border for definition */
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  
-  /* Key to glass effect: backdrop blur */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  
-  /* Soft shadows for depth */
+  background: rgba(255, 255, 255, 0.02);   /* Subtle white tint */
+  border: 1px solid rgba(255, 255, 255, 0.05); /* Faint border */
+  backdrop-filter: blur(20px);              /* Frosted glass */
+  -webkit-backdrop-filter: blur(20px);      /* Safari */
+  border-radius: 16px;                      /* Soft corners */
   box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  
-  /* Rounded corners */
-  border-radius: 16px;
-  
-  /* Subtle glow with Borahae purple */
-  box-shadow: 0 0 40px rgba(168, 85, 247, 0.2);
+    0 8px 32px rgba(0, 0, 0, 0.1),         /* Subtle depth */
+    inset 0 1px 0 rgba(255, 255, 255, 0.1); /* Inner highlight */
 }
 ```
 
-**GlassHUD Component Pattern:**
-
+**Component Pattern:**
 ```tsx
-interface GlassHUDProps {
-  title: string;
-  icon?: React.ElementType;
-  children: React.ReactNode;
-  className?: string;
-  onClose?: () => void;
-  headerAction?: React.ReactNode;
-  accentColor?: string;
-}
-
-function GlassHUD({ 
-  title, 
-  icon: Icon, 
-  children, 
-  accentColor = BORAHAE_COLORS.PRIMARY 
-}: GlassHUDProps) {
+function GlassPanel({ children, accentColor }: GlassPanelProps) {
   return (
-    <div className="glass-panel">
-      <div className="panel-header" style={{ borderColor: accentColor }}>
-        {Icon && <Icon color={accentColor} />}
-        <h2 style={{ color: accentColor }}>{title}</h2>
-      </div>
+    <div 
+      className="glass-panel"
+      style={{
+        boxShadow: `0 0 40px ${withAlpha(accentColor, 0.3)}`,
+        borderColor: withAlpha(accentColor, 0.1),
+      }}
+    >
       {children}
     </div>
   );
 }
 ```
 
----
+### Audio Analysis System (Future)
 
-## Data Flow
-
-### Song Data Flow
+**Planned Architecture:**
 
 ```
-Static Data (constants/songs.ts)
-        │
-        ├─→ Sonic Lab (Audio Analysis)
-        │   └─→ Calculate BPM, energy, valence
-        │       └─→ Display metrics in charts
-        │
-        ├─→ Archive RAG (Semantic Search)
-        │   └─→ Generate embeddings
-        │       └─→ Similarity search
-        │           └─→ Display results with context
-        │
-        └─→ Data Hub (Database Browser)
-            └─→ Apply filters (album, BPM range, sentiment)
-                └─→ Sort results
-                    └─→ Paginate
-                        └─→ Display in table
-                            └─→ Export to CSV/JSON
-```
-
-### Member Data Flow
-
-```
-Static Member Data (constants/members.ts)
-        │
-        ├─→ Landing Ritual
-        │   └─→ Position in constellation (calculateOrbitalPosition)
-        │       └─→ Apply member color (getMemberColor)
-        │           └─→ Render as orbital points
-        │
-        ├─→ Dashboard
-        │   └─→ Member selector/badges
-        │       └─→ Color-coded UI elements
-        │
-        └─→ Member DNA Modal
-            └─→ Display full profile
-                ├─→ KOMCA credits
-                ├─→ Solo tracks
-                ├─→ Achievements
-                └─→ Biography
-```
-
-### Audio Analysis Flow (Future)
-
-```
-Audio File
-    │
-    ├─→ Web Audio API
-    │   ├─→ AudioContext
-    │   ├─→ AnalyserNode (FFT analysis)
-    │   └─→ GainNode (volume control)
-    │
-    ├─→ Frequency Data
-    │   └─→ getByteFrequencyData()
-    │       └─→ Waveform visualization
-    │
-    └─→ Time Data
-        └─→ getByteTimeDomainData()
-            └─→ Oscilloscope display
+Audio Processing Pipeline
+├── Input: Audio file or stream
+├── Web Audio API
+│   ├── Create AudioContext
+│   ├── Create AnalyserNode
+│   └── Connect source → analyser → destination
+│
+├── Frequency Analysis
+│   ├── getByteFrequencyData()
+│   ├── Transform to visual scale
+│   └── Map to waveform height
+│
+└── Visualization
+    ├── Canvas or SVG rendering
+    ├── Real-time updates (60 FPS)
+    └── Color mapping to sentiment
 ```
 
 ---
 
-## Design Patterns
+## Performance Optimizations
 
-### 1. Container/Presentational Pattern
+### 1. **React Compiler Optimizations**
 
-**Container Components** (Logic)
+The React Compiler automatically handles:
+- Component memoization
+- Callback memoization
+- Value memoization
+- Dependency tracking
+
+**Impact:**
 ```tsx
-function SonicLabContainer() {
-  const [playing, setPlaying] = useState(false);
-  const [metrics, setMetrics] = useState(null);
+// Manual optimization (old way)
+const MemberCard = React.memo(({ member }) => {
+  const color = useMemo(() => getMemberColor(member.id), [member.id]);
+  const handleClick = useCallback(() => {
+    selectMember(member.id);
+  }, [member.id]);
   
-  const togglePlay = () => {
-    setPlaying(!playing);
-    if (!playing) analyzeAudio();
-  };
+  return <div onClick={handleClick} style={{ color }}>...</div>;
+});
+
+// With React Compiler (new way)
+function MemberCard({ member }) {
+  const color = getMemberColor(member.id);
+  const handleClick = () => selectMember(member.id);
   
-  return (
-    <SonicLabPresentation 
-      playing={playing}
-      metrics={metrics}
-      onTogglePlay={togglePlay}
-    />
-  );
+  return <div onClick={handleClick} style={{ color }}>...</div>;
+}
+// Compiler automatically adds memoization!
+```
+
+### 2. **CSS Performance**
+
+- **GPU Acceleration**: Use `transform` and `opacity` for animations
+- **Will-change**: Hint browser for upcoming changes
+- **Contain**: Isolate rendering contexts
+
+```css
+.star {
+  /* GPU-accelerated properties */
+  transform: translate3d(var(--x), var(--y), var(--z));
+  will-change: transform; /* Hint for optimization */
+  
+  /* Containment for better rendering performance */
+  contain: layout paint;
 }
 ```
 
-**Presentational Components** (UI)
-```tsx
-function SonicLabPresentation({ playing, metrics, onTogglePlay }) {
-  return (
-    <GlassHUD title="Sonic Lab" icon={Waveform}>
-      <PlayButton playing={playing} onClick={onTogglePlay} />
-      {metrics && <MetricsDisplay data={metrics} />}
-    </GlassHUD>
-  );
-}
-```
-
-### 2. Compound Components
-
-For complex UI groupings:
-
-```tsx
-// Future pattern for member profiles
-<MemberProfile memberId="rm">
-  <MemberProfile.Header />
-  <MemberProfile.Stats>
-    <MemberProfile.KOMCACredits />
-    <MemberProfile.SoloTracks />
-  </MemberProfile.Stats>
-  <MemberProfile.Achievements />
-</MemberProfile>
-```
-
-### 3. Custom Hooks Pattern
-
-Encapsulate reusable logic:
+### 3. **Code Splitting** (Future)
 
 ```typescript
-// src/hooks/useStarfield.ts (Future)
-function useStarfield(count: number, colors: string[]) {
-  const stars = useMemo(
-    () => generateStars(count, colors),
-    [count, colors]
-  );
-  
-  const [rotation, setRotation] = useState(0);
-  
-  useEffect(() => {
-    let animId: number;
-    function animate() {
-      setRotation(prev => prev + 0.001);
-      animId = requestAnimFrame(animate);
-    }
-    animId = requestAnimFrame(animate);
-    return () => cancelAnimFrame(animId);
-  }, []);
-  
-  return { stars, rotation };
-}
+// Lazy load heavy components
+const SonicLab = lazy(() => import('./components/SonicLab'));
+const ArchiveGraph = lazy(() => import('./components/ArchiveGraph'));
 
-// Usage in component
-const { stars, rotation } = useStarfield(800, UNIVERSE_COLORS.STARS);
+// Use with Suspense
+<Suspense fallback={<Loading />}>
+  <SonicLab />
+</Suspense>
 ```
 
-### 4. Factory Functions
-
-For generating visual elements:
+### 4. **Data Optimization**
 
 ```typescript
-// Generate complete bokeh configuration
-function createBokehEffect(count: number, theme: 'purple' | 'rainbow') {
-  const colors = theme === 'purple' 
-    ? [BORAHAE_COLORS.PRIMARY, BORAHAE_COLORS.LIGHT, BORAHAE_COLORS.VIOLET]
-    : UNIVERSE_COLORS.STARS;
-  
-  return generateBokehLights(count).map(bokeh => ({
-    ...bokeh,
-    color: randomItem(colors),
-  }));
-}
+// Efficient data structures
+const songMap = new Map(songs.map(s => [s.id, s])); // O(1) lookup
+const indexedAlbums = groupBy(songs, 'album'); // Pre-grouped data
+
+// Avoid repeated calculations
+const memoizedStars = useMemo(
+  () => generateStars(800, colors),
+  [colors] // Only regenerate if colors change
+);
 ```
 
 ---
 
-## RAG (Retrieval-Augmented Generation) Architecture
+## File Organization
 
-### Planned Implementation
-
-```
-User Query
-    │
-    ├─→ Text Processing
-    │   ├─→ Tokenization
-    │   ├─→ Normalization (lowercase, remove punctuation)
-    │   └─→ Korean/English language detection
-    │
-    ├─→ Embedding Generation
-    │   └─→ OpenAI text-embedding-3-small
-    │       └─→ 1536-dimensional vector
-    │
-    ├─→ Similarity Search
-    │   ├─→ Vector Database (Pinecone/Weaviate/local)
-    │   ├─→ Cosine similarity calculation
-    │   └─→ Top-k results (k=10)
-    │
-    ├─→ Context Retrieval
-    │   ├─→ Fetch song lyrics
-    │   ├─→ Fetch metadata (album, year, sentiment)
-    │   └─→ Fetch related songs
-    │
-    └─→ Result Presentation
-        ├─→ Neural network graph visualization
-        ├─→ Ranked results with scores
-        └─→ Context snippets with highlighting
-```
-
-### Data Structure for RAG
-
-```typescript
-interface SearchResult {
-  id: number;
-  title: string;
-  score: number;              // Similarity score (0-100)
-  context: string;            // Matched lyrics/description
-  metadata: {
-    album: string;
-    year: number;
-    sentiment: string;
-    bpm: number;
-    energy: number;
-  };
-  relatedSongs: number[];     // IDs of similar songs
-}
-
-interface RAGNetwork {
-  nodes: Array<{
-    id: number;
-    title: string;
-    x: number;  // Graph position
-    y: number;
-    color: string; // Based on sentiment
-  }>;
-  edges: Array<{
-    source: number;
-    target: number;
-    weight: number; // Similarity strength
-  }>;
-}
-```
-
----
-
-## File Structure Rationale
-
-### Organization Philosophy
+### Directory Structure Philosophy
 
 ```
 src/
-├── App.tsx                 # Main component (single file for simplicity)
-├── types.ts                # Centralized type definitions
-├── constants/              # Static data and configuration
-│   └── colors.ts           # Borahae color system
-├── utils/                  # Reusable logic (no UI)
-│   ├── helpers.ts          # General utilities
-│   └── animations.ts       # Visual generators
-└── assets/                 # Static files (images, fonts)
-
-Why this structure?
-✅ Currently all components in App.tsx (manageable size: 57KB)
-✅ Easy to navigate (everything in one place)
-✅ No premature abstraction (avoid over-engineering)
-✅ Clear separation: utils (logic) vs App (UI)
-
-When to split App.tsx into /components:
-- When file exceeds 100KB
-- When you need to reuse components across files
-- When team grows (multiple developers working simultaneously)
-- When implementing code splitting/lazy loading
+├── App.tsx                 # Application root
+├── main.tsx               # Entry point
+├── types.ts               # Shared types (backward compat)
+│
+├── constants/             # Static configuration
+│   └── colors.ts          # Color system
+│
+├── types/                 # Type definitions
+│   └── (future type files)
+│
+├── utils/                 # Pure functions
+│   ├── animations.ts      # Animation generators
+│   └── helpers.ts         # General utilities
+│
+├── components/            # (Future) React components
+│   ├── Layout/
+│   ├── Features/
+│   └── UI/
+│
+├── hooks/                 # (Future) Custom React hooks
+│
+├── data/                  # (Future) Static data
+│   ├── songs.ts
+│   ├── members.ts
+│   └── albums.ts
+│
+└── assets/                # Static assets
+    ├── images/
+    ├── audio/             # (Future)
+    └── fonts/             # (Future)
 ```
 
-### Future Component Structure
+### Naming Conventions
 
-```
-src/
-├── components/
-│   ├── layout/
-│   │   ├── Navigation.tsx
-│   │   └── GlassPanel.tsx
-│   ├── universe/
-│   │   ├── Universe3D.tsx
-│   │   ├── StarField.tsx
-│   │   ├── BokehLayer.tsx
-│   │   └── WhaleConstellation.tsx
-│   ├── landing/
-│   │   ├── LandingRitual.tsx
-│   │   ├── BTSLogo.tsx
-│   │   └── MemberConstellation.tsx
-│   ├── dashboard/
-│   │   ├── MissionControl.tsx
-│   │   ├── SonicLab.tsx
-│   │   ├── ArchiveRAG.tsx
-│   │   └── DataHub.tsx
-│   └── member/
-│       └── MemberDNA.tsx
-├── hooks/
-│   ├── useAudioAnalysis.ts
-│   ├── useStarfield.ts
-│   └── useRAGSearch.ts
-└── contexts/
-    └── ThemeContext.tsx
-```
+- **Components**: PascalCase - `MemberCard.tsx`, `Universe3D.tsx`
+- **Utilities**: camelCase - `getMemberColor`, `generateStars`
+- **Constants**: SCREAMING_SNAKE_CASE - `BORAHAE_COLORS`, `MEMBER_COLORS`
+- **Types**: PascalCase - `Member`, `Song`, `AppState`
+- **Files**: kebab-case or PascalCase - `colors.ts`, `MemberCard.tsx`
 
 ---
 
-## Color System Architecture
+## Future Architecture
 
-### Hierarchical Color Structure
+### Planned Enhancements
 
-```
-COLORS (Master Object)
-├── BORAHAE (Primary Palette)
-│   ├── PRIMARY    #A855F7  (Main accent)
-│   ├── LIGHT      #D8B4FE  (Highlights)
-│   ├── INDIGO     #818CF8  (Cool tones)
-│   ├── VIOLET     #C084FC  (Warm tones)
-│   └── DARK       #7E22CE  (Shadows)
-│
-├── MEMBERS (Individual Colors)
-│   ├── RM         #2563EB  (Blue - Leader)
-│   ├── JIN        #EC4899  (Pink - Visual)
-│   ├── SUGA       #10B981  (Green - Producer)
-│   ├── J_HOPE     #EF4444  (Red - Energy)
-│   ├── JIMIN      #F59E0B  (Gold - Elegance)
-│   ├── V          #22c55e  (Green - Natural)
-│   └── JUNGKOOK   #8B5CF6  (Purple - Versatility)
-│
-├── UNIVERSE (Cosmic Background)
-│   ├── SPACE      #020005  (Deep space black)
-│   ├── NEBULA     rgba(88, 28, 135, 0.4)
-│   └── STARS      Array of purples + white
-│
-├── UI (Glass Morphism)
-│   ├── GLASS_BG        rgba(255, 255, 255, 0.02)
-│   ├── GLASS_BORDER    rgba(255, 255, 255, 0.05)
-│   ├── TEXT_PRIMARY    rgba(255, 255, 255, 0.9)
-│   ├── TEXT_SECONDARY  rgba(255, 255, 255, 0.4)
-│   └── TEXT_MUTED      rgba(255, 255, 255, 0.2)
-│
-└── SENTIMENT (Emotional Analysis)
-    ├── JOY            #FBBF24  (Yellow/Gold)
-    ├── GRATITUDE      #A78BFA  (Soft Purple)
-    ├── DETERMINATION  #F59E0B  (Orange)
-    ├── FEAR           #EF4444  (Red)
-    ├── LONGING        #3B82F6  (Blue)
-    ├── PAIN           #DC2626  (Deep Red)
-    ├── COMFORT        #10B981  (Green)
-    ├── DESTINY        #8B5CF6  (Purple)
-    ├── CELEBRATION    #EC4899  (Pink)
-    └── CONFIDENCE     #F59E0B  (Gold)
-```
-
-### Color Application Strategy
-
-1. **Base Colors**: BORAHAE for primary UI elements
-2. **Accents**: MEMBER colors for personalization
-3. **Data**: SENTIMENT colors for visualizations
-4. **Transparency**: withAlpha() for layering
-5. **Consistency**: Use helper functions (getMemberColor, getSentimentColor)
-
----
-
-## Animation System
-
-### Animation Layers
-
-```
-1. Static Elements
-   - Background color
-   - Glass panels
-   - Text content
-
-2. Slow Animations (30-60s)
-   - Bokeh bubbles floating
-   - Subtle nebula pulsing
-   - Whale constellation swimming
-
-3. Medium Animations (5-15s)
-   - Floating particles
-   - Star twinkling
-   - Color transitions
-
-4. Fast Animations (1-3s)
-   - Button interactions
-   - Hover effects
-   - Modal open/close
-
-5. Real-Time (60fps)
-   - Audio waveform visualization
-   - 3D star rotation (if implemented)
-   - Cursor-based parallax
-```
-
-### Performance Budget
-
-- **Target**: 60fps (16.67ms per frame)
-- **Star rendering**: ~5ms (800 elements with GPU acceleration)
-- **React renders**: ~3ms (optimized by React Compiler)
-- **Bokeh updates**: ~2ms (CSS animations, no JS)
-- **Budget remaining**: ~6ms for interactions and effects
-
----
-
-## Security Considerations
-
-### Content Security Policy (Future)
-
+#### 1. **State Management**
 ```typescript
-// Recommended CSP headers for production:
-const csp = {
-  'default-src': ["'self'"],
-  'script-src': ["'self'", "'unsafe-inline'"], // Needed for Vite dev
-  'style-src': ["'self'", "'unsafe-inline'"],  // Needed for Tailwind
-  'img-src': ["'self'", 'data:', 'https:'],
-  'connect-src': ["'self'", 'https://api.spotify.com'], // Future APIs
-  'font-src': ["'self'"],
+// Zustand for global state
+import create from 'zustand';
+
+const useStore = create((set) => ({
+  songs: [],
+  playing: false,
+  currentSong: null,
+  
+  playSong: (id) => set({ currentSong: id, playing: true }),
+  pause: () => set({ playing: false }),
+}));
+```
+
+#### 2. **API Layer**
+```typescript
+// Centralized API client
+export const api = {
+  songs: {
+    getAll: () => fetch('/api/songs').then(r => r.json()),
+    getById: (id) => fetch(`/api/songs/${id}`).then(r => r.json()),
+  },
+  
+  search: {
+    semantic: (query) => fetch('/api/search/rag', {
+      method: 'POST',
+      body: JSON.stringify({ query }),
+    }).then(r => r.json()),
+  },
 };
 ```
 
-### Input Sanitization
-
-```typescript
-// Always sanitize user input (search queries, comments)
-import DOMPurify from 'dompurify';
-
-function sanitizeSearchQuery(query: string): string {
-  return DOMPurify.sanitize(query, { 
-    ALLOWED_TAGS: [],  // Strip all HTML
-    ALLOWED_ATTR: []   // Strip all attributes
-  });
-}
+#### 3. **Component Library**
+```
+components/
+├── Layout/
+│   ├── Universe3D/
+│   ├── GlassPanel/
+│   └── Navigation/
+│
+├── Features/
+│   ├── SonicLab/
+│   ├── MemberDNA/
+│   └── SearchRAG/
+│
+└── UI/
+    ├── Button/
+    ├── Input/
+    └── Card/
 ```
 
----
-
-## Future Enhancements
-
-### Planned Features
-
-1. **Backend Integration**
-   ```
-   Frontend (React) ←→ API Gateway ←→ Services
-                                      ├─→ Spotify API
-                                      ├─→ OpenAI (RAG)
-                                      ├─→ Vector DB
-                                      └─→ KOMCA scraper
-   ```
-
-2. **State Management Migration**
-   - Consider Zustand for complex state
-   - React Query for server state
-   - Persist user preferences to localStorage
-
-3. **Progressive Web App (PWA)**
-   - Offline support with service workers
-   - Install prompt for mobile devices
-   - Cache song database for offline access
-
-4. **Authentication System**
-   - User accounts for personalized playlists
-   - OAuth integration (Spotify, Google)
-   - Saved searches and preferences
-
-5. **Real-Time Features**
-   - Live ARMY chat during events
-   - Real-time comeback countdowns
-   - Synchronized purple ocean effect across users
-
----
-
-## Testing Strategy (Future)
-
-### Unit Tests
+#### 4. **Testing Strategy**
 ```typescript
-// Test utility functions
+// Unit tests for utilities
 describe('getMemberColor', () => {
-  it('returns correct color for valid member ID', () => {
+  it('returns correct color for member', () => {
     expect(getMemberColor('rm')).toBe('#2563EB');
   });
-  
-  it('returns fallback for unknown member', () => {
-    expect(getMemberColor('unknown')).toBe(BORAHAE_COLORS.PRIMARY);
+});
+
+// Component tests
+describe('MemberCard', () => {
+  it('renders member with correct color', () => {
+    render(<MemberCard memberId="rm" />);
+    expect(screen.getByRole('card')).toHaveStyle({
+      borderColor: '#2563EB',
+    });
   });
 });
 ```
 
-### Component Tests
-```tsx
-// Test React components
-describe('GlassPanel', () => {
-  it('renders with title and content', () => {
-    render(<GlassPanel title="Test">Content</GlassPanel>);
-    expect(screen.getByText('Test')).toBeInTheDocument();
-  });
-});
-```
+---
 
-### E2E Tests
-```typescript
-// Test user flows with Playwright
-test('user can navigate from landing to dashboard', async ({ page }) => {
-  await page.goto('/');
-  await page.click('[data-testid="sync-button"]');
-  await expect(page).toHaveURL(/.*dashboard/);
-});
-```
+## Technology Decisions
+
+### Why React 19?
+- Latest features (use transitions, concurrent rendering)
+- Better performance with React Compiler
+- Improved Suspense and error boundaries
+- Future-proof for next 2-3 years
+
+### Why Vite?
+- 10-100x faster than Webpack for development
+- Native ES modules (faster HMR)
+- Optimized production builds
+- Simple configuration
+
+### Why TypeScript?
+- Catches bugs at compile time
+- Better IDE support and autocomplete
+- Self-documenting code
+- Refactoring confidence
+
+### Why Tailwind CSS 4?
+- Utility-first approach matches component architecture
+- Fast iteration on cosmic UI design
+- Excellent purging (small production bundles)
+- Consistent design system
 
 ---
 
-## Performance Monitoring
+## Performance Metrics
 
-### Key Metrics to Track
+### Current Performance
 
-1. **Initial Load Time**: Target < 2s
-2. **Time to Interactive**: Target < 3s
-3. **Frame Rate**: Maintain 60fps for animations
-4. **Bundle Size**: Keep under 500KB (gzipped)
-5. **First Contentful Paint**: Target < 1.5s
+**Development:**
+- Cold start: < 1s
+- HMR update: < 50ms
+- Type checking: < 2s
 
-### Monitoring Tools
+**Production Build:**
+- Build time: ~10-15s
+- Bundle size: ~150KB (gzipped)
+- Initial load: < 500ms
+- Time to Interactive: < 1s
 
-- Chrome DevTools Performance tab
-- Lighthouse CI
-- Web Vitals (LCP, FID, CLS)
-- React DevTools Profiler
-
----
-
-## Accessibility (a11y)
-
-### WCAG 2.1 AA Compliance
-
-```tsx
-// Semantic HTML
-<nav aria-label="Main navigation">
-  <button aria-label="Toggle sonic lab" aria-pressed={active}>
-
-// Keyboard navigation
-<div 
-  role="button" 
-  tabIndex={0}
-  onKeyDown={(e) => e.key === 'Enter' && handleClick()}
->
-
-// Color contrast
-// Purple (#A855F7) on dark background (#020005) = 12.15:1 ratio ✅
-// Text (#ffffff 90%) on dark = 18.53:1 ratio ✅
-
-// Motion preferences
-@media (prefers-reduced-motion: reduce) {
-  .star { animation: none; }
-}
-```
+**Runtime:**
+- 3D starfield: 60 FPS
+- Smooth animations throughout
+- No janky scrolling
+- Responsive interactions (< 100ms)
 
 ---
 
-## Build Output
+## Accessibility Considerations
 
-### Production Build Structure
+### Current Implementation
+- Semantic HTML structure
+- Keyboard navigation support
+- ARIA labels for interactive elements
+- Reduced motion support (future)
 
-```
-dist/
-├── index.html          # Entry point
-├── assets/
-│   ├── index-[hash].js       # Main bundle
-│   ├── vendor-[hash].js      # React, React-DOM
-│   ├── utils-[hash].js       # Utility functions
-│   └── index-[hash].css      # Tailwind CSS (purged)
-└── [assets]            # Images, fonts (from public/)
-```
-
-### Bundle Size Targets
-
-- **Main bundle**: < 150KB (gzipped)
-- **Vendor bundle**: < 200KB (React + React DOM)
-- **Utils bundle**: < 50KB
-- **CSS**: < 30KB (with purging)
-- **Total**: < 430KB initial load
+### Future Enhancements
+- Screen reader optimization
+- High contrast mode
+- Configurable animation speeds
+- Focus management
 
 ---
 
 ## Contributing to Architecture
 
-When making architectural changes:
+When adding new features:
 
-1. **Document**: Update this file with new patterns
-2. **Type**: Ensure TypeScript types are comprehensive
-3. **Test**: Add tests for critical paths
-4. **Performance**: Monitor impact on bundle size and runtime
-5. **Discuss**: Open an issue for major architectural changes
-
----
-
-## References
-
-- [React Architecture Guide](https://react.dev/learn/thinking-in-react)
-- [Vite Documentation](https://vitejs.dev/guide/)
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/)
-- [Web Performance](https://web.dev/performance/)
+1. **Follow existing patterns** - Check similar components first
+2. **Keep utilities pure** - No side effects in helper functions
+3. **Type everything** - Leverage TypeScript's safety
+4. **Document decisions** - Add comments for complex logic
+5. **Consider performance** - Profile before and after changes
+6. **Update this doc** - Keep architecture docs current
 
 ---
+
+**Last Updated**: January 27, 2026  
+**Version**: 0.1.0
 
 *Made with 💜 for BTS & ARMY*
-
-**"작은 것들을 위한 시 (A poem for small things)" — BTS**
-
----
-
-**Last Updated**: January 2026  
-**Version**: 0.0.0  
-**Maintainer**: [@itsmepraks](https://github.com/itsmepraks)
