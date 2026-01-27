@@ -1,66 +1,378 @@
 {
+  /**
+   * TypeScript Configuration for BTS Neural Archive Application Code
+   * 
+   * This configuration is specifically for the src/ directory (application code).
+   * Optimized for React 19.2, TypeScript 5.9, and Vite 7.2 bundler mode.
+   * 
+   * Separate from tsconfig.node.json because:
+   * - App code runs in browser (DOM APIs available)
+   * - Build tools run in Node.js (different globals)
+   * - Different module resolution strategies
+   * - Cleaner type checking and IDE experience
+   */
   "compilerOptions": {
-    /* Build Configuration */
-    // Store incremental build info for faster subsequent builds
+    /* ==================== BUILD CONFIGURATION ==================== */
+    
+    /**
+     * Incremental Build Information
+     * 
+     * Stores compilation metadata for faster subsequent builds.
+     * TypeScript only recompiles changed files and their dependencies.
+     * 
+     * Stored in node_modules/.tmp/ to keep project root clean.
+     * Significantly speeds up development with large codebases.
+     * 
+     * Performance impact: 2-5x faster rebuilds on typical changes.
+     */
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
     
-    // Target ES2022 for modern JavaScript features
+    /**
+     * JavaScript Target Version
+     * 
+     * ES2022 provides modern features used throughout the app:
+     * - Top-level await
+     * - Class fields and private methods
+     * - Error.cause
+     * - Array.at() method
+     * - Object.hasOwn()
+     * 
+     * Safe to use ES2022 because:
+     * - Vite transpiles for older browsers if needed
+     * - Target browsers support ES2022 (Chrome 94+, Firefox 93+, Safari 15+)
+     * - Smaller, more efficient output than ES5
+     * 
+     * For BTS Neural Archive: Enables cleaner async/await code for audio processing
+     */
     "target": "ES2022",
     
-    // Use standard class fields behavior (ECMAScript proposal)
+    /**
+     * Class Fields Standard Behavior
+     * 
+     * Uses ECMAScript standard for class field initialization.
+     * Set to 'true' for spec-compliant behavior matching modern JavaScript.
+     * 
+     * Affects how class properties are initialized and inherited.
+     * Recommended for all new projects to align with TC39 standards.
+     */
     "useDefineForClassFields": true,
     
-    // Include type definitions for ES2022, DOM APIs, and iterables
+    /**
+     * Library Type Definitions
+     * 
+     * Includes type definitions for:
+     * - ES2022: Modern JavaScript APIs (Promise, Array, Object, etc.)
+     * - DOM: Browser APIs (document, window, HTMLElement, etc.)
+     * - DOM.Iterable: For-of loops over DOM collections
+     * 
+     * Essential for our cosmic UI:
+     * - DOM manipulation for star rendering
+     * - window.requestAnimationFrame for smooth animations
+     * - HTMLElement for component refs
+     * - Iterables for nodeList operations
+     */
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     
-    // Use ESNext module system for latest features
+    /**
+     * Module System
+     * 
+     * ESNext uses the latest ECMAScript module features:
+     * - Dynamic imports (await import())
+     * - Import assertions
+     * - Top-level await
+     * 
+     * Required for Vite's modern build pipeline and code splitting.
+     */
     "module": "ESNext",
     
-    // Include Vite-specific type definitions (import.meta.env, etc.)
+    /**
+     * Vite Client Types
+     * 
+     * Includes Vite-specific type definitions:
+     * - import.meta.env (environment variables)
+     * - import.meta.hot (HMR API)
+     * - Asset imports (import pngFile from './image.png')
+     * 
+     * Enables type-safe access to:
+     * - VITE_APP_ENV
+     * - VITE_ENABLE_3D_UNIVERSE
+     * - Other environment variables from .env
+     */
     "types": ["vite/client"],
     
-    // Skip type checking of declaration files for faster compilation
+    /**
+     * Skip Declaration File Checking
+     * 
+     * Skips type checking of .d.ts files from node_modules.
+     * Dramatically speeds up compilation without losing type safety.
+     * 
+     * Why it's safe:
+     * - Published packages are pre-checked
+     * - Focuses checking on your code
+     * - Reduces compilation time by 30-50%
+     * 
+     * Especially helpful with 800+ stars and complex animations.
+     */
     "skipLibCheck": true,
 
-    /* Bundler Mode (Vite-specific) */
-    // Use bundler resolution for optimal Vite compatibility
+    /* ==================== BUNDLER MODE (VITE-SPECIFIC) ==================== */
+    
+    /**
+     * Module Resolution Strategy
+     * 
+     * 'bundler' mode is optimized for modern bundlers like Vite:
+     * - Allows package.json "exports" field
+     * - Supports conditional exports
+     * - Better tree-shaking support
+     * - Aligns with how Vite resolves modules
+     * 
+     * Replaces older 'node' or 'node16' resolution strategies.
+     * Recommended for all Vite projects as of TypeScript 5.0+.
+     */
     "moduleResolution": "bundler",
     
-    // Allow importing .ts/.tsx files without transpiling
+    /**
+     * Allow TS/TSX Imports
+     * 
+     * Allows importing .ts/.tsx files directly (import './utils.ts').
+     * Works with Vite which handles TypeScript compilation automatically.
+     * 
+     * Note: This is a Vite-specific feature. In non-Vite projects,
+     * you'd typically import without extensions.
+     * 
+     * Useful for explicit imports in the BTS Neural Archive.
+     */
     "allowImportingTsExtensions": true,
     
-    // Preserve import/export syntax exactly as written
+    /**
+     * Verbatim Module Syntax
+     * 
+     * Preserves exact import/export syntax as written.
+     * Prevents TypeScript from modifying imports during emit.
+     * 
+     * Example:
+     * - `import type { Member }` stays as type-only import
+     * - `import { Member }` stays as value import
+     * 
+     * Required when using "type" imports with noEmit: true.
+     * Ensures clear distinction between types and runtime values.
+     */
     "verbatimModuleSyntax": true,
     
-    // Force all files to be treated as modules
+    /**
+     * Force Module Detection
+     * 
+     * Treats all files as ES modules (not scripts).
+     * Prevents accidental global scope pollution.
+     * 
+     * Every file has its own scope unless explicitly exported.
+     * Good practice for modern JavaScript applications.
+     */
     "moduleDetection": "force",
     
-    // Don't emit JavaScript files (Vite handles compilation)
+    /**
+     * No Emit
+     * 
+     * TypeScript doesn't output JavaScript files.
+     * 
+     * Why? Vite handles compilation:
+     * - Vite compiles TS to JS during dev server
+     * - Vite bundles and optimizes for production
+     * - TypeScript just validates types
+     * 
+     * TypeScript's role: Type checking only
+     * Vite's role: Actual JavaScript compilation
+     * 
+     * This is the standard pattern for Vite + TypeScript projects.
+     */
     "noEmit": true,
     
-    // Use React's new JSX transform (no need to import React)
+    /**
+     * JSX Transform
+     * 
+     * 'react-jsx' uses React 17+ automatic JSX transform:
+     * - No need to import React in every component file
+     * - Smaller bundle size (React imported automatically)
+     * - Better tree-shaking
+     * 
+     * Before (old transform):
+     * ```tsx
+     * import React from 'react'; // Required!
+     * function App() { return <div>Hello</div>; }
+     * ```
+     * 
+     * Now (react-jsx):
+     * ```tsx
+     * // No React import needed!
+     * function App() { return <div>Hello</div>; }
+     * ```
+     * 
+     * Cleaner code throughout the BTS Neural Archive components.
+     */
     "jsx": "react-jsx",
 
-    /* Strict Type Checking & Linting */
-    // Enable all strict type-checking options
+    /* ==================== STRICT TYPE CHECKING ==================== */
+    
+    /**
+     * Strict Mode (Master Switch)
+     * 
+     * Enables ALL strict type-checking options at once:
+     * - strictNullChecks: null/undefined must be explicitly handled
+     * - strictFunctionTypes: Function parameters are contravariant
+     * - strictBindCallApply: Correct types for bind/call/apply
+     * - strictPropertyInitialization: Class properties must be initialized
+     * - noImplicitAny: Variables must have known types
+     * - noImplicitThis: 'this' must have a known type
+     * - alwaysStrict: Emit "use strict" in JavaScript
+     * 
+     * Why we use strict mode:
+     * - Catches bugs at compile-time, not runtime
+     * - Safer code for complex UI (800+ stars, animations, audio)
+     * - Better autocomplete and IntelliSense
+     * - Industry best practice for TypeScript
+     * 
+     * Critical for BTS Neural Archive:
+     * - Prevents null reference errors in constellation rendering
+     * - Type-safe member color lookups
+     * - Reliable sentiment analysis types
+     * - Catches issues before they reach production
+     */
     "strict": true,
     
-    // Report errors on unused local variables
+    /**
+     * Report Unused Local Variables
+     * 
+     * Flags variables declared but never used:
+     * - Keeps code clean and maintainable
+     * - Prevents dead code accumulation
+     * - Helps identify refactoring opportunities
+     * 
+     * Example error:
+     * ```typescript
+     * const unusedVariable = 42; // Error: 'unusedVariable' is declared but never used
+     * ```
+     * 
+     * Can be bypassed with underscore prefix: `const _unused = 42;`
+     */
     "noUnusedLocals": true,
     
-    // Report errors on unused function parameters
+    /**
+     * Report Unused Parameters
+     * 
+     * Flags function parameters that are never used:
+     * - Identifies unnecessary parameters
+     * - Encourages clean function signatures
+     * 
+     * Example:
+     * ```typescript
+     * function process(data: string, unused: number) { // Error on 'unused'
+     *   return data.toUpperCase();
+     * }
+     * ```
+     * 
+     * Bypass with underscore: `function process(data: string, _unused: number)`
+     * or destructuring: `function onClick(_event: MouseEvent)`
+     */
     "noUnusedParameters": true,
     
-    // Ensure only syntax that can be erased is used (type-only imports)
+    /**
+     * Erasable Syntax Only
+     * 
+     * Ensures only TypeScript syntax that can be safely removed is used.
+     * Prevents runtime-dependent TypeScript features.
+     * 
+     * Good practice for ensuring clean separation between:
+     * - Compile-time types (erased at runtime)
+     * - Runtime values (kept in JavaScript output)
+     * 
+     * Works with verbatimModuleSyntax for explicit type imports.
+     */
     "erasableSyntaxOnly": true,
     
-    // Report errors for fallthrough cases in switch statements
+    /**
+     * Fallthrough Case Warnings
+     * 
+     * Reports errors for switch cases that fallthrough without break/return.
+     * Prevents common bugs in switch statements.
+     * 
+     * Example:
+     * ```typescript
+     * switch (mode) {
+     *   case 'landing':
+     *     initLanding();
+     *     // Error: fallthrough without break!
+     *   case 'dashboard':
+     *     initDashboard();
+     *     break;
+     * }
+     * ```
+     * 
+     * Intentional fallthrough must be marked with comment:
+     * ```typescript
+     * case 'landing':
+     *   initLanding();
+     *   // falls through
+     * case 'dashboard':
+     *   initDashboard();
+     *   break;
+     * ```
+     */
     "noFallthroughCasesInSwitch": true,
     
-    // Ensure imports with side effects are properly marked
+    /**
+     * Unchecked Side Effect Imports
+     * 
+     * Ensures side-effect imports are properly marked.
+     * Helps bundlers optimize tree-shaking and code splitting.
+     * 
+     * Example:
+     * ```typescript
+     * import './styles.css'; // Side-effect import (modifies global state)
+     * import { utility } from './utils'; // Regular import
+     * ```
+     * 
+     * Prevents accidental side effects that could break the build.
+     */
     "noUncheckedSideEffectImports": true
   },
   
-  // Only compile files in the src directory
+  /**
+   * Include Pattern
+   * 
+   * Specifies which files to include in compilation:
+   * - All files in src/ directory
+   * - .ts, .tsx, .d.ts files
+   * - Subdirectories recursively
+   * 
+   * Excludes:
+   * - node_modules/ (handled by dependencies)
+   * - dist/ (build output)
+   * - .config files (handled by tsconfig.node.json)
+   * 
+   * This means TypeScript only checks your application code,
+   * not build tools or dependencies.
+   */
   "include": ["src"]
+  
+  /**
+   * Configuration Summary for BTS Neural Archive:
+   * 
+   * This setup provides:
+   * ✅ Modern JavaScript (ES2022)
+   * ✅ React 19.2 with automatic JSX transform
+   * ✅ Strict type checking (catch bugs early)
+   * ✅ Vite-optimized bundler mode
+   * ✅ Fast incremental builds
+   * ✅ Excellent IDE support
+   * ✅ Clean, maintainable codebase
+   * 
+   * Perfect for:
+   * - Complex UI components (Universe3D, Landing)
+   * - Type-safe utilities (color helpers, animations)
+   * - Large datasets (245+ songs with metadata)
+   * - Performance-critical code (3D rendering, audio analysis)
+   * 
+   * To type-check: npm run build (runs tsc -b)
+   * To check in IDE: VS Code automatically uses this config
+   */
 }
