@@ -1,8 +1,6 @@
-# 📚 BTS Neural Archive - API Reference
+# BTS Neural Archive - Utility Functions API Reference
 
-> Complete reference guide for all utility functions in the BTS Neural Archive
-
-This document provides comprehensive documentation for all utility functions exported from `src/utils/`. These functions power the animations, calculations, and visual effects throughout the application.
+Comprehensive documentation for all utility functions in the `src/utils/` directory.
 
 ## Table of Contents
 
@@ -21,142 +19,93 @@ This document provides comprehensive documentation for all utility functions exp
 
 ## Animation Utilities
 
-Functions from `src/utils/animations.ts` for creating the cosmic visual effects.
+Functions from `src/utils/animations.ts`
 
 ### `generateParticles(count: number): FloatingParticle[]`
 
-Generates random particle configurations for ambient floating animations.
+Generates random particle properties for floating animations.
 
 **Parameters:**
-- `count` (number) - Number of particles to generate
+- `count` (number): Number of particles to generate
 
-**Returns:** Array of `FloatingParticle` objects with properties:
-- `left` (string) - Horizontal position (percentage)
-- `top` (string) - Vertical position (percentage)
-- `delay` (number) - Animation delay in seconds (0-5s)
-- `duration` (number) - Animation duration in seconds (10-20s)
-- `size` (number) - Particle size in pixels (1-4px)
+**Returns:** `FloatingParticle[]` - Array of particle configuration objects
 
 **Example:**
 ```typescript
-const particles = generateParticles(50);
-// Returns 50 particle configurations for floating animations
+import { generateParticles } from '@/utils/animations';
 
-particles.forEach((particle, index) => {
-  console.log(`Particle ${index}: positioned at ${particle.left}, ${particle.top}`);
+const particles = generateParticles(50);
+// Returns array of 50 particle objects with random positions, delays, durations, and sizes
+
+particles.forEach((particle, i) => {
+  console.log(`Particle ${i}:`, {
+    position: `${particle.left}, ${particle.top}`,
+    delay: `${particle.delay}s`,
+    duration: `${particle.duration}s`,
+    size: `${particle.size}px`
+  });
 });
 ```
 
-**Use Case:**
-```tsx
-function FloatingParticles() {
-  const particles = generateParticles(50);
-  
-  return (
-    <div className="particle-container">
-      {particles.map((p, i) => (
-        <div
-          key={i}
-          className="particle"
-          style={{
-            left: p.left,
-            top: p.top,
-            width: p.size,
-            height: p.size,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-```
+**Use Case:** Creating ambient floating particles for the cosmic background.
 
 ---
 
 ### `generateBokehLights(count: number): BokehBubble[]`
 
-Creates bokeh bubble configurations for the "Purple Ocean" ARMY bomb effect.
+Generates bokeh light properties for the "Purple Ocean" effect (ARMY bomb lights).
 
 **Parameters:**
-- `count` (number) - Number of bokeh lights to generate
+- `count` (number): Number of bokeh lights to generate
 
-**Returns:** Array of `BokehBubble` objects with properties:
-- `left` (string) - Horizontal position (percentage)
-- `top` (string) - Vertical position (percentage)
-- `size` (number) - Bubble diameter in pixels (100-300px)
-- `delay` (number) - Animation delay in seconds (0-10s)
-- `duration` (number) - Animation duration in seconds (20-40s)
+**Returns:** `BokehBubble[]` - Array of bokeh configuration objects
 
 **Example:**
 ```typescript
-const bokeh = generateBokehLights(30);
-// Returns 30 bokeh light configurations
+import { generateBokehLights } from '@/utils/animations';
 
-// Average bubble size
-const avgSize = bokeh.reduce((sum, b) => sum + b.size, 0) / bokeh.length;
-console.log(`Average bokeh size: ${avgSize}px`);
+const bokehBubbles = generateBokehLights(30);
+// Creates 30 bokeh light configurations
+
+bokehBubbles.forEach(bubble => {
+  console.log(`Bokeh: Size ${bubble.size}px, Duration ${bubble.duration}s`);
+});
 ```
 
-**Use Case:**
-```tsx
-function PurpleOcean() {
-  const bokehLights = generateBokehLights(30);
-  
-  return (
-    <div className="bokeh-layer">
-      {bokehLights.map((bokeh, i) => (
-        <div
-          key={i}
-          className="bokeh-bubble"
-          style={{
-            left: bokeh.left,
-            top: bokeh.top,
-            width: bokeh.size,
-            height: bokeh.size,
-            animationDelay: `${bokeh.delay}s`,
-            animationDuration: `${bokeh.duration}s`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-```
+**Use Case:** Creating the signature "Purple Ocean" bokeh effect representing ARMY bombs.
 
 ---
 
 ### `generateStars(count: number, colors: string[]): Star[]`
 
-Generates 3D star positions using spherical coordinates for the cosmic universe background.
+Generates 3D star positions for the cosmic universe using spherical coordinates.
 
 **Parameters:**
-- `count` (number) - Number of stars to generate
-- `colors` (string[]) - Array of hex color strings for star colors
+- `count` (number): Number of stars to generate
+- `colors` (string[]): Array of hex color values for stars
 
-**Returns:** Array of `Star` objects with properties:
-- `theta` (number) - Azimuthal angle (0 to 2π) - horizontal rotation
-- `phi` (number) - Polar angle (0 to π) - vertical angle from axis
-- `r` (number) - Radius/distance from center (300-1300px)
-- `size` (number) - Star size in pixels (0.5-3px)
-- `color` (string) - Star color (hex)
-- `delay` (number) - Animation delay (0-5s)
+**Returns:** `Star[]` - Array of star configuration objects with 3D coordinates
 
 **Example:**
 ```typescript
+import { generateStars } from '@/utils/animations';
 import { UNIVERSE_COLORS } from '@/constants/colors';
 
 const stars = generateStars(800, UNIVERSE_COLORS.STARS);
-// Generates 800 stars with Borahae colors
+// Creates 800 stars with Borahae purple color variations
 
-// Every 12th star is white (brighter)
-const whiteStars = stars.filter(s => s.color === '#ffffff');
-console.log(`${whiteStars.length} white stars created`);
+stars.forEach(star => {
+  console.log(`Star:`, {
+    theta: star.theta,      // Azimuthal angle (0 to 2π)
+    phi: star.phi,          // Polar angle (0 to π)
+    radius: star.r,         // Distance from center
+    size: star.size,        // Visual size in pixels
+    color: star.color       // Hex color code
+  });
+});
 ```
 
-**Mathematical Note:**
-The function uses spherical coordinates to ensure uniform distribution across the sphere surface. Using `Math.acos((Math.random() * 2) - 1)` for phi prevents clustering near the poles, which is a common mistake in spherical generation.
+**Use Case:** Creating the 800+ star cosmic universe background.
 
 ---
 
@@ -165,202 +114,158 @@ The function uses spherical coordinates to ensure uniform distribution across th
 Converts spherical coordinates to 3D Cartesian coordinates.
 
 **Parameters:**
-- `theta` (number) - Azimuthal angle in radians
-- `phi` (number) - Polar angle in radians
-- `r` (number) - Radius from origin
+- `theta` (number): Azimuthal angle in radians (horizontal rotation)
+- `phi` (number): Polar angle in radians (vertical angle)
+- `r` (number): Radius (distance from origin)
 
-**Returns:** Object with `x`, `y`, `z` coordinates
-
-**Formula:**
-```
-x = r * sin(φ) * cos(θ)
-y = r * sin(φ) * sin(θ)
-z = r * cos(φ)
-```
+**Returns:** `{ x: number, y: number, z: number }` - Cartesian coordinates
 
 **Example:**
 ```typescript
-const position = sphericalToCartesian(Math.PI / 2, Math.PI / 4, 500);
-// Returns: { x: 353.55, y: 353.55, z: 353.55 }
+import { sphericalToCartesian } from '@/utils/animations';
 
-// Convert all stars to cartesian for rendering
-const stars = generateStars(800, colors);
-const cartesianStars = stars.map(star => ({
-  ...star,
-  position: sphericalToCartesian(star.theta, star.phi, star.r)
-}));
+const spherical = { theta: Math.PI / 4, phi: Math.PI / 3, r: 500 };
+const cartesian = sphericalToCartesian(
+  spherical.theta, 
+  spherical.phi, 
+  spherical.r
+);
+
+console.log(cartesian); 
+// { x: 216.5, y: 375.0, z: 250.0 }
 ```
+
+**Mathematical Background:**
+- x = r × sin(φ) × cos(θ)
+- y = r × sin(φ) × sin(θ)  
+- z = r × cos(φ)
+
+**Use Case:** Converting spherical star positions to screen coordinates for rendering.
 
 ---
 
-### `calculateOrbitalPosition(index: number, totalMembers?: number, distance?: number): OrbitalPosition`
+### `calculateOrbitalPosition(index: number, totalMembers?: number, distance?: number): { x: number, y: number, angle: number }`
 
-Calculates evenly-spaced circular positions for member constellation (the 7 BTS members).
+Calculates orbital position for member constellation (7 members in a circle).
 
 **Parameters:**
-- `index` (number) - Member index (0-6 for 7 members)
-- `totalMembers` (number) - Total members (default: 7)
-- `distance` (number) - Distance from center in pixels (default: 100)
+- `index` (number): Member index (0-6)
+- `totalMembers` (number, optional): Total number of members (default: 7)
+- `distance` (number, optional): Distance from center (default: 100)
 
-**Returns:** Object with:
-- `x` (number) - Horizontal position
-- `y` (number) - Vertical position
-- `angle` (number) - Angle in radians
+**Returns:** Object with `x`, `y` coordinates and `angle` in radians
 
 **Example:**
 ```typescript
-// Position all 7 BTS members in a circle
-const members = ['RM', 'Jin', 'SUGA', 'J-Hope', 'Jimin', 'V', 'Jungkook'];
-const positions = members.map((name, i) => ({
-  name,
-  ...calculateOrbitalPosition(i, 7, 150)
+import { calculateOrbitalPosition } from '@/utils/animations';
+
+// Position all 7 BTS members in a circular constellation
+const memberIds = ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'];
+const memberPositions = memberIds.map((id, index) => ({
+  id,
+  ...calculateOrbitalPosition(index, 7, 150)
 }));
 
-// Result: 7 members evenly spaced around a circle with 150px radius
-positions.forEach(m => {
-  console.log(`${m.name} at (${m.x}, ${m.y}), angle: ${m.angle}`);
+memberPositions.forEach(member => {
+  console.log(`${member.id}: (${member.x}, ${member.y}), angle: ${member.angle}`);
 });
+// rm: (150, 0), angle: 0
+// jin: (106.07, 106.07), angle: 0.898
+// suga: (0, 150), angle: 1.571
+// ... etc.
 ```
 
-**Use Case:**
-```tsx
-function MemberConstellation() {
-  const members = MEMBER_DATA;
-  
-  return (
-    <div className="constellation">
-      {members.map((member, i) => {
-        const pos = calculateOrbitalPosition(i, 7, 200);
-        return (
-          <div
-            key={member.id}
-            className="member-star"
-            style={{
-              transform: `translate(${pos.x}px, ${pos.y}px)`,
-            }}
-          >
-            {member.name}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-```
+**Use Case:** Positioning the 7 BTS members as a constellation in the landing ritual.
 
 ---
 
 ### `getStaggerDelay(index: number, baseDelay?: number, increment?: number): string`
 
-Generates staggered animation delays for sequential animations.
+Generates a staggered animation delay for sequential animations.
 
 **Parameters:**
-- `index` (number) - Element index
-- `baseDelay` (number) - Base delay in milliseconds (default: 0)
-- `increment` (number) - Delay increment per index in milliseconds (default: 100)
+- `index` (number): Element index in sequence
+- `baseDelay` (number, optional): Base delay in milliseconds (default: 0)
+- `increment` (number, optional): Delay increment per index (default: 100ms)
 
-**Returns:** CSS delay string (e.g., "300ms")
+**Returns:** `string` - Delay string for CSS (e.g., "300ms")
 
 **Example:**
 ```typescript
-// Create staggered entrance animations
-const delays = [0, 1, 2, 3, 4].map(i => getStaggerDelay(i, 200, 150));
-// Returns: ["200ms", "350ms", "500ms", "650ms", "800ms"]
+import { getStaggerDelay } from '@/utils/animations';
+
+// Staggered fade-in for navigation items
+const navItems = ['Home', 'Explore', 'Archive', 'About'];
+navItems.forEach((item, index) => {
+  const delay = getStaggerDelay(index, 200, 150);
+  console.log(`${item}: animation-delay: ${delay}`);
+});
+// Home: animation-delay: 200ms
+// Explore: animation-delay: 350ms
+// Archive: animation-delay: 500ms
+// About: animation-delay: 650ms
 ```
 
-**Use Case:**
-```tsx
-function StaggeredList({ items }) {
-  return (
-    <ul>
-      {items.map((item, index) => (
-        <li
-          key={index}
-          style={{
-            animationDelay: getStaggerDelay(index, 0, 100),
-          }}
-          className="fade-in"
-        >
-          {item}
-        </li>
-      ))}
-    </ul>
-  );
-}
-```
+**Use Case:** Creating smooth, sequential animations for lists or grids.
 
 ---
 
 ### `easeInOutCubic(t: number): number`
 
-Cubic easing function for smooth animations (slow start, fast middle, slow end).
+Cubic easing function for smooth animations.
 
 **Parameters:**
-- `t` (number) - Progress value between 0 and 1
+- `t` (number): Progress value between 0 and 1
 
-**Returns:** Eased value between 0 and 1
-
-**Easing Curve:**
-- `t < 0.5`: Eases in (accelerates)
-- `t >= 0.5`: Eases out (decelerates)
+**Returns:** `number` - Eased value between 0 and 1
 
 **Example:**
 ```typescript
-// Animate a value from 0 to 100 with easing
-const startValue = 0;
-const endValue = 100;
-const progress = 0.5; // 50% through animation
+import { easeInOutCubic } from '@/utils/animations';
 
-const easedProgress = easeInOutCubic(progress);
-const currentValue = startValue + (endValue - startValue) * easedProgress;
-// Result: smooth transition value
-```
-
-**Use Case:**
-```typescript
-function animateValue(start, end, duration) {
-  const startTime = Date.now();
-  
-  function update() {
-    const elapsed = Date.now() - startTime;
-    const t = Math.min(elapsed / duration, 1); // Clamp to 0-1
-    const easedT = easeInOutCubic(t);
-    const current = start + (end - start) * easedT;
-    
-    updateDisplay(current);
-    
-    if (t < 1) requestAnimationFrame(update);
-  }
-  
-  update();
+// Smooth transition from 0 to 1
+for (let i = 0; i <= 10; i++) {
+  const t = i / 10;
+  const eased = easeInOutCubic(t);
+  console.log(`t: ${t.toFixed(1)}, eased: ${eased.toFixed(3)}`);
 }
-
-animateValue(0, 1000, 2000); // Animate from 0 to 1000 over 2 seconds
+// t: 0.0, eased: 0.000
+// t: 0.1, eased: 0.004
+// t: 0.2, eased: 0.032
+// t: 0.5, eased: 0.500 (midpoint)
+// t: 0.8, eased: 0.968
+// t: 1.0, eased: 1.000
 ```
+
+**Use Case:** Creating natural-feeling animations (acceleration and deceleration).
 
 ---
 
 ### `clamp(value: number, min: number, max: number): number`
 
-Restricts a value to a specified range.
+Constrains a value between minimum and maximum bounds.
 
 **Parameters:**
-- `value` (number) - Value to clamp
-- `min` (number) - Minimum allowed value
-- `max` (number) - Maximum allowed value
+- `value` (number): Value to clamp
+- `min` (number): Minimum value
+- `max` (number): Maximum value
 
-**Returns:** Clamped value within [min, max]
+**Returns:** `number` - Clamped value
 
 **Example:**
 ```typescript
-clamp(150, 0, 100);  // Returns: 100
-clamp(-50, 0, 100);  // Returns: 0
-clamp(75, 0, 100);   // Returns: 75
+import { clamp } from '@/utils/animations';
 
-// Ensure star size stays within bounds
-const rawSize = Math.random() * 5;
-const size = clamp(rawSize, 0.5, 3); // Size between 0.5px and 3px
+clamp(50, 0, 100);   // 50 (within range)
+clamp(-10, 0, 100);  // 0 (below minimum)
+clamp(150, 0, 100);  // 100 (above maximum)
+
+// Practical use: keeping values in valid range
+const opacity = clamp(userInput, 0, 1);
+const volume = clamp(volumeLevel, 0, 100);
 ```
+
+**Use Case:** Ensuring values stay within valid ranges (opacity, volume, coordinates).
 
 ---
 
@@ -369,33 +274,33 @@ const size = clamp(rawSize, 0.5, 3); // Size between 0.5px and 3px
 Linear interpolation between two values.
 
 **Parameters:**
-- `start` (number) - Starting value
-- `end` (number) - Ending value
-- `t` (number) - Interpolation factor (0 to 1, automatically clamped)
+- `start` (number): Start value
+- `end` (number): End value
+- `t` (number): Progress (0 to 1)
 
-**Returns:** Interpolated value
-
-**Formula:** `result = start + (end - start) * t`
+**Returns:** `number` - Interpolated value
 
 **Example:**
 ```typescript
-lerp(0, 100, 0);     // Returns: 0
-lerp(0, 100, 0.5);   // Returns: 50
-lerp(0, 100, 1);     // Returns: 100
-lerp(0, 100, 1.5);   // Returns: 100 (clamped)
+import { lerp } from '@/utils/animations';
 
-// Smooth color transition
-const startColor = { r: 168, g: 85, b: 247 }; // Purple
-const endColor = { r: 236, g: 72, b: 153 };   // Pink
-const t = 0.5;
+// Animate from 0 to 100 over 10 frames
+for (let frame = 0; frame <= 10; frame++) {
+  const progress = frame / 10;
+  const value = lerp(0, 100, progress);
+  console.log(`Frame ${frame}: ${value}`);
+}
+// Frame 0: 0
+// Frame 5: 50
+// Frame 10: 100
 
-const blendedColor = {
-  r: lerp(startColor.r, endColor.r, t),
-  g: lerp(startColor.g, endColor.g, t),
-  b: lerp(startColor.b, endColor.b, t),
-};
-// Result: midpoint color between purple and pink
+// Color transitions
+const startColor = 168; // R value of #A855F7
+const endColor = 255;   // R value of #FFFFFF
+const midColor = lerp(startColor, endColor, 0.5); // 211.5
 ```
+
+**Use Case:** Smooth transitions, animations, and color blending.
 
 ---
 
@@ -404,199 +309,152 @@ const blendedColor = {
 Generates a random number within a specified range.
 
 **Parameters:**
-- `min` (number) - Minimum value (inclusive)
-- `max` (number) - Maximum value (inclusive)
+- `min` (number): Minimum value
+- `max` (number): Maximum value
 
-**Returns:** Random number between min and max
+**Returns:** `number` - Random value between min and max
 
 **Example:**
 ```typescript
-randomInRange(1, 10);     // Random number like 7.3428
-randomInRange(100, 200);  // Random number like 156.89
+import { randomInRange } from '@/utils/animations';
 
-// Generate random star properties
-const star = {
-  size: randomInRange(0.5, 3),
-  opacity: randomInRange(0.3, 1),
-  speed: randomInRange(5, 15),
-};
+const randomSize = randomInRange(1, 5);        // Random star size
+const randomDelay = randomInRange(0, 3);       // Random animation delay
+const randomOpacity = randomInRange(0.5, 1.0); // Random opacity
+
+console.log(`Star: size ${randomSize}px, delay ${randomDelay}s, opacity ${randomOpacity}`);
 ```
+
+**Use Case:** Adding randomness to animations and visual elements.
 
 ---
 
 ## Helper Functions
 
-Comprehensive utilities from `src/utils/helpers.ts`.
+Functions from `src/utils/helpers.ts`
 
 ### Animation Helpers
 
-#### `randomPosition(): { left: string; top: string }`
+#### `randomPosition(): { left: string, top: string }`
 
-Generates a random position within the viewport.
+Generates a random position within viewport bounds.
 
 **Returns:** Object with `left` and `top` as percentage strings
 
 **Example:**
 ```typescript
-const pos = randomPosition();
-// Returns: { left: "67.23%", top: "42.89%" }
+import { randomPosition } from '@/utils/helpers';
 
-// Create randomly positioned elements
-const element = document.createElement('div');
 const pos = randomPosition();
-element.style.left = pos.left;
-element.style.top = pos.top;
+console.log(pos); // { left: '73.45%', top: '28.91%' }
+
+// Use in styling
+<div style={{ position: 'absolute', ...randomPosition() }}>
+  Floating element
+</div>
 ```
 
 ---
 
 #### `randomDelay(max?: number): number`
 
-Generates a random animation delay.
+Creates a random delay for staggered animations.
 
 **Parameters:**
-- `max` (number) - Maximum delay in seconds (default: 5)
+- `max` (number, optional): Maximum delay in seconds (default: 5)
 
-**Returns:** Random delay between 0 and max
+**Returns:** `number` - Random delay value
 
 **Example:**
 ```typescript
-randomDelay();      // Random value between 0 and 5
-randomDelay(10);    // Random value between 0 and 10
+import { randomDelay } from '@/utils/helpers';
 
-// Apply random delays to multiple elements
-elements.forEach(el => {
-  el.style.animationDelay = `${randomDelay(3)}s`;
-});
+const delay = randomDelay(3);
+console.log(`Animation delay: ${delay}s`); // 0-3 seconds
 ```
 
 ---
 
 #### `randomDuration(min: number, max: number): number`
 
-Generates a random animation duration within a range.
+Creates a random duration within a range.
 
 **Parameters:**
-- `min` (number) - Minimum duration in seconds
-- `max` (number) - Maximum duration in seconds
+- `min` (number): Minimum duration in seconds
+- `max` (number): Maximum duration in seconds
 
-**Returns:** Random duration between min and max
+**Returns:** `number` - Random duration value
 
 **Example:**
 ```typescript
-randomDuration(2, 5);   // Random value like 3.7 seconds
-randomDuration(10, 20); // Random value like 14.2 seconds
+import { randomDuration } from '@/utils/helpers';
 
-// Vary animation speeds
-bokehBubbles.forEach(bubble => {
-  bubble.animationDuration = `${randomDuration(15, 30)}s`;
-});
+const duration = randomDuration(10, 20);
+console.log(`Animation duration: ${duration}s`); // 10-20 seconds
 ```
-
----
-
-#### `generateBokehBubbles(count: number): BokehBubble[]`
-
-Creates bokeh bubble configurations (same as animations.ts version).
-
-**Parameters:**
-- `count` (number) - Number of bubbles
-
-**Returns:** Array of bokeh configurations
-
----
-
-#### `generateFloatingParticles(count: number): FloatingParticle[]`
-
-Generates floating particle configurations.
-
-**Parameters:**
-- `count` (number) - Number of particles
-
-**Returns:** Array of particle configurations
 
 ---
 
 ### Color Helpers
 
-#### `hexToRgb(hex: string): { r: number; g: number; b: number } | null`
+#### `hexToRgb(hex: string): { r: number, g: number, b: number } | null`
 
 Converts hex color to RGB values.
 
 **Parameters:**
-- `hex` (string) - Hex color code (with or without #)
+- `hex` (string): Hex color code (with or without '#')
 
-**Returns:** Object with r, g, b values (0-255) or null if invalid
+**Returns:** RGB object or `null` if invalid
 
 **Example:**
 ```typescript
-hexToRgb('#A855F7');
-// Returns: { r: 168, g: 85, b: 247 }
+import { hexToRgb } from '@/utils/helpers';
 
-hexToRgb('A855F7');  // Also works without #
-// Returns: { r: 168, g: 85, b: 247 }
+const rgb = hexToRgb('#A855F7');
+console.log(rgb); // { r: 168, g: 85, b: 247 }
 
-hexToRgb('invalid');
-// Returns: null
-
-// Use for color manipulation
-const rgb = hexToRgb(BORAHAE_COLORS.PRIMARY);
-if (rgb) {
-  const luminance = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
-  console.log(`Luminance: ${luminance}`);
-}
+const rgb2 = hexToRgb('A855F7'); // Works without '#'
 ```
 
 ---
 
 #### `rgbToHex(r: number, g: number, b: number): string`
 
-Converts RGB values to hex color code.
+Converts RGB values to hex color.
 
 **Parameters:**
-- `r` (number) - Red value (0-255)
-- `g` (number) - Green value (0-255)
-- `b` (number) - Blue value (0-255)
+- `r` (number): Red value (0-255)
+- `g` (number): Green value (0-255)
+- `b` (number): Blue value (0-255)
 
-**Returns:** Hex color string with # prefix
+**Returns:** `string` - Hex color code with '#' prefix
 
 **Example:**
 ```typescript
-rgbToHex(168, 85, 247);
-// Returns: '#a855f7'
+import { rgbToHex } from '@/utils/helpers';
 
-rgbToHex(255, 0, 0);
-// Returns: '#ff0000' (red)
-
-// Round-trip conversion
-const hex = '#A855F7';
-const rgb = hexToRgb(hex);
-const backToHex = rgbToHex(rgb.r, rgb.g, rgb.b);
-// backToHex === '#a855f7' (lowercase)
+const hex = rgbToHex(168, 85, 247);
+console.log(hex); // '#A855F7'
 ```
 
 ---
 
 #### `hexWithAlpha(hex: string, alpha: number): string`
 
-Adds alpha transparency to hex color (returns RGBA).
+Adds alpha transparency to hex color.
 
 **Parameters:**
-- `hex` (string) - Hex color code
-- `alpha` (number) - Alpha value (0-1)
+- `hex` (string): Hex color code
+- `alpha` (number): Alpha value (0-1)
 
-**Returns:** RGBA color string or original hex if invalid
+**Returns:** `string` - RGBA color string
 
 **Example:**
 ```typescript
-hexWithAlpha('#A855F7', 0.5);
-// Returns: 'rgba(168, 85, 247, 0.5)'
+import { hexWithAlpha } from '@/utils/helpers';
 
-hexWithAlpha(MEMBER_COLORS.RM, 0.3);
-// Returns: 'rgba(37, 99, 235, 0.3)'
-
-// Create glass effect
-const glassBackground = hexWithAlpha(BORAHAE_COLORS.PRIMARY, 0.1);
+const rgba = hexWithAlpha('#A855F7', 0.5);
+console.log(rgba); // 'rgba(168, 85, 247, 0.5)'
 ```
 
 ---
@@ -606,22 +464,17 @@ const glassBackground = hexWithAlpha(BORAHAE_COLORS.PRIMARY, 0.1);
 Lightens a color by a percentage.
 
 **Parameters:**
-- `hex` (string) - Hex color code
-- `percent` (number) - Percentage to lighten (0-100)
+- `hex` (string): Hex color code
+- `percent` (number): Percentage to lighten (0-100)
 
-**Returns:** Lightened hex color
+**Returns:** `string` - Lightened hex color
 
 **Example:**
 ```typescript
-lightenColor('#A855F7', 20);
-// Returns lighter shade of purple
+import { lightenColor } from '@/utils/helpers';
 
-lightenColor(MEMBER_COLORS.V, 30);
-// Returns 30% lighter green
-
-// Create hover effects
-const baseColor = BORAHAE_COLORS.PRIMARY;
-const hoverColor = lightenColor(baseColor, 15);
+const lighter = lightenColor('#A855F7', 20);
+// Returns lighter purple shade
 ```
 
 ---
@@ -631,61 +484,49 @@ const hoverColor = lightenColor(baseColor, 15);
 Darkens a color by a percentage.
 
 **Parameters:**
-- `hex` (string) - Hex color code
-- `percent` (number) - Percentage to darken (0-100)
+- `hex` (string): Hex color code
+- `percent` (number): Percentage to darken (0-100)
 
-**Returns:** Darkened hex color
+**Returns:** `string` - Darkened hex color
 
 **Example:**
 ```typescript
-darkenColor('#A855F7', 20);
-// Returns darker shade of purple
+import { darkenColor } from '@/utils/helpers';
 
-// Create shadow colors
-const shadowColor = darkenColor(BORAHAE_COLORS.PRIMARY, 40);
+const darker = darkenColor('#A855F7', 20);
+// Returns darker purple shade
 ```
 
 ---
 
 ### Math Helpers
 
-#### `clamp(value: number, min: number, max: number): number`
-
-(Documented in animations section above)
-
----
-
-#### `lerp(start: number, end: number, t: number): number`
-
-(Documented in animations section above)
-
----
-
 #### `map(value: number, inMin: number, inMax: number, outMin: number, outMax: number): number`
 
 Maps a value from one range to another.
 
 **Parameters:**
-- `value` (number) - Input value
-- `inMin` (number) - Input range minimum
-- `inMax` (number) - Input range maximum
-- `outMin` (number) - Output range minimum
-- `outMax` (number) - Output range maximum
+- `value` (number): Input value
+- `inMin` (number): Input range minimum
+- `inMax` (number): Input range maximum
+- `outMin` (number): Output range minimum
+- `outMax` (number): Output range maximum
 
-**Returns:** Mapped value
+**Returns:** `number` - Mapped value
 
 **Example:**
 ```typescript
-map(50, 0, 100, 0, 1);
-// Returns: 0.5 (50% of 0-100 mapped to 0-1)
+import { map } from '@/utils/helpers';
 
-map(0, -1, 1, 0, 255);
-// Returns: 127.5 (-1 to 1 range mapped to 0-255)
+// Map mouse position (0-1920px) to opacity (0-1)
+const mouseX = 960;
+const opacity = map(mouseX, 0, 1920, 0, 1);
+console.log(opacity); // 0.5
 
-// Map audio levels to visual scale
-const audioLevel = 0.7; // 70% volume
-const particleSize = map(audioLevel, 0, 1, 1, 5);
-// Returns: 3.8 (particle size based on audio)
+// Map BPM (60-180) to color intensity (0-255)
+const bpm = 120;
+const intensity = map(bpm, 60, 180, 0, 255);
+console.log(intensity); // 127.5
 ```
 
 ---
@@ -695,28 +536,24 @@ const particleSize = map(audioLevel, 0, 1, 1, 5);
 Calculates Euclidean distance between two points.
 
 **Parameters:**
-- `x1`, `y1` - First point coordinates
-- `x2`, `y2` - Second point coordinates
+- `x1`, `y1`: Coordinates of first point
+- `x2`, `y2`: Coordinates of second point
 
-**Returns:** Distance between points
-
-**Formula:** `√((x2-x1)² + (y2-y1)²)`
+**Returns:** `number` - Distance between points
 
 **Example:**
 ```typescript
-distance(0, 0, 3, 4);
-// Returns: 5 (Pythagorean triple)
+import { distance } from '@/utils/helpers';
 
-distance(100, 100, 200, 200);
-// Returns: 141.42...
+const dist = distance(0, 0, 3, 4);
+console.log(dist); // 5 (Pythagorean theorem: 3² + 4² = 5²)
 
-// Check if mouse is near a star
-const star = { x: 300, y: 400 };
-const mouse = { x: 310, y: 395 };
-const dist = distance(star.x, star.y, mouse.x, mouse.y);
-if (dist < 50) {
-  // Star is within 50px of mouse
-  highlightStar(star);
+// Check if cursor is near an element
+const cursorX = 100, cursorY = 100;
+const elementX = 150, elementY = 150;
+const distToCursor = distance(cursorX, cursorY, elementX, elementY);
+if (distToCursor < 50) {
+  console.log('Cursor is near element!');
 }
 ```
 
@@ -727,25 +564,21 @@ if (dist < 50) {
 Calculates angle between two points in radians.
 
 **Parameters:**
-- `x1`, `y1` - First point coordinates
-- `x2`, `y2` - Second point coordinates
+- `x1`, `y1`: Coordinates of first point
+- `x2`, `y2`: Coordinates of second point
 
-**Returns:** Angle in radians (-π to π)
+**Returns:** `number` - Angle in radians
 
 **Example:**
 ```typescript
-angleBetween(0, 0, 1, 0);
-// Returns: 0 (pointing right)
+import { angleBetween } from '@/utils/helpers';
 
-angleBetween(0, 0, 0, 1);
-// Returns: π/2 (pointing down)
+const angle = angleBetween(0, 0, 1, 1);
+console.log(angle); // 0.785 radians (45 degrees)
 
-// Rotate element to point at mouse
-const element = { x: 100, y: 100 };
-const mouse = { x: 200, y: 150 };
-const angle = angleBetween(element.x, element.y, mouse.x, mouse.y);
-const degrees = angle * (180 / Math.PI);
-elementRef.style.transform = `rotate(${degrees}deg)`;
+// Convert to degrees
+const degrees = (angle * 180) / Math.PI;
+console.log(degrees); // 45
 ```
 
 ---
@@ -757,21 +590,17 @@ elementRef.style.transform = `rotate(${degrees}deg)`;
 Capitalizes the first letter of a string.
 
 **Parameters:**
-- `str` (string) - Input string
+- `str` (string): Input string
 
-**Returns:** String with first letter capitalized
+**Returns:** `string` - Capitalized string
 
 **Example:**
 ```typescript
-capitalize('hello');
-// Returns: 'Hello'
+import { capitalize } from '@/utils/helpers';
 
-capitalize('ARMY');
-// Returns: 'ARMY' (no change)
-
-// Format member names
-const memberName = capitalize('jungkook');
-// Returns: 'Jungkook'
+capitalize('hello');      // 'Hello'
+capitalize('WORLD');      // 'WORLD'
+capitalize('borahae');    // 'Borahae'
 ```
 
 ---
@@ -781,75 +610,68 @@ const memberName = capitalize('jungkook');
 Converts string to title case (capitalizes each word).
 
 **Parameters:**
-- `str` (string) - Input string
+- `str` (string): Input string
 
-**Returns:** String in title case
+**Returns:** `string` - Title-cased string
 
 **Example:**
 ```typescript
-toTitleCase('blood sweat and tears');
-// Returns: 'Blood Sweat And Tears'
+import { toTitleCase } from '@/utils/helpers';
 
-toTitleCase('the most beautiful moment in life');
-// Returns: 'The Most Beautiful Moment In Life'
-
-// Format song titles
-const songTitle = toTitleCase('spring day');
-// Returns: 'Spring Day'
+toTitleCase('hello world');           // 'Hello World'
+toTitleCase('boy with luv');          // 'Boy With Luv'
+toTitleCase('map of the soul: 7');    // 'Map Of The Soul: 7'
 ```
 
 ---
 
 #### `truncate(str: string, maxLength: number, suffix?: string): string`
 
-Truncates string to specified length with optional suffix.
+Truncates string to specified length.
 
 **Parameters:**
-- `str` (string) - Input string
-- `maxLength` (number) - Maximum length
-- `suffix` (string) - Suffix to append (default: '...')
+- `str` (string): Input string
+- `maxLength` (number): Maximum length
+- `suffix` (string, optional): Suffix to add (default: '...')
 
-**Returns:** Truncated string
+**Returns:** `string` - Truncated string
 
 **Example:**
 ```typescript
-truncate('Blood, Sweat & Tears', 10);
-// Returns: 'Blood, ...'
+import { truncate } from '@/utils/helpers';
 
-truncate('This is a long description', 15, '…');
-// Returns: 'This is a lon…'
+truncate('This is a very long song title', 20);
+// 'This is a very lo...'
 
-truncate('Short', 10);
-// Returns: 'Short' (no truncation)
+truncate('Short', 20);
+// 'Short' (unchanged - below max length)
 
-// Display song lyrics preview
-const lyrics = "지나간 얼굴들 내 맘의 조각들...";
-const preview = truncate(lyrics, 30);
+truncate('Custom suffix example', 15, '…');
+// 'Custom suffix…'
 ```
 
 ---
 
 #### `formatNumber(num: number): string`
 
-Formats number with thousands separators.
+Formats a number with commas as thousands separators.
 
 **Parameters:**
-- `num` (number) - Number to format
+- `num` (number): Number to format
 
-**Returns:** Formatted string with commas
+**Returns:** `string` - Formatted number string
 
 **Example:**
 ```typescript
-formatNumber(1000);
-// Returns: '1,000'
+import { formatNumber } from '@/utils/helpers';
 
-formatNumber(1234567);
-// Returns: '1,234,567'
+formatNumber(1000);        // '1,000'
+formatNumber(1234567);     // '1,234,567'
+formatNumber(42);          // '42'
 
-// Display play counts
-const plays = 54321000;
-const formatted = formatNumber(plays);
-// Returns: '54,321,000'
+// Use in UI
+<div>{formatNumber(views)} views</div>
+// Displays: "1,234,567 views"
 ```
 
 ---
@@ -861,93 +683,69 @@ const formatted = formatNumber(plays);
 Formats duration in seconds to MM:SS format.
 
 **Parameters:**
-- `seconds` (number) - Duration in seconds
+- `seconds` (number): Duration in seconds
 
-**Returns:** Formatted string 'MM:SS'
+**Returns:** `string` - Formatted duration string
 
 **Example:**
 ```typescript
-formatDuration(65);
-// Returns: '1:05'
+import { formatDuration } from '@/utils/helpers';
 
-formatDuration(245);
-// Returns: '4:05'
-
-formatDuration(45);
-// Returns: '0:45'
-
-// Display song duration
-const songLength = 203; // 3 minutes 23 seconds
-const display = formatDuration(songLength);
-// Returns: '3:23'
+formatDuration(65);      // '1:05'
+formatDuration(130);     // '2:10'
+formatDuration(3600);    // '60:00'
+formatDuration(45);      // '0:45'
 ```
 
 ---
 
-#### `debounce<T>(func: T, wait: number): (...args) => void`
+#### `debounce<T>(func: T, wait: number): Function`
 
-Creates a debounced function that delays execution.
+Debounces a function (delays execution until after wait time).
 
 **Parameters:**
-- `func` - Function to debounce
-- `wait` (number) - Delay in milliseconds
+- `func` (Function): Function to debounce
+- `wait` (number): Wait time in milliseconds
 
-**Returns:** Debounced function
+**Returns:** `Function` - Debounced function
 
 **Example:**
 ```typescript
-// Debounce search input
-const searchSongs = (query: string) => {
-  console.log('Searching:', query);
-};
+import { debounce } from '@/utils/helpers';
 
-const debouncedSearch = debounce(searchSongs, 300);
+const searchSongs = debounce((query: string) => {
+  console.log('Searching for:', query);
+  // API call here
+}, 300);
 
-// User types 'spring'
-debouncedSearch('s');      // Waits...
-debouncedSearch('sp');     // Waits... (cancels previous)
-debouncedSearch('spr');    // Waits... (cancels previous)
-debouncedSearch('spring'); // Executes after 300ms
-
-// Debounce window resize
-const handleResize = debounce(() => {
-  console.log('Window resized');
-  recalculateLayout();
-}, 250);
-
-window.addEventListener('resize', handleResize);
+// User types "BTS" quickly
+searchSongs('B');   // Cancelled
+searchSongs('BT');  // Cancelled
+searchSongs('BTS'); // Executes after 300ms of no typing
 ```
 
 ---
 
-#### `throttle<T>(func: T, limit: number): (...args) => void`
+#### `throttle<T>(func: T, limit: number): Function`
 
-Creates a throttled function that limits execution frequency.
+Throttles a function (limits execution frequency).
 
 **Parameters:**
-- `func` - Function to throttle
-- `limit` (number) - Minimum time between executions (ms)
+- `func` (Function): Function to throttle
+- `limit` (number): Minimum time between executions in milliseconds
 
-**Returns:** Throttled function
+**Returns:** `Function` - Throttled function
 
 **Example:**
 ```typescript
-// Throttle scroll handler
-const handleScroll = () => {
-  console.log('Scrolling:', window.scrollY);
-};
+import { throttle } from '@/utils/helpers';
 
-const throttledScroll = throttle(handleScroll, 100);
+const trackScroll = throttle(() => {
+  console.log('Scroll position:', window.scrollY);
+}, 100);
 
-window.addEventListener('scroll', throttledScroll);
-// Executes at most once every 100ms
-
-// Throttle mouse move for performance
-const trackMouse = throttle((e: MouseEvent) => {
-  updateStarPositions(e.clientX, e.clientY);
-}, 16); // ~60fps
-
-document.addEventListener('mousemove', trackMouse);
+window.addEventListener('scroll', trackScroll);
+// Executes at most once every 100ms, even if scrolling rapidly
 ```
 
 ---
@@ -959,33 +757,25 @@ document.addEventListener('mousemove', trackMouse);
 Checks if an element is visible in the viewport.
 
 **Parameters:**
-- `element` (HTMLElement) - DOM element to check
+- `element` (HTMLElement): DOM element to check
 
-**Returns:** `true` if element is in viewport, `false` otherwise
+**Returns:** `boolean` - True if element is in viewport
 
 **Example:**
 ```typescript
+import { isInViewport } from '@/utils/helpers';
+
 const card = document.querySelector('.member-card');
-if (isInViewport(card)) {
-  card.classList.add('animate-in');
+if (card && isInViewport(card)) {
+  card.classList.add('animate');
 }
 
-// Lazy load images
+// Lazy loading images
 images.forEach(img => {
   if (isInViewport(img)) {
-    img.src = img.dataset.src; // Load image
+    img.src = img.dataset.src;
   }
 });
-
-// Trigger animations on scroll
-function onScroll() {
-  const elements = document.querySelectorAll('.animate-on-scroll');
-  elements.forEach(el => {
-    if (isInViewport(el)) {
-      el.classList.add('animated');
-    }
-  });
-}
 ```
 
 ---
@@ -995,32 +785,23 @@ function onScroll() {
 Smoothly scrolls to an element.
 
 **Parameters:**
-- `element` (HTMLElement) - Target element
-- `offset` (number) - Offset from element top in pixels (default: 0)
-- `behavior` (ScrollBehavior) - Scroll behavior: 'smooth' | 'auto' (default: 'smooth')
+- `element` (HTMLElement): Target element
+- `offset` (number, optional): Offset from element top (default: 0)
+- `behavior` (ScrollBehavior, optional): Scroll behavior (default: 'smooth')
 
-**Returns:** void
+**Returns:** `void`
 
 **Example:**
 ```typescript
-const section = document.getElementById('sonic-lab');
-scrollToElement(section);
-// Smoothly scrolls to section
+import { scrollToElement } from '@/utils/helpers';
 
-scrollToElement(section, 100);
-// Scrolls to 100px above section
+const section = document.querySelector('#sonic-lab');
+if (section) {
+  scrollToElement(section, 80); // 80px offset for fixed header
+}
 
+// Instant scroll
 scrollToElement(section, 0, 'auto');
-// Instantly jumps to section
-
-// Navigation menu
-menuItems.forEach(item => {
-  item.addEventListener('click', (e) => {
-    e.preventDefault();
-    const target = document.querySelector(item.dataset.target);
-    scrollToElement(target, 80); // Account for fixed header
-  });
-});
 ```
 
 ---
@@ -1029,307 +810,188 @@ menuItems.forEach(item => {
 
 #### `shuffle<T>(array: T[]): T[]`
 
-Shuffles array using Fisher-Yates algorithm.
+Shuffles an array using Fisher-Yates algorithm.
 
 **Parameters:**
-- `array` (T[]) - Array to shuffle
+- `array` (T[]): Array to shuffle
 
-**Returns:** New shuffled array (original unchanged)
+**Returns:** `T[]` - New shuffled array
 
 **Example:**
 ```typescript
-const songs = ['Spring Day', 'Blood Sweat Tears', 'Dynamite'];
+import { shuffle } from '@/utils/helpers';
+
+const songs = ['Dynamite', 'Butter', 'Permission to Dance'];
 const shuffled = shuffle(songs);
-// Returns: Random order like ['Dynamite', 'Spring Day', 'Blood Sweat Tears']
+console.log(shuffled); // Random order, e.g., ['Butter', 'Permission to Dance', 'Dynamite']
 
-// Shuffle playlist
-const playlist = shuffle(allSongs);
-
-// Shuffle member order
-const randomOrder = shuffle(BTS_MEMBERS);
+// Original array is unchanged
+console.log(songs); // ['Dynamite', 'Butter', 'Permission to Dance']
 ```
 
 ---
 
 #### `randomItem<T>(array: T[]): T`
 
-Returns a random item from an array.
+Gets a random item from an array.
 
 **Parameters:**
-- `array` (T[]) - Source array
+- `array` (T[]): Input array
 
-**Returns:** Random item from array
+**Returns:** `T` - Random item from array
 
 **Example:**
 ```typescript
-const colors = ['#A855F7', '#D8B4FE', '#818CF8'];
+import { randomItem } from '@/utils/helpers';
+
+const colors = ['#A855F7', '#D8B4FE', '#818CF8', '#C084FC'];
 const randomColor = randomItem(colors);
-// Returns one of the colors
+console.log(randomColor); // Random purple shade
 
-// Random member selector
-const randomMember = randomItem(BTS_MEMBERS);
-
-// Random song recommendation
-const recommendation = randomItem(discography);
+const members = ['RM', 'Jin', 'SUGA', 'J-Hope', 'Jimin', 'V', 'Jungkook'];
+const featuredMember = randomItem(members);
 ```
 
 ---
 
 #### `chunk<T>(array: T[], size: number): T[][]`
 
-Splits array into chunks of specified size.
+Splits an array into chunks of specified size.
 
 **Parameters:**
-- `array` (T[]) - Array to chunk
-- `size` (number) - Chunk size
+- `array` (T[]): Input array
+- `size` (number): Chunk size
 
-**Returns:** Array of chunks
+**Returns:** `T[][]` - Array of chunks
 
 **Example:**
 ```typescript
-const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-chunk(numbers, 3);
-// Returns: [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+import { chunk } from '@/utils/helpers';
 
-// Paginate songs
-const songs = [...]; // 245 songs
-const pages = chunk(songs, 20);
-// Returns: 13 pages with 20 songs each (last page has 5)
+const songs = ['Song 1', 'Song 2', 'Song 3', 'Song 4', 'Song 5'];
+const pages = chunk(songs, 2);
+console.log(pages);
+// [['Song 1', 'Song 2'], ['Song 3', 'Song 4'], ['Song 5']]
 
-// Grid layout
-const items = chunk(allItems, 4);
-items.forEach(row => {
-  // Render row with 4 items
-});
+// Pagination
+const itemsPerPage = 12;
+const songPages = chunk(allSongs, itemsPerPage);
+const currentPage = songPages[pageNumber];
 ```
 
 ---
 
 ### Performance Helpers
 
-#### `requestAnimFrame(): Function`
+#### `requestAnimFrame: (callback: FrameRequestCallback) => number`
 
-Cross-browser requestAnimationFrame with fallback.
-
-**Returns:** Function for requesting animation frames
+Request animation frame with cross-browser fallback.
 
 **Example:**
 ```typescript
-let frame = 0;
+import { requestAnimFrame } from '@/utils/helpers';
 
 function animate() {
-  frame++;
-  updateStars(frame);
+  // Animation logic
+  updateStarPositions();
   
   requestAnimFrame(animate);
 }
 
-animate();
-
-// Smooth animation loop
-const startTime = Date.now();
-
-function render() {
-  const elapsed = Date.now() - startTime;
-  const rotation = (elapsed / 1000) * Math.PI * 2; // Full rotation per second
-  
-  updateMemberConstellation(rotation);
-  requestAnimFrame(render);
-}
+requestAnimFrame(animate);
 ```
 
 ---
 
-#### `cancelAnimFrame(): Function`
+#### `cancelAnimFrame: (handle: number) => void`
 
-Cross-browser cancelAnimationFrame with fallback.
-
-**Returns:** Function for canceling animation frames
+Cancel animation frame with cross-browser fallback.
 
 **Example:**
 ```typescript
-let animId;
+import { requestAnimFrame, cancelAnimFrame } from '@/utils/helpers';
+
+let animationId: number;
 
 function startAnimation() {
-  animId = requestAnimFrame(animate);
+  animationId = requestAnimFrame(animate);
 }
 
 function stopAnimation() {
-  cancelAnimFrame(animId);
+  cancelAnimFrame(animationId);
 }
-
-// Start and stop animation
-startAnimation();
-setTimeout(stopAnimation, 5000); // Stop after 5 seconds
 ```
 
 ---
 
 ## Usage Patterns
 
-### Creating the Cosmic Universe
+### Common Combinations
 
+#### Creating a Floating Star with Random Properties
 ```typescript
-import { 
-  generateStars, 
-  generateBokehLights, 
-  generateFloatingParticles 
-} from '@/utils/animations';
+import { randomPosition, randomDelay, randomItem } from '@/utils/helpers';
 import { UNIVERSE_COLORS } from '@/constants/colors';
 
-// Generate all visual elements
-const stars = generateStars(800, UNIVERSE_COLORS.STARS);
-const bokeh = generateBokehLights(30);
-const particles = generateFloatingParticles(50);
+const star = {
+  ...randomPosition(),
+  color: randomItem(UNIVERSE_COLORS.STARS),
+  animationDelay: randomDelay(5),
+  size: Math.random() * 3 + 1
+};
+```
 
-// Render in component
-function Universe3D() {
-  return (
-    <>
-      <StarField stars={stars} />
-      <BokehLayer lights={bokeh} />
-      <ParticleLayer particles={particles} />
-    </>
+#### Smooth Color Transition Animation
+```typescript
+import { lerp, easeInOutCubic, hexToRgb, rgbToHex } from '@/utils/helpers';
+
+function transitionColor(startHex: string, endHex: string, progress: number) {
+  const start = hexToRgb(startHex)!;
+  const end = hexToRgb(endHex)!;
+  const eased = easeInOutCubic(progress);
+  
+  return rgbToHex(
+    lerp(start.r, end.r, eased),
+    lerp(start.g, end.g, eased),
+    lerp(start.b, end.b, eased)
   );
 }
 ```
 
-### Member Constellation Layout
-
+#### Debounced Search with Throttled Scroll
 ```typescript
-import { calculateOrbitalPosition } from '@/utils/animations';
-import { MEMBER_COLORS, getMemberColor } from '@/constants/colors';
+import { debounce, throttle } from '@/utils/helpers';
 
-const MEMBERS = ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'];
-
-function MemberConstellation() {
-  return (
-    <div className="constellation">
-      {MEMBERS.map((id, index) => {
-        const pos = calculateOrbitalPosition(index, 7, 200);
-        const color = getMemberColor(id);
-        
-        return (
-          <div
-            key={id}
-            className="member-star"
-            style={{
-              transform: `translate(${pos.x}px, ${pos.y}px)`,
-              boxShadow: `0 0 20px ${color}`,
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-}
-```
-
-### Smooth Animations
-
-```typescript
-import { lerp, easeInOutCubic } from '@/utils/animations';
-import { debounce } from '@/utils/helpers';
-
-function animateToValue(from: number, to: number, duration: number) {
-  const startTime = Date.now();
-  
-  function update() {
-    const elapsed = Date.now() - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = easeInOutCubic(progress);
-    const current = lerp(from, to, eased);
-    
-    updateDisplay(current);
-    
-    if (progress < 1) {
-      requestAnimFrame(update);
-    }
-  }
-  
-  requestAnimFrame(update);
-}
-
-// Debounced search
 const handleSearch = debounce((query: string) => {
-  searchDiscography(query);
+  performSearch(query);
 }, 300);
+
+const handleScroll = throttle(() => {
+  checkLazyImages();
+}, 100);
 ```
 
 ---
 
-## Performance Notes
+## Performance Considerations
 
-### Optimization Tips
-
-1. **Star Generation**: Use memoization for `generateStars()` to avoid recreating on every render
-2. **Animation Frames**: Always use `requestAnimFrame` instead of `setInterval` for smooth 60fps
-3. **Debounce/Throttle**: Apply to event handlers that fire frequently (scroll, resize, input)
-4. **Array Operations**: `shuffle` and `chunk` create new arrays - consider reusing when possible
-5. **Color Conversions**: Cache `hexToRgb` results if converting the same color multiple times
-
-### Best Practices
-
-```typescript
-// ✅ Good: Memoize expensive calculations
-const stars = useMemo(
-  () => generateStars(800, UNIVERSE_COLORS.STARS),
-  []
-);
-
-// ❌ Bad: Recreating on every render
-const stars = generateStars(800, UNIVERSE_COLORS.STARS);
-
-// ✅ Good: Throttle high-frequency events
-const handleMouseMove = throttle((e) => {
-  updateParallax(e.clientX, e.clientY);
-}, 16);
-
-// ❌ Bad: Executing on every mouse move
-const handleMouseMove = (e) => {
-  updateParallax(e.clientX, e.clientY);
-};
-```
+- **Debounce vs Throttle**: Use debounce for actions that should wait (search input), throttle for frequent events (scroll, resize)
+- **Animation Frame**: Always use `requestAnimFrame` for smooth 60fps animations
+- **Array Operations**: `shuffle`, `chunk`, and `randomItem` create new arrays (immutable)
+- **Color Conversions**: Cache results if converting the same colors repeatedly
+- **DOM Queries**: Store element references instead of repeated querySelector calls
 
 ---
 
 ## TypeScript Types
 
 All functions are fully typed. Import types from:
-
 ```typescript
-import type {
-  Star,
-  BokehBubble,
-  FloatingParticle,
-  Position3D,
-} from '@/types';
+import type { Star, BokehBubble, FloatingParticle, Position3D } from '@/types';
 ```
 
 ---
 
-## Contributing
+**Made with 💜 for BTS & ARMY**
 
-When adding new utility functions:
-
-1. Add comprehensive JSDoc with `@param`, `@returns`, and `@example` tags
-2. Include TypeScript types for all parameters and return values
-3. Write at least 2-3 usage examples
-4. Update this API.md documentation
-5. Consider performance implications
-6. Add unit tests in `__tests__/`
-
----
-
-## Related Documentation
-
-- [Color Constants Documentation](../src/constants/colors.ts)
-- [Type Definitions](../src/types.ts)
-- [Component Usage Guide](./COMPONENTS.md) *(coming soon)*
-- [Animation Guide](./ANIMATIONS.md) *(coming soon)*
-
----
-
-Made with 💜 for BTS & ARMY
-
-*"어떤 빛이 맞는 빛일까 (Which light would be the right one?)" - Mikrokosmos*
+*"작은 것들을 위한 시 (A poem for small things)" — BTS*
