@@ -1,5 +1,58 @@
 {
+  /**
+   * Root TypeScript Configuration for BTS Neural Archive
+   * 
+   * This is the root TypeScript configuration that uses "project references"
+   * to split the codebase into separate compilation units for better organization
+   * and build performance.
+   * 
+   * Project References Benefits:
+   * - Faster incremental builds (only rebuild changed projects)
+   * - Better IDE performance (separate compilation contexts)
+   * - Clearer separation between app code and build tooling
+   * - Enforces dependency graph between projects
+   * 
+   * Our Project Structure:
+   * - tsconfig.app.json: Application source code (src/ directory)
+   * - tsconfig.node.json: Build tooling (vite.config.ts, etc.)
+   * 
+   * Learn More:
+   * - Project References: https://www.typescriptlang.org/docs/handbook/project-references.html
+   * - TypeScript Config: https://www.typescriptlang.org/tsconfig
+   */
+  
+  /**
+   * Files to Include
+   * 
+   * Empty array because we're using project references.
+   * All files are specified in the referenced tsconfig files instead.
+   * 
+   * This prevents accidentally compiling files outside of the intended scopes.
+   */
   "files": [],
+  
+  /**
+   * Project References
+   * 
+   * Defines the separate TypeScript projects that make up the BTS Neural Archive.
+   * Each reference points to a tsconfig file that handles a specific part of the codebase.
+   * 
+   * - tsconfig.app.json: Main application code
+   *   - Compiles everything in src/ directory
+   *   - Configured for React, DOM APIs, and modern ES features
+   *   - Uses strict type checking for code quality
+   * 
+   * - tsconfig.node.json: Build scripts and configuration
+   *   - Compiles Vite config and other Node.js-based files
+   *   - Configured for Node.js environment (not browser)
+   *   - Separate from app code to avoid mixing contexts
+   * 
+   * This separation ensures:
+   * ✅ IDE can provide correct autocomplete for each context
+   * ✅ Build tools work in Node environment
+   * ✅ App code works in browser environment
+   * ✅ No confusion between Node APIs and browser APIs
+   */
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
