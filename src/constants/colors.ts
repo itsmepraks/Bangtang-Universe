@@ -103,9 +103,49 @@ export const SENTIMENT_COLORS = {
 } as const;
 
 /**
- * Helper function to get member color by ID
- * @param memberId - The member's ID (lowercase)
- * @returns The member's signature color
+ * Retrieves the signature color for a BTS member by their ID
+ * 
+ * This function maps member IDs to their unique colors used throughout
+ * the application. Falls back to the primary Borahae purple if the
+ * member ID is not recognized.
+ * 
+ * @param memberId - The member's ID (case-insensitive)
+ *                   Accepts: 'rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'
+ * @returns The member's signature color as a hex string
+ * 
+ * @example
+ * Basic usage:
+ * ```typescript
+ * const rmColor = getMemberColor('rm');
+ * // Returns: '#2563EB' (blue)
+ * ```
+ * 
+ * @example
+ * Case-insensitive lookup:
+ * ```typescript
+ * const jiminColor = getMemberColor('JM');
+ * // Returns: '#F59E0B' (gold)
+ * ```
+ * 
+ * @example
+ * Fallback for unknown IDs:
+ * ```typescript
+ * const unknownColor = getMemberColor('unknown');
+ * // Returns: '#A855F7' (primary Borahae purple)
+ * ```
+ * 
+ * @example
+ * Using in component styling:
+ * ```tsx
+ * function MemberCard({ memberId }: { memberId: string }) {
+ *   const color = getMemberColor(memberId);
+ *   return (
+ *     <div style={{ borderColor: color, boxShadow: `0 0 20px ${color}` }}>
+ *       Member Profile
+ *     </div>
+ *   );
+ * }
+ * ```
  */
 export const getMemberColor = (memberId: string): string => {
   const colorMap: Record<string, string> = {
@@ -122,9 +162,60 @@ export const getMemberColor = (memberId: string): string => {
 };
 
 /**
- * Helper function to get sentiment color
- * @param sentiment - The emotional sentiment
- * @returns The corresponding color
+ * Retrieves the color associated with an emotional sentiment
+ * 
+ * Maps sentiment strings to their corresponding color values from the
+ * SENTIMENT_COLORS palette. Handles multi-word sentiments by converting
+ * spaces to underscores. Falls back to primary Borahae purple for
+ * unrecognized sentiments.
+ * 
+ * @param sentiment - The emotional sentiment (case-insensitive)
+ *                    Examples: 'joy', 'gratitude', 'determination', etc.
+ * @returns The corresponding color as a hex string
+ * 
+ * @example
+ * Basic sentiment lookup:
+ * ```typescript
+ * const joyColor = getSentimentColor('joy');
+ * // Returns: '#FBBF24' (yellow/gold)
+ * ```
+ * 
+ * @example
+ * Case-insensitive matching:
+ * ```typescript
+ * const comfortColor = getSentimentColor('COMFORT');
+ * // Returns: '#10B981' (green)
+ * ```
+ * 
+ * @example
+ * Fallback for unknown sentiments:
+ * ```typescript
+ * const unknownColor = getSentimentColor('nostalgia');
+ * // Returns: '#A855F7' (primary Borahae purple)
+ * ```
+ * 
+ * @example
+ * Using in song analysis visualization:
+ * ```tsx
+ * function SongSentiment({ sentiment }: { sentiment: string }) {
+ *   const color = getSentimentColor(sentiment);
+ *   return (
+ *     <div className="sentiment-badge" style={{ backgroundColor: color }}>
+ *       {sentiment}
+ *     </div>
+ *   );
+ * }
+ * ```
+ * 
+ * @example
+ * Creating sentiment-based gradients:
+ * ```typescript
+ * const song = { sentiments: ['joy', 'gratitude', 'celebration'] };
+ * const gradient = song.sentiments
+ *   .map(s => getSentimentColor(s))
+ *   .join(', ');
+ * // Use in: background: linear-gradient(to right, ${gradient})
+ * ```
  */
 export const getSentimentColor = (sentiment: string): string => {
   const sentimentKey = sentiment.toUpperCase().replace(/\s+/g, '_');
@@ -132,10 +223,75 @@ export const getSentimentColor = (sentiment: string): string => {
 };
 
 /**
- * Helper function to add alpha transparency to hex color
- * @param hex - Hex color code
- * @param alpha - Alpha value (0-1)
- * @returns RGBA color string
+ * Adds alpha transparency to a hex color code
+ * 
+ * Converts a hex color to RGBA format with specified transparency.
+ * Useful for creating layered effects, glassmorphism, and subtle overlays
+ * while maintaining the base color.
+ * 
+ * @param hex - Hex color code (with or without '#' prefix)
+ * @param alpha - Alpha transparency value (0.0 = fully transparent, 1.0 = fully opaque)
+ * @returns RGBA color string in format 'rgba(r, g, b, alpha)'
+ * 
+ * @example
+ * Basic transparency:
+ * ```typescript
+ * const semiTransparent = withAlpha('#A855F7', 0.5);
+ * // Returns: 'rgba(168, 85, 247, 0.5)'
+ * ```
+ * 
+ * @example
+ * Creating glass effect overlays:
+ * ```typescript
+ * const glassBg = withAlpha(BORAHAE_COLORS.PRIMARY, 0.1);
+ * // Use in: background-color: glassBg
+ * ```
+ * 
+ * @example
+ * Member color with transparency:
+ * ```typescript
+ * const rmGlow = withAlpha(MEMBER_COLORS.RM, 0.3);
+ * // Returns: 'rgba(37, 99, 235, 0.3)'
+ * // Use for glowing effects around member cards
+ * ```
+ * 
+ * @example
+ * Layered bokeh effect:
+ * ```tsx
+ * function BokehBubble({ color }: { color: string }) {
+ *   return (
+ *     <div 
+ *       className="bokeh-bubble"
+ *       style={{
+ *         background: `radial-gradient(
+ *           circle,
+ *           ${withAlpha(color, 0.6)} 0%,
+ *           ${withAlpha(color, 0.2)} 50%,
+ *           ${withAlpha(color, 0)} 100%
+ *         )`
+ *       }}
+ *     />
+ *   );
+ * }
+ * ```
+ * 
+ * @example
+ * Creating hover states:
+ * ```css
+ * .member-card {
+ *   background: withAlpha(MEMBER_COLORS.JIMIN, 0.1);
+ * }
+ * .member-card:hover {
+ *   background: withAlpha(MEMBER_COLORS.JIMIN, 0.2);
+ * }
+ * ```
+ * 
+ * @example
+ * Text shadow with color and transparency:
+ * ```typescript
+ * const textGlow = `0 0 20px ${withAlpha(BORAHAE_COLORS.PRIMARY, 0.8)}`;
+ * // Use in: text-shadow: textGlow
+ * ```
  */
 export const withAlpha = (hex: string, alpha: number): string => {
   const r = parseInt(hex.slice(1, 3), 16);
