@@ -1,13 +1,87 @@
 {
   "name": "bts-neural-archive",
+  "version": "0.1.0",
+  "description": "🌌 BTS Neural Archive - An immersive 3D cosmic data visualization exploring BTS's musical universe through interactive glass morphism UI, AI-powered semantic search, and real-time audio analysis. Built with React 19, TypeScript, Vite 7, and Tailwind CSS 4.",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
+  "keywords": [
+    "bts",
+    "kpop",
+    "music-visualization",
+    "data-visualization",
+    "3d-visualization",
+    "react",
+    "typescript",
+    "vite",
+    "tailwind-css",
+    "glass-morphism",
+    "cosmic-ui",
+    "purple-aesthetic",
+    "music-analysis",
+    "audio-visualization",
+    "semantic-search",
+    "rag-search",
+    "neural-network",
+    "interactive-dashboard",
+    "react-19",
+    "react-compiler",
+    "tailwind-4",
+    "vite-7",
+    "animation",
+    "particles",
+    "borahae"
+  ],
+  "author": {
+    "name": "Prakriti Bista",
+    "email": "hello@praks.me",
+    "url": "https://github.com/itsmepraks"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/itsmepraks/BTS-universe.git"
+  },
+  "homepage": "https://github.com/itsmepraks/BTS-universe#readme",
+  "bugs": {
+    "url": "https://github.com/itsmepraks/BTS-universe/issues",
+    "email": "hello@praks.me"
+  },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/itsmepraks"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "packageManager": "npm@10.9.2",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "preview:build": "npm run build && npm run preview",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,json,md}\"",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf node_modules dist .vite",
+    "clean:build": "rm -rf dist",
+    "analyze": "vite build --mode analyze",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "echo \"Setting up git hooks...\""
   },
   "dependencies": {
     "lucide-react": "^0.562.0",
