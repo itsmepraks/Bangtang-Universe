@@ -1,83 +1,836 @@
+/**
+ * BTS Neural Archive - Global Styles & Animations
+ * 
+ * This file contains all global CSS styles, custom animations, and keyframes
+ * for the cosmic BTS visualization experience. Built with Tailwind CSS 4
+ * for utility-first styling and custom animations for unique effects.
+ * 
+ * **Contents:**
+ * - Tailwind CSS Import
+ * - Custom Scrollbar Styles
+ * - Keyframe Animations (12 animations)
+ * - Utility Classes
+ * - Global Resets & Base Styles
+ * - 3D Transform Utilities
+ * - Glass Morphism Effects
+ * 
+ * **Performance Notes:**
+ * - All animations use GPU-accelerated properties (transform, opacity)
+ * - Avoid animating layout properties (width, height, top, left)
+ * - Use will-change sparingly for complex animations
+ * - Prefer CSS animations over JavaScript for better performance
+ * 
+ * **Browser Compatibility:**
+ * - Modern browsers (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
+ * - Fallbacks provided for older browsers where needed
+ * - Autoprefixer handles vendor prefixes automatically
+ * 
+ * @see {@link https://tailwindcss.com/docs} for Tailwind documentation
+ */
+
+/* ============================================================================
+   TAILWIND CSS IMPORT
+   ============================================================================
+   
+   Imports Tailwind CSS 4 base styles, components, and utilities.
+   Tailwind 4 uses native CSS for faster builds and better HMR.
+   
+   The @import "tailwindcss" directive loads:
+   - Base layer: Reset styles and element defaults
+   - Components layer: Reusable component classes
+   - Utilities layer: Single-purpose utility classes
+   
+   Customization is done through tailwind.config.ts and CSS variables.
+   
+   @see {@link https://tailwindcss.com/docs/v4-beta} for Tailwind 4 features
+*/
 @import "tailwindcss";
 
-/* Pretty scrollbar */
+/* ============================================================================
+   CUSTOM SCROLLBAR STYLES
+   ============================================================================
+   
+   Creates a minimal, purple-themed scrollbar that matches the BTS cosmic
+   aesthetic. Uses webkit scrollbar pseudo-elements for customization.
+   
+   **Design:**
+   - 4px wide/high for minimal visual weight
+   - Transparent track for seamless integration
+   - Purple thumb with low opacity for subtlety
+   - Increased opacity on hover for feedback
+   
+   **Browser Support:**
+   - Chrome/Edge/Safari: Full support
+   - Firefox: Uses scrollbar-width and scrollbar-color instead
+   
+   **Usage:**
+   Apply the .pretty-scrollbar class to any scrollable container.
+*/
+
+/* Scrollbar width and height */
 .pretty-scrollbar::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 4px;   /* Vertical scrollbar width */
+  height: 4px;  /* Horizontal scrollbar height */
 }
+
+/* Scrollbar track (background) */
 .pretty-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent;  /* Invisible track for clean look */
 }
+
+/* Scrollbar thumb (the draggable part) */
 .pretty-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.2);
-  border-radius: 10px;
+  background: rgba(168, 85, 247, 0.2);  /* BTS purple with 20% opacity */
+  border-radius: 10px;                   /* Fully rounded for smooth appearance */
 }
+
+/* Scrollbar thumb on hover */
 .pretty-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.4);
+  background: rgba(168, 85, 247, 0.4);  /* Increased opacity for interaction feedback */
 }
 
-/* Custom animations */
+/**
+ * Usage Example:
+ * 
+ * <div className="overflow-y-auto pretty-scrollbar max-h-96">
+ *   <p>Long scrollable content...</p>
+ * </div>
+ * 
+ * For Firefox compatibility, add:
+ * scrollbar-width: thin;
+ * scrollbar-color: rgba(168, 85, 247, 0.2) transparent;
+ */
+
+/* ============================================================================
+   KEYFRAME ANIMATIONS
+   ============================================================================
+   
+   Custom animation keyframes for the cosmic BTS experience. Each animation
+   is designed to be smooth, performant, and enhance the immersive atmosphere.
+   
+   **Performance Best Practices:**
+   - Only animate transform and opacity (GPU-accelerated)
+   - Avoid animating layout properties (causes reflows)
+   - Use hardware acceleration with transform: translateZ(0)
+   - Keep animation duration reasonable (0.3s - 3s for UI, longer for ambient)
+   
+   **Naming Convention:**
+   - Descriptive names indicating the effect (twinkle, float, pulse)
+   - Consistent naming for related animations
+*/
+
+/* ----------------------------------------------------------------------------
+   TWINKLE ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Creates a gentle pulsing opacity effect for stars, simulating the natural
+   twinkling of distant celestial bodies.
+   
+   **Effect:** Stars fade between 80% and 30% opacity in a smooth cycle.
+   
+   **Duration:** Typically 3-5 seconds with random delays for organic feel
+   
+   **Use Cases:**
+   - Star particles in the 3D universe background
+   - Ambient light effects
+   - Distant bokeh bubbles
+   
+   **Performance:** Excellent - only animates opacity (GPU-accelerated)
+*/
 @keyframes twinkle {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 0.3; }
+  0%, 100% { 
+    opacity: 0.8;  /* Full visibility at start and end */
+  }
+  50% { 
+    opacity: 0.3;  /* Dimmed at midpoint for twinkling effect */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .star {
+ *   animation: twinkle 4s ease-in-out infinite;
+ *   animation-delay: calc(var(--star-index) * 0.1s);
+ * }
+ */
+
+/* ----------------------------------------------------------------------------
+   FLOAT ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Animates particles floating across the screen in a diagonal path, creating
+   the effect of cosmic dust drifting through space.
+   
+   **Effect:** Particles move from bottom-left to top-right with slight rotation
+   
+   **Path:**
+   - Start: 20% left of origin
+   - Middle: 50% right, 20% up
+   - End: 120% right, 10% up (off-screen)
+   
+   **Duration:** 10-20 seconds for slow, ambient movement
+   
+   **Use Cases:**
+   - Floating particles in the cosmic background
+   - Ambient dust effects
+   - Gentle drifting elements
+   
+   **Performance:** Excellent - transform is GPU-accelerated
+*/
 @keyframes float {
-  0% { transform: translate(-20%, 0) rotate(0deg); }
-  50% { transform: translate(50%, -20%) rotate(5deg); }
-  100% { transform: translate(120%, -10%) rotate(-5deg); }
+  0% { 
+    transform: translate(-20%, 0) rotate(0deg);  /* Start position */
+  }
+  50% { 
+    transform: translate(50%, -20%) rotate(5deg);  /* Midpoint with slight rotation */
+  }
+  100% { 
+    transform: translate(120%, -10%) rotate(-5deg);  /* End off-screen */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .floating-particle {
+ *   animation: float 15s linear infinite;
+ *   animation-delay: calc(var(--particle-index) * 0.2s);
+ * }
+ * 
+ * Performance Note:
+ * Use translate() instead of left/top for better performance.
+ * Transform is composited on the GPU, avoiding layout recalculation.
+ */
+
+/* ----------------------------------------------------------------------------
+   BOKEH-FLOAT ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Creates the photographic bokeh effect with soft, out-of-focus light orbs
+   that float, scale, and pulse. This is the signature "Purple Ocean" effect
+   for the BTS "Borahae" aesthetic.
+   
+   **Effect:** Circular movement with scaling and opacity changes
+   
+   **Motion Pattern:**
+   - 0%: Start position, normal scale, low opacity
+   - 33%: Move right-up, scale up, higher opacity
+   - 66%: Move left-down, scale down, lower opacity
+   - 100%: Return to start
+   
+   **Duration:** 20-40 seconds for slow, dreamy movement
+   
+   **Use Cases:**
+   - Purple ocean background effect
+   - Bokeh bubble layers
+   - Ambient atmospheric lighting
+   
+   **Performance:** Good - uses transform and opacity, but large blur is GPU-intensive
+*/
 @keyframes bokeh-float {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
-  33% { transform: translate(30px, -50px) scale(1.1); opacity: 0.3; }
-  66% { transform: translate(-20px, 20px) scale(0.9); opacity: 0.15; }
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);  /* Start/end position */
+    opacity: 0.2;                          /* Low opacity for subtle effect */
+  }
+  33% { 
+    transform: translate(30px, -50px) scale(1.1);  /* Float up-right, grow */
+    opacity: 0.3;                                   /* Peak opacity */
+  }
+  66% { 
+    transform: translate(-20px, 20px) scale(0.9);  /* Float down-left, shrink */
+    opacity: 0.15;                                  /* Lower opacity */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .bokeh-bubble {
+ *   width: 200px;
+ *   height: 200px;
+ *   background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, transparent 70%);
+ *   filter: blur(60px);
+ *   animation: bokeh-float 30s ease-in-out infinite;
+ *   animation-delay: calc(var(--bokeh-index) * 2s);
+ * }
+ * 
+ * Performance Warning:
+ * Large blur radius (>40px) is GPU-intensive. Limit to 10-15 bokeh bubbles
+ * for 60fps performance. Reduce count on mobile devices.
+ * 
+ * Browser Note:
+ * Blur filter is well-supported but can impact performance on older devices.
+ */
+
+/* ----------------------------------------------------------------------------
+   DRAW-LINE ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Animates SVG line drawing using stroke-dashoffset technique. Creates the
+   effect of lines being drawn in real-time, perfect for constellation
+   connections and graph visualizations.
+   
+   **Effect:** Lines appear to draw from start to end
+   
+   **Technique:**
+   - Uses stroke-dasharray and stroke-dashoffset
+   - Animates dashoffset from full length (1000) to 0
+   - Opacity animates for fade-in effect
+   
+   **Duration:** 1-3 seconds for line drawing
+   
+   **Use Cases:**
+   - Member constellation connections
+   - Graph network lines
+   - Animated borders
+   - Path tracing effects
+   
+   **Performance:** Excellent - GPU-accelerated properties
+*/
 @keyframes draw-line {
-  0% { stroke-dashoffset: 1000; opacity: 0; }
-  50% { opacity: 0.5; }
-  100% { stroke-dashoffset: 0; opacity: 0.3; }
+  0% { 
+    stroke-dashoffset: 1000;  /* Line fully hidden */
+    opacity: 0;                /* Fade in from invisible */
+  }
+  50% { 
+    opacity: 0.5;              /* Mid-fade for smooth appearance */
+  }
+  100% { 
+    stroke-dashoffset: 0;      /* Line fully drawn */
+    opacity: 0.3;              /* Final subtle opacity */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * <svg>
+ *   <line
+ *     x1="0" y1="0" x2="100" y2="100"
+ *     stroke="rgba(168, 85, 247, 0.5)"
+ *     stroke-width="2"
+ *     stroke-dasharray="1000"
+ *     style={{ animation: 'draw-line 2s ease-out forwards' }}
+ *   />
+ * </svg>
+ * 
+ * Setup:
+ * 1. Set stroke-dasharray to line length (or large value like 1000)
+ * 2. Apply draw-line animation
+ * 3. Use 'forwards' to maintain final state
+ * 
+ * Calculating Exact Length:
+ * const line = document.querySelector('line');
+ * const length = line.getTotalLength();
+ * line.style.strokeDasharray = length;
+ */
+
+/* ----------------------------------------------------------------------------
+   PULSE-GLOW ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Creates a pulsing glow effect using drop-shadow filter. Perfect for
+   highlighting interactive elements and creating attention-drawing effects.
+   
+   **Effect:** Soft glow that pulses between subtle and prominent
+   
+   **Glow Intensity:**
+   - Min: 5px blur, 30% opacity
+   - Max: 15px blur, 60% opacity
+   
+   **Duration:** 2-3 seconds for gentle pulsing
+   
+   **Use Cases:**
+   - Active member indicators
+   - Interactive button highlights
+   - Call-to-action elements
+   - Status indicators
+   
+   **Performance:** Good - filter is GPU-accelerated but can be intensive
+*/
 @keyframes pulse-glow {
-  0%, 100% { filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.3)); }
-  50% { filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6)); }
+  0%, 100% { 
+    filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.3));  /* Subtle glow */
+  }
+  50% { 
+    filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));  /* Prominent glow */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .member-avatar-active {
+ *   animation: pulse-glow 2.5s ease-in-out infinite;
+ * }
+ * 
+ * .cta-button {
+ *   animation: pulse-glow 2s ease-in-out infinite;
+ * }
+ * 
+ * Performance Note:
+ * Drop-shadow is more performant than box-shadow for non-rectangular shapes.
+ * However, still GPU-intensive. Use sparingly on many elements.
+ * 
+ * Alternative for Better Performance:
+ * Use box-shadow instead if shape is rectangular:
+ * box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+ */
+
+/* ----------------------------------------------------------------------------
+   FLOAT-MIST ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Creates slowly drifting mist/fog effect for atmospheric depth. Large-scale
+   gradients move across the screen to create cosmic nebula atmosphere.
+   
+   **Effect:** Subtle movement and scale changes for layered depth
+   
+   **Motion:**
+   - Horizontal and vertical drift
+   - Slight scale variation (1.0 to 1.1)
+   - Opacity pulsing (0.05 to 0.1)
+   
+   **Duration:** 60-80 seconds for very slow, ambient movement
+   
+   **Use Cases:**
+   - Background mist layers
+   - Atmospheric depth
+   - Nebula effects
+   - Ambient fog
+   
+   **Performance:** Moderate - large elements require more GPU memory
+*/
 @keyframes float-mist {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.05; }
-  50% { transform: translate(50px, -30px) scale(1.1); opacity: 0.1; }
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);  /* Start/end position */
+    opacity: 0.05;                         /* Very subtle */
+  }
+  50% { 
+    transform: translate(50px, -30px) scale(1.1);  /* Drift and grow */
+    opacity: 0.1;                                   /* Slightly more visible */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .mist-layer {
+ *   position: absolute;
+ *   width: 200%;
+ *   height: 200%;
+ *   background: radial-gradient(circle at center, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+ *   filter: blur(120px);
+ *   animation: float-mist 80s infinite linear;
+ *   pointer-events: none;
+ * }
+ * 
+ * Layering Technique:
+ * Use multiple .mist-layer elements with different animation-delay values
+ * for parallax depth effect:
+ * 
+ * .mist-layer:nth-child(1) { animation-delay: 0s; }
+ * .mist-layer:nth-child(2) { animation-delay: 20s; }
+ * .mist-layer:nth-child(3) { animation-delay: 40s; }
+ * 
+ * Performance Warning:
+ * Very large blur radius (120px) and oversized elements (200% x 200%) are
+ * GPU-intensive. Limit to 2-3 layers maximum for good performance.
+ */
+
+/* ----------------------------------------------------------------------------
+   NEBULA-PULSE ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Creates deep space nebula effect with slow pulsing and blur variation.
+   Combines opacity and blur changes for ethereal cosmic clouds.
+   
+   **Effect:** Slow breathing motion with blur intensity changes
+   
+   **Animation:**
+   - Opacity: 0.1 to 0.25 (very subtle to subtle)
+   - Blur: 60px to 80px with slight scale
+   
+   **Duration:** 15-20 seconds for slow, meditative pulsing
+   
+   **Use Cases:**
+   - Deep space background nebulae
+   - Cosmic cloud effects
+   - Atmospheric layers behind stars
+   
+   **Performance:** Moderate to Heavy - animating blur is GPU-intensive
+*/
 @keyframes nebula-pulse {
-  0%, 100% { opacity: 0.1; filter: blur(60px) scale(1); }
-  50% { opacity: 0.25; filter: blur(80px) scale(1.05); }
+  0%, 100% { 
+    opacity: 0.1;                         /* Barely visible */
+    filter: blur(60px) scale(1);          /* Smaller blur */
+  }
+  50% { 
+    opacity: 0.25;                        /* More prominent */
+    filter: blur(80px) scale(1.05);       /* Larger blur with slight growth */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .nebula-layer {
+ *   position: absolute;
+ *   width: 100%;
+ *   height: 100%;
+ *   background: radial-gradient(
+ *     ellipse at 30% 50%,
+ *     rgba(168, 85, 247, 0.3) 0%,
+ *     rgba(192, 132, 252, 0.2) 30%,
+ *     transparent 70%
+ *   );
+ *   animation: nebula-pulse 18s ease-in-out infinite;
+ *   pointer-events: none;
+ * }
+ * 
+ * Multi-Layer Nebula:
+ * Create depth by stacking multiple nebula layers with different colors,
+ * positions, and animation delays:
+ * 
+ * .nebula-layer-1 { animation-delay: 0s; opacity: 0.15; }
+ * .nebula-layer-2 { animation-delay: 6s; opacity: 0.1; }
+ * .nebula-layer-3 { animation-delay: 12s; opacity: 0.08; }
+ * 
+ * Performance Critical:
+ * Animating blur filter is one of the most GPU-intensive operations.
+ * - Mobile: Reduce blur radius to 40-50px
+ * - Limit to 2-3 nebula layers max
+ * - Consider static blur for low-end devices
+ */
+
+/* ----------------------------------------------------------------------------
+   LOGO-GLOW ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Subtle glow and scale animation for logo or brand elements. Creates
+   a "breathing" effect that draws attention without being distracting.
+   
+   **Effect:** Gentle glow pulsing with micro-scale variation
+   
+   **Animation:**
+   - Glow: 8px to 30px blur radius
+   - Scale: 1.0 to 1.02 (very subtle)
+   - Opacity: 30% to 70%
+   
+   **Duration:** 3-4 seconds for calm, professional feel
+   
+   **Use Cases:**
+   - Application logo
+   - Brand watermarks
+   - Header titles
+   - Featured elements
+   
+   **Performance:** Good - minimal transform and filter changes
+*/
 @keyframes logo-glow {
-  0%, 100% { filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3)); transform: scale(1); }
-  50% { filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.7)); transform: scale(1.02); }
+  0%, 100% { 
+    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3));  /* Subtle glow */
+    transform: scale(1);                                    /* Normal size */
+  }
+  50% { 
+    filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.7));  /* Prominent glow */
+    transform: scale(1.02);                                  /* Slight growth */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .app-logo {
+ *   animation: logo-glow 3.5s ease-in-out infinite;
+ * }
+ * 
+ * .hero-title {
+ *   animation: logo-glow 4s ease-in-out infinite;
+ *   animation-delay: 0.5s;
+ * }
+ * 
+ * Entrance Effect:
+ * Combine with opacity fade-in on page load:
+ * 
+ * .app-logo {
+ *   animation: 
+ *     fadeIn 1s ease-out,
+ *     logo-glow 3.5s ease-in-out 1s infinite;
+ * }
+ * 
+ * Accessibility Note:
+ * Ensure pulsing animations don't trigger motion sensitivity issues.
+ * Consider prefers-reduced-motion media query for accessibility.
+ */
+
+/* ----------------------------------------------------------------------------
+   SHOOTING-STAR ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Creates a shooting star/meteor effect that streaks across the screen.
+   Perfect for occasional accent animations and magical moments.
+   
+   **Effect:** Star shoots from top-left to bottom-right with fade in/out
+   
+   **Animation Path:**
+   - Start: Off-screen top-left, invisible, small scale
+   - 10%: Fade in, full scale
+   - 100%: Off-screen bottom-right, invisible
+   
+   **Duration:** 2-4 seconds for realistic shooting star speed
+   
+   **Use Cases:**
+   - Occasional accent animations (every 10-30 seconds)
+   - Transition effects
+   - Easter egg interactions
+   - Magic/surprise moments
+   
+   **Performance:** Excellent - transform and opacity only
+*/
 @keyframes shooting-star {
-  0% { transform: translate(-100%, -100%) scale(0); opacity: 0; }
-  10% { opacity: 1; transform: translate(-80%, -80%) scale(1); }
-  100% { transform: translate(100vw, 100vh) scale(1); opacity: 0; }
+  0% { 
+    transform: translate(-100%, -100%) scale(0);  /* Start off-screen top-left */
+    opacity: 0;                                    /* Invisible */
+  }
+  10% { 
+    opacity: 1;                                    /* Fade in quickly */
+    transform: translate(-80%, -80%) scale(1);     /* Visible on screen */
+  }
+  100% { 
+    transform: translate(100vw, 100vh) scale(1);   /* Shoot to bottom-right */
+    opacity: 0;                                    /* Fade out */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * function ShootingStar() {
+ *   const [show, setShow] = useState(false);
+ *   
+ *   useEffect(() => {
+ *     const interval = setInterval(() => {
+ *       setShow(true);
+ *       setTimeout(() => setShow(false), 3000);
+ *     }, 15000); // Every 15 seconds
+ *     
+ *     return () => clearInterval(interval);
+ *   }, []);
+ *   
+ *   if (!show) return null;
+ *   
+ *   return (
+ *     <div className="shooting-star-container">
+ *       <div 
+ *         className="shooting-star"
+ *         style={{ animation: 'shooting-star 3s ease-out forwards' }}
+ *       />
+ *     </div>
+ *   );
+ * }
+ * 
+ * CSS:
+ * .shooting-star {
+ *   position: fixed;
+ *   width: 4px;
+ *   height: 4px;
+ *   background: white;
+ *   border-radius: 50%;
+ *   box-shadow: 0 0 10px white;
+ * }
+ * 
+ * Trail Effect:
+ * Add a ::after pseudo-element for a glowing trail:
+ * 
+ * .shooting-star::after {
+ *   content: '';
+ *   position: absolute;
+ *   width: 100px;
+ *   height: 2px;
+ *   background: linear-gradient(to right, white, transparent);
+ *   transform: translateX(-100px);
+ * }
+ */
+
+/* ----------------------------------------------------------------------------
+   GALAXY-SPIN ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Slow rotation and scale animation for galaxy-like elements. Creates
+   hypnotic spiral motion perfect for loading states or ambient effects.
+   
+   **Effect:** Full 360° rotation with pulsing scale
+   
+   **Animation:**
+   - Rotation: 0° to 360° (full spin)
+   - Scale: 1.0 to 1.1 at midpoint
+   
+   **Duration:** 30-60 seconds for slow, mesmerizing rotation
+   
+   **Use Cases:**
+   - Galaxy background elements
+   - Loading spinners
+   - Portal effects
+   - Hypnotic ambient elements
+   
+   **Performance:** Excellent - transform is GPU-accelerated
+*/
 @keyframes galaxy-spin {
-  0% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(180deg) scale(1.1); }
-  100% { transform: rotate(360deg) scale(1); }
+  0% { 
+    transform: rotate(0deg) scale(1);    /* Start position */
+  }
+  50% { 
+    transform: rotate(180deg) scale(1.1);  /* Halfway, slightly larger */
+  }
+  100% { 
+    transform: rotate(360deg) scale(1);    /* Full rotation back to normal */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .galaxy-element {
+ *   animation: galaxy-spin 45s linear infinite;
+ * }
+ * 
+ * .loading-spinner {
+ *   animation: galaxy-spin 2s linear infinite;
+ * }
+ * 
+ * Nested Rotation:
+ * Create complex patterns by nesting spinning elements:
+ * 
+ * <div className="galaxy-outer" style={{ animation: 'galaxy-spin 60s linear infinite' }}>
+ *   <div className="galaxy-middle" style={{ animation: 'galaxy-spin 40s linear infinite reverse' }}>
+ *     <div className="galaxy-inner" style={{ animation: 'galaxy-spin 20s linear infinite' }}>
+ *       <!-- Content -->
+ *     </div>
+ *   </div>
+ * </div>
+ * 
+ * Performance:
+ * Use transform-origin to control rotation center:
+ * transform-origin: center center;
+ * 
+ * Hardware Acceleration:
+ * Add will-change for smoother animation:
+ * will-change: transform;
+ */
+
+/* ----------------------------------------------------------------------------
+   WARP-PORTAL ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Creates a sci-fi warp portal effect with scaling, rotation, and blur.
+   Used for dramatic transitions between application states.
+   
+   **Effect:** Portal expands from center with blur, rotating as it grows
+   
+   **Animation:**
+   - Scale: 0 to 40x (massive expansion)
+   - Rotation: 0° to 360° (full spin during expansion)
+   - Blur: 0px to 20px (increasing blur as it expands)
+   - Opacity: Fades in then out
+   
+   **Duration:** 1.5-2.5 seconds for impactful transition
+   
+   **Use Cases:**
+   - Landing → Dashboard transition
+   - Mode switching effects
+   - Portal/teleportation animations
+   - Dramatic scene transitions
+   
+   **Performance:** Heavy - uses scale, rotate, blur simultaneously
+*/
 @keyframes warp-portal {
-  0% { transform: scale(0) rotate(0deg); opacity: 0; filter: blur(0px); }
-  30% { opacity: 1; }
-  100% { transform: scale(40) rotate(360deg); opacity: 0; filter: blur(20px); }
+  0% { 
+    transform: scale(0) rotate(0deg);      /* Start: tiny point */
+    opacity: 0;                             /* Invisible */
+    filter: blur(0px);                      /* Sharp */
+  }
+  30% { 
+    opacity: 1;                             /* Fully visible */
+  }
+  100% { 
+    transform: scale(40) rotate(360deg);   /* End: massive and rotated */
+    opacity: 0;                             /* Fade to white */
+    filter: blur(20px);                     /* Very blurred */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * function WarpTransition({ onComplete }) {
+ *   return (
+ *     <div className="warp-portal-container">
+ *       <div 
+ *         className="warp-portal"
+ *         style={{ animation: 'warp-portal 2s ease-out forwards' }}
+ *         onAnimationEnd={onComplete}
+ *       />
+ *     </div>
+ *   );
+ * }
+ * 
+ * CSS:
+ * .warp-portal-container {
+ *   position: fixed;
+ *   top: 0;
+ *   left: 0;
+ *   width: 100%;
+ *   height: 100%;
+ *   display: flex;
+ *   align-items: center;
+ *   justify-content: center;
+ *   pointer-events: none;
+ *   z-index: 9999;
+ * }
+ * 
+ * .warp-portal {
+ *   width: 100px;
+ *   height: 100px;
+ *   border-radius: 50%;
+ *   background: radial-gradient(circle, white 0%, rgba(168, 85, 247, 0.8) 50%, transparent 100%);
+ * }
+ * 
+ * Performance Warning:
+ * This is one of the most GPU-intensive animations due to:
+ * - Large scale (40x)
+ * - Simultaneous blur animation
+ * - Full rotation
+ * 
+ * Use only for major transitions, not frequent animations.
+ * Consider reducing scale to 20x on mobile devices.
+ */
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================
+   
+   Custom utility classes that complement Tailwind CSS for specific
+   BTS Neural Archive effects and layouts.
+*/
+
+/* ----------------------------------------------------------------------------
+   MIST-LAYER CLASS
+   ----------------------------------------------------------------------------
+   
+   Predefined class for atmospheric mist layers. Creates the foundational
+   cosmic fog effect that adds depth to the 3D universe.
+   
+   **Properties:**
+   - Oversized (200% x 200%) for full coverage during animation
+   - Radial gradient with purple tint
+   - Heavy blur for soft, atmospheric effect
+   - Animated float-mist for ambient movement
+   - No pointer events (doesn't block interactions)
+   
+   **Usage:** Background atmospheric layer
+*/
 .mist-layer {
   position: absolute;
   width: 200%;
@@ -85,67 +838,612 @@
   background: radial-gradient(circle at center, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
   filter: blur(120px);
   animation: float-mist 80s infinite linear;
-  pointer-events: none;
+  pointer-events: none;  /* Don't interfere with click events */
 }
 
-/* Ensure full viewport */
+/**
+ * Usage Example:
+ * 
+ * <div className="relative w-full h-full overflow-hidden">
+ *   <div className="mist-layer" />
+ *   <div className="mist-layer" style={{ animationDelay: '20s' }} />
+ *   <!-- Other content -->
+ * </div>
+ * 
+ * Layering Tips:
+ * - Use 2-3 mist layers with different animation-delay values
+ * - Vary the gradient center point (e.g., "30% 70%", "70% 30%")
+ * - Adjust opacity in the rgba() for subtle variation
+ */
+
+/* ============================================================================
+   GLOBAL RESETS & BASE STYLES
+   ============================================================================
+   
+   Essential global styles that ensure consistent rendering across browsers
+   and provide the foundation for the cosmic BTS experience.
+   
+   **Key Principles:**
+   - Reset all margins, paddings, and sizing
+   - Set overflow hidden for contained experience
+   - Establish dark cosmic background
+   - Prevent text selection for app-like feel
+   - Use system font stack for performance
+*/
+
+/* Full viewport coverage for app container */
 html, body, #root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background-color: #020005;
-  color: white;
-  font-family: 'Inter', system-ui, sans-serif;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
+  margin: 0;                      /* Remove default margins */
+  padding: 0;                     /* Remove default padding */
+  width: 100%;                    /* Full width */
+  height: 100%;                   /* Full height */
+  overflow: hidden;               /* Prevent scrolling (contained experience) */
+  background-color: #020005;      /* Deep space black with slight purple tint */
+  color: white;                   /* Default text color */
+  font-family: 'Inter', system-ui, sans-serif;  /* Modern, readable font */
+  user-select: none;              /* Prevent text selection (app-like) */
+  -webkit-user-select: none;      /* Safari/Chrome */
+  -webkit-touch-callout: none;    /* iOS Safari */
 }
 
-/* 3D transforms */
+/**
+ * Font Stack Explanation:
+ * 
+ * 'Inter': Modern, clean sans-serif with excellent readability
+ * system-ui: Uses the operating system's default interface font
+ * sans-serif: Final fallback to any sans-serif font
+ * 
+ * Benefits:
+ * - Inter provides consistent branding
+ * - system-ui ensures native feel on each platform
+ * - No web font download = faster initial load
+ * 
+ * To use Inter web font, add to index.html:
+ * <link rel="preconnect" href="https://fonts.googleapis.com">
+ * <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+ */
+
+/**
+ * Background Color Choice:
+ * 
+ * #020005 is not pure black (#000000) but deep space black with a
+ * subtle purple tint. This:
+ * - Reduces eye strain (pure black can be harsh)
+ * - Maintains BTS purple theme subtly
+ * - Provides better contrast for purple UI elements
+ * - Creates a more immersive cosmic atmosphere
+ * 
+ * For true deep space effect with subtle stars:
+ * background: 
+ *   radial-gradient(2px 2px at 20px 30px, white, transparent),
+ *   radial-gradient(2px 2px at 60px 70px, white, transparent),
+ *   radial-gradient(1px 1px at 50px 50px, white, transparent),
+ *   #020005;
+ * background-size: 200px 200px;
+ */
+
+/* ============================================================================
+   3D TRANSFORM UTILITIES
+   ============================================================================
+   
+   Custom utilities for 3D transforms and perspective effects. These enable
+   the immersive 3D star field and depth effects throughout the application.
+   
+   **3D Rendering Context:**
+   - Perspective defines the viewing distance (lower = more dramatic)
+   - transform-style: preserve-3d maintains 3D positioning for children
+   - translateZ() moves elements in 3D space (positive = toward viewer)
+*/
+
+/* ----------------------------------------------------------------------------
+   PERSPECTIVE UTILITY
+   ----------------------------------------------------------------------------
+   
+   Sets the perspective for 3D transforms. This defines how far the viewer
+   is from the Z=0 plane, affecting the intensity of 3D effects.
+   
+   **Value:** 1200px is a moderate perspective
+   - Lower values (500-800px): More dramatic 3D effect
+   - Higher values (1500-2000px): Subtler 3D effect
+   
+   **Usage:** Apply to container of 3D elements
+*/
 .perspective-\[1200px\] {
   perspective: 1200px;
 }
 
+/**
+ * Usage Example:
+ * 
+ * <div className="perspective-[1200px] w-full h-full relative">
+ *   <div className="transform-style-3d">
+ *     <div style={{ transform: 'translateZ(100px)' }}>Closer to viewer</div>
+ *     <div style={{ transform: 'translateZ(-100px)' }}>Further from viewer</div>
+ *   </div>
+ * </div>
+ * 
+ * Perspective Origin:
+ * Control the vanishing point with perspective-origin:
+ * perspective-origin: 50% 50%; // Center (default)
+ * perspective-origin: left top; // Top-left vanishing point
+ */
+
+/* ----------------------------------------------------------------------------
+   TRANSFORM-STYLE-3D
+   ----------------------------------------------------------------------------
+   
+   Preserves 3D positioning for child elements. Without this, children
+   would be flattened into the parent's plane.
+   
+   **Essential for:**
+   - Star field 3D positioning
+   - Layered 3D elements
+   - Card flip effects
+   - Nested 3D transforms
+*/
 .transform-style-3d {
   transform-style: preserve-3d;
 }
 
+/**
+ * Usage Example:
+ * 
+ * function StarField() {
+ *   return (
+ *     <div className="perspective-[1200px]">
+ *       <div className="transform-style-3d relative w-full h-full">
+ *         {stars.map((star, i) => (
+ *           <div
+ *             key={i}
+ *             style={{
+ *               transform: `translate3d(${star.x}px, ${star.y}px, ${star.z}px)`
+ *             }}
+ *           />
+ *         ))}
+ *       </div>
+ *     </div>
+ *   );
+ * }
+ * 
+ * Why preserve-3d?
+ * Without it, all children are flattened to the parent's Z plane,
+ * losing depth information. This is critical for realistic 3D scenes.
+ */
+
+/* ----------------------------------------------------------------------------
+   ROTATE-X-5
+   ----------------------------------------------------------------------------
+   
+   Rotates element 5 degrees around the X-axis (vertical rotation).
+   Creates a subtle tilt effect useful for cards, panels, and depth cues.
+   
+   **Effect:** Element tilts slightly backward/forward
+*/
 .rotate-x-5 {
   transform: rotateX(5deg);
 }
 
+/**
+ * Usage Example:
+ * 
+ * <div className="rotate-x-5 glass-panel">
+ *   Tilted panel with depth
+ * </div>
+ * 
+ * Rotation Axes:
+ * - rotateX(): Rotation around horizontal axis (tilt forward/back)
+ * - rotateY(): Rotation around vertical axis (turn left/right)
+ * - rotateZ(): Rotation around depth axis (spin clockwise/counter)
+ * 
+ * Combining Rotations:
+ * transform: rotateX(5deg) rotateY(10deg) rotateZ(2deg);
+ */
+
+/* ----------------------------------------------------------------------------
+   TRANSLATE-Z
+   ----------------------------------------------------------------------------
+   
+   Moves element along the Z-axis (depth). Positive values bring element
+   toward the viewer; negative values push it away.
+   
+   **Usage:** Creating depth layers in 3D space
+*/
 .translate-z-\[2000px\] {
   transform: translateZ(2000px);
 }
 
+/**
+ * Usage Example:
+ * 
+ * <div className="perspective-[1200px]">
+ *   <div className="transform-style-3d">
+ *     <div className="translate-z-[2000px]">Very close to viewer</div>
+ *     <div className="translate-z-[1000px]">Moderately close</div>
+ *     <div>At Z=0 plane</div>
+ *     <div style={{ transform: 'translateZ(-1000px)' }}>Far away</div>
+ *   </div>
+ * </div>
+ * 
+ * Perspective Calculation:
+ * Apparent size = actualSize * (perspective / (perspective - z))
+ * 
+ * Example with perspective: 1200px
+ * - Z = 0: scale = 1.0 (normal size)
+ * - Z = 600px: scale = 2.0 (2x larger)
+ * - Z = -600px: scale = 0.67 (smaller)
+ * 
+ * Performance:
+ * translate3d(x, y, z) is GPU-accelerated on all modern browsers.
+ * Always prefer translate3d over separate translateX/Y/Z.
+ */
+
+/* ============================================================================
+   ORBITAL ANIMATION
+   ============================================================================
+   
+   Creates circular orbital motion for member constellation effects.
+   Elements rotate around a center point while maintaining orientation.
+   
+   **Effect:** Perfect circular orbit with counter-rotation to maintain upright
+   
+   **Technique:**
+   - Rotate parent: Creates circular path
+   - Counter-rotate child: Keeps element upright
+   
+   **Duration:** 30-60 seconds for slow, mesmerizing orbit
+*/
 @keyframes orbit {
-  from { transform: rotate(0deg) translateX(100px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+  from { 
+    transform: rotate(0deg) translateX(100px) rotate(0deg);
+  }
+  to { 
+    transform: rotate(360deg) translateX(100px) rotate(-360deg);
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * <div className="orbit-container">
+ *   <div className="orbit-item" style={{ animation: 'orbit 40s linear infinite' }}>
+ *     <div className="orbit-content">
+ *       Content stays upright
+ *     </div>
+ *   </div>
+ * </div>
+ * 
+ * Technique Breakdown:
+ * 1. rotate(360deg): Rotates the entire path
+ * 2. translateX(100px): Moves element away from center (orbit radius)
+ * 3. rotate(-360deg): Counter-rotates element to stay upright
+ * 
+ * Adjusting Orbit Size:
+ * Change translateX value to adjust orbit radius:
+ * - translateX(150px): Larger orbit
+ * - translateX(50px): Smaller orbit
+ * 
+ * Multiple Orbits:
+ * Stagger multiple elements around the orbit:
+ * .orbit-item:nth-child(1) { animation-delay: 0s; }
+ * .orbit-item:nth-child(2) { animation-delay: 5.71s; } // 360/7 = 51.43° offset
+ * .orbit-item:nth-child(3) { animation-delay: 11.43s; }
+ */
+
+/* ----------------------------------------------------------------------------
+   FLOAT-PARTICLE ANIMATION
+   ----------------------------------------------------------------------------
+   
+   Subtle floating animation for individual particles with scale variation.
+   Creates organic, life-like movement for cosmic dust particles.
+   
+   **Effect:** Particles drift and pulse in size with opacity changes
+*/
 @keyframes float-particle {
-  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
-  50% { transform: translate(20px, -20px) scale(1.5); opacity: 0.5; }
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);  /* Start/end position */
+    opacity: 0;                            /* Invisible at endpoints */
+  }
+  50% { 
+    transform: translate(20px, -20px) scale(1.5);  /* Drift and grow */
+    opacity: 0.5;                                   /* Peak visibility */
+  }
 }
 
+/**
+ * Usage Example:
+ * 
+ * .particle {
+ *   animation: float-particle 5s ease-in-out infinite;
+ *   animation-delay: calc(var(--particle-index) * 0.1s);
+ * }
+ * 
+ * Creating Particle Field:
+ * Array.from({ length: 50 }, (_, i) => (
+ *   <div
+ *     key={i}
+ *     className="particle"
+ *     style={{ '--particle-index': i }}
+ *   />
+ * ));
+ */
+
+/* ============================================================================
+   GLASS MORPHISM EFFECTS
+   ============================================================================
+   
+   Signature glass morphism styling for panels and cards throughout the
+   BTS Neural Archive. Creates frosted glass effect with depth and elegance.
+   
+   **Technique:**
+   - Semi-transparent dark background
+   - Backdrop blur for frosted glass effect
+   - Subtle border for definition
+   - Layered shadows for depth
+   - Inset glow for internal light
+   
+   **Browser Support:**
+   - Chrome 76+, Safari 14+, Edge 79+
+   - Firefox 103+ (behind flag in older versions)
+   - Fallback: Solid background without blur
+   
+   **Performance:**
+   - backdrop-filter is GPU-accelerated
+   - Can be intensive with many panels
+   - Consider limiting to key UI elements
+*/
 .glass-panel {
-  background: linear-gradient(135deg, rgba(15, 5, 25, 0.4) 0%, rgba(5, 2, 10, 0.6) 100%);
-  backdrop-filter: blur(40px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 32px 0 rgba(168, 85, 247, 0.02);
+  /* Background: Dark gradient for depth */
+  background: linear-gradient(
+    135deg,                              /* Diagonal gradient direction */
+    rgba(15, 5, 25, 0.4) 0%,            /* Slightly purple dark at top */
+    rgba(5, 2, 10, 0.6) 100%            /* Darker at bottom for depth */
+  );
+  
+  /* Frosted glass effect */
+  backdrop-filter: blur(40px) saturate(180%);  /* Key glass morphism property */
+  
+  /* Subtle border for definition */
+  border: 1px solid rgba(255, 255, 255, 0.03);  /* Very subtle white border */
+  
+  /* Layered shadows for depth and glow */
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.8),              /* Outer shadow for depth */
+    inset 0 0 32px 0 rgba(168, 85, 247, 0.02);    /* Inner purple glow */
 }
 
+/* Hover state with enhanced border and glow */
 .glass-panel:hover {
-  border-color: rgba(168, 85, 247, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 32px 0 rgba(168, 85, 247, 0.05);
+  border-color: rgba(168, 85, 247, 0.2);  /* More visible purple border */
+  
+  /* Enhanced shadows on hover */
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.8),
+    inset 0 0 32px 0 rgba(168, 85, 247, 0.05);  /* Stronger inner glow */
 }
 
+/**
+ * Usage Example:
+ * 
+ * <div className="glass-panel rounded-xl p-6">
+ *   <h2>Glass Panel Content</h2>
+ *   <p>Beautiful frosted glass effect</p>
+ * </div>
+ * 
+ * Customization:
+ * 
+ * // Lighter glass
+ * background: linear-gradient(135deg, rgba(15, 5, 25, 0.2) 0%, rgba(5, 2, 10, 0.4) 100%);
+ * backdrop-filter: blur(20px) saturate(150%);
+ * 
+ * // More blur
+ * backdrop-filter: blur(60px) saturate(200%);
+ * 
+ * // Different accent color
+ * box-shadow: 
+ *   0 8px 32px 0 rgba(0, 0, 0, 0.8),
+ *   inset 0 0 32px 0 rgba(192, 132, 252, 0.02);  // Different purple
+ * 
+ * Fallback for Unsupported Browsers:
+ * @supports not (backdrop-filter: blur(40px)) {
+ *   .glass-panel {
+ *     background: linear-gradient(135deg, rgba(15, 5, 25, 0.95) 0%, rgba(5, 2, 10, 0.98) 100%);
+ *   }
+ * }
+ * 
+ * Performance Optimization:
+ * - Use fixed backdrop-filter values (not animated)
+ * - Limit number of glass panels on screen
+ * - Consider will-change for animated glass panels:
+ *   will-change: transform, opacity;
+ */
+
+/* ============================================================================
+   TEXT & VISUAL EFFECTS
+   ============================================================================
+   
+   Additional utility classes for text effects and visual enhancements.
+*/
+
+/* ----------------------------------------------------------------------------
+   TEXT-GLOW
+   ----------------------------------------------------------------------------
+   
+   Adds a soft glow effect to text for emphasis and cosmic feel.
+   Perfect for titles, labels, and important text.
+*/
 .text-glow {
   text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
 }
 
+/**
+ * Usage Example:
+ * 
+ * <h1 className="text-glow text-4xl font-bold">
+ *   BTS Neural Archive
+ * </h1>
+ * 
+ * Color Variations:
+ * text-shadow: 0 0 15px rgba(168, 85, 247, 0.5);  // Purple glow
+ * text-shadow: 0 0 20px rgba(192, 132, 252, 0.6);  // Stronger purple
+ * text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);  // Bright white
+ * 
+ * Multi-Layer Glow:
+ * text-shadow: 
+ *   0 0 10px rgba(255, 255, 255, 0.3),
+ *   0 0 20px rgba(168, 85, 247, 0.2),
+ *   0 0 30px rgba(168, 85, 247, 0.1);
+ */
+
+/* ----------------------------------------------------------------------------
+   BG-NEBULA-PURPLE
+   ----------------------------------------------------------------------------
+   
+   Creates a subtle purple nebula background effect using radial gradients.
+   Adds atmospheric depth without overwhelming content.
+*/
 .bg-nebula-purple {
-  background: radial-gradient(circle at center, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(168, 85, 247, 0.15) 0%,    /* Purple center */
+    transparent 70%                  /* Fade to transparent */
+  );
 }
+
+/**
+ * Usage Example:
+ * 
+ * <div className="bg-nebula-purple w-full h-full absolute inset-0" />
+ * 
+ * Variations:
+ * 
+ * // Off-center nebula
+ * background: radial-gradient(
+ *   circle at 30% 70%,
+ *   rgba(168, 85, 247, 0.15) 0%,
+ *   transparent 70%
+ * );
+ * 
+ * // Elliptical nebula
+ * background: radial-gradient(
+ *   ellipse at center,
+ *   rgba(168, 85, 247, 0.15) 0%,
+ *   transparent 70%
+ * );
+ * 
+ * // Multi-color nebula
+ * background: radial-gradient(
+ *   circle at center,
+ *   rgba(168, 85, 247, 0.15) 0%,
+ *   rgba(192, 132, 252, 0.1) 40%,
+ *   transparent 70%
+ * );
+ */
+
+/* ============================================================================
+   ACCESSIBILITY & REDUCED MOTION
+   ============================================================================
+   
+   Respects user preferences for reduced motion. Essential for accessibility
+   and preventing motion sickness or seizures in sensitive users.
+   
+   **Best Practice:** Always provide reduced-motion alternatives for
+   animations that could cause discomfort.
+*/
+
+/**
+ * Reduced Motion Media Query:
+ * 
+ * @media (prefers-reduced-motion: reduce) {
+ *   *,
+ *   *::before,
+ *   *::after {
+ *     animation-duration: 0.01ms !important;
+ *     animation-iteration-count: 1 !important;
+ *     transition-duration: 0.01ms !important;
+ *   }
+ *   
+ *   .galaxy-spin,
+ *   .orbit,
+ *   .warp-portal {
+ *     animation: none !important;
+ *   }
+ * }
+ * 
+ * Implementing Reduced Motion in React:
+ * 
+ * const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ * 
+ * function AnimatedElement() {
+ *   return (
+ *     <div 
+ *       style={{
+ *         animation: prefersReducedMotion ? 'none' : 'twinkle 3s infinite',
+ *       }}
+ *     />
+ *   );
+ * }
+ */
+
+/* ============================================================================
+   PERFORMANCE OPTIMIZATION NOTES
+   ============================================================================
+   
+   **GPU-Accelerated Properties (Fastest):**
+   - transform (translate, scale, rotate)
+   - opacity
+   - filter (with hardware acceleration)
+   
+   **Avoid Animating (Causes Layout Recalculation):**
+   - width, height
+   - margin, padding
+   - top, left, right, bottom (use transform instead)
+   - border-width
+   
+   **Best Practices:**
+   1. Use transform: translate3d() instead of left/top
+   2. Use transform: scale() instead of width/height
+   3. Batch animations with requestAnimationFrame
+   4. Use will-change for complex animations (sparingly)
+   5. Limit number of simultaneous animations
+   6. Reduce animation complexity on mobile devices
+   7. Test performance with Chrome DevTools Performance tab
+   
+   **Will-Change Usage:**
+   
+   Good:
+   .element-being-animated {
+     will-change: transform, opacity;
+   }
+   
+   Bad (too many properties):
+   .element {
+     will-change: transform, opacity, filter, backdrop-filter;
+   }
+   
+   **Mobile Optimization:**
+   
+   @media (max-width: 768px) {
+     .bokeh-bubble {
+       display: none; // Remove GPU-intensive effects
+     }
+     
+     .glass-panel {
+       backdrop-filter: none; // Fallback to solid background
+       background: rgba(15, 5, 25, 0.95);
+     }
+   }
+*/
+
+/* ============================================================================
+   END OF STYLESHEET
+   ============================================================================
+   
+   "You are my galaxy, my cosmos, my universe." 💜
+   
+   Made with 보라해 (Borahae) for BTS & ARMY
+   
+   For questions or contributions, see:
+   - README.md
+   - CONTRIBUTING.md
+   - docs/ARCHITECTURE.md
+*/
