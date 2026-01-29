@@ -346,49 +346,244 @@ interface LandingRitualProps {
 }
 
 const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
-  // Generate ARMY bomb positions for stadium tiers
+  // Generate ARMY bomb positions as a 3D SPHERICAL STADIUM (bowl shape)
   const armyBombs = useMemo(() => {
-    const bombs: { x: number; y: number; size: number; color: string; delay: number; brightness: number }[] = [];
+    const bombs: { x: number; y: number; z: number; size: number; color: string; delay: number; brightness: number }[] = [];
+
+    // ARMY BOMB PURPLE PALETTE - predominantly purple with white accents
     const colors = [
-      '#9333EA', '#A855F7', '#C084FC', '#E879F9', // Purple shades
-      '#3B82F6', '#60A5FA', '#38BDF8', '#22D3EE', // Blue to cyan
-      '#10B981', '#34D399', '#6EE7B7',            // Greens
-      '#F472B6', '#EC4899', '#DB2777',            // Pinks
+      '#A855F7', '#9333EA', '#7C3AED', '#8B5CF6', '#C084FC', // Core purples
+      '#D8B4FE', '#E9D5FF', '#F3E8FF', // Light purples
+      '#FFFFFF', '#F5F3FF', // White accents (sparse)
     ];
 
-    // Create curved tiers of ARMY bombs (stadium seating effect)
-    for (let tier = 0; tier < 8; tier++) {
-      const tierY = 5 + tier * 6; // Vertical position for each tier
-      const bombsInTier = 25 + tier * 5; // More bombs in outer tiers
-      const curveIntensity = 0.15 - tier * 0.01; // Curve decreases for outer tiers
+    // Weighted color selection - 85% purple, 15% white
+    const getColor = () => {
+      const rand = Math.random();
+      if (rand < 0.85) {
+        return colors[Math.floor(Math.random() * 8)]; // Purples
+      }
+      return colors[8 + Math.floor(Math.random() * 2)]; // Whites
+    };
 
-      for (let i = 0; i < bombsInTier; i++) {
-        const xPercent = (i / (bombsInTier - 1)) * 100;
-        // Parabolic curve to simulate stadium curvature
-        const curveOffset = Math.pow((xPercent - 50) / 50, 2) * curveIntensity * 20;
+    // UPPER HEMISPHERE: 3D Spherical Stadium Bowl
+    // Using spherical coordinates: theta (horizontal angle), phi (vertical angle from top)
+    const numRings = 12; // Concentric rings from top to horizon
+    const baseRadius = 50; // Base percentage radius
+
+    for (let ring = 0; ring < numRings; ring++) {
+      // phi: angle from top (0 = top, PI/2 = horizon)
+      const phi = (ring / numRings) * (Math.PI * 0.45); // 0 to ~80 degrees
+      const ringY = 5 + ring * 4; // Y position on screen (top to middle)
+
+      // More bombs in outer rings (perspective + coverage)
+      const bombsInRing = Math.floor(20 + ring * 8);
+
+      for (let i = 0; i < bombsInRing; i++) {
+        // theta: horizontal angle around the bowl
+        const theta = (i / bombsInRing) * Math.PI * 2;
+
+        // Calculate 3D position and project to 2D
+        const r = baseRadius * Math.sin(phi); // Radius at this ring
+        const x = 50 + r * Math.cos(theta); // Center at 50%
+
+        // Add depth variation with z for parallax effect
+        const z = Math.cos(phi) * 100 + Math.random() * 20;
+
+        // Size based on "distance" (smaller = further)
+        const perspectiveScale = 0.3 + (1 - phi / (Math.PI * 0.5)) * 0.7;
+        const baseSize = 1.5 + Math.random() * 2;
 
         bombs.push({
-          x: xPercent,
-          y: tierY + curveOffset,
-          size: 2 + Math.random() * 2,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          delay: Math.random() * 5,
-          brightness: 0.5 + Math.random() * 0.5,
+          x: x + (Math.random() - 0.5) * 3, // Slight randomness
+          y: ringY + (Math.random() - 0.5) * 2,
+          z: z,
+          size: baseSize * perspectiveScale,
+          color: getColor(),
+          delay: Math.random() * 6,
+          brightness: 0.4 + Math.random() * 0.5 + perspectiveScale * 0.2,
         });
       }
     }
+
+    // SIDE WALLS: Left and Right stadium sections
+    for (let side = 0; side < 2; side++) {
+      const isLeft = side === 0;
+      for (let row = 0; row < 8; row++) {
+        const rowY = 15 + row * 5;
+        const bombsInRow = 6 + row * 2;
+
+        for (let i = 0; i < bombsInRow; i++) {
+          const xBase = isLeft ? 2 + i * 1.5 : 98 - i * 1.5;
+          const curve = Math.pow(row / 8, 1.5) * 8; // Curve in towards center at bottom
+
+          bombs.push({
+            x: isLeft ? xBase + curve : xBase - curve,
+            y: rowY + (Math.random() - 0.5) * 2,
+            z: 50 + Math.random() * 30,
+            size: 2 + Math.random() * 2.5,
+            color: getColor(),
+            delay: Math.random() * 5,
+            brightness: 0.5 + Math.random() * 0.4,
+          });
+        }
+      }
+    }
+
+    // LOWER FLOOR: Concert floor crowd (closest to stage)
+    for (let row = 0; row < 6; row++) {
+      const rowY = 70 + row * 4;
+      const bombsInRow = 50 - row * 6; // Fewer towards bottom (perspective)
+      const rowWidth = 75 - row * 8; // Narrower towards bottom
+
+      for (let i = 0; i < bombsInRow; i++) {
+        const xPercent = (50 - rowWidth / 2) + (i / (bombsInRow - 1)) * rowWidth;
+        bombs.push({
+          x: xPercent + (Math.random() - 0.5) * 2,
+          y: rowY + (Math.random() - 0.5) * 1.5,
+          z: 20 + row * 10 + Math.random() * 10,
+          size: 3.5 + Math.random() * 3 - row * 0.3, // Bigger when closer
+          color: getColor(),
+          delay: Math.random() * 4,
+          brightness: 0.7 + Math.random() * 0.3,
+        });
+      }
+    }
+
     return bombs;
   }, []);
 
-  return (
-    <div className="absolute inset-0 z-50 flex flex-col overflow-hidden select-none bg-gradient-to-b from-[#0a0015] via-[#120020] to-[#0a0015]">
+  // Enhanced UNIVERSE/GALAXY stars for cosmic backdrop
+  const universeStars = useMemo(() => {
+    const stars: { x: number; y: number; size: number; delay: number; duration: number; type: 'star' | 'galaxy' | 'nebula' }[] = [];
 
-      {/* LAYER 1: Stadium Atmosphere - Upper darkness with subtle purple */}
+    // Regular stars
+    for (let i = 0; i < 80; i++) {
+      stars.push({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 0.5 + Math.random() * 1.5,
+        delay: Math.random() * 5,
+        duration: 3 + Math.random() * 4,
+        type: 'star'
+      });
+    }
+
+    // Distant galaxies (larger, dimmer, slower)
+    for (let i = 0; i < 8; i++) {
+      stars.push({
+        x: Math.random() * 100,
+        y: Math.random() * 50, // Upper half only
+        size: 3 + Math.random() * 4,
+        delay: Math.random() * 8,
+        duration: 8 + Math.random() * 6,
+        type: 'galaxy'
+      });
+    }
+
+    // Small purple nebula spots
+    for (let i = 0; i < 5; i++) {
+      stars.push({
+        x: Math.random() * 100,
+        y: Math.random() * 60,
+        size: 15 + Math.random() * 20,
+        delay: Math.random() * 10,
+        duration: 15 + Math.random() * 10,
+        type: 'nebula'
+      });
+    }
+
+    return stars;
+  }, []);
+
+  return (
+    <div className="absolute inset-0 z-50 flex flex-col overflow-hidden select-none bg-gradient-to-b from-[#050010] via-[#0a0018] to-[#080012]">
+
+      {/* UNIVERSE LAYER: Stars, Galaxies, and Nebulae */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gradient-to-b from-black via-purple-950/20 to-transparent" />
+        {universeStars.map((star, i) => {
+          if (star.type === 'nebula') {
+            return (
+              <div
+                key={`nebula-${i}`}
+                className="absolute rounded-full"
+                style={{
+                  left: `${star.x}%`,
+                  top: `${star.y}%`,
+                  width: `${star.size}px`,
+                  height: `${star.size}px`,
+                  background: 'radial-gradient(circle, rgba(168,85,247,0.15) 0%, rgba(139,92,246,0.08) 40%, transparent 70%)',
+                  filter: 'blur(8px)',
+                  opacity: 0.6,
+                  animation: `nebula-breathe ${star.duration}s ease-in-out infinite`,
+                  animationDelay: `${star.delay}s`,
+                }}
+              />
+            );
+          }
+          if (star.type === 'galaxy') {
+            return (
+              <div
+                key={`galaxy-${i}`}
+                className="absolute"
+                style={{
+                  left: `${star.x}%`,
+                  top: `${star.y}%`,
+                  width: `${star.size}px`,
+                  height: `${star.size * 0.4}px`,
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(200,180,255,0.3) 30%, rgba(255,255,255,0.5) 50%, rgba(200,180,255,0.3) 70%, transparent 100%)',
+                  borderRadius: '50%',
+                  filter: 'blur(1px)',
+                  opacity: 0.4,
+                  transform: `rotate(${Math.random() * 60 - 30}deg)`,
+                  animation: `star-twinkle ${star.duration}s ease-in-out infinite`,
+                  animationDelay: `${star.delay}s`,
+                }}
+              />
+            );
+          }
+          // Regular star
+          return (
+            <div
+              key={`star-${i}`}
+              className="absolute rounded-full bg-white"
+              style={{
+                left: `${star.x}%`,
+                top: `${star.y}%`,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                opacity: 0.4 + Math.random() * 0.4,
+                boxShadow: '0 0 2px rgba(255,255,255,0.8)',
+                animation: `star-twinkle ${star.duration}s ease-in-out infinite`,
+                animationDelay: `${star.delay}s`,
+              }}
+            />
+          );
+        })}
       </div>
 
-      {/* LAYER 2: ARMY Bomb Ocean - The Purple Sea */}
+      {/* NEBULA LAYER: Cosmic purple glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-purple-600/10 blur-[150px]"
+          style={{ animation: 'nebula-breathe 25s ease-in-out infinite' }}
+        />
+        <div
+          className="absolute top-[60%] left-[30%] w-[400px] h-[300px] rounded-full bg-violet-500/8 blur-[120px]"
+          style={{ animation: 'nebula-breathe 30s ease-in-out infinite', animationDelay: '-10s' }}
+        />
+        <div
+          className="absolute bottom-[10%] right-[20%] w-[500px] h-[300px] rounded-full bg-purple-700/10 blur-[130px]"
+          style={{ animation: 'nebula-breathe 28s ease-in-out infinite', animationDelay: '-18s' }}
+        />
+      </div>
+
+      {/* Upper darkness gradient (stadium ceiling) */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-0 right-0 h-[15%] bg-gradient-to-b from-black to-transparent" />
+      </div>
+
+      {/* ARMY Bomb Ocean - Upper Stadium + Lower Floor */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {armyBombs.map((bomb, i) => (
           <div
@@ -409,25 +604,25 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         ))}
       </div>
 
-      {/* LAYER 3: Stage Spotlights - Light rays from center */}
+      {/* Stage Spotlights */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute bottom-[35%] left-1/2 -translate-x-1/2 w-full h-[60%]">
-          {/* Central spotlight beam */}
+        <div className="absolute top-[45%] left-1/2 -translate-x-1/2 w-full h-[50%]">
+          {/* Central white beam */}
           <div
-            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-full opacity-20"
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[90%] opacity-15"
             style={{
-              background: 'linear-gradient(to top, rgba(255,255,255,0.8) 0%, transparent 80%)',
-              filter: 'blur(20px)',
+              background: 'linear-gradient(to top, rgba(255,255,255,0.9) 0%, transparent 70%)',
+              filter: 'blur(25px)',
             }}
           />
           {/* Side beams */}
-          {[-30, -15, 15, 30].map((angle, i) => (
+          {[-35, -20, -8, 8, 20, 35].map((angle, i) => (
             <div
               key={`beam-${i}`}
-              className="absolute bottom-0 left-1/2 w-3 h-[80%] opacity-10"
+              className="absolute bottom-0 left-1/2 w-3 h-[80%] opacity-8"
               style={{
-                background: 'linear-gradient(to top, rgba(168,85,247,0.6) 0%, transparent 70%)',
-                filter: 'blur(15px)',
+                background: 'linear-gradient(to top, rgba(168,85,247,0.5) 0%, transparent 65%)',
+                filter: 'blur(12px)',
                 transform: `translateX(-50%) rotate(${angle}deg)`,
                 transformOrigin: 'bottom center',
               }}
@@ -436,55 +631,110 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         </div>
       </div>
 
-      {/* LAYER 4: Stage Platform with glow */}
-      <div className="absolute bottom-[30%] left-1/2 -translate-x-1/2 pointer-events-none">
+      {/* Stage Platform Glow - Enhanced */}
+      <div className="absolute top-[62%] left-1/2 -translate-x-1/2 pointer-events-none">
         <div
-          className="w-[600px] h-4 rounded-full opacity-60"
+          className="w-[900px] h-10 rounded-full opacity-80"
           style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgba(168,85,247,0.5) 30%, rgba(255,255,255,0.3) 50%, rgba(168,85,247,0.5) 70%, transparent 100%)',
-            filter: 'blur(8px)',
+            background: 'linear-gradient(90deg, transparent 0%, rgba(168,85,247,0.5) 20%, rgba(255,255,255,0.35) 50%, rgba(168,85,247,0.5) 80%, transparent 100%)',
+            filter: 'blur(15px)',
+          }}
+        />
+        {/* Extra stage rim glow */}
+        <div
+          className="absolute top-2 left-1/2 -translate-x-1/2 w-[700px] h-3 rounded-full"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)',
+            filter: 'blur(4px)',
           }}
         />
       </div>
 
-      {/* LAYER 5: 7 Member Silhouettes on Stage */}
-      <div className="absolute bottom-[32%] left-1/2 -translate-x-1/2 flex items-end justify-center gap-6 pointer-events-none">
+      {/* Floor Reflection Grid */}
+      <div className="absolute top-[60%] left-0 right-0 h-[15%] pointer-events-none overflow-hidden opacity-20">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(168,85,247,0.1) 30px, rgba(168,85,247,0.1) 31px)',
+            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
+          }}
+        />
+      </div>
+
+      {/* 7 Member Silhouettes on Stage - ENLARGED & CENTERED */}
+      <div className="absolute top-[42%] left-1/2 -translate-x-1/2 flex items-end justify-center gap-6 sm:gap-10 md:gap-14 pointer-events-none">
         {MEMBER_DATA.map((member, i) => {
-          // Varied heights for natural look
-          const heights = [52, 56, 50, 58, 54, 52, 56];
-          const offsets = [-2, 0, 1, -1, 2, 0, -1]; // Slight vertical offsets
+          // Heights scaled up ~3x for prominence
+          const heights = [145, 165, 135, 175, 155, 140, 160];
+          const offsets = [-8, 0, 6, -4, 8, -6, 3];
+          // Center member (index 3) is tallest
+          const isCenter = i === 3;
+
           return (
             <div
               key={member.id}
-              className="relative flex flex-col items-center group"
+              className="relative flex flex-col items-center transition-transform duration-500 hover:scale-105"
               style={{ marginBottom: `${offsets[i]}px` }}
             >
-              {/* Member silhouette */}
+              {/* Outer aura glow */}
               <div
-                className="rounded-full"
+                className="absolute -inset-4 rounded-full opacity-20 blur-xl"
+                style={{ backgroundColor: member.color }}
+              />
+
+              {/* Head glow - larger with pulsing */}
+              <div
+                className="rounded-full relative z-10"
                 style={{
-                  width: '10px',
-                  height: '10px',
+                  width: isCenter ? '32px' : '28px',
+                  height: isCenter ? '32px' : '28px',
                   backgroundColor: member.color,
-                  boxShadow: `0 0 15px ${member.color}, 0 0 30px ${member.color}80`,
+                  boxShadow: `0 0 30px ${member.color}, 0 0 60px ${member.color}90, 0 0 90px ${member.color}50`,
+                  animation: 'pulse-glow 3s ease-in-out infinite',
+                  animationDelay: `${i * 0.2}s`,
                 }}
               />
-              {/* Body silhouette */}
+
+              {/* Body - significantly larger with gradient */}
               <div
-                className="mt-1 rounded-t-full"
+                className="mt-2 rounded-t-full relative z-10"
                 style={{
-                  width: '8px',
+                  width: isCenter ? '26px' : '22px',
                   height: `${heights[i]}px`,
-                  background: `linear-gradient(to top, ${member.color}30 0%, ${member.color}80 50%, ${member.color}30 100%)`,
-                  boxShadow: `0 0 10px ${member.color}50`,
+                  background: `linear-gradient(to top, ${member.color}15 0%, ${member.color}60 30%, ${member.color}80 60%, ${member.color}50 100%)`,
+                  boxShadow: `0 0 25px ${member.color}60, inset 0 0 15px ${member.color}30`,
                 }}
               />
-              {/* Member name on hover - shown all the time subtly */}
+
+              {/* Feet glow on stage */}
+              <div
+                className="absolute -bottom-2 w-full h-4 rounded-full opacity-50 blur-md"
+                style={{ backgroundColor: member.color }}
+              />
+
+              {/* Reflection on floor */}
+              <div
+                className="mt-2 rounded-b-full opacity-25"
+                style={{
+                  width: isCenter ? '20px' : '16px',
+                  height: `${heights[i] * 0.35}px`,
+                  background: `linear-gradient(to bottom, ${member.color}60 0%, transparent 100%)`,
+                  filter: 'blur(4px)',
+                  transform: 'scaleY(-1)',
+                }}
+              />
+
+              {/* Name label - larger and more prominent */}
               <span
-                className="absolute -bottom-6 text-[8px] font-bold tracking-wider opacity-60"
-                style={{ color: member.color }}
+                className="absolute -bottom-14 text-xs sm:text-sm font-bold tracking-widest uppercase whitespace-nowrap"
+                style={{
+                  color: member.color,
+                  textShadow: `0 0 10px ${member.color}, 0 0 20px ${member.color}80`,
+                  opacity: 0.9,
+                }}
               >
-                {member.name.split(' ').pop()}
+                {member.name}
               </span>
             </div>
           );
@@ -493,7 +743,7 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
 
       {/* MAIN CONTENT - Centered */}
       <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
-        <div className="flex flex-col items-center gap-8 pointer-events-auto">
+        <div className="flex flex-col items-center gap-6 pointer-events-auto -mt-16">
 
           {/* Title */}
           <div className="text-center animate-in fade-in slide-in-from-top-8 duration-1000">
@@ -506,7 +756,7 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
             >
               BTS Neural Archive
             </h1>
-            <p className="mt-4 text-purple-300/60 text-sm tracking-[0.4em] uppercase">
+            <p className="mt-3 text-purple-300/50 text-sm tracking-[0.4em] uppercase">
               Seven Stars • Infinite ARMY
             </p>
           </div>
@@ -514,40 +764,37 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           {/* BTS Logo - Clickable */}
           <button
             onClick={onSync}
-            className="relative w-32 h-32 flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none select-none hover:scale-110 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000"
+            className="relative w-28 h-28 flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none select-none hover:scale-110 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            {/* Glow behind logo */}
-            <div className="absolute inset-0 rounded-full bg-purple-500/30 blur-[30px] group-hover:bg-purple-400/50 transition-all duration-500" />
-
-            {/* BTS Logo */}
+            <div className="absolute inset-0 rounded-full bg-purple-500/25 blur-[25px] group-hover:bg-purple-400/45 transition-all duration-500" />
             <div className="relative z-10 animate-[logo-glow_4s_infinite] group-hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.9)] transition-all duration-500">
-              <BTSLogo className="w-20 h-20 text-white" />
+              <BTSLogo className="w-16 h-16 text-white" />
             </div>
           </button>
 
           {/* CTA Button */}
           <button
             onClick={onSync}
-            className="flex flex-col items-center gap-3 group cursor-pointer hover:scale-105 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 duration-1000"
+            className="flex flex-col items-center gap-2 group cursor-pointer hover:scale-105 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 duration-1000"
           >
             <div className="flex items-center gap-3">
               <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-purple-400/70 group-hover:w-16 transition-all duration-500" />
               <span
-                className="text-base text-white/80 tracking-[0.3em] font-medium uppercase group-hover:text-white group-hover:tracking-[0.4em] transition-all duration-500"
+                className="text-sm text-white/80 tracking-[0.3em] font-medium uppercase group-hover:text-white group-hover:tracking-[0.4em] transition-all duration-500"
                 style={{ textShadow: '0 0 20px rgba(168,85,247,0.5)' }}
               >
                 Enter The Universe
               </span>
               <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-purple-400/70 group-hover:w-16 transition-all duration-500" />
             </div>
-            <ChevronRight size={20} className="text-purple-400/80 group-hover:text-purple-300 animate-pulse rotate-90 group-hover:translate-y-1 transition-all duration-500" />
+            <ChevronRight size={18} className="text-purple-400/80 group-hover:text-purple-300 animate-pulse rotate-90 group-hover:translate-y-1 transition-all duration-500" />
           </button>
         </div>
       </div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+      {/* Bottom subtle vignette */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
     </div>
   );
 };
