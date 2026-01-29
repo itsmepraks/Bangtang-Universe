@@ -346,55 +346,122 @@ interface LandingRitualProps {
 }
 
 const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
-  // Shooting stars state - cycle through positions
-  const [stars, setStars] = useState<{ id: number; left: number; top: number }[]>([]);
+  // Multi-directional shooting stars with random angles
+  const [stars, setStars] = useState<{ id: number; left: number; top: number; angle: number; dx: number; dy: number }[]>([]);
 
   useEffect(() => {
-    // Create a new shooting star every 5 seconds
-    const interval = setInterval(() => {
+    // Create a new shooting star every 10-15 seconds
+    const createStar = () => {
+      const angle = Math.random() * 360; // Random angle in degrees
+      const radians = (angle * Math.PI) / 180;
+      const distance = 400 + Math.random() * 200; // Travel distance
       const newStar = {
         id: Date.now(),
-        left: Math.random() * 60, // Start from left 60% of screen
-        top: Math.random() * 40,  // Start from top 40%
+        left: Math.random() * 80 + 10, // 10-90% of screen
+        top: Math.random() * 60 + 5,   // 5-65% of screen
+        angle,
+        dx: Math.cos(radians) * distance,
+        dy: Math.sin(radians) * distance,
       };
-      setStars(prev => [...prev.slice(-2), newStar]); // Keep max 3 stars
-    }, 5000);
+      setStars(prev => [...prev.slice(-1), newStar]); // Keep max 2 stars
+    };
 
-    // Create first star immediately
-    setStars([{ id: Date.now(), left: 20, top: 15 }]);
+    // Random interval between 10-15 seconds
+    const scheduleNext = () => {
+      const delay = 10000 + Math.random() * 5000;
+      return setTimeout(() => {
+        createStar();
+        timerId = scheduleNext();
+      }, delay);
+    };
 
-    return () => clearInterval(interval);
+    // First star after 3 seconds
+    let timerId = setTimeout(() => {
+      createStar();
+      timerId = scheduleNext();
+    }, 3000);
+
+    return () => clearTimeout(timerId);
   }, []);
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-hidden select-none">
 
-      {/* LAYER 1: Aurora Background - Slow, ethereal waves */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div
-          className="absolute -top-1/2 -left-1/4 w-[150%] h-[200%] opacity-15"
-          style={{
-            background: 'linear-gradient(180deg, transparent 0%, rgba(147,51,234,0.3) 30%, rgba(168,85,247,0.2) 50%, rgba(192,132,252,0.1) 70%, transparent 100%)',
-            animation: 'aurora-wave 30s ease-in-out infinite',
-          }}
-        />
-        <div
-          className="absolute -top-1/2 -right-1/4 w-[150%] h-[200%] opacity-10"
-          style={{
-            background: 'linear-gradient(180deg, transparent 0%, rgba(192,132,252,0.2) 40%, rgba(147,51,234,0.15) 60%, transparent 100%)',
-            animation: 'aurora-wave 25s ease-in-out infinite reverse',
-            animationDelay: '-10s',
-          }}
-        />
+      {/* UNIVERSE LAYER 1: Deep Space Background Stars */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {/* Distant tiny stars - many and subtle */}
+        {[...Array(50)].map((_, i) => (
+          <div
+            key={`star-${i}`}
+            className="absolute rounded-full bg-white"
+            style={{
+              left: `${(i * 17 + 7) % 100}%`,
+              top: `${(i * 23 + 11) % 100}%`,
+              width: `${1 + (i % 2)}px`,
+              height: `${1 + (i % 2)}px`,
+              opacity: 0.2 + (i % 5) * 0.1,
+              animation: `star-twinkle ${3 + (i % 4)}s ease-in-out infinite`,
+              animationDelay: `${(i * 0.3) % 5}s`,
+            }}
+          />
+        ))}
+        {/* Brighter accent stars */}
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={`bright-${i}`}
+            className="absolute rounded-full bg-white"
+            style={{
+              left: `${15 + (i * 43) % 70}%`,
+              top: `${10 + (i * 37) % 80}%`,
+              width: '3px',
+              height: '3px',
+              opacity: 0.6,
+              boxShadow: '0 0 6px rgba(255,255,255,0.8), 0 0 12px rgba(168,85,247,0.4)',
+              animation: `star-twinkle ${4 + (i % 3)}s ease-in-out infinite`,
+              animationDelay: `${i * 0.5}s`,
+            }}
+          />
+        ))}
       </div>
 
-      {/* LAYER 2: Centered Nebula Glow */}
+      {/* UNIVERSE LAYER 2: Distant Nebula Clouds */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-purple-600/20 blur-[180px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-purple-500/25 blur-[80px]" />
+        {/* Main central nebula */}
+        <div
+          className="absolute top-1/2 left-1/2 w-[700px] h-[700px] rounded-full bg-purple-600/15 blur-[150px]"
+          style={{ animation: 'nebula-breathe 20s ease-in-out infinite' }}
+        />
+        {/* Secondary nebula - offset */}
+        <div
+          className="absolute top-[30%] left-[20%] w-[400px] h-[300px] rounded-full bg-purple-500/10 blur-[120px]"
+          style={{ animation: 'nebula-breathe 25s ease-in-out infinite', animationDelay: '-8s' }}
+        />
+        {/* Tertiary nebula - opposite side */}
+        <div
+          className="absolute bottom-[25%] right-[15%] w-[350px] h-[250px] rounded-full bg-violet-600/10 blur-[100px]"
+          style={{ animation: 'nebula-breathe 22s ease-in-out infinite', animationDelay: '-15s' }}
+        />
       </div>
 
-      {/* LAYER 2.5: Shooting Stars - Mikrokosmos magic */}
+      {/* UNIVERSE LAYER 3: Distant Galaxies (subtle spirals) */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-[15%] right-[20%] w-16 h-16 opacity-20"
+          style={{ animation: 'galaxy-rotate 60s linear infinite' }}
+        >
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400/50 via-transparent to-purple-400/50 blur-[2px]" />
+          <div className="absolute top-1/2 left-1/2 w-2 h-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/60" />
+        </div>
+        <div
+          className="absolute bottom-[20%] left-[12%] w-12 h-12 opacity-15"
+          style={{ animation: 'galaxy-rotate 80s linear infinite reverse' }}
+        >
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-300/40 via-transparent to-violet-300/40 blur-[2px]" />
+          <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/50" />
+        </div>
+      </div>
+
+      {/* UNIVERSE LAYER 4: Shooting Stars */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
         {stars.map(star => (
           <div
@@ -403,13 +470,16 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
             style={{
               left: `${star.left}%`,
               top: `${star.top}%`,
+              transform: `rotate(${star.angle}deg)`,
+              ['--star-dx' as string]: `${star.dx}px`,
+              ['--star-dy' as string]: `${star.dy}px`,
             }}
           />
         ))}
       </div>
 
-      {/* LAYER 3: Main Content */}
-      <div className="relative z-20 flex flex-col items-center gap-12 max-w-5xl px-8">
+      {/* MAIN CONTENT */}
+      <div className="relative z-20 flex flex-col items-center gap-14 max-w-5xl px-8">
 
         {/* Title */}
         <div className="text-center animate-in fade-in slide-in-from-top-8 duration-1000">
@@ -431,10 +501,10 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
           {/* Orbit Ring */}
-          <div className="absolute inset-6 rounded-full border border-purple-400/20 group-hover:border-purple-400/40 transition-colors duration-700" />
+          <div className="absolute inset-6 rounded-full border border-purple-400/25 group-hover:border-purple-400/50 transition-colors duration-700" />
 
           {/* Inner Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-purple-500/40 blur-[50px] group-hover:bg-purple-400/50 transition-all duration-700" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-36 h-36 rounded-full bg-purple-500/35 blur-[50px] group-hover:bg-purple-400/50 transition-all duration-700" />
 
           {/* BTS Logo */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 animate-[logo-glow_6s_infinite] group-hover:drop-shadow-[0_0_50px_rgba(255,255,255,0.8)] transition-all duration-700">
@@ -486,7 +556,7 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 />
                 {/* Member Name Tooltip */}
                 <div
-                  className="absolute left-1/2 -translate-x-1/2 -top-8 px-2 py-1 bg-black/80 backdrop-blur-sm rounded text-[10px] font-bold text-white tracking-wider opacity-0 group-hover/member:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none"
+                  className="absolute left-1/2 -translate-x-1/2 -top-8 px-2 py-1 bg-black/80 backdrop-blur-sm rounded text-[10px] font-bold tracking-wider opacity-0 group-hover/member:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none"
                   style={{ color: m.color }}
                 >
                   {m.name}
@@ -518,36 +588,6 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           </div>
           <ChevronRight size={18} className="text-purple-400/70 group-hover:text-purple-300 animate-pulse rotate-90 group-hover:translate-y-1 transition-all duration-500" />
         </button>
-      </div>
-
-      {/* 보라해 (Borahae) Watermark - Bottom right */}
-      <div className="absolute bottom-8 right-10 z-30 pointer-events-none select-none">
-        <span
-          className="text-2xl font-light tracking-wider opacity-20"
-          style={{
-            fontFamily: '"Noto Sans KR", sans-serif',
-            color: '#A855F7',
-            textShadow: '0 0 30px rgba(168,85,247,0.3)'
-          }}
-        >
-          보라해
-        </span>
-      </div>
-
-      {/* Sparse twinkling stars */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white/40 rounded-full animate-pulse"
-            style={{
-              left: `${8 + (i * 41) % 84}%`,
-              top: `${6 + (i * 53) % 88}%`,
-              animationDelay: `${i * 0.4}s`,
-              animationDuration: `${2 + (i % 3)}s`
-            }}
-          />
-        ))}
       </div>
     </div>
   );

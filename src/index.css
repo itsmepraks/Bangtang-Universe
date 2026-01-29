@@ -54,51 +54,78 @@
    Designed to be subtle, slow, and elegant.
 */
 
-/* Shooting Star - Diagonal streak across the screen */
-@keyframes shooting-star-fall {
+/* Shooting Star - Multi-directional streaks */
+@keyframes shooting-star-move {
   0% {
-    transform: translateX(0) translateY(0) rotate(-45deg);
+    transform: translateX(0) translateY(0);
+    opacity: 0;
+  }
+
+  10% {
     opacity: 1;
   }
-  70% {
-    opacity: 1;
+
+  90% {
+    opacity: 0.8;
   }
+
   100% {
-    transform: translateX(500px) translateY(500px) rotate(-45deg);
+    transform: translateX(var(--star-dx, 300px)) translateY(var(--star-dy, 300px));
     opacity: 0;
   }
 }
 
-/* Aurora Wave - Slow undulating purple glow */
-@keyframes aurora-wave {
-  0%, 100% {
-    transform: translateX(-20%) skewX(-5deg);
-    opacity: 0.1;
+/* Star twinkle effect */
+@keyframes star-twinkle {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
   }
+
   50% {
-    transform: translateX(20%) skewX(5deg);
-    opacity: 0.2;
+    opacity: 0.8;
+    transform: scale(1.2);
   }
 }
 
-/* Aurora Shimmer - Vertical wave motion */
-@keyframes aurora-shimmer {
-  0%, 100% {
-    transform: translateY(0) scaleY(1);
+/* Nebula pulse - slow breathing */
+@keyframes nebula-breathe {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.15;
   }
+
   50% {
-    transform: translateY(-10px) scaleY(1.1);
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.25;
+  }
+}
+
+/* Distant galaxy rotation */
+@keyframes galaxy-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
   }
 }
 
 /* Utility class for shooting star element */
 .shooting-star {
   position: absolute;
-  width: 100px;
+  width: 80px;
   height: 2px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, transparent 100%);
-  animation: shooting-star-fall 3s linear forwards;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9) 0%, rgba(168, 85, 247, 0.5) 50%, transparent 100%);
+  border-radius: 2px;
+  animation: shooting-star-move 4s linear forwards;
   pointer-events: none;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5), 0 0 12px rgba(168, 85, 247, 0.3);
 }
 
 /* ============================================================================
@@ -124,24 +151,30 @@
 
 /* Scrollbar width and height */
 .pretty-scrollbar::-webkit-scrollbar {
-  width: 4px;   /* Vertical scrollbar width */
-  height: 4px;  /* Horizontal scrollbar height */
+  width: 4px;
+  /* Vertical scrollbar width */
+  height: 4px;
+  /* Horizontal scrollbar height */
 }
 
 /* Scrollbar track (background) */
 .pretty-scrollbar::-webkit-scrollbar-track {
-  background: transparent;  /* Invisible track for clean look */
+  background: transparent;
+  /* Invisible track for clean look */
 }
 
 /* Scrollbar thumb (the draggable part) */
 .pretty-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.2);  /* BTS purple with 20% opacity */
-  border-radius: 10px;                   /* Fully rounded for smooth appearance */
+  background: rgba(168, 85, 247, 0.2);
+  /* BTS purple with 20% opacity */
+  border-radius: 10px;
+  /* Fully rounded for smooth appearance */
 }
 
 /* Scrollbar thumb on hover */
 .pretty-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.4);  /* Increased opacity for interaction feedback */
+  background: rgba(168, 85, 247, 0.4);
+  /* Increased opacity for interaction feedback */
 }
 
 /**
@@ -193,11 +226,16 @@
    **Performance:** Excellent - only animates opacity (GPU-accelerated)
 */
 @keyframes twinkle {
-  0%, 100% { 
-    opacity: 0.8;  /* Full visibility at start and end */
+
+  0%,
+  100% {
+    opacity: 0.8;
+    /* Full visibility at start and end */
   }
-  50% { 
-    opacity: 0.3;  /* Dimmed at midpoint for twinkling effect */
+
+  50% {
+    opacity: 0.3;
+    /* Dimmed at midpoint for twinkling effect */
   }
 }
 
@@ -234,14 +272,19 @@
    **Performance:** Excellent - transform is GPU-accelerated
 */
 @keyframes float {
-  0% { 
-    transform: translate(-20%, 0) rotate(0deg);  /* Start position */
+  0% {
+    transform: translate(-20%, 0) rotate(0deg);
+    /* Start position */
   }
-  50% { 
-    transform: translate(50%, -20%) rotate(5deg);  /* Midpoint with slight rotation */
+
+  50% {
+    transform: translate(50%, -20%) rotate(5deg);
+    /* Midpoint with slight rotation */
   }
-  100% { 
-    transform: translate(120%, -10%) rotate(-5deg);  /* End off-screen */
+
+  100% {
+    transform: translate(120%, -10%) rotate(-5deg);
+    /* End off-screen */
   }
 }
 
@@ -284,17 +327,27 @@
    **Performance:** Good - uses transform and opacity, but large blur is GPU-intensive
 */
 @keyframes bokeh-float {
-  0%, 100% { 
-    transform: translate(0, 0) scale(1);  /* Start/end position */
-    opacity: 0.2;                          /* Low opacity for subtle effect */
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    /* Start/end position */
+    opacity: 0.2;
+    /* Low opacity for subtle effect */
   }
-  33% { 
-    transform: translate(30px, -50px) scale(1.1);  /* Float up-right, grow */
-    opacity: 0.3;                                   /* Peak opacity */
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+    /* Float up-right, grow */
+    opacity: 0.3;
+    /* Peak opacity */
   }
-  66% { 
-    transform: translate(-20px, 20px) scale(0.9);  /* Float down-left, shrink */
-    opacity: 0.15;                                  /* Lower opacity */
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+    /* Float down-left, shrink */
+    opacity: 0.15;
+    /* Lower opacity */
   }
 }
 
@@ -344,16 +397,23 @@
    **Performance:** Excellent - GPU-accelerated properties
 */
 @keyframes draw-line {
-  0% { 
-    stroke-dashoffset: 1000;  /* Line fully hidden */
-    opacity: 0;                /* Fade in from invisible */
+  0% {
+    stroke-dashoffset: 1000;
+    /* Line fully hidden */
+    opacity: 0;
+    /* Fade in from invisible */
   }
-  50% { 
-    opacity: 0.5;              /* Mid-fade for smooth appearance */
+
+  50% {
+    opacity: 0.5;
+    /* Mid-fade for smooth appearance */
   }
-  100% { 
-    stroke-dashoffset: 0;      /* Line fully drawn */
-    opacity: 0.3;              /* Final subtle opacity */
+
+  100% {
+    stroke-dashoffset: 0;
+    /* Line fully drawn */
+    opacity: 0.3;
+    /* Final subtle opacity */
   }
 }
 
@@ -405,11 +465,16 @@
    **Performance:** Good - filter is GPU-accelerated but can be intensive
 */
 @keyframes pulse-glow {
-  0%, 100% { 
-    filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.3));  /* Subtle glow */
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.3));
+    /* Subtle glow */
   }
-  50% { 
-    filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));  /* Prominent glow */
+
+  50% {
+    filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));
+    /* Prominent glow */
   }
 }
 
@@ -458,13 +523,20 @@
    **Performance:** Moderate - large elements require more GPU memory
 */
 @keyframes float-mist {
-  0%, 100% { 
-    transform: translate(0, 0) scale(1);  /* Start/end position */
-    opacity: 0.05;                         /* Very subtle */
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    /* Start/end position */
+    opacity: 0.05;
+    /* Very subtle */
   }
-  50% { 
-    transform: translate(50px, -30px) scale(1.1);  /* Drift and grow */
-    opacity: 0.1;                                   /* Slightly more visible */
+
+  50% {
+    transform: translate(50px, -30px) scale(1.1);
+    /* Drift and grow */
+    opacity: 0.1;
+    /* Slightly more visible */
   }
 }
 
@@ -517,13 +589,20 @@
    **Performance:** Moderate to Heavy - animating blur is GPU-intensive
 */
 @keyframes nebula-pulse {
-  0%, 100% { 
-    opacity: 0.1;                         /* Barely visible */
-    filter: blur(60px) scale(1);          /* Smaller blur */
+
+  0%,
+  100% {
+    opacity: 0.1;
+    /* Barely visible */
+    filter: blur(60px) scale(1);
+    /* Smaller blur */
   }
-  50% { 
-    opacity: 0.25;                        /* More prominent */
-    filter: blur(80px) scale(1.05);       /* Larger blur with slight growth */
+
+  50% {
+    opacity: 0.25;
+    /* More prominent */
+    filter: blur(80px) scale(1.05);
+    /* Larger blur with slight growth */
   }
 }
 
@@ -584,13 +663,20 @@
    **Performance:** Good - minimal transform and filter changes
 */
 @keyframes logo-glow {
-  0%, 100% { 
-    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3));  /* Subtle glow */
-    transform: scale(1);                                    /* Normal size */
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3));
+    /* Subtle glow */
+    transform: scale(1);
+    /* Normal size */
   }
-  50% { 
-    filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.7));  /* Prominent glow */
-    transform: scale(1.02);                                  /* Slight growth */
+
+  50% {
+    filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.7));
+    /* Prominent glow */
+    transform: scale(1.02);
+    /* Slight growth */
   }
 }
 
@@ -645,17 +731,25 @@
    **Performance:** Excellent - transform and opacity only
 */
 @keyframes shooting-star {
-  0% { 
-    transform: translate(-100%, -100%) scale(0);  /* Start off-screen top-left */
-    opacity: 0;                                    /* Invisible */
+  0% {
+    transform: translate(-100%, -100%) scale(0);
+    /* Start off-screen top-left */
+    opacity: 0;
+    /* Invisible */
   }
-  10% { 
-    opacity: 1;                                    /* Fade in quickly */
-    transform: translate(-80%, -80%) scale(1);     /* Visible on screen */
+
+  10% {
+    opacity: 1;
+    /* Fade in quickly */
+    transform: translate(-80%, -80%) scale(1);
+    /* Visible on screen */
   }
-  100% { 
-    transform: translate(100vw, 100vh) scale(1);   /* Shoot to bottom-right */
-    opacity: 0;                                    /* Fade out */
+
+  100% {
+    transform: translate(100vw, 100vh) scale(1);
+    /* Shoot to bottom-right */
+    opacity: 0;
+    /* Fade out */
   }
 }
 
@@ -733,14 +827,19 @@
    **Performance:** Excellent - transform is GPU-accelerated
 */
 @keyframes galaxy-spin {
-  0% { 
-    transform: rotate(0deg) scale(1);    /* Start position */
+  0% {
+    transform: rotate(0deg) scale(1);
+    /* Start position */
   }
-  50% { 
-    transform: rotate(180deg) scale(1.1);  /* Halfway, slightly larger */
+
+  50% {
+    transform: rotate(180deg) scale(1.1);
+    /* Halfway, slightly larger */
   }
-  100% { 
-    transform: rotate(360deg) scale(1);    /* Full rotation back to normal */
+
+  100% {
+    transform: rotate(360deg) scale(1);
+    /* Full rotation back to normal */
   }
 }
 
@@ -801,18 +900,27 @@
    **Performance:** Heavy - uses scale, rotate, blur simultaneously
 */
 @keyframes warp-portal {
-  0% { 
-    transform: scale(0) rotate(0deg);      /* Start: tiny point */
-    opacity: 0;                             /* Invisible */
-    filter: blur(0px);                      /* Sharp */
+  0% {
+    transform: scale(0) rotate(0deg);
+    /* Start: tiny point */
+    opacity: 0;
+    /* Invisible */
+    filter: blur(0px);
+    /* Sharp */
   }
-  30% { 
-    opacity: 1;                             /* Fully visible */
+
+  30% {
+    opacity: 1;
+    /* Fully visible */
   }
-  100% { 
-    transform: scale(40) rotate(360deg);   /* End: massive and rotated */
-    opacity: 0;                             /* Fade to white */
-    filter: blur(20px);                     /* Very blurred */
+
+  100% {
+    transform: scale(40) rotate(360deg);
+    /* End: massive and rotated */
+    opacity: 0;
+    /* Fade to white */
+    filter: blur(20px);
+    /* Very blurred */
   }
 }
 
@@ -893,7 +1001,8 @@
   background: radial-gradient(circle at center, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
   filter: blur(120px);
   animation: float-mist 80s infinite linear;
-  pointer-events: none;  /* Don't interfere with click events */
+  pointer-events: none;
+  /* Don't interfere with click events */
 }
 
 /**
@@ -927,18 +1036,31 @@
 */
 
 /* Full viewport coverage for app container */
-html, body, #root {
-  margin: 0;                      /* Remove default margins */
-  padding: 0;                     /* Remove default padding */
-  width: 100%;                    /* Full width */
-  height: 100%;                   /* Full height */
-  overflow: hidden;               /* Prevent scrolling (contained experience) */
-  background-color: #020005;      /* Deep space black with slight purple tint */
-  color: white;                   /* Default text color */
-  font-family: 'Inter', system-ui, sans-serif;  /* Modern, readable font */
-  user-select: none;              /* Prevent text selection (app-like) */
-  -webkit-user-select: none;      /* Safari/Chrome */
-  -webkit-touch-callout: none;    /* iOS Safari */
+html,
+body,
+#root {
+  margin: 0;
+  /* Remove default margins */
+  padding: 0;
+  /* Remove default padding */
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: hidden;
+  /* Prevent scrolling (contained experience) */
+  background-color: #020005;
+  /* Deep space black with slight purple tint */
+  color: white;
+  /* Default text color */
+  font-family: 'Inter', system-ui, sans-serif;
+  /* Modern, readable font */
+  user-select: none;
+  /* Prevent text selection (app-like) */
+  -webkit-user-select: none;
+  /* Safari/Chrome */
+  -webkit-touch-callout: none;
+  /* iOS Safari */
 }
 
 /**
@@ -1148,10 +1270,11 @@ html, body, #root {
    **Duration:** 30-60 seconds for slow, mesmerizing orbit
 */
 @keyframes orbit {
-  from { 
+  from {
     transform: rotate(0deg) translateX(100px) rotate(0deg);
   }
-  to { 
+
+  to {
     transform: rotate(360deg) translateX(100px) rotate(-360deg);
   }
 }
@@ -1194,13 +1317,20 @@ html, body, #root {
    **Effect:** Particles drift and pulse in size with opacity changes
 */
 @keyframes float-particle {
-  0%, 100% { 
-    transform: translate(0, 0) scale(1);  /* Start/end position */
-    opacity: 0;                            /* Invisible at endpoints */
+
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    /* Start/end position */
+    opacity: 0;
+    /* Invisible at endpoints */
   }
-  50% { 
-    transform: translate(20px, -20px) scale(1.5);  /* Drift and grow */
-    opacity: 0.5;                                   /* Peak visibility */
+
+  50% {
+    transform: translate(20px, -20px) scale(1.5);
+    /* Drift and grow */
+    opacity: 0.5;
+    /* Peak visibility */
   }
 }
 
@@ -1248,32 +1378,40 @@ html, body, #root {
 */
 .glass-panel {
   /* Background: Dark gradient for depth */
-  background: linear-gradient(
-    135deg,                              /* Diagonal gradient direction */
-    rgba(15, 5, 25, 0.4) 0%,            /* Slightly purple dark at top */
-    rgba(5, 2, 10, 0.6) 100%            /* Darker at bottom for depth */
-  );
-  
+  background: linear-gradient(135deg,
+      /* Diagonal gradient direction */
+      rgba(15, 5, 25, 0.4) 0%,
+      /* Slightly purple dark at top */
+      rgba(5, 2, 10, 0.6) 100%
+      /* Darker at bottom for depth */
+    );
+
   /* Frosted glass effect */
-  backdrop-filter: blur(40px) saturate(180%);  /* Key glass morphism property */
-  
+  backdrop-filter: blur(40px) saturate(180%);
+  /* Key glass morphism property */
+
   /* Subtle border for definition */
-  border: 1px solid rgba(255, 255, 255, 0.03);  /* Very subtle white border */
-  
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  /* Very subtle white border */
+
   /* Layered shadows for depth and glow */
-  box-shadow: 
-    0 8px 32px 0 rgba(0, 0, 0, 0.8),              /* Outer shadow for depth */
-    inset 0 0 32px 0 rgba(168, 85, 247, 0.02);    /* Inner purple glow */
+  box-shadow:
+    0 8px 32px 0 rgba(0, 0, 0, 0.8),
+    /* Outer shadow for depth */
+    inset 0 0 32px 0 rgba(168, 85, 247, 0.02);
+  /* Inner purple glow */
 }
 
 /* Hover state with enhanced border and glow */
 .glass-panel:hover {
-  border-color: rgba(168, 85, 247, 0.2);  /* More visible purple border */
-  
+  border-color: rgba(168, 85, 247, 0.2);
+  /* More visible purple border */
+
   /* Enhanced shadows on hover */
-  box-shadow: 
+  box-shadow:
     0 8px 32px 0 rgba(0, 0, 0, 0.8),
-    inset 0 0 32px 0 rgba(168, 85, 247, 0.05);  /* Stronger inner glow */
+    inset 0 0 32px 0 rgba(168, 85, 247, 0.05);
+  /* Stronger inner glow */
 }
 
 /**
@@ -1357,11 +1495,12 @@ html, body, #root {
    Adds atmospheric depth without overwhelming content.
 */
 .bg-nebula-purple {
-  background: radial-gradient(
-    circle at center,
-    rgba(168, 85, 247, 0.15) 0%,    /* Purple center */
-    transparent 70%                  /* Fade to transparent */
-  );
+  background: radial-gradient(circle at center,
+      rgba(168, 85, 247, 0.15) 0%,
+      /* Purple center */
+      transparent 70%
+      /* Fade to transparent */
+    );
 }
 
 /**
