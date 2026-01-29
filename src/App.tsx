@@ -347,133 +347,129 @@ interface LandingRitualProps {
 
 const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
   return (
-    <div className="absolute inset-0 z-50 grid place-items-center overflow-hidden select-none">
-      {/* Title Section - Properly spaced at top */}
-      <div className="absolute top-[12%] left-0 right-0 text-center z-10 animate-in fade-in slide-in-from-top-8 duration-1000">
-        <h1
-          className="text-6xl md:text-8xl font-black text-white tracking-[0.2em] uppercase leading-tight"
-          style={{
-            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-            textShadow: '0 0 60px rgba(168,85,247,0.6), 0 0 120px rgba(168,85,247,0.3), 0 4px 20px rgba(0,0,0,0.5)'
-          }}
-        >
-          BTS Neural Archive
-        </h1>
-        <p className="mt-6 text-white/30 text-sm tracking-[0.5em] uppercase font-light">
-          Seven Stars • One Universe
-        </p>
+    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-hidden select-none">
+      {/* Ambient Background Glow - Centered cosmic nebula */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-purple-600/15 blur-[200px] animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-purple-500/20 blur-[100px]" />
       </div>
 
-      {/* Decorative Constellation Lines */}
-      <div className="absolute inset-0 pointer-events-none z-5">
-        <svg className="w-full h-full opacity-20">
-          <defs>
-            <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#A855F7" stopOpacity="0" />
-              <stop offset="50%" stopColor="#A855F7" stopOpacity="0.5" />
-              <stop offset="100%" stopColor="#A855F7" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {/* Constellation Lines */}
-          <line x1="15%" y1="25%" x2="30%" y2="35%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" />
-          <line x1="70%" y1="28%" x2="85%" y2="22%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" style={{ animationDelay: '1s' }} />
-          <line x1="20%" y1="70%" x2="35%" y2="65%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" style={{ animationDelay: '2s' }} />
-          <line x1="75%" y1="72%" x2="90%" y2="78%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" style={{ animationDelay: '3s' }} />
-        </svg>
-        {/* Subtle corner accents */}
-        <div className="absolute top-[22%] left-[15%] w-2 h-2 bg-purple-400/40 rounded-full blur-[2px] animate-pulse" />
-        <div className="absolute top-[25%] right-[12%] w-1.5 h-1.5 bg-purple-300/30 rounded-full blur-[2px] animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-[28%] left-[18%] w-1.5 h-1.5 bg-purple-400/30 rounded-full blur-[2px] animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-[22%] right-[15%] w-2 h-2 bg-purple-300/40 rounded-full blur-[2px] animate-pulse" style={{ animationDelay: '3s' }} />
-      </div>
+      {/* Content Container - Proper vertical stacking */}
+      <div className="relative z-20 flex flex-col items-center gap-16 max-w-5xl px-8">
 
-      {/* Centered Logo Section - Perfectly centered */}
-      <div className="relative flex flex-col items-center justify-center z-20 gap-12 group">
-        {/* THE GATEWAY LOGO */}
+        {/* Title Section */}
+        <div className="text-center animate-in fade-in slide-in-from-top-8 duration-1000">
+          <h1
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[0.15em] uppercase"
+            style={{
+              fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+              textShadow: '0 0 50px rgba(168,85,247,0.5), 0 0 100px rgba(168,85,247,0.3), 0 2px 10px rgba(0,0,0,0.5)'
+            }}
+          >
+            BTS Neural Archive
+          </h1>
+        </div>
+
+        {/* Logo + Constellation Section */}
         <button
           onClick={onSync}
-          className="relative w-56 h-56 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none ring-0 focus:ring-0 select-none hover:scale-105 active:scale-95 group/logo"
+          className="relative w-80 h-80 flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none select-none hover:scale-105 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000"
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
-          {/* Multi-layer glow effects */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Outer ambient glow */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-purple-600/10 blur-[120px] animate-pulse group-hover/logo:opacity-60 transition-opacity duration-1000"
-            />
-            {/* Inner glow ring */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-purple-500/25 blur-[80px] group-hover/logo:scale-110 transition-transform duration-1000"
-            />
-            {/* Core glow */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-purple-400/30 blur-[40px] group-hover/logo:bg-purple-300/40 transition-all duration-700"
-            />
+          {/* Outer Orbit Ring - Subtle guide */}
+          <div className="absolute inset-8 rounded-full border border-white/[0.08]" />
+
+          {/* Inner Glow Ring */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-purple-500/30 blur-[60px] group-hover:bg-purple-400/40 transition-all duration-700" />
+
+          {/* BTS Logo - Center */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 animate-[logo-glow_6s_infinite] group-hover:drop-shadow-[0_0_50px_rgba(255,255,255,0.8)] transition-all duration-700">
+            <BTSLogo className="w-20 h-20 text-white" />
           </div>
 
-          {/* BTS Logo - Larger and more prominent */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 animate-[logo-glow_6s_infinite] group-hover/logo:drop-shadow-[0_0_40px_rgba(255,255,255,0.9)] transition-all duration-700">
-            <BTSLogo className="w-24 h-24 text-white" />
-          </div>
-
-          {/* Orbiting Connection Points - Larger and more visible */}
-          {MEMBER_DATA.map((m, i) => {
-            const angle = (i / 7) * Math.PI * 2 - Math.PI / 2;
-            const dist = 140;
-            const x = Math.cos(angle) * dist;
-            const y = Math.sin(angle) * dist;
-            return (
-              <div
-                key={m.id}
-                className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full opacity-60 transition-all duration-700 group-hover/logo:opacity-100 group-hover/logo:scale-125"
-                style={{
-                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
-                  backgroundColor: m.color,
-                  boxShadow: `0 0 20px ${m.color}, 0 0 40px ${m.color}50`,
-                  transitionDelay: `${i * 60}ms`
-                }}
-              />
-            )
-          })}
-
-          {/* Connection lines between dots */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30 group-hover/logo:opacity-50 transition-opacity duration-700">
+          {/* 7 Member Constellation - Clean circular orbit */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 320">
+            {/* Connecting lines between members */}
             {MEMBER_DATA.map((_, i) => {
               const angle1 = (i / 7) * Math.PI * 2 - Math.PI / 2;
-              const angle2 = ((i + 1) / 7) * Math.PI * 2 - Math.PI / 2;
-              const dist = 140;
-              const x1 = 112 + Math.cos(angle1) * dist;
-              const y1 = 112 + Math.sin(angle1) * dist;
-              const x2 = 112 + Math.cos(angle2) * dist;
-              const y2 = 112 + Math.sin(angle2) * dist;
+              const angle2 = ((i + 1) % 7 / 7) * Math.PI * 2 - Math.PI / 2;
+              const radius = 115;
+              const cx = 160, cy = 160;
+              const x1 = cx + Math.cos(angle1) * radius;
+              const y1 = cy + Math.sin(angle1) * radius;
+              const x2 = cx + Math.cos(angle2) * radius;
+              const y2 = cy + Math.sin(angle2) * radius;
               return (
                 <line
-                  key={i}
+                  key={`line-${i}`}
                   x1={x1} y1={y1} x2={x2} y2={y2}
                   stroke="#A855F7"
                   strokeWidth="1"
-                  strokeDasharray="4 4"
-                  className="animate-pulse"
-                  style={{ animationDelay: `${i * 0.2}s` }}
+                  strokeOpacity="0.3"
+                  className="group-hover:stroke-opacity-60 transition-all duration-700"
                 />
               );
             })}
           </svg>
+
+          {/* Member Color Dots - Positioned on orbit */}
+          {MEMBER_DATA.map((m, i) => {
+            const angle = (i / 7) * Math.PI * 2 - Math.PI / 2;
+            const radius = 115;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            return (
+              <div
+                key={m.id}
+                className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full transition-all duration-500 group-hover:scale-125"
+                style={{
+                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+                  backgroundColor: m.color,
+                  boxShadow: `0 0 15px ${m.color}, 0 0 30px ${m.color}60`,
+                }}
+              />
+            );
+          })}
+
+          {/* Subtitle - Below logo, inside button area */}
+          <span className="absolute bottom-4 text-[10px] text-white/40 tracking-[0.5em] uppercase font-light">
+            Seven Stars • One Universe
+          </span>
         </button>
 
-        {/* Enhanced Call to Action - Much more visible */}
+        {/* Call to Action */}
         <button
           onClick={onSync}
-          className="flex flex-col items-center gap-5 group/text cursor-pointer hover:scale-105 transition-all duration-500"
+          className="flex flex-col items-center gap-4 group cursor-pointer hover:scale-105 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 duration-1000"
         >
-          <div className="h-[2px] w-20 bg-gradient-to-r from-transparent via-purple-400/60 to-transparent group-hover/text:w-32 group-hover/text:via-purple-300 transition-all duration-700" />
-          <span className="text-sm text-white/50 tracking-[0.6em] font-medium uppercase group-hover/text:text-white group-hover/text:tracking-[0.8em] transition-all duration-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">
-            Enter Dashboard
-          </span>
-          <div className="flex items-center gap-2 opacity-0 group-hover/text:opacity-100 transition-opacity duration-500">
-            <ChevronRight size={16} className="text-purple-400 animate-pulse" />
+          <div className="flex items-center gap-4">
+            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-purple-400/50 group-hover:w-16 transition-all duration-500" />
+            <span
+              className="text-base text-white/60 tracking-[0.4em] font-medium uppercase group-hover:text-white group-hover:tracking-[0.5em] transition-all duration-500"
+              style={{ textShadow: '0 0 20px rgba(168,85,247,0.4)' }}
+            >
+              Enter Dashboard
+            </span>
+            <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-purple-400/50 group-hover:w-16 transition-all duration-500" />
           </div>
+          <ChevronRight size={20} className="text-purple-400/60 group-hover:text-purple-300 animate-pulse rotate-90 group-hover:translate-y-1 transition-all duration-500" />
         </button>
+      </div>
+
+      {/* Sparse Star Field - Subtle, not distracting */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
+            style={{
+              left: `${10 + (i * 37) % 80}%`,
+              top: `${5 + (i * 47) % 90}%`,
+              animationDelay: `${i * 0.3}s`,
+              opacity: 0.2 + (i % 3) * 0.1
+            }}
+          />
+        ))}
       </div>
     </div>
   );
