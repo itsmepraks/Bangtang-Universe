@@ -47,6 +47,61 @@
 @import "tailwindcss";
 
 /* ============================================================================
+   MIKROKOSMOS THEME ANIMATIONS
+   ============================================================================
+   
+   Special animations for the BTS-themed landing page experience.
+   Designed to be subtle, slow, and elegant.
+*/
+
+/* Shooting Star - Diagonal streak across the screen */
+@keyframes shooting-star-fall {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-45deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(500px) translateY(500px) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+/* Aurora Wave - Slow undulating purple glow */
+@keyframes aurora-wave {
+  0%, 100% {
+    transform: translateX(-20%) skewX(-5deg);
+    opacity: 0.1;
+  }
+  50% {
+    transform: translateX(20%) skewX(5deg);
+    opacity: 0.2;
+  }
+}
+
+/* Aurora Shimmer - Vertical wave motion */
+@keyframes aurora-shimmer {
+  0%, 100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-10px) scaleY(1.1);
+  }
+}
+
+/* Utility class for shooting star element */
+.shooting-star {
+  position: absolute;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.8) 0%, transparent 100%);
+  animation: shooting-star-fall 3s linear forwards;
+  pointer-events: none;
+}
+
+/* ============================================================================
    CUSTOM SCROLLBAR STYLES
    ============================================================================
    

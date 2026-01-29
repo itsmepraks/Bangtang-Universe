@@ -346,21 +346,75 @@ interface LandingRitualProps {
 }
 
 const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
+  // Shooting stars state - cycle through positions
+  const [stars, setStars] = useState<{ id: number; left: number; top: number }[]>([]);
+
+  useEffect(() => {
+    // Create a new shooting star every 5 seconds
+    const interval = setInterval(() => {
+      const newStar = {
+        id: Date.now(),
+        left: Math.random() * 60, // Start from left 60% of screen
+        top: Math.random() * 40,  // Start from top 40%
+      };
+      setStars(prev => [...prev.slice(-2), newStar]); // Keep max 3 stars
+    }, 5000);
+
+    // Create first star immediately
+    setStars([{ id: Date.now(), left: 20, top: 15 }]);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-hidden select-none">
-      {/* Ambient Background Glow - Centered cosmic nebula */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full bg-purple-600/15 blur-[200px] animate-pulse" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-purple-500/20 blur-[100px]" />
+
+      {/* LAYER 1: Aurora Background - Slow, ethereal waves */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute -top-1/2 -left-1/4 w-[150%] h-[200%] opacity-15"
+          style={{
+            background: 'linear-gradient(180deg, transparent 0%, rgba(147,51,234,0.3) 30%, rgba(168,85,247,0.2) 50%, rgba(192,132,252,0.1) 70%, transparent 100%)',
+            animation: 'aurora-wave 30s ease-in-out infinite',
+          }}
+        />
+        <div
+          className="absolute -top-1/2 -right-1/4 w-[150%] h-[200%] opacity-10"
+          style={{
+            background: 'linear-gradient(180deg, transparent 0%, rgba(192,132,252,0.2) 40%, rgba(147,51,234,0.15) 60%, transparent 100%)',
+            animation: 'aurora-wave 25s ease-in-out infinite reverse',
+            animationDelay: '-10s',
+          }}
+        />
       </div>
 
-      {/* Content Container - Proper vertical stacking */}
-      <div className="relative z-20 flex flex-col items-center gap-16 max-w-5xl px-8">
+      {/* LAYER 2: Centered Nebula Glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-purple-600/20 blur-[180px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-purple-500/25 blur-[80px]" />
+      </div>
 
-        {/* Title Section */}
+      {/* LAYER 2.5: Shooting Stars - Mikrokosmos magic */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+        {stars.map(star => (
+          <div
+            key={star.id}
+            className="shooting-star"
+            style={{
+              left: `${star.left}%`,
+              top: `${star.top}%`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* LAYER 3: Main Content */}
+      <div className="relative z-20 flex flex-col items-center gap-12 max-w-5xl px-8">
+
+        {/* Title */}
         <div className="text-center animate-in fade-in slide-in-from-top-8 duration-1000">
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[0.15em] uppercase"
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[0.12em] uppercase"
             style={{
               fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
               textShadow: '0 0 50px rgba(168,85,247,0.5), 0 0 100px rgba(168,85,247,0.3), 0 2px 10px rgba(0,0,0,0.5)'
@@ -370,103 +424,127 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           </h1>
         </div>
 
-        {/* Logo + Constellation Section */}
+        {/* Logo + 7 Member Constellation */}
         <button
           onClick={onSync}
-          className="relative w-80 h-80 flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none select-none hover:scale-105 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000"
+          className="relative w-72 h-72 flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none select-none hover:scale-105 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000"
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
-          {/* Outer Orbit Ring - Subtle guide */}
-          <div className="absolute inset-8 rounded-full border border-white/[0.08]" />
+          {/* Orbit Ring */}
+          <div className="absolute inset-6 rounded-full border border-purple-400/20 group-hover:border-purple-400/40 transition-colors duration-700" />
 
-          {/* Inner Glow Ring */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full bg-purple-500/30 blur-[60px] group-hover:bg-purple-400/40 transition-all duration-700" />
+          {/* Inner Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full bg-purple-500/40 blur-[50px] group-hover:bg-purple-400/50 transition-all duration-700" />
 
-          {/* BTS Logo - Center */}
+          {/* BTS Logo */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 animate-[logo-glow_6s_infinite] group-hover:drop-shadow-[0_0_50px_rgba(255,255,255,0.8)] transition-all duration-700">
-            <BTSLogo className="w-20 h-20 text-white" />
+            <BTSLogo className="w-16 h-16 text-white" />
           </div>
 
-          {/* 7 Member Constellation - Clean circular orbit */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 320 320">
-            {/* Connecting lines between members */}
+          {/* Constellation Lines (SVG) */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 288 288">
             {MEMBER_DATA.map((_, i) => {
               const angle1 = (i / 7) * Math.PI * 2 - Math.PI / 2;
               const angle2 = ((i + 1) % 7 / 7) * Math.PI * 2 - Math.PI / 2;
-              const radius = 115;
-              const cx = 160, cy = 160;
-              const x1 = cx + Math.cos(angle1) * radius;
-              const y1 = cy + Math.sin(angle1) * radius;
-              const x2 = cx + Math.cos(angle2) * radius;
-              const y2 = cy + Math.sin(angle2) * radius;
+              const radius = 105;
+              const cx = 144, cy = 144;
               return (
                 <line
                   key={`line-${i}`}
-                  x1={x1} y1={y1} x2={x2} y2={y2}
+                  x1={cx + Math.cos(angle1) * radius}
+                  y1={cy + Math.sin(angle1) * radius}
+                  x2={cx + Math.cos(angle2) * radius}
+                  y2={cy + Math.sin(angle2) * radius}
                   stroke="#A855F7"
                   strokeWidth="1"
-                  strokeOpacity="0.3"
-                  className="group-hover:stroke-opacity-60 transition-all duration-700"
+                  strokeOpacity="0.4"
+                  className="group-hover:stroke-opacity-70 transition-all duration-700"
                 />
               );
             })}
           </svg>
 
-          {/* Member Color Dots - Positioned on orbit */}
+          {/* 7 Member Dots with Name Tooltips */}
           {MEMBER_DATA.map((m, i) => {
             const angle = (i / 7) * Math.PI * 2 - Math.PI / 2;
-            const radius = 115;
+            const radius = 105;
             const x = Math.cos(angle) * radius;
             const y = Math.sin(angle) * radius;
             return (
               <div
                 key={m.id}
-                className="absolute top-1/2 left-1/2 w-4 h-4 rounded-full transition-all duration-500 group-hover:scale-125"
-                style={{
-                  transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
-                  backgroundColor: m.color,
-                  boxShadow: `0 0 15px ${m.color}, 0 0 30px ${m.color}60`,
-                }}
-              />
+                className="absolute top-1/2 left-1/2 group/member"
+                style={{ transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))` }}
+              >
+                {/* The Dot */}
+                <div
+                  className="w-4 h-4 rounded-full transition-all duration-500 group-hover:scale-110 group-hover/member:scale-150"
+                  style={{
+                    backgroundColor: m.color,
+                    boxShadow: `0 0 12px ${m.color}, 0 0 25px ${m.color}50`,
+                  }}
+                />
+                {/* Member Name Tooltip */}
+                <div
+                  className="absolute left-1/2 -translate-x-1/2 -top-8 px-2 py-1 bg-black/80 backdrop-blur-sm rounded text-[10px] font-bold text-white tracking-wider opacity-0 group-hover/member:opacity-100 transition-all duration-300 whitespace-nowrap pointer-events-none"
+                  style={{ color: m.color }}
+                >
+                  {m.name}
+                </div>
+              </div>
             );
           })}
 
-          {/* Subtitle - Below logo, inside button area */}
-          <span className="absolute bottom-4 text-[10px] text-white/40 tracking-[0.5em] uppercase font-light">
+          {/* Subtitle */}
+          <span className="absolute bottom-2 text-[10px] text-white/50 tracking-[0.4em] uppercase font-light">
             Seven Stars • One Universe
           </span>
         </button>
 
-        {/* Call to Action */}
+        {/* CTA Button */}
         <button
           onClick={onSync}
-          className="flex flex-col items-center gap-4 group cursor-pointer hover:scale-105 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 duration-1000"
+          className="flex flex-col items-center gap-3 group cursor-pointer hover:scale-105 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 duration-1000"
         >
-          <div className="flex items-center gap-4">
-            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-purple-400/50 group-hover:w-16 transition-all duration-500" />
+          <div className="flex items-center gap-3">
+            <div className="h-[1px] w-10 bg-gradient-to-r from-transparent to-purple-400/60 group-hover:w-14 transition-all duration-500" />
             <span
-              className="text-base text-white/60 tracking-[0.4em] font-medium uppercase group-hover:text-white group-hover:tracking-[0.5em] transition-all duration-500"
+              className="text-sm text-white/70 tracking-[0.35em] font-medium uppercase group-hover:text-white group-hover:tracking-[0.45em] transition-all duration-500"
               style={{ textShadow: '0 0 20px rgba(168,85,247,0.4)' }}
             >
               Enter Dashboard
             </span>
-            <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-purple-400/50 group-hover:w-16 transition-all duration-500" />
+            <div className="h-[1px] w-10 bg-gradient-to-l from-transparent to-purple-400/60 group-hover:w-14 transition-all duration-500" />
           </div>
-          <ChevronRight size={20} className="text-purple-400/60 group-hover:text-purple-300 animate-pulse rotate-90 group-hover:translate-y-1 transition-all duration-500" />
+          <ChevronRight size={18} className="text-purple-400/70 group-hover:text-purple-300 animate-pulse rotate-90 group-hover:translate-y-1 transition-all duration-500" />
         </button>
       </div>
 
-      {/* Sparse Star Field - Subtle, not distracting */}
+      {/* 보라해 (Borahae) Watermark - Bottom right */}
+      <div className="absolute bottom-8 right-10 z-30 pointer-events-none select-none">
+        <span
+          className="text-2xl font-light tracking-wider opacity-20"
+          style={{
+            fontFamily: '"Noto Sans KR", sans-serif',
+            color: '#A855F7',
+            textShadow: '0 0 30px rgba(168,85,247,0.3)'
+          }}
+        >
+          보라해
+        </span>
+      </div>
+
+      {/* Sparse twinkling stars */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(15)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse"
+            className="absolute w-1 h-1 bg-white/40 rounded-full animate-pulse"
             style={{
-              left: `${10 + (i * 37) % 80}%`,
-              top: `${5 + (i * 47) % 90}%`,
-              animationDelay: `${i * 0.3}s`,
-              opacity: 0.2 + (i % 3) * 0.1
+              left: `${8 + (i * 41) % 84}%`,
+              top: `${6 + (i * 53) % 88}%`,
+              animationDelay: `${i * 0.4}s`,
+              animationDuration: `${2 + (i % 3)}s`
             }}
           />
         ))}
