@@ -347,101 +347,132 @@ interface LandingRitualProps {
 
 const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
   return (
-    <div className="absolute inset-0 z-50 flex flex-col items-center justify-center overflow-hidden select-none">
-      {/* Title Section - Top */}
-      <div className="absolute top-[10%] text-center z-10 animate-in fade-in slide-in-from-top-10 duration-1000">
-        <h1 className="text-5xl md:text-7xl font-black text-white tracking-[0.15em] drop-shadow-[0_0_50px_rgba(168,85,247,0.5)] uppercase leading-tight" style={{ fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace', letterSpacing: '0.15em' }}>
+    <div className="absolute inset-0 z-50 grid place-items-center overflow-hidden select-none">
+      {/* Title Section - Properly spaced at top */}
+      <div className="absolute top-[12%] left-0 right-0 text-center z-10 animate-in fade-in slide-in-from-top-8 duration-1000">
+        <h1
+          className="text-6xl md:text-8xl font-black text-white tracking-[0.2em] uppercase leading-tight"
+          style={{
+            fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+            textShadow: '0 0 60px rgba(168,85,247,0.6), 0 0 120px rgba(168,85,247,0.3), 0 4px 20px rgba(0,0,0,0.5)'
+          }}
+        >
           BTS Neural Archive
         </h1>
+        <p className="mt-6 text-white/30 text-sm tracking-[0.5em] uppercase font-light">
+          Seven Stars • One Universe
+        </p>
       </div>
 
-      {/* Decorative Elements - Fill space */}
+      {/* Decorative Constellation Lines */}
       <div className="absolute inset-0 pointer-events-none z-5">
+        <svg className="w-full h-full opacity-20">
+          <defs>
+            <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#A855F7" stopOpacity="0" />
+              <stop offset="50%" stopColor="#A855F7" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="#A855F7" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          {/* Constellation Lines */}
+          <line x1="15%" y1="25%" x2="30%" y2="35%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" />
+          <line x1="70%" y1="28%" x2="85%" y2="22%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" style={{ animationDelay: '1s' }} />
+          <line x1="20%" y1="70%" x2="35%" y2="65%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" style={{ animationDelay: '2s' }} />
+          <line x1="75%" y1="72%" x2="90%" y2="78%" stroke="url(#lineGrad)" strokeWidth="1" className="animate-pulse" style={{ animationDelay: '3s' }} />
+        </svg>
         {/* Subtle corner accents */}
-        <div className="absolute top-[20%] left-[15%] w-1 h-1 bg-purple-400/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '0s' }} />
-        <div className="absolute top-[25%] right-[18%] w-1 h-1 bg-purple-300/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute bottom-[25%] left-[20%] w-1 h-1 bg-purple-400/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute bottom-[20%] right-[15%] w-1 h-1 bg-purple-300/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '3s' }} />
+        <div className="absolute top-[22%] left-[15%] w-2 h-2 bg-purple-400/40 rounded-full blur-[2px] animate-pulse" />
+        <div className="absolute top-[25%] right-[12%] w-1.5 h-1.5 bg-purple-300/30 rounded-full blur-[2px] animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute bottom-[28%] left-[18%] w-1.5 h-1.5 bg-purple-400/30 rounded-full blur-[2px] animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute bottom-[22%] right-[15%] w-2 h-2 bg-purple-300/40 rounded-full blur-[2px] animate-pulse" style={{ animationDelay: '3s' }} />
       </div>
 
-      {/* Centered Logo Section - Moved down */}
-      <div className="relative flex flex-col items-center justify-center z-20 translate-y-8 gap-10 group">
+      {/* Centered Logo Section - Perfectly centered */}
+      <div className="relative flex flex-col items-center justify-center z-20 gap-12 group">
         {/* THE GATEWAY LOGO */}
         <button
           onClick={onSync}
-          className="relative w-48 h-48 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none ring-0 focus:ring-0 select-none hover:scale-110 active:scale-95 group/logo"
+          className="relative w-56 h-56 rounded-full flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none ring-0 focus:ring-0 select-none hover:scale-105 active:scale-95 group/logo"
           style={{ WebkitTapHighlightColor: 'transparent' }}
         >
-          {/* Centered container for all glow effects - prevents cursor library interference */}
-          <div
-            className="absolute pointer-events-none z-0"
-            style={{
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '1px',
-              height: '1px'
-            }}
-          >
-            {/* Ambient Cosmic Glow - Properly centered */}
+          {/* Multi-layer glow effects */}
+          <div className="absolute inset-0 pointer-events-none">
+            {/* Outer ambient glow */}
             <div
-              className="absolute rounded-full bg-purple-600/10 opacity-20 blur-[100px] animate-pulse group-hover/logo:opacity-40 transition-opacity duration-700"
-              style={{
-                width: '600px',
-                height: '600px',
-                left: '-300px',
-                top: '-300px',
-                zIndex: 0
-              }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-purple-600/10 blur-[120px] animate-pulse group-hover/logo:opacity-60 transition-opacity duration-1000"
             />
+            {/* Inner glow ring */}
             <div
-              className="absolute rounded-full bg-purple-500/20 opacity-30 blur-[60px] group-hover/logo:scale-125 transition-transform duration-1000"
-              style={{
-                width: '300px',
-                height: '300px',
-                left: '-150px',
-                top: '-150px',
-                zIndex: 1
-              }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] rounded-full bg-purple-500/25 blur-[80px] group-hover/logo:scale-110 transition-transform duration-1000"
+            />
+            {/* Core glow */}
+            <div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] rounded-full bg-purple-400/30 blur-[40px] group-hover/logo:bg-purple-300/40 transition-all duration-700"
             />
           </div>
 
-          {/* BTS Logo - Perfectly centered in middle of circles and 7 orbiting dots */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 animate-[logo-glow_8s_infinite] group-hover/logo:drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] transition-all duration-700">
-            <BTSLogo className="w-20 h-20 text-white" />
+          {/* BTS Logo - Larger and more prominent */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 animate-[logo-glow_6s_infinite] group-hover/logo:drop-shadow-[0_0_40px_rgba(255,255,255,0.9)] transition-all duration-700">
+            <BTSLogo className="w-24 h-24 text-white" />
           </div>
 
-          {/* Orbiting Connection Points */}
+          {/* Orbiting Connection Points - Larger and more visible */}
           {MEMBER_DATA.map((m, i) => {
-            const angle = (i / 7) * Math.PI * 2;
+            const angle = (i / 7) * Math.PI * 2 - Math.PI / 2;
             const dist = 140;
             const x = Math.cos(angle) * dist;
             const y = Math.sin(angle) * dist;
             return (
               <div
                 key={m.id}
-                className="absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full opacity-40 transition-all duration-1000 group-hover/logo:opacity-100 group-hover/logo:scale-150"
+                className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full opacity-60 transition-all duration-700 group-hover/logo:opacity-100 group-hover/logo:scale-125"
                 style={{
                   transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
                   backgroundColor: m.color,
-                  boxShadow: `0 0 15px ${m.color}`,
-                  transitionDelay: `${i * 50}ms`
+                  boxShadow: `0 0 20px ${m.color}, 0 0 40px ${m.color}50`,
+                  transitionDelay: `${i * 60}ms`
                 }}
               />
             )
           })}
+
+          {/* Connection lines between dots */}
+          <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30 group-hover/logo:opacity-50 transition-opacity duration-700">
+            {MEMBER_DATA.map((_, i) => {
+              const angle1 = (i / 7) * Math.PI * 2 - Math.PI / 2;
+              const angle2 = ((i + 1) / 7) * Math.PI * 2 - Math.PI / 2;
+              const dist = 140;
+              const x1 = 112 + Math.cos(angle1) * dist;
+              const y1 = 112 + Math.sin(angle1) * dist;
+              const x2 = 112 + Math.cos(angle2) * dist;
+              const y2 = 112 + Math.sin(angle2) * dist;
+              return (
+                <line
+                  key={i}
+                  x1={x1} y1={y1} x2={x2} y2={y2}
+                  stroke="#A855F7"
+                  strokeWidth="1"
+                  strokeDasharray="4 4"
+                  className="animate-pulse"
+                  style={{ animationDelay: `${i * 0.2}s` }}
+                />
+              );
+            })}
+          </svg>
         </button>
 
-        {/* Call to Action Text - With space below circles */}
+        {/* Enhanced Call to Action - Much more visible */}
         <button
           onClick={onSync}
-          className="flex flex-col items-center gap-4 group/text cursor-pointer hover:scale-105 transition-all duration-500 mt-4"
+          className="flex flex-col items-center gap-5 group/text cursor-pointer hover:scale-105 transition-all duration-500"
         >
-          <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent group-hover/text:w-24 transition-all duration-1000" />
-          <span className="text-[10px] text-white/40 tracking-[0.8em] font-mono uppercase group-hover:text-white group-hover:tracking-[1em] transition-all duration-700 animate-pulse">
-            Go to Dashboard
+          <div className="h-[2px] w-20 bg-gradient-to-r from-transparent via-purple-400/60 to-transparent group-hover/text:w-32 group-hover/text:via-purple-300 transition-all duration-700" />
+          <span className="text-sm text-white/50 tracking-[0.6em] font-medium uppercase group-hover/text:text-white group-hover/text:tracking-[0.8em] transition-all duration-500 drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+            Enter Dashboard
           </span>
-          <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-purple-500/50 to-transparent group-hover/text:w-24 transition-all duration-1000" />
+          <div className="flex items-center gap-2 opacity-0 group-hover/text:opacity-100 transition-opacity duration-500">
+            <ChevronRight size={16} className="text-purple-400 animate-pulse" />
+          </div>
         </button>
       </div>
     </div>
@@ -484,30 +515,38 @@ interface GlassHUDProps {
 
 const GlassHUD: React.FC<GlassHUDProps> = ({ title, icon: Icon, children, className = "", onClose, headerAction, accentColor = "#A855F7" }) => (
   <div className={`
-    relative glass-panel rounded-3xl flex flex-col overflow-hidden
-    transition-all duration-700 hover:border-[${accentColor}]/30 group/hud
+    relative rounded-3xl flex flex-col overflow-hidden
+    transition-all duration-500 group/hud
+    border border-white/[0.06] hover:border-purple-500/30
     ${className}
   `}
-    style={{ '--accent-color': accentColor } as React.CSSProperties}>
+    style={{
+      '--accent-color': accentColor,
+      background: 'linear-gradient(135deg, rgba(20, 10, 35, 0.5) 0%, rgba(8, 4, 15, 0.7) 100%)',
+      backdropFilter: 'blur(40px) saturate(180%)',
+      boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255,255,255,0.03)'
+    } as React.CSSProperties}>
     {/* Soft Inner Glow */}
-    <div className="absolute inset-0 opacity-[0.02] pointer-events-none transition-opacity duration-700 group-hover/hud:opacity-[0.08]"
-      style={{ background: `radial-gradient(circle at 50% 0%, ${accentColor} 0%, transparent 70%)` }} />
+    <div className="absolute inset-0 opacity-[0.03] pointer-events-none transition-opacity duration-500 group-hover/hud:opacity-[0.08]"
+      style={{ background: `radial-gradient(ellipse at 50% 0%, ${accentColor} 0%, transparent 60%)` }} />
+    {/* Top edge highlight */}
+    <div className="absolute top-0 left-[10%] right-[10%] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
-    <div className="px-6 py-5 border-b border-white/5 bg-white/[0.01] flex items-center justify-between relative z-10">
+    <div className="px-7 py-6 border-b border-white/[0.04] bg-white/[0.015] flex items-center justify-between relative z-10">
       <div className="flex items-center gap-4">
-        {Icon && <Icon size={18} className="group-hover/hud:animate-pulse transition-colors duration-500" style={{ color: accentColor }} />}
-        <span className="text-[11px] font-bold tracking-[0.4em] text-white/40 uppercase group-hover/hud:text-white transition-colors duration-500">{title}</span>
+        {Icon && <Icon size={20} className="group-hover/hud:animate-pulse transition-colors duration-500" style={{ color: accentColor }} />}
+        <span className="text-xs font-bold tracking-[0.35em] text-white/50 uppercase group-hover/hud:text-white/80 transition-colors duration-500">{title}</span>
       </div>
       <div className="flex gap-2">
         {headerAction}
         {onClose && (
-          <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded-full transition-all text-white/40 hover:text-white">
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-xl transition-all text-white/30 hover:text-white">
             <X size={16} />
           </button>
         )}
       </div>
     </div>
-    <div className="p-6 flex-1 overflow-auto pretty-scrollbar relative z-10">
+    <div className="p-7 flex-1 overflow-auto pretty-scrollbar relative z-10">
       {children}
     </div>
   </div>
@@ -732,29 +771,46 @@ const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
   if (!member) return null;
 
   return (
-    <div className="absolute inset-0 z-[100] bg-[#020005]/80 backdrop-blur-[60px] animate-in fade-in duration-1000 flex flex-col overflow-hidden">
-      {/* Dynamic Member Aura */}
-      <div className="absolute inset-0 pointer-events-none opacity-40">
-        <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] opacity-30 blur-[150px] animate-pulse"
-          style={{ background: `radial-gradient(circle at 30% 30%, ${member.color} 0%, transparent 60%)` }} />
-        <div className="absolute bottom-[-20%] right-[-20%] w-[140%] h-[140%] opacity-20 blur-[150px] animate-pulse"
-          style={{ background: `radial-gradient(circle at 70% 70%, ${member.color} 0%, transparent 60%)`, animationDelay: '-5s' }} />
+    <div className="absolute inset-0 z-[100] bg-[#020005]/85 backdrop-blur-[80px] animate-in fade-in duration-700 flex flex-col overflow-hidden">
+      {/* Dynamic Member Aura - Enhanced with stronger gradients */}
+      <div className="absolute inset-0 pointer-events-none opacity-50">
+        <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] opacity-40 blur-[180px]"
+          style={{ background: `radial-gradient(circle at 30% 30%, ${member.color} 0%, transparent 50%)` }} />
+        <div className="absolute bottom-[-20%] right-[-20%] w-[140%] h-[140%] opacity-30 blur-[180px]"
+          style={{ background: `radial-gradient(circle at 70% 70%, ${member.color} 0%, transparent 50%)` }} />
         <FloatingParticles />
       </div>
 
-      {/* Top Bar */}
-      <div className="h-24 flex items-center justify-between px-16 border-b border-white/5 relative z-10 bg-black/20">
+      {/* Top Bar - Enhanced with gradient background */}
+      <div
+        className="h-28 flex items-center justify-between px-16 border-b border-white/[0.06] relative z-10"
+        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%)' }}
+      >
         <div className="flex items-center gap-8">
-          <button onClick={onClose} className="p-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-all duration-500 hover:scale-110 group border border-white/5 hover:border-white/20">
+          <button onClick={onClose} className="p-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-all duration-500 hover:scale-105 group border border-white/[0.06] hover:border-white/20">
             <ChevronLeft size={24} className="text-white group-hover:text-purple-300 transition-colors" />
           </button>
           <div>
-            <h1 className="text-2xl font-light tracking-[0.4em] text-white uppercase drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">Artist Profile Archive</h1>
-            <div className="text-[9px] text-white/30 font-mono tracking-[0.5em] mt-2 uppercase">Subject ID: {member.id.toUpperCase()} • Connection Stable</div>
+            <h1
+              className="text-3xl font-light tracking-[0.4em] text-white uppercase"
+              style={{ textShadow: `0 0 30px ${member.color}40, 0 4px 20px rgba(0,0,0,0.3)` }}
+            >
+              Artist Profile Archive
+            </h1>
+            <div className="text-[10px] text-white/40 font-mono tracking-[0.5em] mt-2 uppercase">Subject ID: {member.id.toUpperCase()} • Connection Stable</div>
           </div>
         </div>
         <div className="flex gap-4">
-          <span className="px-6 py-2 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold tracking-widest text-white/60 uppercase">{member.role}</span>
+          <span
+            className="px-6 py-2.5 rounded-full border text-[10px] font-bold tracking-widest uppercase"
+            style={{
+              borderColor: `${member.color}40`,
+              backgroundColor: `${member.color}10`,
+              color: member.color
+            }}
+          >
+            {member.role}
+          </span>
         </div>
       </div>
 
@@ -967,34 +1023,36 @@ export default function App() {
           {/* Content Area */}
           <div className="flex-1 flex flex-col min-w-0 relative z-10">
 
-            {/* Header */}
-            <header className="h-28 flex items-center justify-between px-16 bg-gradient-to-b from-black/40 to-transparent pointer-events-auto border-b border-white/[0.03]">
+            {/* Header - Enhanced visibility */}
+            <header className="h-32 flex items-center justify-between px-16 bg-gradient-to-b from-black/50 via-black/20 to-transparent pointer-events-auto border-b border-white/[0.05]">
               <div className="animate-in slide-in-from-left-10 duration-1000">
-                <h1 className="text-4xl font-extralight tracking-[0.3em] text-white drop-shadow-[0_0_30px_rgba(168,85,247,0.4)] uppercase">
+                <h1
+                  className="text-5xl font-light tracking-[0.25em] text-white uppercase"
+                  style={{ textShadow: '0 0 40px rgba(168,85,247,0.5), 0 4px 20px rgba(0,0,0,0.3)' }}
+                >
                   {activeSection === 'overview' ? 'Mission Control' : activeSection === 'sonic' ? 'Sonic Lab' : activeSection === 'rag' ? 'Archive Graph' : 'Records Hub'}
                 </h1>
-                <div className="flex items-center gap-4 text-[10px] text-purple-300/60 font-mono tracking-[0.4em] mt-3 font-bold">
-                  <span className="flex h-2 w-2 relative">
+                <div className="flex items-center gap-4 text-[11px] text-purple-300/70 font-mono tracking-[0.4em] mt-4 font-semibold">
+                  <span className="flex h-2.5 w-2.5 relative">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500 shadow-[0_0_15px_rgba(74,222,128,0.6)]"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-400 shadow-[0_0_15px_rgba(74,222,128,0.8)]"></span>
                   </span>
-                  SYSTEM OPERATIONAL • ARCHIVE SYNCHRONIZED
+                  SYSTEM ONLINE • ARCHIVE SYNCHRONIZED
                 </div>
               </div>
 
-              {/* Member Selectors - Prettier and softer */}
-              <div className="flex gap-4 bg-white/[0.02] backdrop-blur-3xl border border-white/10 px-8 py-4 rounded-[2.5rem] shadow-2xl animate-in slide-in-from-right-10 duration-1000">
+              {/* Member Selectors - Enhanced with cleaner hover states */}
+              <div className="flex gap-3 bg-white/[0.03] backdrop-blur-3xl border border-white/[0.08] px-6 py-3 rounded-[2rem] shadow-2xl animate-in slide-in-from-right-10 duration-1000">
                 {MEMBER_DATA.map(m => (
                   <button
                     key={m.id}
                     onClick={() => setActiveMemberId(m.id)}
-                    className="w-12 h-12 rounded-[1rem] flex items-center justify-center text-[11px] font-bold transition-all duration-700 border border-transparent hover:border-white/20 hover:bg-white/[0.04] text-white/20 hover:text-white relative group overflow-hidden"
+                    className="w-14 h-10 rounded-xl flex items-center justify-center text-[11px] font-bold transition-all duration-500 border border-transparent hover:border-white/20 hover:bg-white/[0.06] relative group overflow-hidden"
                     style={{ color: m.color }}
                   >
-                    <span className="relative z-10 transition-all duration-700 group-hover:scale-125 group-hover:text-white">{m.name}</span>
-                    <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-[0.1] transition-opacity duration-700" />
-                    <div className="absolute bottom-[-18px] left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-current opacity-0 group-hover:opacity-100 blur-[3px] transition-all duration-700 group-hover:translate-y-[-8px] shadow-[0_0_15px_currentColor]" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-current/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                    <span className="relative z-10 transition-all duration-500 group-hover:scale-110 group-hover:text-white">{m.name}</span>
+                    <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-[0.12] transition-opacity duration-500" />
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-full bg-current opacity-0 group-hover:opacity-80 transition-all duration-500" />
                   </button>
                 ))}
               </div>
