@@ -346,106 +346,106 @@ interface LandingRitualProps {
 }
 
 const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
-  // Generate ARMY bomb positions as a 3D SPHERICAL STADIUM (bowl shape)
+  // Generate ARMY bomb positions - MASSIVE 180-DEGREE SURROUNDING EFFECT
   const armyBombs = useMemo(() => {
     const bombs: { x: number; y: number; z: number; size: number; color: string; delay: number; brightness: number }[] = [];
 
-    // ARMY BOMB PURPLE PALETTE - predominantly purple with white accents
+    // ARMY BOMB PURPLE PALETTE - vibrant purples with occasional white
     const colors = [
-      '#A855F7', '#9333EA', '#7C3AED', '#8B5CF6', '#C084FC', // Core purples
+      '#A855F7', '#9333EA', '#7C3AED', '#8B5CF6', '#C084FC', '#B47EE5', // Core purples
       '#D8B4FE', '#E9D5FF', '#F3E8FF', // Light purples
-      '#FFFFFF', '#F5F3FF', // White accents (sparse)
+      '#FFFFFF', '#F5F3FF', // White accents
     ];
 
-    // Weighted color selection - 85% purple, 15% white
     const getColor = () => {
       const rand = Math.random();
-      if (rand < 0.85) {
-        return colors[Math.floor(Math.random() * 8)]; // Purples
-      }
-      return colors[8 + Math.floor(Math.random() * 2)]; // Whites
+      if (rand < 0.88) return colors[Math.floor(Math.random() * 9)];
+      return colors[9 + Math.floor(Math.random() * 2)];
     };
 
-    // UPPER HEMISPHERE: 3D Spherical Stadium Bowl
-    // Using spherical coordinates: theta (horizontal angle), phi (vertical angle from top)
-    const numRings = 12; // Concentric rings from top to horizon
-    const baseRadius = 50; // Base percentage radius
+    // === 180-DEGREE SEMICIRCLE AROUND THE STAGE ===
+    // Dense semicircular distribution focused behind and around the stage
+    const numArcs = 20; // More arcs for density
 
-    for (let ring = 0; ring < numRings; ring++) {
-      // phi: angle from top (0 = top, PI/2 = horizon)
-      const phi = (ring / numRings) * (Math.PI * 0.45); // 0 to ~80 degrees
-      const ringY = 5 + ring * 4; // Y position on screen (top to middle)
+    for (let arc = 0; arc < numArcs; arc++) {
+      // Radius increases as we go further from stage
+      const radiusPercent = 15 + arc * 4;
+      // Y position curves down as arc goes outward  
+      const baseY = 35 - arc * 1.5;
+      // Points per arc (more points = denser)
+      const pointsInArc = 35 + arc * 5;
 
-      // More bombs in outer rings (perspective + coverage)
-      const bombsInRing = Math.floor(20 + ring * 8);
+      for (let p = 0; p < pointsInArc; p++) {
+        // Angle from 0 to PI (180 degrees - behind and sides)
+        const angle = (p / (pointsInArc - 1)) * Math.PI;
+        const x = 50 + radiusPercent * Math.cos(angle);
+        const y = baseY + radiusPercent * 0.4 * Math.sin(angle);
 
-      for (let i = 0; i < bombsInRing; i++) {
-        // theta: horizontal angle around the bowl
-        const theta = (i / bombsInRing) * Math.PI * 2;
-
-        // Calculate 3D position and project to 2D
-        const r = baseRadius * Math.sin(phi); // Radius at this ring
-        const x = 50 + r * Math.cos(theta); // Center at 50%
-
-        // Add depth variation with z for parallax effect
-        const z = Math.cos(phi) * 100 + Math.random() * 20;
-
-        // Size based on "distance" (smaller = further)
-        const perspectiveScale = 0.3 + (1 - phi / (Math.PI * 0.5)) * 0.7;
-        const baseSize = 1.5 + Math.random() * 2;
+        // Perspective: further away = smaller
+        const perspectiveScale = 0.4 + (1 - arc / numArcs) * 0.6;
 
         bombs.push({
-          x: x + (Math.random() - 0.5) * 3, // Slight randomness
-          y: ringY + (Math.random() - 0.5) * 2,
-          z: z,
-          size: baseSize * perspectiveScale * 1.3, // Slightly bigger for visibility
+          x: x + (Math.random() - 0.5) * 4,
+          y: Math.max(3, y + (Math.random() - 0.5) * 3),
+          z: 100 - arc * 3 + Math.random() * 10,
+          size: (2 + Math.random() * 3) * perspectiveScale,
           color: getColor(),
-          delay: Math.random() * 6,
-          brightness: 0.5 + Math.random() * 0.5 + perspectiveScale * 0.2,
+          delay: Math.random() * 5,
+          brightness: 0.5 + Math.random() * 0.5,
         });
       }
     }
 
-    // SIDE WALLS: Left and Right stadium sections
-    for (let side = 0; side < 2; side++) {
-      const isLeft = side === 0;
-      for (let row = 0; row < 8; row++) {
-        const rowY = 15 + row * 5;
-        const bombsInRow = 6 + row * 2;
-
-        for (let i = 0; i < bombsInRow; i++) {
-          const xBase = isLeft ? 2 + i * 1.5 : 98 - i * 1.5;
-          const curve = Math.pow(row / 8, 1.5) * 8; // Curve in towards center at bottom
-
-          bombs.push({
-            x: isLeft ? xBase + curve : xBase - curve,
-            y: rowY + (Math.random() - 0.5) * 2,
-            z: 50 + Math.random() * 30,
-            size: 2 + Math.random() * 2.5,
-            color: getColor(),
-            delay: Math.random() * 5,
-            brightness: 0.5 + Math.random() * 0.4,
-          });
-        }
+    // === LEFT STADIUM WALL ===
+    for (let row = 0; row < 12; row++) {
+      const rowY = 10 + row * 5;
+      const bombsInRow = 10 + row * 2;
+      for (let i = 0; i < bombsInRow; i++) {
+        bombs.push({
+          x: 2 + i * 1.2 + Math.pow(row / 12, 1.5) * 10,
+          y: rowY + (Math.random() - 0.5) * 2,
+          z: 50 + Math.random() * 30,
+          size: 2.5 + Math.random() * 3,
+          color: getColor(),
+          delay: Math.random() * 5,
+          brightness: 0.55 + Math.random() * 0.4,
+        });
       }
     }
 
-    // LOWER FLOOR: Concert floor crowd (closest to stage)
-    for (let row = 0; row < 6; row++) {
-      const rowY = 70 + row * 4;
-      const bombsInRow = 50 - row * 6; // Fewer towards bottom (perspective)
-      const rowWidth = 75 - row * 8; // Narrower towards bottom
+    // === RIGHT STADIUM WALL ===
+    for (let row = 0; row < 12; row++) {
+      const rowY = 10 + row * 5;
+      const bombsInRow = 10 + row * 2;
+      for (let i = 0; i < bombsInRow; i++) {
+        bombs.push({
+          x: 98 - i * 1.2 - Math.pow(row / 12, 1.5) * 10,
+          y: rowY + (Math.random() - 0.5) * 2,
+          z: 50 + Math.random() * 30,
+          size: 2.5 + Math.random() * 3,
+          color: getColor(),
+          delay: Math.random() * 5,
+          brightness: 0.55 + Math.random() * 0.4,
+        });
+      }
+    }
+
+    // === BOTTOM CROWD (closest to camera) ===
+    for (let row = 0; row < 10; row++) {
+      const rowY = 72 + row * 2.5;
+      const bombsInRow = 80 - row * 6;
+      const rowWidth = 95 - row * 7;
 
       for (let i = 0; i < bombsInRow; i++) {
         const xPercent = (50 - rowWidth / 2) + (i / (bombsInRow - 1)) * rowWidth;
         bombs.push({
           x: xPercent + (Math.random() - 0.5) * 2,
-          y: rowY + (Math.random() - 0.5) * 1.5,
-          z: 20 + row * 10 + Math.random() * 10,
-          size: 4.5 + Math.random() * 4 - row * 0.3, // BIGGER when closer
+          y: rowY + (Math.random() - 0.5) * 1,
+          z: 10 + row * 5 + Math.random() * 5,
+          size: 5 + Math.random() * 4 - row * 0.2,
           color: getColor(),
-          delay: Math.random() * 4,
-          brightness: 0.75 + Math.random() * 0.25,
+          delay: Math.random() * 3,
+          brightness: 0.8 + Math.random() * 0.2,
         });
       }
     }
@@ -755,82 +755,96 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         />
       </div>
 
-      {/* 7 Member Silhouettes on Stage - CENTER FOCAL POINT */}
-      <div className="absolute top-[38%] left-1/2 -translate-x-1/2 flex items-end justify-center gap-4 sm:gap-8 md:gap-12 pointer-events-none z-10">
+      {/* 7 Member Silhouettes - COLORED GLOWING CAPSULE BARS WITH HEAD */}
+      <div className="absolute top-[30%] left-1/2 -translate-x-1/2 flex items-end justify-center gap-3 sm:gap-5 md:gap-8 pointer-events-none z-10">
         {MEMBER_DATA.map((member, i) => {
-          // Heights scaled up ~3x for prominence
-          const heights = [145, 165, 135, 175, 155, 140, 160];
-          const offsets = [-8, 0, 6, -4, 8, -6, 3];
-          // Center member (index 3) is tallest
-          const isCenter = i === 3;
+          // Heights for each capsule body (not including head)
+          const bodyHeights = [120, 135, 110, 150, 130, 115, 140];
+          const headSize = i === 3 ? 26 : 22;
+          const bodyWidth = i === 3 ? 22 : 18;
+
+          // BRIGHT SOLID COLORS for silhouettes - vibrant versions
+          const brightColors = [
+            '#3B82F6', // RM - Bright Blue
+            '#EC4899', // Jin - Hot Pink
+            '#94A3B8', // Suga - Silver Gray
+            '#FFFFFF', // J-Hope - White (center)
+            '#F59E0B', // Jimin - Orange/Amber
+            '#10B981', // V - Emerald Green
+            '#8B5CF6', // JK - Purple
+          ];
+          const solidColor = brightColors[i];
 
           return (
             <div
               key={member.id}
-              className="relative flex flex-col items-center transition-transform duration-500 hover:scale-105"
-              style={{ marginBottom: `${offsets[i]}px` }}
+              className="relative flex flex-col items-center"
             >
-              {/* Outer aura glow */}
+              {/* Outer glow effect */}
               <div
-                className="absolute -inset-4 rounded-full opacity-20 blur-xl"
-                style={{ backgroundColor: member.color }}
-              />
-
-              {/* Head glow - larger with pulsing */}
-              <div
-                className="rounded-full relative z-10"
+                className="absolute"
                 style={{
-                  width: isCenter ? '32px' : '28px',
-                  height: isCenter ? '32px' : '28px',
-                  backgroundColor: member.color,
-                  boxShadow: `0 0 30px ${member.color}, 0 0 60px ${member.color}90, 0 0 90px ${member.color}50`,
-                  animation: 'pulse-glow 3s ease-in-out infinite',
-                  animationDelay: `${i * 0.2}s`,
+                  width: '70px',
+                  height: `${bodyHeights[i] + headSize + 60}px`,
+                  top: '-20px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: `radial-gradient(ellipse at center, ${solidColor}60 0%, ${solidColor}30 40%, transparent 70%)`,
+                  filter: 'blur(18px)',
                 }}
               />
 
-              {/* Body - significantly larger with gradient */}
+              {/* HEAD - Round circle with solid bright color */}
               <div
-                className="mt-2 rounded-t-full relative z-10"
+                className="relative z-10"
                 style={{
-                  width: isCenter ? '26px' : '22px',
-                  height: `${heights[i]}px`,
-                  background: `linear-gradient(to top, ${member.color}15 0%, ${member.color}60 30%, ${member.color}80 60%, ${member.color}50 100%)`,
-                  boxShadow: `0 0 25px ${member.color}60, inset 0 0 15px ${member.color}30`,
+                  width: `${headSize}px`,
+                  height: `${headSize}px`,
+                  backgroundColor: solidColor,
+                  borderRadius: '50%',
+                  boxShadow: `
+                    0 0 10px ${solidColor},
+                    0 0 20px ${solidColor}cc,
+                    0 0 40px ${solidColor}80,
+                    0 0 60px ${solidColor}50
+                  `,
+                  marginBottom: '4px',
                 }}
               />
 
-              {/* Reflection on floor */}
+              {/* BODY - Capsule bar with solid bright color */}
               <div
-                className="mt-2 rounded-b-full opacity-30"
+                className="relative z-10"
                 style={{
-                  width: isCenter ? '20px' : '16px',
-                  height: `${heights[i] * 0.4}px`,
-                  background: `linear-gradient(to bottom, ${member.color}70 0%, transparent 100%)`,
-                  filter: 'blur(5px)',
-                  transform: 'scaleY(-1)',
+                  width: `${bodyWidth}px`,
+                  height: `${bodyHeights[i]}px`,
+                  backgroundColor: solidColor,
+                  borderRadius: '50px',
+                  boxShadow: `
+                    0 0 10px ${solidColor},
+                    0 0 25px ${solidColor}cc,
+                    0 0 50px ${solidColor}80,
+                    0 0 80px ${solidColor}50,
+                    0 0 120px ${solidColor}30
+                  `,
                 }}
               />
+
+              {/* Name below */}
+              <span
+                className="mt-4 text-[9px] sm:text-[11px] font-bold tracking-[0.2em] uppercase whitespace-nowrap relative z-10"
+                style={{
+                  color: solidColor,
+                  textShadow: `0 0 8px ${solidColor}, 0 0 15px ${solidColor}cc`,
+                }}
+              >
+                {member.name}
+              </span>
             </div>
           );
         })}
       </div>
 
-      {/* MEMBER NAMES - Separate row at stage glow line */}
-      <div className="absolute top-[63%] left-1/2 -translate-x-1/2 flex items-center justify-center gap-6 sm:gap-10 md:gap-14 pointer-events-none z-20">
-        {MEMBER_DATA.map((member, i) => (
-          <span
-            key={`name-${member.id}`}
-            className="text-[10px] sm:text-xs font-bold tracking-widest uppercase whitespace-nowrap"
-            style={{
-              color: member.color,
-              textShadow: `0 0 10px ${member.color}, 0 0 20px ${member.color}80, 0 2px 4px rgba(0,0,0,0.5)`,
-            }}
-          >
-            {member.name}
-          </span>
-        ))}
-      </div>
 
       {/* TITLE - At top */}
       <div className="absolute top-[8%] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
@@ -879,7 +893,7 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
 
       {/* Bottom subtle vignette */}
       <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
-    </div>
+    </div >
   );
 };
 
