@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { generateStars, generateBokehBubbles, generateFloatingParticles } from './utils/helpers';
-import type { SearchResult } from './types';
+
+// Import real data
+import { MEMBER_DATA, type ExtendedMember } from './data/members';
+import { SONGS, type Song, getTotalSongCount, getSongsBySentiment } from './data/songs';
+import { ALBUMS, getAlbumById } from './data/albums';
+
+// Import services
+import { searchAll, type SearchResult } from './services/searchService';
+import { generateVerse, generateTitle } from './services/lyricGenerator';
+import { exportFullArchive, exportSongsCSV } from './services/exportService';
+
 import {
   Activity,
   Search,
@@ -23,130 +33,11 @@ import {
   Award,
 } from 'lucide-react';
 
-// --- TYPES ---
-interface Member {
-  id: string;
-  name: string;
-  full: string;
-  color: string;
-  role: string;
-  mic: string;
-  komca: number;
-  bio: string;
-  soloTracks: string[];
-  achievements: string[];
-}
+// Type alias for component compatibility
+type Member = ExtendedMember;
 
-interface Song {
-  id: number;
-  title: string;
-  album: string;
-  bpm: number;
-  energy: number;
-  valence: number;
-  sentiment: string;
-}
-
-// --- CONSTANTS & DUMMY DATA ---
-const MEMBER_DATA: Member[] = [
-  {
-    id: 'rm',
-    name: 'RM',
-    full: 'Kim Namjoon',
-    color: '#2563EB',
-    role: 'Leader / Main Rapper / Producer',
-    mic: 'Blue',
-    komca: 218,
-    bio: 'The poetic leader and linguistic genius behind BTS. Known for his philosophical lyrics and robust production skills.',
-    soloTracks: ['Indigo', 'Wild Flower', 'Persona', 'Seoul', 'Moonchild'],
-    achievements: ['UN Speaker', 'Youngest Most Credited Korean Artist', 'Cultural Merit Medal']
-  },
-  {
-    id: 'jin',
-    name: 'JIN',
-    full: 'Kim Seokjin',
-    color: '#EC4899',
-    role: 'Sub Vocalist / Visual',
-    mic: 'Pink',
-    komca: 35,
-    bio: 'The Silver Voice. Known for his stable vocals, emotional range, and being Worldwide Handsome.',
-    soloTracks: ['The Astronaut', 'Epiphany', 'Moon', 'Awake', 'Abyss'],
-    achievements: ['Cultural Merit Medal', 'Sold Out King', '联合国 (UN) Envoy']
-  },
-  {
-    id: 'suga',
-    name: 'SUGA',
-    full: 'Min Yoongi',
-    color: '#9CA3AF', // Silver-gray (black mic, but lighter for visibility)
-    role: 'Lead Rapper / Producer',
-    mic: 'Black',
-    komca: 169,
-    bio: 'The Minstradamus. A prolific producer who captures raw human emotion and social commentary.',
-    soloTracks: ['D-DAY', 'Daechwita', 'Haegeum', 'Seesaw', 'Shadow'],
-    achievements: ['Produced for IU, PSY', 'Samsung Ambassador', 'NBA Ambassador']
-  },
-  {
-    id: 'jh',
-    name: 'J-HOPE',
-    full: 'Jung Hoseok',
-    color: '#C0C0C0', // Silver mic color
-    role: 'Main Dancer / Sub Rapper',
-    mic: 'Silver',
-    komca: 137,
-    bio: 'The Golden Hyung. Bringing sunshine and street dance roots to the global stage.',
-    soloTracks: ['Jack In The Box', 'Arson', 'More', 'Ego', 'Just Dance'],
-    achievements: ['Lollapalooza Headliner', 'Louis Vuitton Ambassador', 'Cultural Merit Medal']
-  },
-  {
-    id: 'jm',
-    name: 'JIMIN',
-    full: 'Park Jimin',
-    color: '#F59E0B',
-    role: 'Lead Vocalist / Main Dancer',
-    mic: 'Gold',
-    komca: 15,
-    bio: 'The Stage Commander. Known for his unique vocal tone and contemporary dance background.',
-    soloTracks: ['FACE', 'Like Crazy', 'Set Me Free Pt.2', 'Filter', 'Serendipity'],
-    achievements: ['Billboard Hot 100 #1 (Solo)', 'Dior Ambassador', 'Tiffany & Co. Ambassador']
-  },
-  {
-    id: 'v',
-    name: 'V',
-    full: 'Kim Taehyung',
-    color: '#22c55e',
-    role: 'Sub Vocalist / Visual',
-    mic: 'Green',
-    komca: 19,
-    bio: 'The Soulful Baritone. Known for his deep voice, jazz influences, and artistic vision.',
-    soloTracks: ['Layover', 'Slow Dancing', 'Love Me Again', 'Singularity', 'Stigma'],
-    achievements: ['Celine Ambassador', 'Cartier Ambassador', 'Vogue Cover Star']
-  },
-  {
-    id: 'jk',
-    name: 'JK',
-    full: 'Jeon Jungkook',
-    color: '#8B5CF6',
-    role: 'Main Vocalist / Center',
-    mic: 'Purple',
-    komca: 22,
-    bio: 'The Golden Maknae. Exceling in vocals, dance, and videography. The pop star of the generation.',
-    soloTracks: ['GOLDEN', 'Seven', 'Standing Next to You', 'Euphoria', 'My Time'],
-    achievements: ['FIFA World Cup Performer', 'Calvin Klein Ambassador', 'Spotify Billion Club']
-  },
-];
-
-const SONG_DATABASE: Song[] = [
-  { id: 1, title: 'Take Two', album: 'Single', bpm: 120, energy: 0.8, valence: 0.7, sentiment: 'Gratitude' },
-  { id: 2, title: 'Run BTS', album: 'Proof', bpm: 145, energy: 0.95, valence: 0.6, sentiment: 'Determination' },
-  { id: 3, title: 'Black Swan', album: 'MOTS:7', bpm: 147, energy: 0.65, valence: 0.2, sentiment: 'Fear' },
-  { id: 4, title: 'Spring Day', album: 'YNWA', bpm: 107, energy: 0.5, valence: 0.4, sentiment: 'Longing' },
-  { id: 5, title: 'Dynamite', album: 'BE', bpm: 114, energy: 0.85, valence: 0.8, sentiment: 'Joy' },
-  { id: 6, title: 'Fake Love', album: 'LY: Tear', bpm: 78, energy: 0.7, valence: 0.3, sentiment: 'Pain' },
-  { id: 7, title: 'Mikrokosmos', album: 'MOTS: Persona', bpm: 120, energy: 0.75, valence: 0.65, sentiment: 'Comfort' },
-  { id: 8, title: 'DNA', album: 'LY: Her', bpm: 130, energy: 0.8, valence: 0.6, sentiment: 'Destiny' },
-  { id: 9, title: 'IDOL', album: 'LY: Answer', bpm: 126, energy: 0.9, valence: 0.8, sentiment: 'Celebration' },
-  { id: 10, title: 'Butter', album: 'Single', bpm: 110, energy: 0.85, valence: 0.75, sentiment: 'Confidence' }
-];
+// Use SONGS as SONG_DATABASE for backward compatibility
+const SONG_DATABASE = SONGS;
 
 // --- VISUAL UTILS ---
 const BTSLogo = ({ className }: { className?: string }) => (
@@ -1031,11 +922,16 @@ const SonicAnalyzer = ({ playing, togglePlay, accentColor = "#A855F7" }: { playi
       </div>
 
       <div className="grid grid-cols-4 gap-6 px-2">
-        {['Energy', 'Valence', 'BPM', 'Dance'].map(s => (
-          <div key={s} className="bg-white/[0.01] rounded-[1.5rem] p-5 text-center border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all duration-700 cursor-pointer group relative overflow-hidden">
+        {[
+          { label: 'Energy', value: (SONGS.reduce((a, b) => a + b.energy, 0) / SONGS.length).toFixed(2) },
+          { label: 'Valence', value: (SONGS.reduce((a, b) => a + b.valence, 0) / SONGS.length).toFixed(2) },
+          { label: 'Avg BPM', value: Math.round(SONGS.reduce((a, b) => a + b.bpm, 0) / SONGS.length) },
+          { label: 'Dance', value: (SONGS.reduce((a, b) => a + b.danceability, 0) / SONGS.length).toFixed(2) }
+        ].map(s => (
+          <div key={s.label} className="bg-white/[0.01] rounded-[1.5rem] p-5 text-center border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all duration-700 cursor-pointer group relative overflow-hidden">
             <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-700" style={{ backgroundColor: accentColor }} />
-            <div className="text-[9px] text-white/30 uppercase tracking-[0.3em] mb-2 group-hover:text-white/60 transition-colors relative z-10">{s}</div>
-            <div className="text-3xl font-light text-white/90 font-mono tracking-tighter relative z-10">0.85</div>
+            <div className="text-[9px] text-white/30 uppercase tracking-[0.3em] mb-2 group-hover:text-white/60 transition-colors relative z-10">{s.label}</div>
+            <div className="text-3xl font-light text-white/90 font-mono tracking-tighter relative z-10">{s.value}</div>
           </div>
         ))}
       </div>
@@ -1045,23 +941,21 @@ const SonicAnalyzer = ({ playing, togglePlay, accentColor = "#A855F7" }: { playi
 
 // --- MODULE: RAG GRAPH ---
 const RAGNetwork = ({ accentColor = "#A855F7" }: { accentColor?: string }) => {
-  const [query, setQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
 
   const handleSearch = () => {
-    if (!query) return;
+    if (!searchQuery.trim()) return;
     setSearching(true);
-    setResults([]);
+
+    // Smooth transition for search
     setTimeout(() => {
+      const searchResults = searchAll(searchQuery);
+      setResults(searchResults);
       setSearching(false);
-      setResults([
-        { id: 1, title: 'Mikrokosmos', score: 98, context: 'Lyrics match: "Shine, dream, smile"' },
-        { id: 2, title: 'Magic Shop', score: 95, context: 'Theme: Healing & Comfort' },
-        { id: 3, title: 'Home', score: 91, context: 'Semantic overlap: "Connection"' }
-      ]);
-    }, 1200);
-  }
+    }, 400); // Small delay for UI feel
+  };
 
   return (
     <div className="h-full flex flex-col gap-8">
@@ -1069,12 +963,12 @@ const RAGNetwork = ({ accentColor = "#A855F7" }: { accentColor?: string }) => {
         <div className="flex-1 flex items-center px-4 gap-3">
           <Search size={16} className="text-white/20" />
           <input
-            value={query}
-            onChange={e => setQuery(e.target.value)}
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSearch()}
             type="text"
-            placeholder="Search the Archive..."
-            className="bg-transparent border-none text-[13px] text-white focus:outline-none w-full placeholder:text-white/10 font-light tracking-wide"
+            placeholder="ACCESS NEURAL ARCHIVE..."
+            className="bg-transparent border-none text-[13px] text-white focus:outline-none w-full placeholder:text-white/10 font-light tracking-wide uppercase font-mono"
           />
         </div>
         <button
@@ -1082,7 +976,7 @@ const RAGNetwork = ({ accentColor = "#A855F7" }: { accentColor?: string }) => {
           className="px-6 py-3 rounded-xl text-white font-bold text-[10px] tracking-widest transition-all duration-500 hover:scale-105 active:scale-95 shadow-lg flex items-center gap-2"
           style={{ backgroundColor: accentColor }}
         >
-          {searching ? <RefreshCw className="animate-spin" size={14} /> : 'EXECUTE'}
+          {searching ? <RefreshCw className="animate-spin" size={14} /> : 'SEARCH'}
         </button>
       </div>
 
@@ -1125,16 +1019,19 @@ const DataHub = ({ accentColor = "#A855F7" }: { accentColor?: string }) => (
           <span className="text-[9px] text-white/20 font-mono tracking-widest uppercase">Database Status</span>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-white/60 tracking-[0.2em] uppercase">245 Records</span>
+            <span className="text-[10px] font-bold text-white/60 tracking-[0.2em] uppercase">{getTotalSongCount()} Records</span>
           </div>
         </div>
         <div className="w-[1px] h-8 bg-white/5 mx-2" />
         <div className="flex flex-col gap-1">
           <span className="text-[9px] text-white/20 font-mono tracking-widest uppercase">Last Update</span>
-          <span className="text-[10px] font-bold text-purple-300/80 tracking-[0.2em] uppercase">Synchronized Today</span>
+          <span className="text-[10px] font-bold text-purple-300/80 tracking-[0.2em] uppercase">LIVE CONNECTION</span>
         </div>
       </div>
-      <button className="flex items-center gap-3 px-6 py-2.5 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold text-white/40 hover:text-white hover:border-white/30 tracking-[0.2em] uppercase transition-all duration-700 hover:scale-105 group">
+      <button
+        onClick={() => exportFullArchive()}
+        className="flex items-center gap-3 px-6 py-2.5 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold text-white/40 hover:text-white hover:border-white/30 tracking-[0.2em] uppercase transition-all duration-700 hover:scale-105 group"
+      >
         <Download size={14} className="group-hover:translate-y-0.5 transition-transform" /> Export Neural Archive
       </button>
     </div>
@@ -1240,13 +1137,26 @@ const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
             <div className="relative aspect-[3/4.2] rounded-[3rem] overflow-hidden border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] group">
               {/* Image Placeholder with Member Aura */}
               <div className="absolute inset-0 bg-[#0a0a0f]" />
-              <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-1000"
-                style={{ background: `radial-gradient(circle at center, ${member.color} 0%, transparent 80%)` }} />
 
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-                <BTSLogo className="w-32 h-32 text-white/5 mb-8 group-hover:scale-110 transition-transform duration-1000" />
-                <span className="text-[120px] font-black text-white/5 tracking-tighter group-hover:text-white/[0.08] transition-colors duration-1000">{member.id.toUpperCase()}</span>
+              {/* Member Photo */}
+              <img
+                src={member.image}
+                alt={member.name}
+                className="absolute inset-0 w-full h-full object-cover opacity-80 transition-all duration-1000 group-hover:scale-105 group-hover:opacity-100 filter grayscale group-hover:grayscale-0"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none'; // Hide if missing
+                  e.currentTarget.parentElement?.querySelector('.placeholder-fallback')?.classList.remove('hidden');
+                }}
+              />
+
+              {/* Fallback Placeholder (Hidden by default, shown via JS if image fails) */}
+              <div className="placeholder-fallback hidden absolute inset-0 flex flex-col items-center justify-center p-12 text-center pointer-events-none">
+                <BTSLogo className="w-32 h-32 text-white/5 mb-8" />
+                <span className="text-[120px] font-black text-white/5 tracking-tighter">{member.id.toUpperCase()}</span>
               </div>
+
+              <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-1000 mix-blend-overlay"
+                style={{ background: `radial-gradient(circle at center, ${member.color} 0%, transparent 80%)` }} />
 
               <div className="absolute bottom-0 left-0 w-full p-12 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
                 <h2 className="text-7xl font-light text-white mb-4 tracking-tighter drop-shadow-2xl">{member.name}</h2>
@@ -1332,13 +1242,13 @@ const LyricistAI = () => {
   const run = () => {
     setGen(true);
     setText("");
-    const poem = "Galaxy wide, eyes open,\nWe connect through the light.\n(Chorus)\nShining through the darkest night,\nYou are my universe.";
+    const poem = generateVerse();
     let i = 0;
     const t = window.setInterval(() => {
       setText(p => p + poem.charAt(i));
       i++;
       if (i >= poem.length) { clearInterval(t); setGen(false); }
-    }, 50);
+    }, 30);
   };
 
   return (

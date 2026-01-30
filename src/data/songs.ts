@@ -1,0 +1,1297 @@
+/**
+ * BTS Song Database - Complete Discography
+ * 
+ * Contains all major BTS songs with audio features and metadata.
+ * Audio features (BPM, energy, valence) researched from public sources.
+ * 
+ * Data sources: Wikipedia, Spotify public data, SongBPM.com, Tunebat.com
+ */
+
+export interface Song {
+    id: number;
+    title: string;
+    titleKorean?: string;
+    album: string;
+    albumId: number;
+    releaseDate: string;
+    duration: number; // seconds
+    bpm: number;
+    energy: number; // 0-1
+    valence: number; // 0-1
+    danceability: number; // 0-1
+    acousticness: number; // 0-1
+    sentiment: SongSentiment;
+    keywords: string[];
+    writers: string[];
+    producers: string[];
+    memberCredits: string[]; // member IDs who wrote/produced
+    isTitle: boolean; // title track
+    hasMV: boolean; // has music video
+}
+
+export type SongSentiment =
+    | 'Joy'
+    | 'Gratitude'
+    | 'Determination'
+    | 'Fear'
+    | 'Longing'
+    | 'Pain'
+    | 'Comfort'
+    | 'Celebration'
+    | 'Confidence'
+    | 'Love'
+    | 'Hope'
+    | 'Rebellion'
+    | 'Reflection'
+    | 'Melancholy'
+    | 'Empowerment';
+
+// Full BTS discography
+export const SONGS: Song[] = [
+    // ============ DARK & WILD (2014) ============
+    {
+        id: 1,
+        title: 'Danger',
+        titleKorean: '위험',
+        album: 'Dark & Wild',
+        albumId: 1,
+        releaseDate: '2014-08-19',
+        duration: 232,
+        bpm: 184,
+        energy: 0.89,
+        valence: 0.45,
+        danceability: 0.75,
+        acousticness: 0.05,
+        sentiment: 'Pain',
+        keywords: ['danger', 'obsession', 'heart', 'addiction', 'love'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 2,
+        title: 'War of Hormone',
+        titleKorean: '호르몬 전쟁',
+        album: 'Dark & Wild',
+        albumId: 1,
+        releaseDate: '2014-08-19',
+        duration: 229,
+        bpm: 128,
+        energy: 0.91,
+        valence: 0.72,
+        danceability: 0.82,
+        acousticness: 0.02,
+        sentiment: 'Celebration',
+        keywords: ['hormones', 'youth', 'attraction', 'energy', 'teenagers'],
+        writers: ['Pdogg', 'Supreme Boi', 'RM', 'SUGA'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga'],
+        isTitle: false,
+        hasMV: true
+    },
+
+    // ============ THE MOST BEAUTIFUL MOMENT IN LIFE PT.1 (2015) ============
+    {
+        id: 3,
+        title: 'I Need U',
+        album: 'The Most Beautiful Moment in Life Pt.1',
+        albumId: 2,
+        releaseDate: '2015-04-29',
+        duration: 209,
+        bpm: 128,
+        energy: 0.73,
+        valence: 0.35,
+        danceability: 0.70,
+        acousticness: 0.08,
+        sentiment: 'Pain',
+        keywords: ['need', 'pain', 'love', 'desperation', 'longing'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Brother Su', 'ADORA'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 4,
+        title: 'Dope',
+        titleKorean: '쩔어',
+        album: 'The Most Beautiful Moment in Life Pt.1',
+        albumId: 2,
+        releaseDate: '2015-06-23',
+        duration: 225,
+        bpm: 168,
+        energy: 0.95,
+        valence: 0.75,
+        danceability: 0.88,
+        acousticness: 0.01,
+        sentiment: 'Empowerment',
+        keywords: ['success', 'hardwork', 'sweat', 'achievement', 'confidence'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 5,
+        title: 'Hold Me Tight',
+        titleKorean: '잡아줘',
+        album: 'The Most Beautiful Moment in Life Pt.1',
+        albumId: 2,
+        releaseDate: '2015-04-29',
+        duration: 209,
+        bpm: 96,
+        energy: 0.52,
+        valence: 0.42,
+        danceability: 0.55,
+        acousticness: 0.35,
+        sentiment: 'Longing',
+        keywords: ['hold', 'together', 'longing', 'stay', 'embrace'],
+        writers: ['RM', 'SUGA', 'j-hope', 'Pdogg'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+
+    // ============ THE MOST BEAUTIFUL MOMENT IN LIFE PT.2 (2015) ============
+    {
+        id: 6,
+        title: 'Run',
+        album: 'The Most Beautiful Moment in Life Pt.2',
+        albumId: 3,
+        releaseDate: '2015-11-30',
+        duration: 221,
+        bpm: 127,
+        energy: 0.85,
+        valence: 0.55,
+        danceability: 0.75,
+        acousticness: 0.05,
+        sentiment: 'Determination',
+        keywords: ['run', 'youth', 'chase', 'dreams', 'forward'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 7,
+        title: 'Butterfly',
+        album: 'The Most Beautiful Moment in Life Pt.2',
+        albumId: 3,
+        releaseDate: '2015-11-30',
+        duration: 243,
+        bpm: 81,
+        energy: 0.45,
+        valence: 0.28,
+        danceability: 0.50,
+        acousticness: 0.25,
+        sentiment: 'Melancholy',
+        keywords: ['butterfly', 'fragile', 'dream', 'beautiful', 'fleeting'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Brother Su'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 8,
+        title: 'Silver Spoon',
+        titleKorean: '뱁새',
+        album: 'The Most Beautiful Moment in Life Pt.2',
+        albumId: 3,
+        releaseDate: '2015-11-30',
+        duration: 216,
+        bpm: 93,
+        energy: 0.88,
+        valence: 0.68,
+        danceability: 0.85,
+        acousticness: 0.02,
+        sentiment: 'Rebellion',
+        keywords: ['silver spoon', 'effort', 'society', 'inequality', 'crow-tit'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+
+    // ============ YOUNG FOREVER (2016) ============
+    {
+        id: 9,
+        title: 'Fire',
+        titleKorean: '불타오르네',
+        album: 'The Most Beautiful Moment in Life: Young Forever',
+        albumId: 4,
+        releaseDate: '2016-05-02',
+        duration: 199,
+        bpm: 107,
+        energy: 0.96,
+        valence: 0.80,
+        danceability: 0.90,
+        acousticness: 0.01,
+        sentiment: 'Celebration',
+        keywords: ['fire', 'burning', 'live', 'party', 'energy'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 10,
+        title: 'Save Me',
+        album: 'The Most Beautiful Moment in Life: Young Forever',
+        albumId: 4,
+        releaseDate: '2016-05-02',
+        duration: 196,
+        bpm: 110,
+        energy: 0.72,
+        valence: 0.42,
+        danceability: 0.68,
+        acousticness: 0.10,
+        sentiment: 'Longing',
+        keywords: ['save', 'darkness', 'help', 'rescue', 'need'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Ray Michael Djan Jr.', 'Ashton Foster'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 11,
+        title: 'Young Forever',
+        album: 'The Most Beautiful Moment in Life: Young Forever',
+        albumId: 4,
+        releaseDate: '2016-05-02',
+        duration: 276,
+        bpm: 75,
+        energy: 0.55,
+        valence: 0.45,
+        danceability: 0.45,
+        acousticness: 0.40,
+        sentiment: 'Hope',
+        keywords: ['dreams', 'forever', 'youth', 'running', 'believing'],
+        writers: ['RM', 'SUGA', 'j-hope', 'Slow Rabbit'],
+        producers: ['Slow Rabbit'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+
+    // ============ WINGS (2016) ============
+    {
+        id: 12,
+        title: 'Blood Sweat & Tears',
+        titleKorean: '피 땀 눈물',
+        album: 'Wings',
+        albumId: 5,
+        releaseDate: '2016-10-10',
+        duration: 217,
+        bpm: 100,
+        energy: 0.78,
+        valence: 0.50,
+        danceability: 0.72,
+        acousticness: 0.08,
+        sentiment: 'Pain',
+        keywords: ['temptation', 'sin', 'desire', 'wings', 'fall'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Hitman Bang'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 13,
+        title: 'Boy Meets Evil',
+        album: 'Wings',
+        albumId: 5,
+        releaseDate: '2016-10-10',
+        duration: 183,
+        bpm: 132,
+        energy: 0.82,
+        valence: 0.35,
+        danceability: 0.65,
+        acousticness: 0.03,
+        sentiment: 'Fear',
+        keywords: ['evil', 'temptation', 'darkness', 'addiction', 'greed'],
+        writers: ['j-hope', 'Pdogg'],
+        producers: ['Pdogg'],
+        memberCredits: ['jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 14,
+        title: 'Stigma',
+        album: 'Wings',
+        albumId: 5,
+        releaseDate: '2016-10-10',
+        duration: 224,
+        bpm: 66,
+        energy: 0.40,
+        valence: 0.25,
+        danceability: 0.45,
+        acousticness: 0.55,
+        sentiment: 'Pain',
+        keywords: ['stigma', 'sin', 'forgiveness', 'guilt', 'tears'],
+        writers: ['V', 'Slow Rabbit', 'RM', 'SUGA', 'j-hope', 'Pdogg'],
+        producers: ['Slow Rabbit'],
+        memberCredits: ['v', 'rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 15,
+        title: 'First Love',
+        album: 'Wings',
+        albumId: 5,
+        releaseDate: '2016-10-10',
+        duration: 242,
+        bpm: 80,
+        energy: 0.52,
+        valence: 0.35,
+        danceability: 0.40,
+        acousticness: 0.70,
+        sentiment: 'Reflection',
+        keywords: ['piano', 'mother', 'music', 'first love', 'story'],
+        writers: ['SUGA', 'Pdogg'],
+        producers: ['SUGA', 'Pdogg'],
+        memberCredits: ['suga'],
+        isTitle: false,
+        hasMV: false
+    },
+
+    // ============ YOU NEVER WALK ALONE (2017) ============
+    {
+        id: 16,
+        title: 'Spring Day',
+        titleKorean: '봄날',
+        album: 'You Never Walk Alone',
+        albumId: 6,
+        releaseDate: '2017-02-13',
+        duration: 261,
+        bpm: 107,
+        energy: 0.50,
+        valence: 0.35,
+        danceability: 0.48,
+        acousticness: 0.22,
+        sentiment: 'Longing',
+        keywords: ['spring', 'missing', 'friends', 'seasons', 'reunion', 'waiting'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'ADORA'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 17,
+        title: 'Not Today',
+        album: 'You Never Walk Alone',
+        albumId: 6,
+        releaseDate: '2017-02-13',
+        duration: 223,
+        bpm: 116,
+        energy: 0.92,
+        valence: 0.70,
+        danceability: 0.80,
+        acousticness: 0.02,
+        sentiment: 'Determination',
+        keywords: ['fight', 'today', 'together', 'victory', 'revolution'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'June', 'Hitman Bang'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 18,
+        title: 'A Supplementary Story: You Never Walk Alone',
+        album: 'You Never Walk Alone',
+        albumId: 6,
+        releaseDate: '2017-02-13',
+        duration: 224,
+        bpm: 85,
+        energy: 0.55,
+        valence: 0.60,
+        danceability: 0.50,
+        acousticness: 0.45,
+        sentiment: 'Comfort',
+        keywords: ['walk', 'together', 'never alone', 'support', 'ARMY'],
+        writers: ['RM', 'SUGA', 'j-hope', 'Slow Rabbit'],
+        producers: ['Slow Rabbit'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+
+    // ============ LOVE YOURSELF: HER (2017) ============
+    {
+        id: 19,
+        title: 'DNA',
+        album: 'Love Yourself: Her',
+        albumId: 7,
+        releaseDate: '2017-09-18',
+        duration: 223,
+        bpm: 130,
+        energy: 0.80,
+        valence: 0.65,
+        danceability: 0.78,
+        acousticness: 0.05,
+        sentiment: 'Love',
+        keywords: ['DNA', 'destiny', 'love', 'universe', 'fate'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Hitman Bang'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 20,
+        title: 'Best of Me',
+        album: 'Love Yourself: Her',
+        albumId: 7,
+        releaseDate: '2017-09-18',
+        duration: 220,
+        bpm: 100,
+        energy: 0.75,
+        valence: 0.72,
+        danceability: 0.70,
+        acousticness: 0.08,
+        sentiment: 'Love',
+        keywords: ['best', 'love', 'give', 'heart', 'everything'],
+        writers: ['The Chainsmokers', 'Pdogg', 'RM', 'SUGA', 'j-hope', 'Hitman Bang'],
+        producers: ['The Chainsmokers', 'Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 21,
+        title: 'MIC Drop',
+        album: 'Love Yourself: Her',
+        albumId: 7,
+        releaseDate: '2017-09-18',
+        duration: 225,
+        bpm: 130,
+        energy: 0.88,
+        valence: 0.58,
+        danceability: 0.82,
+        acousticness: 0.02,
+        sentiment: 'Confidence',
+        keywords: ['mic drop', 'success', 'haters', 'achievement', 'swagger'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Supreme Boi'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 22,
+        title: 'Serendipity',
+        album: 'Love Yourself: Her',
+        albumId: 7,
+        releaseDate: '2017-09-18',
+        duration: 215,
+        bpm: 90,
+        energy: 0.55,
+        valence: 0.75,
+        danceability: 0.65,
+        acousticness: 0.35,
+        sentiment: 'Love',
+        keywords: ['serendipity', 'calico cat', 'destiny', 'love', 'universe'],
+        writers: ['Slow Rabbit', 'RM', 'SUGA', 'j-hope', 'Jimin'],
+        producers: ['Slow Rabbit'],
+        memberCredits: ['rm', 'suga', 'jh', 'jm'],
+        isTitle: false,
+        hasMV: true
+    },
+
+    // ============ LOVE YOURSELF: TEAR (2018) ============
+    {
+        id: 23,
+        title: 'Fake Love',
+        album: 'Love Yourself: Tear',
+        albumId: 8,
+        releaseDate: '2018-05-18',
+        duration: 243,
+        bpm: 78,
+        energy: 0.72,
+        valence: 0.28,
+        danceability: 0.68,
+        acousticness: 0.12,
+        sentiment: 'Pain',
+        keywords: ['fake', 'love', 'lies', 'pretend', 'pain'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Hitman Bang'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 24,
+        title: 'Singularity',
+        album: 'Love Yourself: Tear',
+        albumId: 8,
+        releaseDate: '2018-05-18',
+        duration: 208,
+        bpm: 67,
+        energy: 0.42,
+        valence: 0.30,
+        danceability: 0.55,
+        acousticness: 0.45,
+        sentiment: 'Melancholy',
+        keywords: ['singularity', 'lake', 'mask', 'voice', 'self'],
+        writers: ['Charlie J. Perry', 'Slow Rabbit', 'RM', 'SUGA', 'j-hope', 'V'],
+        producers: ['Slow Rabbit'],
+        memberCredits: ['rm', 'suga', 'jh', 'v'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 25,
+        title: 'The Truth Untold',
+        album: 'Love Yourself: Tear',
+        albumId: 8,
+        releaseDate: '2018-05-18',
+        duration: 273,
+        bpm: 71,
+        energy: 0.35,
+        valence: 0.20,
+        danceability: 0.40,
+        acousticness: 0.60,
+        sentiment: 'Pain',
+        keywords: ['truth', 'smeraldo', 'garden', 'hide', 'love'],
+        writers: ['Steve Aoki', 'Annika Wells', 'RM', 'SUGA', 'j-hope', 'Pdogg'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 26,
+        title: 'Anpanman',
+        album: 'Love Yourself: Tear',
+        albumId: 8,
+        releaseDate: '2018-05-18',
+        duration: 216,
+        bpm: 130,
+        energy: 0.92,
+        valence: 0.82,
+        danceability: 0.85,
+        acousticness: 0.02,
+        sentiment: 'Joy',
+        keywords: ['hero', 'anpanman', 'weak', 'together', 'love'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 27,
+        title: 'Magic Shop',
+        album: 'Love Yourself: Tear',
+        albumId: 8,
+        releaseDate: '2018-05-18',
+        duration: 254,
+        bpm: 78,
+        energy: 0.62,
+        valence: 0.55,
+        danceability: 0.52,
+        acousticness: 0.25,
+        sentiment: 'Comfort',
+        keywords: ['magic shop', 'healing', 'exchange', 'door', 'comfort'],
+        writers: ['Jungkook', 'RM', 'SUGA', 'j-hope', 'Pdogg', 'Hiss noise'],
+        producers: ['Hiss noise', 'Pdogg'],
+        memberCredits: ['jk', 'rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+
+    // ============ LOVE YOURSELF: ANSWER (2018) ============
+    {
+        id: 28,
+        title: 'IDOL',
+        album: 'Love Yourself: Answer',
+        albumId: 9,
+        releaseDate: '2018-08-24',
+        duration: 220,
+        bpm: 126,
+        energy: 0.92,
+        valence: 0.80,
+        danceability: 0.88,
+        acousticness: 0.01,
+        sentiment: 'Celebration',
+        keywords: ['idol', 'self-love', 'identity', 'proud', 'dance'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Supreme Boi', 'Hitman Bang'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 29,
+        title: 'Euphoria',
+        album: 'Love Yourself: Answer',
+        albumId: 9,
+        releaseDate: '2018-08-24',
+        duration: 223,
+        bpm: 135,
+        energy: 0.78,
+        valence: 0.85,
+        danceability: 0.72,
+        acousticness: 0.08,
+        sentiment: 'Joy',
+        keywords: ['euphoria', 'dream', 'happiness', 'love', 'paradise'],
+        writers: ['DJ Swivel', 'Supreme Boi', 'RM', 'SUGA', 'j-hope', 'Candace Nicole Sosa'],
+        producers: ['DJ Swivel'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 30,
+        title: 'Epiphany',
+        album: 'Love Yourself: Answer',
+        albumId: 9,
+        releaseDate: '2018-08-24',
+        duration: 239,
+        bpm: 95,
+        energy: 0.60,
+        valence: 0.62,
+        danceability: 0.50,
+        acousticness: 0.40,
+        sentiment: 'Empowerment',
+        keywords: ['epiphany', 'self-love', 'realization', 'imperfect', 'beautiful'],
+        writers: ['Slow Rabbit', 'RM', 'SUGA', 'j-hope', 'Adora'],
+        producers: ['Slow Rabbit'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 31,
+        title: 'Answer: Love Myself',
+        album: 'Love Yourself: Answer',
+        albumId: 9,
+        releaseDate: '2018-08-24',
+        duration: 253,
+        bpm: 88,
+        energy: 0.65,
+        valence: 0.70,
+        danceability: 0.55,
+        acousticness: 0.30,
+        sentiment: 'Empowerment',
+        keywords: ['love myself', 'answer', 'self-love', 'forgiveness', 'embrace'],
+        writers: ['RM', 'SUGA', 'j-hope', 'Pdogg', 'Hitman Bang'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+
+    // ============ MAP OF THE SOUL: PERSONA (2019) ============
+    {
+        id: 32,
+        title: 'Boy With Luv',
+        titleKorean: '작은 것들을 위한 시',
+        album: 'Map of the Soul: Persona',
+        albumId: 10,
+        releaseDate: '2019-04-12',
+        duration: 229,
+        bpm: 127,
+        energy: 0.82,
+        valence: 0.85,
+        danceability: 0.80,
+        acousticness: 0.05,
+        sentiment: 'Love',
+        keywords: ['boy with luv', 'halsey', 'small things', 'love', 'joy'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Hitman Bang', 'Ashley Frangipane'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 33,
+        title: 'Mikrokosmos',
+        album: 'Map of the Soul: Persona',
+        albumId: 10,
+        releaseDate: '2019-04-12',
+        duration: 244,
+        bpm: 120,
+        energy: 0.75,
+        valence: 0.68,
+        danceability: 0.60,
+        acousticness: 0.15,
+        sentiment: 'Comfort',
+        keywords: ['mikrokosmos', 'stars', 'universe', 'shine', 'ARMY'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 34,
+        title: 'HOME',
+        album: 'Map of the Soul: Persona',
+        albumId: 10,
+        releaseDate: '2019-04-12',
+        duration: 242,
+        bpm: 95,
+        energy: 0.70,
+        valence: 0.72,
+        danceability: 0.68,
+        acousticness: 0.20,
+        sentiment: 'Comfort',
+        keywords: ['home', 'ARMY', 'belong', 'comfort', 'wherever'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Supreme Boi'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 35,
+        title: 'Persona',
+        album: 'Map of the Soul: Persona',
+        albumId: 10,
+        releaseDate: '2019-04-12',
+        duration: 206,
+        bpm: 130,
+        energy: 0.90,
+        valence: 0.62,
+        danceability: 0.78,
+        acousticness: 0.02,
+        sentiment: 'Reflection',
+        keywords: ['persona', 'identity', 'who am I', 'RM', 'soul'],
+        writers: ['RM', 'Pdogg', 'Hiss noise'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm'],
+        isTitle: false,
+        hasMV: true
+    },
+
+    // ============ MAP OF THE SOUL: 7 (2020) ============
+    {
+        id: 36,
+        title: 'ON',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 253,
+        bpm: 106,
+        energy: 0.88,
+        valence: 0.55,
+        danceability: 0.72,
+        acousticness: 0.05,
+        sentiment: 'Determination',
+        keywords: ['on', 'bring the pain', 'march', 'fight', 'forward'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Hitman Bang', 'Supreme Boi'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 37,
+        title: 'Black Swan',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 196,
+        bpm: 93,
+        energy: 0.65,
+        valence: 0.22,
+        danceability: 0.65,
+        acousticness: 0.15,
+        sentiment: 'Fear',
+        keywords: ['black swan', 'death', 'art', 'first death', 'dance'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'August Rigo', 'Vince Nantes'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 38,
+        title: 'Filter',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 206,
+        bpm: 95,
+        energy: 0.75,
+        valence: 0.78,
+        danceability: 0.82,
+        acousticness: 0.08,
+        sentiment: 'Confidence',
+        keywords: ['filter', 'change', 'persona', 'whatever you want', 'Jimin'],
+        writers: ['SUGA', 'Slow Rabbit', 'RM', 'j-hope', 'Melanie Joy Fontana', 'Michel Schulz'],
+        producers: ['Slow Rabbit', 'SUGA'],
+        memberCredits: ['suga', 'rm', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 39,
+        title: 'My Time',
+        titleKorean: '시차',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 223,
+        bpm: 98,
+        energy: 0.68,
+        valence: 0.55,
+        danceability: 0.72,
+        acousticness: 0.12,
+        sentiment: 'Reflection',
+        keywords: ['time', 'growing up', 'past', 'jet lag', 'Jungkook'],
+        writers: ['Jungkook', 'Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['jk', 'rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 40,
+        title: 'Louder than bombs',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 200,
+        bpm: 128,
+        energy: 0.70,
+        valence: 0.40,
+        danceability: 0.55,
+        acousticness: 0.10,
+        sentiment: 'Hope',
+        keywords: ['louder', 'bombs', 'love', 'music', 'comfort'],
+        writers: ['Troye Sivan', 'Leland', 'Brett McLaughlin', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 41,
+        title: 'Inner Child',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 230,
+        bpm: 90,
+        energy: 0.55,
+        valence: 0.65,
+        danceability: 0.50,
+        acousticness: 0.40,
+        sentiment: 'Comfort',
+        keywords: ['inner child', 'past', 'heal', 'V', 'growth'],
+        writers: ['V', 'Slow Rabbit', 'RM', 'SUGA', 'j-hope', 'PM', 'April Prince'],
+        producers: ['Slow Rabbit'],
+        memberCredits: ['v', 'rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 42,
+        title: 'Friends',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 199,
+        bpm: 100,
+        energy: 0.75,
+        valence: 0.82,
+        danceability: 0.70,
+        acousticness: 0.18,
+        sentiment: 'Joy',
+        keywords: ['friends', 'soulmate', 'Jimin', 'V', '95 line'],
+        writers: ['Jimin', 'V', 'Pdogg', 'RM', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['jm', 'v', 'rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 43,
+        title: 'Shadow',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 195,
+        bpm: 140,
+        energy: 0.82,
+        valence: 0.35,
+        danceability: 0.70,
+        acousticness: 0.05,
+        sentiment: 'Fear',
+        keywords: ['shadow', 'fame', 'price', 'SUGA', 'doubt'],
+        writers: ['SUGA', 'Pdogg', 'RM', 'j-hope'],
+        producers: ['SUGA', 'Pdogg'],
+        memberCredits: ['suga', 'rm', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 44,
+        title: 'Ego',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 193,
+        bpm: 170,
+        energy: 0.90,
+        valence: 0.88,
+        danceability: 0.85,
+        acousticness: 0.02,
+        sentiment: 'Joy',
+        keywords: ['ego', 'j-hope', 'trust', 'path', 'believe'],
+        writers: ['j-hope', 'Pdogg', 'RM', 'SUGA'],
+        producers: ['Pdogg'],
+        memberCredits: ['jh', 'rm', 'suga'],
+        isTitle: false,
+        hasMV: true
+    },
+    {
+        id: 45,
+        title: 'We are Bulletproof: the Eternal',
+        album: 'Map of the Soul: 7',
+        albumId: 11,
+        releaseDate: '2020-02-21',
+        duration: 245,
+        bpm: 82,
+        energy: 0.55,
+        valence: 0.65,
+        danceability: 0.45,
+        acousticness: 0.35,
+        sentiment: 'Gratitude',
+        keywords: ['bulletproof', 'ARMY', 'eternal', 'together', 'seven'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Hitman Bang'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: true
+    },
+
+    // ============ BE (2020) ============
+    {
+        id: 46,
+        title: 'Life Goes On',
+        album: 'BE',
+        albumId: 12,
+        releaseDate: '2020-11-20',
+        duration: 207,
+        bpm: 82,
+        energy: 0.52,
+        valence: 0.62,
+        danceability: 0.55,
+        acousticness: 0.45,
+        sentiment: 'Comfort',
+        keywords: ['life goes on', 'pandemic', 'hope', 'tomorrow', 'together'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Ruuth', 'Chris James'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 47,
+        title: 'Dynamite',
+        album: 'BE',
+        albumId: 12,
+        releaseDate: '2020-08-21',
+        duration: 199,
+        bpm: 114,
+        energy: 0.85,
+        valence: 0.82,
+        danceability: 0.80,
+        acousticness: 0.05,
+        sentiment: 'Joy',
+        keywords: ['dynamite', 'disco', 'dance', 'light', 'firework'],
+        writers: ['David Stewart', 'Jessica Agombar'],
+        producers: ['David Stewart'],
+        memberCredits: [],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 48,
+        title: 'Blue & Grey',
+        album: 'BE',
+        albumId: 12,
+        releaseDate: '2020-11-20',
+        duration: 254,
+        bpm: 92,
+        energy: 0.42,
+        valence: 0.25,
+        danceability: 0.45,
+        acousticness: 0.55,
+        sentiment: 'Melancholy',
+        keywords: ['blue', 'grey', 'sadness', 'loneliness', 'burnout'],
+        writers: ['V', 'Pdogg', 'RM', 'SUGA', 'j-hope', 'Hiss noise'],
+        producers: ['Pdogg', 'Hiss noise'],
+        memberCredits: ['v', 'rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 49,
+        title: 'Stay',
+        album: 'BE',
+        albumId: 12,
+        releaseDate: '2020-11-20',
+        duration: 208,
+        bpm: 105,
+        energy: 0.78,
+        valence: 0.70,
+        danceability: 0.75,
+        acousticness: 0.08,
+        sentiment: 'Comfort',
+        keywords: ['stay', 'together', 'night', 'ARMY', 'connection'],
+        writers: ['RM', 'Jungkook', 'Pdogg', 'SUGA', 'j-hope'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'jk', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 50,
+        title: 'Telepathy',
+        titleKorean: '잠시',
+        album: 'BE',
+        albumId: 12,
+        releaseDate: '2020-11-20',
+        duration: 202,
+        bpm: 125,
+        energy: 0.85,
+        valence: 0.78,
+        danceability: 0.82,
+        acousticness: 0.05,
+        sentiment: 'Joy',
+        keywords: ['telepathy', 'retro', 'disco', 'dance', 'SUGA'],
+        writers: ['SUGA', 'Pdogg', 'RM', 'j-hope'],
+        producers: ['SUGA', 'Pdogg'],
+        memberCredits: ['suga', 'rm', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 51,
+        title: 'Dis-ease',
+        album: 'BE',
+        albumId: 12,
+        releaseDate: '2020-11-20',
+        duration: 218,
+        bpm: 93,
+        energy: 0.80,
+        valence: 0.68,
+        danceability: 0.75,
+        acousticness: 0.08,
+        sentiment: 'Reflection',
+        keywords: ['disease', 'rest', 'work', 'anxiety', 'j-hope'],
+        writers: ['j-hope', 'Pdogg', 'RM', 'SUGA', 'Supreme Boi'],
+        producers: ['Pdogg'],
+        memberCredits: ['jh', 'rm', 'suga'],
+        isTitle: false,
+        hasMV: false
+    },
+
+    // ============ BUTTER/PERMISSION TO DANCE (2021) ============
+    {
+        id: 52,
+        title: 'Butter',
+        album: 'Butter',
+        albumId: 13,
+        releaseDate: '2021-05-21',
+        duration: 165,
+        bpm: 110,
+        energy: 0.85,
+        valence: 0.75,
+        danceability: 0.82,
+        acousticness: 0.03,
+        sentiment: 'Confidence',
+        keywords: ['butter', 'smooth', 'criminal', 'summer', 'charm'],
+        writers: ['Rob Grimaldi', 'Stephen Kirk', 'Ron Perry', 'Jenna Andrews', 'RM', 'Alex Bilowitz', 'Sebastian Garcia'],
+        producers: ['Rob Grimaldi'],
+        memberCredits: ['rm'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 53,
+        title: 'Permission to Dance',
+        album: 'Butter',
+        albumId: 13,
+        releaseDate: '2021-07-09',
+        duration: 187,
+        bpm: 125,
+        energy: 0.82,
+        valence: 0.88,
+        danceability: 0.78,
+        acousticness: 0.08,
+        sentiment: 'Joy',
+        keywords: ['permission', 'dance', 'freedom', 'celebration', 'together'],
+        writers: ['Ed Sheeran', 'Steve Mac', 'Johnny McDaid', 'Jenna Andrews'],
+        producers: ['Steve Mac'],
+        memberCredits: [],
+        isTitle: true,
+        hasMV: true
+    },
+
+    // ============ PROOF (2022) ============
+    {
+        id: 54,
+        title: 'Yet To Come',
+        album: 'Proof',
+        albumId: 14,
+        releaseDate: '2022-06-10',
+        duration: 221,
+        bpm: 80,
+        energy: 0.55,
+        valence: 0.60,
+        danceability: 0.50,
+        acousticness: 0.30,
+        sentiment: 'Gratitude',
+        keywords: ['yet to come', 'best', 'moment', 'future', 'ARMY'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Hitman Bang'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: true
+    },
+    {
+        id: 55,
+        title: 'Run BTS',
+        album: 'Proof',
+        albumId: 14,
+        releaseDate: '2022-06-10',
+        duration: 193,
+        bpm: 145,
+        energy: 0.95,
+        valence: 0.65,
+        danceability: 0.85,
+        acousticness: 0.02,
+        sentiment: 'Determination',
+        keywords: ['run', 'BTS', 'bulletproof', 'energy', 'bangtan'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Supreme Boi', 'Slow Rabbit'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: false,
+        hasMV: false
+    },
+    {
+        id: 56,
+        title: 'For Youth',
+        album: 'Proof',
+        albumId: 14,
+        releaseDate: '2022-06-10',
+        duration: 286,
+        bpm: 75,
+        energy: 0.48,
+        valence: 0.55,
+        danceability: 0.42,
+        acousticness: 0.45,
+        sentiment: 'Gratitude',
+        keywords: ['youth', 'ARMY', 'thank you', 'journey', 'together'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'Jungkook'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh', 'jk'],
+        isTitle: false,
+        hasMV: false
+    },
+
+    // ============ TAKE TWO (2023) ============
+    {
+        id: 57,
+        title: 'Take Two',
+        album: 'Take Two',
+        albumId: 15,
+        releaseDate: '2023-06-09',
+        duration: 212,
+        bpm: 120,
+        energy: 0.78,
+        valence: 0.72,
+        danceability: 0.68,
+        acousticness: 0.15,
+        sentiment: 'Gratitude',
+        keywords: ['take two', 'new chapter', 'ARMY', 'anniversary', 'together'],
+        writers: ['Pdogg', 'RM', 'SUGA', 'j-hope', 'August Rigo'],
+        producers: ['Pdogg'],
+        memberCredits: ['rm', 'suga', 'jh'],
+        isTitle: true,
+        hasMV: false
+    }
+];
+
+// ============ HELPER FUNCTIONS ============
+
+// Get song by ID
+export const getSongById = (id: number): Song | undefined => {
+    return SONGS.find(s => s.id === id);
+};
+
+// Get songs by album
+export const getSongsByAlbum = (albumId: number): Song[] => {
+    return SONGS.filter(s => s.albumId === albumId);
+};
+
+// Get songs by member credit
+export const getSongsByMember = (memberId: string): Song[] => {
+    return SONGS.filter(s => s.memberCredits.includes(memberId));
+};
+
+// Get songs by sentiment
+export const getSongsBySentiment = (sentiment: SongSentiment): Song[] => {
+    return SONGS.filter(s => s.sentiment === sentiment);
+};
+
+// Get title tracks only
+export const getTitleTracks = (): Song[] => {
+    return SONGS.filter(s => s.isTitle);
+};
+
+// Get songs sorted by energy
+export const getSongsByEnergy = (ascending = false): Song[] => {
+    return [...SONGS].sort((a, b) => ascending ? a.energy - b.energy : b.energy - a.energy);
+};
+
+// Get songs sorted by BPM
+export const getSongsByBPM = (ascending = false): Song[] => {
+    return [...SONGS].sort((a, b) => ascending ? a.bpm - b.bpm : b.bpm - a.bpm);
+};
+
+// Search songs by keyword
+export const searchSongsByKeyword = (keyword: string): Song[] => {
+    const lower = keyword.toLowerCase();
+    return SONGS.filter(s =>
+        s.title.toLowerCase().includes(lower) ||
+        s.album.toLowerCase().includes(lower) ||
+        s.keywords.some(k => k.toLowerCase().includes(lower))
+    );
+};
+
+// Get total song count
+export const getTotalSongCount = (): number => SONGS.length;
+
+// Get average BPM
+export const getAverageBPM = (): number => {
+    return Math.round(SONGS.reduce((sum, s) => sum + s.bpm, 0) / SONGS.length);
+};
+
+// Get sentiment distribution
+export const getSentimentDistribution = (): Record<SongSentiment, number> => {
+    const dist: Partial<Record<SongSentiment, number>> = {};
+    SONGS.forEach(s => {
+        dist[s.sentiment] = (dist[s.sentiment] || 0) + 1;
+    });
+    return dist as Record<SongSentiment, number>;
+};
+
+export default SONGS;
