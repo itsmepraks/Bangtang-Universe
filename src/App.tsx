@@ -77,7 +77,7 @@ const MEMBER_DATA: Member[] = [
     id: 'suga',
     name: 'SUGA',
     full: 'Min Yoongi',
-    color: '#10B981',
+    color: '#9CA3AF', // Silver-gray (black mic, but lighter for visibility)
     role: 'Lead Rapper / Producer',
     mic: 'Black',
     komca: 169,
@@ -89,9 +89,9 @@ const MEMBER_DATA: Member[] = [
     id: 'jh',
     name: 'J-HOPE',
     full: 'Jung Hoseok',
-    color: '#EF4444',
+    color: '#C0C0C0', // Silver mic color
     role: 'Main Dancer / Sub Rapper',
-    mic: 'Red',
+    mic: 'Silver',
     komca: 137,
     bio: 'The Golden Hyung. Bringing sunshine and street dance roots to the global stage.',
     soloTracks: ['Jack In The Box', 'Arson', 'More', 'Ego', 'Just Dance'],
@@ -398,10 +398,10 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           x: x + (Math.random() - 0.5) * 3, // Slight randomness
           y: ringY + (Math.random() - 0.5) * 2,
           z: z,
-          size: baseSize * perspectiveScale,
+          size: baseSize * perspectiveScale * 1.3, // Slightly bigger for visibility
           color: getColor(),
           delay: Math.random() * 6,
-          brightness: 0.4 + Math.random() * 0.5 + perspectiveScale * 0.2,
+          brightness: 0.5 + Math.random() * 0.5 + perspectiveScale * 0.2,
         });
       }
     }
@@ -442,10 +442,10 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           x: xPercent + (Math.random() - 0.5) * 2,
           y: rowY + (Math.random() - 0.5) * 1.5,
           z: 20 + row * 10 + Math.random() * 10,
-          size: 3.5 + Math.random() * 3 - row * 0.3, // Bigger when closer
+          size: 4.5 + Math.random() * 4 - row * 0.3, // BIGGER when closer
           color: getColor(),
           delay: Math.random() * 4,
-          brightness: 0.7 + Math.random() * 0.3,
+          brightness: 0.75 + Math.random() * 0.25,
         });
       }
     }
@@ -583,7 +583,7 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         <div className="absolute top-0 left-0 right-0 h-[15%] bg-gradient-to-b from-black to-transparent" />
       </div>
 
-      {/* ARMY Bomb Ocean - Upper Stadium + Lower Floor */}
+      {/* ARMY Bomb Ocean - Purple Universe Effect */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {armyBombs.map((bomb, i) => (
           <div
@@ -596,8 +596,8 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               height: `${bomb.size}px`,
               backgroundColor: bomb.color,
               opacity: bomb.brightness,
-              boxShadow: `0 0 ${bomb.size * 2}px ${bomb.color}, 0 0 ${bomb.size * 4}px ${bomb.color}50`,
-              animation: `star-twinkle ${2 + Math.random() * 3}s ease-in-out infinite`,
+              boxShadow: `0 0 ${bomb.size}px ${bomb.color}, 0 0 ${bomb.size * 2.5}px ${bomb.color}90, 0 0 ${bomb.size * 5}px ${bomb.color}40`,
+              animation: `star-twinkle ${2.5 + Math.random() * 2.5}s ease-in-out infinite`,
               animationDelay: `${bomb.delay}s`,
             }}
           />
@@ -631,6 +631,99 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         </div>
       </div>
 
+      {/* STADIUM SPOTLIGHT SYSTEM - Multiple angles converging on center stage */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* TOP LIGHTING RIG - Main parallel beams */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[70%]">
+          {/* Lighting rig bar */}
+          <div className="absolute top-[1%] left-1/2 -translate-x-1/2 w-[90%] h-[2px] bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+
+          {/* Multiple parallel spotlight beams from top */}
+          {[-40, -30, -20, -10, 0, 10, 20, 30, 40].map((offset, idx) => (
+            <div
+              key={`top-beam-${idx}`}
+              className="absolute top-0"
+              style={{
+                left: `calc(50% + ${offset * 1.8}%)`,
+                width: offset === 0 ? '8px' : '3px',
+                height: '100%',
+                background: offset === 0
+                  ? `linear-gradient(to bottom, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.6) 15%, rgba(200,200,255,0.3) 45%, transparent 75%)`
+                  : `linear-gradient(to bottom, rgba(255,255,255,0.5) 0%, rgba(200,200,255,0.3) 15%, rgba(168,85,247,0.15) 40%, transparent 70%)`,
+                transform: `rotate(${offset * 0.25}deg)`,
+                transformOrigin: 'top center',
+                filter: offset === 0 ? 'blur(5px)' : 'blur(2px)',
+                opacity: offset === 0 ? 0.9 : 0.6,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* LEFT SIDE SPOTLIGHTS - Angled beams from left */}
+        <div className="absolute top-[10%] left-0 w-[50%] h-[60%]">
+          {[15, 25, 35].map((angle, idx) => (
+            <div
+              key={`left-beam-${idx}`}
+              className="absolute"
+              style={{
+                top: `${10 + idx * 15}%`,
+                left: '0',
+                width: '120%',
+                height: '4px',
+                background: 'linear-gradient(to right, rgba(168,85,247,0.4) 0%, rgba(200,200,255,0.2) 40%, transparent 80%)',
+                transform: `rotate(${angle}deg)`,
+                transformOrigin: 'left center',
+                filter: 'blur(4px)',
+                opacity: 0.5,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* RIGHT SIDE SPOTLIGHTS - Angled beams from right */}
+        <div className="absolute top-[10%] right-0 w-[50%] h-[60%]">
+          {[-15, -25, -35].map((angle, idx) => (
+            <div
+              key={`right-beam-${idx}`}
+              className="absolute"
+              style={{
+                top: `${10 + idx * 15}%`,
+                right: '0',
+                width: '120%',
+                height: '4px',
+                background: 'linear-gradient(to left, rgba(168,85,247,0.4) 0%, rgba(200,200,255,0.2) 40%, transparent 80%)',
+                transform: `rotate(${angle}deg)`,
+                transformOrigin: 'right center',
+                filter: 'blur(4px)',
+                opacity: 0.5,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* STAGE FOCUS - Concentrated light pool on members */}
+        <div
+          className="absolute top-[35%] left-1/2 -translate-x-1/2"
+          style={{
+            width: '700px',
+            height: '300px',
+            background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.2) 0%, rgba(200,200,255,0.1) 30%, transparent 70%)',
+            filter: 'blur(40px)',
+          }}
+        />
+
+        {/* Atmospheric haze effect */}
+        <div
+          className="absolute top-[40%] left-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            width: '800px',
+            height: '250px',
+            background: 'radial-gradient(ellipse at center, rgba(168,85,247,0.12) 0%, transparent 60%)',
+            filter: 'blur(50px)',
+          }}
+        />
+      </div>
+
       {/* Stage Platform Glow - Enhanced */}
       <div className="absolute top-[62%] left-1/2 -translate-x-1/2 pointer-events-none">
         <div
@@ -662,8 +755,8 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         />
       </div>
 
-      {/* 7 Member Silhouettes on Stage - ENLARGED & CENTERED */}
-      <div className="absolute top-[42%] left-1/2 -translate-x-1/2 flex items-end justify-center gap-6 sm:gap-10 md:gap-14 pointer-events-none">
+      {/* 7 Member Silhouettes on Stage - CENTER FOCAL POINT */}
+      <div className="absolute top-[38%] left-1/2 -translate-x-1/2 flex items-end justify-center gap-4 sm:gap-8 md:gap-12 pointer-events-none z-10">
         {MEMBER_DATA.map((member, i) => {
           // Heights scaled up ~3x for prominence
           const heights = [145, 165, 135, 175, 155, 140, 160];
@@ -707,90 +800,81 @@ const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 }}
               />
 
-              {/* Feet glow on stage */}
-              <div
-                className="absolute -bottom-2 w-full h-4 rounded-full opacity-50 blur-md"
-                style={{ backgroundColor: member.color }}
-              />
-
               {/* Reflection on floor */}
               <div
-                className="mt-2 rounded-b-full opacity-25"
+                className="mt-2 rounded-b-full opacity-30"
                 style={{
                   width: isCenter ? '20px' : '16px',
-                  height: `${heights[i] * 0.35}px`,
-                  background: `linear-gradient(to bottom, ${member.color}60 0%, transparent 100%)`,
-                  filter: 'blur(4px)',
+                  height: `${heights[i] * 0.4}px`,
+                  background: `linear-gradient(to bottom, ${member.color}70 0%, transparent 100%)`,
+                  filter: 'blur(5px)',
                   transform: 'scaleY(-1)',
                 }}
               />
-
-              {/* Name label - larger and more prominent */}
-              <span
-                className="absolute -bottom-14 text-xs sm:text-sm font-bold tracking-widest uppercase whitespace-nowrap"
-                style={{
-                  color: member.color,
-                  textShadow: `0 0 10px ${member.color}, 0 0 20px ${member.color}80`,
-                  opacity: 0.9,
-                }}
-              >
-                {member.name}
-              </span>
             </div>
           );
         })}
       </div>
 
-      {/* MAIN CONTENT - Centered */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none">
-        <div className="flex flex-col items-center gap-6 pointer-events-auto -mt-16">
-
-          {/* Title */}
-          <div className="text-center animate-in fade-in slide-in-from-top-8 duration-1000">
-            <h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[0.1em] uppercase"
-              style={{
-                fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-                textShadow: '0 0 40px rgba(168,85,247,0.6), 0 0 80px rgba(168,85,247,0.3), 0 4px 20px rgba(0,0,0,0.5)'
-              }}
-            >
-              BTS Neural Archive
-            </h1>
-            <p className="mt-3 text-purple-300/50 text-sm tracking-[0.4em] uppercase">
-              Seven Stars • Infinite ARMY
-            </p>
-          </div>
-
-          {/* BTS Logo - Clickable */}
-          <button
-            onClick={onSync}
-            className="relative w-28 h-28 flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none select-none hover:scale-110 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
+      {/* MEMBER NAMES - Separate row at stage glow line */}
+      <div className="absolute top-[63%] left-1/2 -translate-x-1/2 flex items-center justify-center gap-6 sm:gap-10 md:gap-14 pointer-events-none z-20">
+        {MEMBER_DATA.map((member, i) => (
+          <span
+            key={`name-${member.id}`}
+            className="text-[10px] sm:text-xs font-bold tracking-widest uppercase whitespace-nowrap"
+            style={{
+              color: member.color,
+              textShadow: `0 0 10px ${member.color}, 0 0 20px ${member.color}80, 0 2px 4px rgba(0,0,0,0.5)`,
+            }}
           >
-            <div className="absolute inset-0 rounded-full bg-purple-500/25 blur-[25px] group-hover:bg-purple-400/45 transition-all duration-500" />
-            <div className="relative z-10 animate-[logo-glow_4s_infinite] group-hover:drop-shadow-[0_0_40px_rgba(255,255,255,0.9)] transition-all duration-500">
-              <BTSLogo className="w-16 h-16 text-white" />
-            </div>
-          </button>
+            {member.name}
+          </span>
+        ))}
+      </div>
 
-          {/* CTA Button */}
-          <button
-            onClick={onSync}
-            className="flex flex-col items-center gap-2 group cursor-pointer hover:scale-105 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 duration-1000"
+      {/* TITLE - At top */}
+      <div className="absolute top-[8%] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+        <div className="text-center animate-in fade-in slide-in-from-top-8 duration-1000">
+          <h1
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[0.1em] uppercase"
+            style={{
+              fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+              textShadow: '0 0 40px rgba(168,85,247,0.6), 0 0 80px rgba(168,85,247,0.3), 0 4px 20px rgba(0,0,0,0.5)'
+            }}
           >
-            <div className="flex items-center gap-3">
-              <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-purple-400/70 group-hover:w-16 transition-all duration-500" />
-              <span
-                className="text-sm text-white/80 tracking-[0.3em] font-medium uppercase group-hover:text-white group-hover:tracking-[0.4em] transition-all duration-500"
-                style={{ textShadow: '0 0 20px rgba(168,85,247,0.5)' }}
-              >
-                Enter The Universe
-              </span>
-              <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-purple-400/70 group-hover:w-16 transition-all duration-500" />
-            </div>
-            <ChevronRight size={18} className="text-purple-400/80 group-hover:text-purple-300 animate-pulse rotate-90 group-hover:translate-y-1 transition-all duration-500" />
-          </button>
+            BTS Neural Archive
+          </h1>
         </div>
+      </div>
+
+      {/* ENTER THE UNIVERSE - BTS Logo first, then text (no lines) */}
+      <div className="absolute top-[76%] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-auto">
+        {/* BTS Logo - Primary CTA */}
+        <button
+          onClick={onSync}
+          className="relative w-16 h-16 flex items-center justify-center transition-all duration-700 cursor-pointer outline-none focus:outline-none select-none hover:scale-110 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          <div className="absolute inset-0 rounded-full bg-purple-500/25 blur-[18px] group-hover:bg-purple-400/45 transition-all duration-500" />
+          <div className="relative z-10 animate-[logo-glow_4s_infinite] group-hover:drop-shadow-[0_0_30px_rgba(255,255,255,0.9)] transition-all duration-500">
+            <BTSLogo className="w-10 h-10 text-white" />
+          </div>
+        </button>
+
+        {/* Enter The Universe - Below logo, no lines */}
+        <button
+          onClick={onSync}
+          className="flex items-center group cursor-pointer hover:scale-105 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8 duration-1000"
+        >
+          <span
+            className="text-xs text-white/70 tracking-[0.3em] font-medium uppercase group-hover:text-white group-hover:tracking-[0.4em] transition-all duration-500"
+            style={{ textShadow: '0 0 15px rgba(168,85,247,0.4)' }}
+          >
+            Enter The Universe
+          </span>
+        </button>
+
+        <ChevronRight size={14} className="text-purple-400/50 animate-pulse rotate-90" />
       </div>
 
       {/* Bottom subtle vignette */}
