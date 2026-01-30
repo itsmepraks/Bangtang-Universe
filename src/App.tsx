@@ -31,6 +31,7 @@ import {
   Download,
   RefreshCw,
   Award,
+  ChevronDown,
 } from 'lucide-react';
 
 // Type alias for component compatibility
@@ -862,29 +863,67 @@ const GlassHUD: React.FC<GlassHUDProps> = ({ title, icon: Icon, children, classN
 );
 
 // --- MODULE: SONIC LAB ---
-const SonicAnalyzer = ({ playing, togglePlay, accentColor = "#A855F7" }: { playing: boolean; togglePlay: () => void; accentColor?: string }) => {
-
-  useEffect(() => {
-    // Determine heights only on mount to be pure, then we can animate with CSS or update periodically if needed.
-    // However, to keep it simple and pure, we generate a static set of random heights for the "stopped" state.
-    // For "playing", we can rely on CSS animations or we can use a simpler deterministic value.
-    // Actually, `playing ? random : sine`. The playing part needs to animate.
-    // We can simulate the "random" equalizer effect using CSS keyframes for each bar with different durations.
-    // That avoids Math.random() in render entirely.
-
-    // So here just generate the static "sine" wave offsets or just nothing, 
-    // and let the render logic use the index `i` for the sine wave.
-  }, []);
+const SonicAnalyzer = ({ playing, togglePlay, song, onSelectSong, accentColor = "#A855F7" }: { playing: boolean; togglePlay: () => void; song: Song | null; onSelectSong: (s: Song | null) => void; accentColor?: string }) => {
+  // Use song metrics or global averages
+  const metrics = song ? {
+    energy: song.energy.toFixed(2),
+    valence: song.valence.toFixed(2),
+    bpm: song.bpm,
+    dance: song.danceability ? song.danceability.toFixed(2) : "0.75" // Default if missing
+  } : {
+    energy: (SONGS.reduce((a, b) => a + b.energy, 0) / SONGS.length).toFixed(2),
+    valence: (SONGS.reduce((a, b) => a + b.valence, 0) / SONGS.length).toFixed(2),
+    bpm: Math.round(SONGS.reduce((a, b) => a + b.bpm, 0) / SONGS.length),
+    dance: (SONGS.reduce((a, b) => a + b.danceability, 0) / SONGS.length).toFixed(2)
+  };
 
   return (
-    <div className="h-full flex flex-col gap-8">
+    <div className="h-full flex flex-col gap-6">
+      {/* Header for Analyzer */}
+      <div className="flex justify-between items-end px-4 min-h-[40px]">
+        <div className="flex flex-col gap-1 w-full mr-4">
+          <div className="flex justify-between items-center w-full">
+            <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/40">Target Signal</h3>
+            {song && (
+              <button onClick={() => onSelectSong(null)} className="text-[9px] text-white/40 hover:text-white uppercase tracking-widest border border-white/10 px-2 py-0.5 rounded hover:bg-white/10 transition-colors">
+                Reset to Global
+              </button>
+            )}
+          </div>
+
+          <div className="relative group">
+            <select
+              className="w-full bg-transparent text-xl text-white font-light tracking-widest appearance-none focus:outline-none cursor-pointer py-1 border-b border-transparent hover:border-white/20 transition-colors [&>option]:text-black"
+              value={song?.id || ""}
+              onChange={(e) => {
+                const s = SONGS.find(song => song.id === Number(e.target.value));
+                onSelectSong(s || null);
+              }}
+            >
+              <option value="">GLOBAL DISCOGRAPHY</option>
+              {SONGS.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+            </select>
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+              <ChevronDown size={14} className="text-white/40" />
+            </div>
+          </div>
+        </div>
+        {song && (
+          <div className="px-3 py-1 bg-white/5 rounded border border-white/10 text-[9px] text-white/60 tracking-widest uppercase whitespace-nowrap">
+            {song.album}
+          </div>
+        )}
+      </div>
+
       <div className="flex-1 bg-black/20 border border-white/5 rounded-[2.5rem] flex items-end justify-center px-10 pb-10 gap-2 relative overflow-hidden group shadow-inner">
         <div className="absolute inset-0 transition-opacity duration-1000 opacity-20 group-hover:opacity-40"
           style={{ background: `linear-gradient(to top, ${accentColor} 0%, transparent 100%)` }} />
         <FloatingParticles />
         {[...Array(24)].map((_, i) => {
-          // Deterministic value for "paused" state
-          const pausedHeight = 15 + Math.sin(i * 0.4) * 10;
+          // If song is selected, use a seeded pattern based on its ID to make it look "unique"
+          // Otherwise use the sine wave
+          const seed = song ? (song.id * 13 + i * 7) % 100 : Math.sin(i * 0.4) * 10 + 15;
+          const pausedHeight = song ? 10 + (seed % 60) : 15 + Math.sin(i * 0.4) * 10;
 
           return (
             <div
@@ -923,10 +962,10 @@ const SonicAnalyzer = ({ playing, togglePlay, accentColor = "#A855F7" }: { playi
 
       <div className="grid grid-cols-4 gap-6 px-2">
         {[
-          { label: 'Energy', value: (SONGS.reduce((a, b) => a + b.energy, 0) / SONGS.length).toFixed(2) },
-          { label: 'Valence', value: (SONGS.reduce((a, b) => a + b.valence, 0) / SONGS.length).toFixed(2) },
-          { label: 'Avg BPM', value: Math.round(SONGS.reduce((a, b) => a + b.bpm, 0) / SONGS.length) },
-          { label: 'Dance', value: (SONGS.reduce((a, b) => a + b.danceability, 0) / SONGS.length).toFixed(2) }
+          { label: 'Energy', value: metrics.energy },
+          { label: 'Valence', value: metrics.valence },
+          { label: 'Avg BPM', value: metrics.bpm },
+          { label: 'Dance', value: metrics.dance }
         ].map(s => (
           <div key={s.label} className="bg-white/[0.01] rounded-[1.5rem] p-5 text-center border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all duration-700 cursor-pointer group relative overflow-hidden">
             <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-700" style={{ backgroundColor: accentColor }} />
@@ -1011,7 +1050,7 @@ const RAGNetwork = ({ accentColor = "#A855F7" }: { accentColor?: string }) => {
 };
 
 // --- MODULE: DATA HUB ---
-const DataHub = ({ accentColor = "#A855F7" }: { accentColor?: string }) => (
+const DataHub = ({ accentColor = "#A855F7", onSelectSong }: { accentColor?: string; onSelectSong: (s: Song) => void }) => (
   <div className="h-full flex flex-col gap-8">
     <div className="flex justify-between items-center px-4">
       <div className="flex gap-4">
@@ -1048,7 +1087,11 @@ const DataHub = ({ accentColor = "#A855F7" }: { accentColor?: string }) => (
         </thead>
         <tbody className="divide-y divide-white/[0.02]">
           {SONG_DATABASE.map(s => (
-            <tr key={s.id} className="hover:bg-white/[0.03] transition-all duration-700 cursor-pointer group">
+            <tr
+              key={s.id}
+              onClick={() => onSelectSong(s)}
+              className="hover:bg-white/[0.03] transition-all duration-700 cursor-pointer group hover:pl-2"
+            >
               <td className="px-8 py-6">
                 <div className="flex flex-col">
                   <span className="font-bold text-white/80 group-hover:text-white transition-colors tracking-tight text-sm">{s.title}</span>
@@ -1274,6 +1317,7 @@ export default function App() {
   const [mode, setMode] = useState<'landing' | 'warp' | 'dashboard'>('landing');
   const [activeSection, setActiveSection] = useState('overview'); // overview, rag, sonic, data
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
+  const [analyzingSong, setAnalyzingSong] = useState<Song | null>(null);
   const [playing, setPlaying] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -1392,10 +1436,33 @@ export default function App() {
               {/* OVERVIEW MODE */}
               {activeSection === 'overview' && (
                 <div className="grid grid-cols-12 gap-8 h-full">
-                  <div className="col-span-8 flex flex-col gap-8">
-                    <GlassHUD title="Live Waveform Analysis" icon={Activity} className="h-72">
-                      <SonicAnalyzer playing={playing} togglePlay={() => setPlaying(!playing)} />
+                  <div className="col-span-8 flex flex-col gap-6">
+                    <GlassHUD title="Live Waveform Analysis" icon={Activity} className="h-80">
+                      <SonicAnalyzer
+                        playing={playing}
+                        togglePlay={() => setPlaying(!playing)}
+                        song={analyzingSong}
+                        onSelectSong={setAnalyzingSong}
+                      />
                     </GlassHUD>
+
+                    {/* Quick Picks Bar */}
+                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                      {['Butter', 'Dynamite', 'Spring Day', 'Run BTS', 'Mic Drop'].map(title => {
+                        const s = SONGS.find(song => song.title.toLowerCase() === title.toLowerCase());
+                        if (!s) return null;
+                        return (
+                          <button
+                            key={title}
+                            onClick={() => { setAnalyzingSong(s); setPlaying(true); }}
+                            className={`px-4 py-2 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all duration-300 ${analyzingSong?.id === s.id ? 'bg-white text-black border-white' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:border-white/30 hover:text-white'}`}
+                          >
+                            {title}
+                          </button>
+                        );
+                      })}
+                    </div>
+
                     <div className="flex-1 grid grid-cols-2 gap-8">
                       <GlassHUD title="Recent Neural Queries" icon={Search} className="h-full">
                         <div className="space-y-4">
@@ -1431,7 +1498,12 @@ export default function App() {
               {activeSection === 'sonic' && (
                 <div className="h-full max-w-5xl mx-auto flex flex-col animate-in fade-in slide-in-from-bottom-8 duration-1000">
                   <GlassHUD title="High-Fidelity Vector Analysis" icon={Activity} className="flex-1">
-                    <SonicAnalyzer playing={playing} togglePlay={() => setPlaying(!playing)} />
+                    <SonicAnalyzer
+                      playing={playing}
+                      togglePlay={() => setPlaying(!playing)}
+                      song={analyzingSong}
+                      onSelectSong={setAnalyzingSong}
+                    />
                   </GlassHUD>
                 </div>
               )}
@@ -1449,7 +1521,11 @@ export default function App() {
               {activeSection === 'data' && (
                 <div className="h-full max-w-6xl mx-auto flex flex-col animate-in fade-in slide-in-from-bottom-8 duration-1000">
                   <GlassHUD title="Global Discography Archive" icon={Database} className="flex-1">
-                    <DataHub />
+                    <DataHub onSelectSong={(s) => {
+                      setAnalyzingSong(s);
+                      setActiveSection('overview'); // Switch to main view to see analysis
+                      setPlaying(true); // Auto play visualization
+                    }} />
                   </GlassHUD>
                 </div>
               )}
