@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { generateStars, generateBokehBubbles, generateFloatingParticles } from './utils/helpers';
 
-// Import real data
+// Import data (fallback) and hooks
 import { MEMBER_DATA, type ExtendedMember } from './data/members';
 import { SONGS, type Song, getTotalSongCount, getSongsBySentiment } from './data/songs';
 import { ALBUMS, getAlbumById } from './data/albums';
+import { useMembers, useSongs, useAlbums } from './hooks';
 
 // Import services
 import { searchAll, type SearchResult } from './services/searchService';
@@ -36,9 +37,6 @@ import {
 
 // Type alias for component compatibility
 type Member = ExtendedMember;
-
-// Use SONGS as SONG_DATABASE for backward compatibility
-const SONG_DATABASE = SONGS;
 
 // --- VISUAL UTILS ---
 const BTSLogo = ({ className }: { className?: string }) => (
@@ -1321,9 +1319,44 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  // Fetch data from Supabase (with fallback to local data)
+  const { members: dbMembers, loading: membersLoading } = useMembers();
+  const { songs: dbSongs, loading: songsLoading } = useSongs();
+  const { albums: dbAlbums, loading: albumsLoading } = useAlbums();
+
+  // Use database data or fallback to local constants
+  const SONG_DATABASE = useMemo(() => {
+    if (dbSongs.length > 0) {
+      // Convert database format to local format for compatibility
+      return dbSongs.map(s => ({
+        id: s.id,
+        title: s.title,
+        titleKorean: s.title_korean,
+        album: dbAlbums.find(a => a.id === s.album_id)?.title || 'Unknown',
+        albumId: s.album_id,
+        releaseDate: s.release_date,
+        duration: s.duration_seconds,
+        bpm: s.bpm || 0,
+        energy: s.energy || 0,
+        valence: s.valence || 0,
+        danceability: s.danceability || 0,
+        acousticness: s.acousticness || 0,
+        sentiment: s.sentiment as Song['sentiment'],
+        keywords: s.keywords || [],
+        writers: s.writers || [],
+        producers: s.producers || [],
+        memberCredits: s.member_credits || [],
+        isTitle: s.is_title_track,
+        hasMV: s.has_mv,
+      }));
+    }
+    return SONGS; // Fallback to local data
+  }, [dbSongs, dbAlbums]);
+
   const handleSync = () => {
     setMode('dashboard');
   };
+
 
   return (
     <div className="relative w-screen h-screen bg-[#020005] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white">
