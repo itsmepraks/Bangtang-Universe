@@ -82,7 +82,9 @@
     "analyze": "vite build --mode analyze",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "echo \"Setting up git hooks...\"",
-    "db:migrate": "npx tsx scripts/migrate-to-supabase.ts"
+    "db:migrate": "npx tsx scripts/migrate-to-supabase.ts",
+    "db:update-photos": "npx tsx scripts/update-member-photos.ts",
+    "db:upload-photos": "npx tsx scripts/upload-member-photos.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.3",

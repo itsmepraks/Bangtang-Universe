@@ -5,7 +5,7 @@ import { generateStars, generateBokehBubbles, generateFloatingParticles } from '
 import { MEMBER_DATA, type ExtendedMember } from './data/members';
 import { SONGS, type Song, getTotalSongCount, getSongsBySentiment } from './data/songs';
 import { ALBUMS, getAlbumById } from './data/albums';
-import { useMembers, useSongs, useAlbums } from './hooks';
+import { useMembers, useSongs, useAlbums, useMemberById } from './hooks';
 
 // Import services
 import { searchAll, type SearchResult } from './services/searchService';
@@ -1123,8 +1123,23 @@ interface MemberDNAProps {
 }
 
 const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
-  const member = MEMBER_DATA.find(m => m.id === memberId);
+  // Fetch member from database (includes Supabase image_url)
+  const { member: dbMember, loading } = useMemberById(memberId);
+  // Fallback to local data for non-image fields
+  const localMember = MEMBER_DATA.find(m => m.id === memberId);
+
+  // Merge: use database image_url, local data for everything else
+  const member = localMember ? {
+    ...localMember,
+    image: dbMember?.image_url || localMember.image || ''
+  } : null;
+
   if (!member) return null;
+  if (loading) return (
+    <div className="absolute inset-0 z-[100] bg-[#020005]/85 backdrop-blur-[80px] flex items-center justify-center">
+      <div className="text-white/50 text-lg tracking-widest uppercase animate-pulse">Loading...</div>
+    </div>
+  );
 
   return (
     <div className="absolute inset-0 z-[100] bg-[#020005]/85 backdrop-blur-[80px] animate-in fade-in duration-700 flex flex-col overflow-hidden">
