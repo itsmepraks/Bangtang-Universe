@@ -6,7 +6,7 @@
 
 import { saveAs } from 'file-saver';
 import { SONGS, type Song } from '../data/songs';
-import { MEMBER_DATA, type ExtendedMember } from '../data/members';
+import { MEMBER_DATA } from '../data/members';
 import { ALBUMS, type Album } from '../data/albums';
 
 // ============ CSV CONVERSION ============

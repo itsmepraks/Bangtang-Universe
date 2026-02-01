@@ -5,7 +5,7 @@
  * Falls back to local data if database is unavailable
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Member } from '../types/database';
 import { MEMBER_DATA } from '../data/members';
@@ -103,11 +103,11 @@ export function useMemberColor(id: string): string {
 // Get members sorted by KOMCA credits
 export function useMembersByCredits() {
     const { members, loading, error } = useMembers();
-    return {
-        members: [...members].sort((a, b) => b.komca_credits - a.komca_credits),
-        loading,
-        error,
-    };
+    const sortedMembers = useMemo(
+        () => [...members].sort((a, b) => b.komca_credits - a.komca_credits),
+        [members]
+    );
+    return { members: sortedMembers, loading, error };
 }
 
 // Get total KOMCA credits

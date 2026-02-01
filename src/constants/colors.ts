@@ -105,79 +105,14 @@ export const SENTIMENT_COLORS = {
 /**
  * Retrieves the signature color for a BTS member by their ID
  * 
- * This function maps member IDs to their unique colors used throughout
- * the application. Falls back to the primary Borahae purple if the
- * member ID is not recognized.
- * 
- * @param memberId - The member's ID (case-insensitive)
- *                   Accepts: 'rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'
- * @returns The member's signature color as a hex string
+ * @param memberId - The member's ID (case-insensitive): 'rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'
+ * @returns The member's signature color as a hex string, or primary purple if not found
  * 
  * @example
- * Basic usage:
  * ```typescript
- * const rmColor = getMemberColor('rm');
- * // Returns: '#2563EB' (blue)
- * ```
- * 
- * @example
- * Case-insensitive lookup:
- * ```typescript
- * const jiminColor = getMemberColor('JM');
- * // Returns: '#F59E0B' (gold)
- * 
- * getMemberColor('RM')   // Works - returns '#2563EB'
- * getMemberColor('Rm')   // Works - returns '#2563EB'
- * getMemberColor('rM')   // Works - returns '#2563EB'
- * ```
- * 
- * @example
- * Fallback for unknown IDs:
- * ```typescript
- * const unknownColor = getMemberColor('unknown');
- * // Returns: '#A855F7' (primary Borahae purple - safe fallback)
- * ```
- * 
- * @example
- * Using in component styling:
- * ```tsx
- * function MemberCard({ memberId }: { memberId: string }) {
- *   const color = getMemberColor(memberId);
- *   return (
- *     <div style={{ 
- *       borderColor: color, 
- *       boxShadow: `0 0 20px ${color}`,
- *       background: `linear-gradient(135deg, ${withAlpha(color, 0.1)}, transparent)`
- *     }}>
- *       <h2 style={{ color }}>Member Profile</h2>
- *     </div>
- *   );
- * }
- * ```
- * 
- * @example
- * Iterating through all members:
- * ```typescript
- * const memberIds = ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'];
- * const memberPalette = memberIds.map(id => ({
- *   id,
- *   name: id.toUpperCase(),
- *   color: getMemberColor(id)
- * }));
- * // Returns array for generating color legends or UI palettes
- * ```
- * 
- * @example
- * Dynamic CSS custom properties:
- * ```tsx
- * function MemberTheme({ memberId }: Props) {
- *   const color = getMemberColor(memberId);
- *   return (
- *     <div style={{ '--member-color': color } as React.CSSProperties}>
- *       {/* CSS can now use: var(--member-color) */}
- *     </div>
- *   );
- * }
+ * getMemberColor('rm');      // '#2563EB' (blue)
+ * getMemberColor('jm');      // '#F59E0B' (gold)
+ * getMemberColor('unknown'); // '#A855F7' (fallback purple)
  * ```
  */
 export const getMemberColor = (memberId: string): string => {
@@ -207,103 +142,10 @@ export const getMemberColor = (memberId: string): string => {
  * @returns The corresponding color as a hex string
  * 
  * @example
- * Basic sentiment lookup:
  * ```typescript
- * const joyColor = getSentimentColor('joy');
- * // Returns: '#FBBF24' (yellow/gold)
- * 
- * const painColor = getSentimentColor('pain');
- * // Returns: '#DC2626' (deep red)
- * ```
- * 
- * @example
- * Case-insensitive matching:
- * ```typescript
- * const comfortColor = getSentimentColor('COMFORT');
- * // Returns: '#10B981' (green)
- * 
- * getSentimentColor('joy')           // Works
- * getSentimentColor('JOY')           // Works
- * getSentimentColor('Joy')           // Works
- * ```
- * 
- * @example
- * Fallback for unknown sentiments:
- * ```typescript
- * const unknownColor = getSentimentColor('nostalgia');
- * // Returns: '#A855F7' (primary Borahae purple)
- * ```
- * 
- * @example
- * Using in song analysis visualization:
- * ```tsx
- * function SongSentiment({ song }: { song: Song }) {
- *   const color = getSentimentColor(song.sentiment);
- *   return (
- *     <div 
- *       className="sentiment-badge" 
- *       style={{ 
- *         backgroundColor: withAlpha(color, 0.2),
- *         borderLeft: `4px solid ${color}`,
- *         color: color
- *       }}
- *     >
- *       {song.sentiment}
- *     </div>
- *   );
- * }
- * ```
- * 
- * @example
- * Creating sentiment-based gradients:
- * ```typescript
- * const song = { sentiments: ['joy', 'gratitude', 'celebration'] };
- * const gradientColors = song.sentiments
- *   .map(s => getSentimentColor(s))
- *   .join(', ');
- * // Use in: background: linear-gradient(to right, ${gradientColors})
- * ```
- * 
- * @example
- * Sentiment distribution chart:
- * ```tsx
- * function SentimentChart({ songs }: Props) {
- *   const sentimentCounts = songs.reduce((acc, song) => {
- *     const color = getSentimentColor(song.sentiment);
- *     acc[song.sentiment] = { 
- *       count: (acc[song.sentiment]?.count || 0) + 1, 
- *       color 
- *     };
- *     return acc;
- *   }, {});
- *   
- *   return (
- *     <div className="chart">
- *       {Object.entries(sentimentCounts).map(([sentiment, { count, color }]) => (
- *         <div 
- *           key={sentiment}
- *           style={{ 
- *             width: `${(count / songs.length) * 100}%`,
- *             backgroundColor: color
- *           }}
- *         />
- *       ))}
- *     </div>
- *   );
- * }
- * ```
- * 
- * @example
- * Combining with opacity for layered mood effects:
- * ```typescript
- * function getMoodGradient(sentiment: string) {
- *   const baseColor = getSentimentColor(sentiment);
- *   return `linear-gradient(135deg, 
- *     ${withAlpha(baseColor, 0.8)} 0%, 
- *     ${withAlpha(baseColor, 0.4)} 50%, 
- *     ${withAlpha(baseColor, 0)} 100%
- *   )`;
- * }
+  * const joyColor = getSentimentColor('joy');      // '#FBBF24'
+ * const painColor = getSentimentColor('pain');    // '#DC2626'
+ * const unknownColor = getSentimentColor('xyz');  // '#A855F7' (fallback)
  * ```
  */
 export const getSentimentColor = (sentiment: string): string => {
@@ -315,162 +157,17 @@ export const getSentimentColor = (sentiment: string): string => {
  * Adds alpha transparency to a hex color code
  * 
  * Converts a hex color to RGBA format with specified transparency.
- * Useful for creating layered effects, glassmorphism, and subtle overlays
- * while maintaining the base color. Essential for the "Purple Ocean" 
- * bokeh effect and glass panel aesthetics.
+ * Useful for glassmorphism effects and layered overlays.
  * 
- * @param hex - Hex color code (with or without '#' prefix)
- * @param alpha - Alpha transparency value (0.0 = fully transparent, 1.0 = fully opaque)
- * @returns RGBA color string in format 'rgba(r, g, b, alpha)'
+ * @param hex - Hex color code (with '#' prefix)
+ * @param alpha - Alpha value (0.0 = transparent, 1.0 = opaque)
+ * @returns RGBA color string
  * 
  * @example
- * Basic transparency:
  * ```typescript
- * const semiTransparent = withAlpha('#A855F7', 0.5);
- * // Returns: 'rgba(168, 85, 247, 0.5)' - 50% transparent purple
- * 
- * const fullyOpaque = withAlpha('#A855F7', 1.0);
- * // Returns: 'rgba(168, 85, 247, 1)' - fully opaque
- * 
- * const barelyVisible = withAlpha('#A855F7', 0.05);
- * // Returns: 'rgba(168, 85, 247, 0.05)' - very subtle
- * ```
- * 
- * @example
- * Creating glass morphism effects (Purple Ocean aesthetic):
- * ```typescript
- * const glassBg = withAlpha(BORAHAE_COLORS.PRIMARY, 0.1);
- * const glassBorder = withAlpha('#FFFFFF', 0.05);
- * // Use in: background-color: glassBg; border: 1px solid glassBorder
- * ```
- * 
- * @example
- * Glass panel component:
- * ```tsx
- * function GlassPanel({ children }: Props) {
- *   return (
- *     <div style={{
- *       background: withAlpha('#ffffff', 0.02),
- *       border: `1px solid ${withAlpha('#ffffff', 0.05)}`,
- *       backdropFilter: 'blur(10px)',
- *       borderRadius: '12px',
- *       boxShadow: `0 8px 32px ${withAlpha('#000000', 0.1)}`
- *     }}>
- *       {children}
- *     </div>
- *   );
- * }
- * ```
- * 
- * @example
- * Member color with transparency:
- * ```typescript
- * const rmGlow = withAlpha(MEMBER_COLORS.RM, 0.3);
- * // Returns: 'rgba(37, 99, 235, 0.3)'
- * // Perfect for glowing effects around member cards
- * ```
- * 
- * @example
- * Layered bokeh bubble effect (ARMY bomb lights):
- * ```tsx
- * function BokehBubble({ color }: { color: string }) {
- *   return (
- *     <div 
- *       className="bokeh-bubble"
- *       style={{
- *         background: `radial-gradient(
- *           circle,
- *           ${withAlpha(color, 0.6)} 0%,
- *           ${withAlpha(color, 0.3)} 40%,
- *           ${withAlpha(color, 0.1)} 70%,
- *           ${withAlpha(color, 0)} 100%
- *         )`
- *       }}
- *     />
- *   );
- * }
- * ```
- * 
- * @example
- * Creating hover states with dynamic opacity:
- * ```tsx
- * function InteractiveCard({ isHovered }: Props) {
- *   const bgOpacity = isHovered ? 0.15 : 0.05;
- *   return (
- *     <div style={{
- *       backgroundColor: withAlpha(BORAHAE_COLORS.PRIMARY, bgOpacity),
- *       transition: 'background-color 0.3s ease'
- *     }}>
- *       Card Content
- *     </div>
- *   );
- * }
- * ```
- * 
- * @example
- * Text shadow with purple glow:
- * ```typescript
- * const textGlow = `
- *   0 0 10px ${withAlpha(BORAHAE_COLORS.PRIMARY, 0.5)},
- *   0 0 20px ${withAlpha(BORAHAE_COLORS.PRIMARY, 0.3)},
- *   0 0 30px ${withAlpha(BORAHAE_COLORS.PRIMARY, 0.1)}
- * `;
- * // Use in: text-shadow: textGlow for glowing purple text
- * ```
- * 
- * @example
- * Modal overlay with backdrop:
- * ```tsx
- * function Modal({ children }: Props) {
- *   return (
- *     <div 
- *       className="modal-overlay"
- *       style={{
- *         background: withAlpha('#000000', 0.75),
- *         backdropFilter: 'blur(4px)'
- *       }}
- *     >
- *       <div className="modal-content">{children}</div>
- *     </div>
- *   );
- * }
- * ```
- * 
- * @example
- * Nebula layers effect (multiple transparency layers):
- * ```typescript
- * const nebulaLayers = [
- *   withAlpha('#581C87', 0.6),  // Deep purple base (back)
- *   withAlpha('#7E22CE', 0.4),  // Medium purple (middle)
- *   withAlpha('#A855F7', 0.2),  // Light purple (front)
- * ];
- * 
- * const nebulaEffect = nebulaLayers
- *   .map(color => `radial-gradient(circle, ${color} 0%, transparent 70%)`)
- *   .join(', ');
- * // Creates depth with multiple semi-transparent layers
- * ```
- * 
- * @example
- * Star twinkle animation with varying opacity:
- * ```tsx
- * function TwinklingStar({ color }: { color: string }) {
- *   const [opacity, setOpacity] = useState(0.8);
- *   
- *   useEffect(() => {
- *     const interval = setInterval(() => {
- *       setOpacity(Math.random() * 0.6 + 0.4); // Random 0.4-1.0
- *     }, 2000);
- *     return () => clearInterval(interval);
- *   }, []);
- *   
- *   return (
- *     <div style={{
- *       backgroundColor: withAlpha(color, opacity),
- *       transition: 'opacity 2s ease-in-out'
- *     }} />
- *   );
- * }
+ * withAlpha('#A855F7', 0.5);  // 'rgba(168, 85, 247, 0.5)'
+ * withAlpha('#FFFFFF', 0.1);  // 'rgba(255, 255, 255, 0.1)'
+ * withAlpha('#000000', 0.75); // 'rgba(0, 0, 0, 0.75)'
  * ```
  */
 export const withAlpha = (hex: string, alpha: number): string => {

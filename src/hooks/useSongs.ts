@@ -86,31 +86,31 @@ export function useSongs(): UseSongsResult {
 // Get songs by album
 export function useSongsByAlbum(albumId: number) {
     const { songs, loading, error } = useSongs();
-    return {
-        songs: songs.filter(s => s.album_id === albumId),
-        loading,
-        error,
-    };
+    const filteredSongs = useMemo(
+        () => songs.filter(s => s.album_id === albumId),
+        [songs, albumId]
+    );
+    return { songs: filteredSongs, loading, error };
 }
 
 // Get songs by sentiment
 export function useSongsBySentiment(sentiment: string) {
     const { songs, loading, error } = useSongs();
-    return {
-        songs: songs.filter(s => s.sentiment === sentiment),
-        loading,
-        error,
-    };
+    const filteredSongs = useMemo(
+        () => songs.filter(s => s.sentiment === sentiment),
+        [songs, sentiment]
+    );
+    return { songs: filteredSongs, loading, error };
 }
 
 // Get title tracks only
 export function useTitleTracks() {
     const { songs, loading, error } = useSongs();
-    return {
-        songs: songs.filter(s => s.is_title_track),
-        loading,
-        error,
-    };
+    const titleTracks = useMemo(
+        () => songs.filter(s => s.is_title_track),
+        [songs]
+    );
+    return { songs: titleTracks, loading, error };
 }
 
 // Get song by ID

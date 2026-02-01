@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { generateStars, generateBokehBubbles, generateFloatingParticles } from './utils/helpers';
 
 // Import data (fallback) and hooks
-import { MEMBER_DATA, type ExtendedMember } from './data/members';
-import { SONGS, type Song, getTotalSongCount, getSongsBySentiment } from './data/songs';
-import { ALBUMS, getAlbumById } from './data/albums';
+import { MEMBER_DATA } from './data/members';
+import { SONGS, type Song, getTotalSongCount } from './data/songs';
 import { useMembers, useSongs, useAlbums, useMemberById } from './hooks';
 
 // Import services
 import { searchAll, type SearchResult } from './services/searchService';
-import { generateVerse, generateTitle } from './services/lyricGenerator';
-import { exportFullArchive, exportSongsCSV } from './services/exportService';
+import { generateVerse } from './services/lyricGenerator';
+import { exportFullArchive } from './services/exportService';
 
 import {
   Activity,
@@ -35,8 +34,9 @@ import {
   ChevronDown,
 } from 'lucide-react';
 
+
 // Type alias for component compatibility
-type Member = ExtendedMember;
+// ExtendedMember is used as import type
 
 // --- VISUAL UTILS ---
 const BTSLogo = ({ className }: { className?: string }) => (
@@ -862,18 +862,30 @@ const GlassHUD: React.FC<GlassHUDProps> = ({ title, icon: Icon, children, classN
 
 // --- MODULE: SONIC LAB ---
 const SonicAnalyzer = ({ playing, togglePlay, song, onSelectSong, accentColor = "#A855F7" }: { playing: boolean; togglePlay: () => void; song: Song | null; onSelectSong: (s: Song | null) => void; accentColor?: string }) => {
+  // Memoized global averages - single iteration instead of 4 separate reduces
+  const globalAverages = useMemo(() => {
+    const totals = SONGS.reduce((acc, s) => ({
+      energy: acc.energy + s.energy,
+      valence: acc.valence + s.valence,
+      bpm: acc.bpm + s.bpm,
+      dance: acc.dance + s.danceability
+    }), { energy: 0, valence: 0, bpm: 0, dance: 0 });
+    const len = SONGS.length;
+    return {
+      energy: (totals.energy / len).toFixed(2),
+      valence: (totals.valence / len).toFixed(2),
+      bpm: Math.round(totals.bpm / len),
+      dance: (totals.dance / len).toFixed(2)
+    };
+  }, []);
+
   // Use song metrics or global averages
   const metrics = song ? {
     energy: song.energy.toFixed(2),
     valence: song.valence.toFixed(2),
     bpm: song.bpm,
-    dance: song.danceability ? song.danceability.toFixed(2) : "0.75" // Default if missing
-  } : {
-    energy: (SONGS.reduce((a, b) => a + b.energy, 0) / SONGS.length).toFixed(2),
-    valence: (SONGS.reduce((a, b) => a + b.valence, 0) / SONGS.length).toFixed(2),
-    bpm: Math.round(SONGS.reduce((a, b) => a + b.bpm, 0) / SONGS.length),
-    dance: (SONGS.reduce((a, b) => a + b.danceability, 0) / SONGS.length).toFixed(2)
-  };
+    dance: song.danceability ? song.danceability.toFixed(2) : "0.75"
+  } : globalAverages;
 
   return (
     <div className="h-full flex flex-col gap-6">
@@ -1084,7 +1096,7 @@ const DataHub = ({ accentColor = "#A855F7", onSelectSong }: { accentColor?: stri
           </tr>
         </thead>
         <tbody className="divide-y divide-white/[0.02]">
-          {SONG_DATABASE.map(s => (
+          {SONGS.map(s => (
             <tr
               key={s.id}
               onClick={() => onSelectSong(s)}
@@ -1333,40 +1345,11 @@ export default function App() {
   const [analyzingSong, setAnalyzingSong] = useState<Song | null>(null);
   const [playing, setPlaying] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-
-  // Fetch data from Supabase (with fallback to local data)
-  const { members: dbMembers, loading: membersLoading } = useMembers();
-  const { songs: dbSongs, loading: songsLoading } = useSongs();
-  const { albums: dbAlbums, loading: albumsLoading } = useAlbums();
-
-  // Use database data or fallback to local constants
-  const SONG_DATABASE = useMemo(() => {
-    if (dbSongs.length > 0) {
-      // Convert database format to local format for compatibility
-      return dbSongs.map(s => ({
-        id: s.id,
-        title: s.title,
-        titleKorean: s.title_korean,
-        album: dbAlbums.find(a => a.id === s.album_id)?.title || 'Unknown',
-        albumId: s.album_id,
-        releaseDate: s.release_date,
-        duration: s.duration_seconds,
-        bpm: s.bpm || 0,
-        energy: s.energy || 0,
-        valence: s.valence || 0,
-        danceability: s.danceability || 0,
-        acousticness: s.acousticness || 0,
-        sentiment: s.sentiment as Song['sentiment'],
-        keywords: s.keywords || [],
-        writers: s.writers || [],
-        producers: s.producers || [],
-        memberCredits: s.member_credits || [],
-        isTitle: s.is_title_track,
-        hasMV: s.has_mv,
-      }));
-    }
-    return SONGS; // Fallback to local data
-  }, [dbSongs, dbAlbums]);
+  // Database hooks called for future features
+  // Currently using local SONGS constant directly
+  useSongs();
+  useAlbums();
+  useMembers();
 
   const handleSync = () => {
     setMode('dashboard');
@@ -1488,7 +1471,7 @@ export default function App() {
                     <GlassHUD title="Live Waveform Analysis" icon={Activity} className="h-80">
                       <SonicAnalyzer
                         playing={playing}
-                        togglePlay={() => setPlaying(!playing)}
+                        togglePlay={() => setPlaying(prev => !prev)}
                         song={analyzingSong}
                         onSelectSong={setAnalyzingSong}
                       />
@@ -1548,7 +1531,7 @@ export default function App() {
                   <GlassHUD title="High-Fidelity Vector Analysis" icon={Activity} className="flex-1">
                     <SonicAnalyzer
                       playing={playing}
-                      togglePlay={() => setPlaying(!playing)}
+                      togglePlay={() => setPlaying(prev => !prev)}
                       song={analyzingSong}
                       onSelectSong={setAnalyzingSong}
                     />
