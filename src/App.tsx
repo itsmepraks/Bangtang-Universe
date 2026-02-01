@@ -1,24 +1,36 @@
-import { useState } from 'react';
+import { useState, Suspense, lazy } from 'react';
 
 // Import data and hooks
 import { MEMBER_DATA } from './data/members';
 import { SONGS, type Song } from './data/songs';
 import { useMembers, useSongs, useAlbums } from './hooks';
 
-// Import components from new modular structure
+// Lightweight components - imported directly
 import {
   BTSLogo,
   NoiseOverlay,
   FloatingParticles,
   GlassHUD,
-  Universe3D,
-  LandingRitual,
   SonicAnalyzer,
   RAGNetwork,
-  DataHub,
-  MemberDNA,
   LyricistAI,
 } from './components';
+
+// Heavy components - lazy loaded for code-splitting
+const Universe3D = lazy(() => import('./components/features/Universe3D'));
+const LandingRitual = lazy(() => import('./components/features/LandingRitual'));
+const MemberDNA = lazy(() => import('./components/features/MemberDNA'));
+const DataHub = lazy(() => import('./components/features/DataHub'));
+
+// Loading fallback for lazy components
+const LoadingFallback = () => (
+  <div className="absolute inset-0 bg-[#020005] flex items-center justify-center">
+    <div className="flex flex-col items-center gap-4">
+      <div className="w-12 h-12 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+      <span className="text-[10px] text-white/30 tracking-[0.4em] uppercase font-mono">Loading...</span>
+    </div>
+  </div>
+);
 
 import {
   Activity,
@@ -56,10 +68,14 @@ export default function App() {
       <NoiseOverlay />
 
       {/* 1. UNIVERSE LAYER - PERSISTENT */}
-      <Universe3D mode={mode} />
+      <Suspense fallback={<LoadingFallback />}>
+        <Universe3D mode={mode} />
+      </Suspense>
 
       {/* 2. LANDING */}
-      {mode === 'landing' && <LandingRitual onSync={handleSync} />}
+      <Suspense fallback={<LoadingFallback />}>
+        {mode === 'landing' && <LandingRitual onSync={handleSync} />}
+      </Suspense>
 
       {/* 3. DASHBOARD */}
       {mode === 'dashboard' && !activeMemberId && (
@@ -247,11 +263,13 @@ export default function App() {
               {activeSection === 'data' && (
                 <div className="h-full max-w-6xl mx-auto flex flex-col animate-in fade-in slide-in-from-bottom-8 duration-1000">
                   <GlassHUD title="Global Discography Archive" icon={Database} className="flex-1">
-                    <DataHub onSelectSong={(s) => {
-                      setAnalyzingSong(s);
-                      setActiveSection('overview'); // Switch to main view to see analysis
-                      setPlaying(true); // Auto play visualization
-                    }} />
+                    <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" /></div>}>
+                      <DataHub onSelectSong={(s) => {
+                        setAnalyzingSong(s);
+                        setActiveSection('overview'); // Switch to main view to see analysis
+                        setPlaying(true); // Auto play visualization
+                      }} />
+                    </Suspense>
                   </GlassHUD>
                 </div>
               )}
@@ -262,9 +280,11 @@ export default function App() {
       )}
 
       {/* 4. MEMBER DETAIL OVERLAY (FULL SCREEN) */}
-      {activeMemberId && (
-        <MemberDNA memberId={activeMemberId} onClose={() => setActiveMemberId(null)} />
-      )}
+      <Suspense fallback={<LoadingFallback />}>
+        {activeMemberId && (
+          <MemberDNA memberId={activeMemberId} onClose={() => setActiveMemberId(null)} />
+        )}
+      </Suspense>
 
       {/* 5. SETTINGS OVERLAY */}
       {showSettings && (
