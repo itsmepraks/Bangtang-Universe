@@ -5,7 +5,7 @@
  * Actual Fuse instances are created in useSearch hook with live data.
  */
 
-import type Fuse from 'fuse.js';
+import type { IFuseOptions, FuseResult } from 'fuse.js';
 import type { Song, Member, Album } from '../types/database';
 
 // ============ SEARCH RESULT TYPES ============
@@ -23,7 +23,7 @@ export interface SearchResult {
 
 // ============ FUSE CONFIGURATIONS ============
 
-export const SONG_FUSE_OPTIONS: Fuse.IFuseOptions<Song> = {
+export const SONG_FUSE_OPTIONS: IFuseOptions<Song> = {
     keys: [
         { name: 'title', weight: 0.4 },
         { name: 'sentiment', weight: 0.15 },
@@ -37,7 +37,7 @@ export const SONG_FUSE_OPTIONS: Fuse.IFuseOptions<Song> = {
     minMatchCharLength: 2
 };
 
-export const MEMBER_FUSE_OPTIONS: Fuse.IFuseOptions<Member> = {
+export const MEMBER_FUSE_OPTIONS: IFuseOptions<Member> = {
     keys: [
         { name: 'stage_name', weight: 0.3 },
         { name: 'full_name', weight: 0.25 },
@@ -51,7 +51,7 @@ export const MEMBER_FUSE_OPTIONS: Fuse.IFuseOptions<Member> = {
     minMatchCharLength: 2
 };
 
-export const ALBUM_FUSE_OPTIONS: Fuse.IFuseOptions<Album> = {
+export const ALBUM_FUSE_OPTIONS: IFuseOptions<Album> = {
     keys: [
         { name: 'title', weight: 0.4 },
         { name: 'description', weight: 0.3 },
@@ -66,7 +66,7 @@ export const ALBUM_FUSE_OPTIONS: Fuse.IFuseOptions<Album> = {
 
 // ============ RESULT MAPPERS ============
 
-export const mapSongResult = (r: Fuse.FuseResult<Song>): SearchResult => ({
+export const mapSongResult = (r: FuseResult<Song>): SearchResult => ({
     id: r.item.id,
     type: 'song',
     title: r.item.title,
@@ -76,7 +76,7 @@ export const mapSongResult = (r: Fuse.FuseResult<Song>): SearchResult => ({
     item: r.item
 });
 
-export const mapMemberResult = (r: Fuse.FuseResult<Member>): SearchResult => ({
+export const mapMemberResult = (r: FuseResult<Member>): SearchResult => ({
     id: r.item.id,
     type: 'member',
     title: r.item.stage_name,
@@ -87,7 +87,7 @@ export const mapMemberResult = (r: Fuse.FuseResult<Member>): SearchResult => ({
     item: r.item
 });
 
-export const mapAlbumResult = (r: Fuse.FuseResult<Album>): SearchResult => ({
+export const mapAlbumResult = (r: FuseResult<Album>): SearchResult => ({
     id: r.item.id,
     type: 'album',
     title: r.item.title,
