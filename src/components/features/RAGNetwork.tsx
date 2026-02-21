@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Search, Network, RefreshCw } from 'lucide-react';
-import { searchAll, type SearchResult } from '../../services/searchService';
+import { useSearch, type SearchResult } from '../../hooks';
 
 export interface RAGNetworkProps {
     accentColor?: string;
 }
 
 export const RAGNetwork: React.FC<RAGNetworkProps> = ({ accentColor = "#A855F7" }) => {
+    const { searchAll } = useSearch();
     const [searchQuery, setSearchQuery] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
     const [searching, setSearching] = useState(false);
