@@ -504,7 +504,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                             textShadow: '0 0 40px rgba(168,85,247,0.6), 0 0 80px rgba(168,85,247,0.3), 0 4px 20px rgba(0,0,0,0.5)'
                         }}
                     >
-                        BTS Neural Archive
+                        Bangtan Universe
                     </h1>
                 </div>
             </div>

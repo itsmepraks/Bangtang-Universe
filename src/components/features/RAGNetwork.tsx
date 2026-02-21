@@ -34,7 +34,7 @@ export const RAGNetwork: React.FC<RAGNetworkProps> = ({ accentColor = "#A855F7" 
                         onChange={e => setSearchQuery(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && handleSearch()}
                         type="text"
-                        placeholder="ACCESS NEURAL ARCHIVE..."
+                        placeholder="ACCESS BANGTAN ARCHIVE..."
                         className="bg-transparent border-none text-[13px] text-white focus:outline-none w-full placeholder:text-white/10 font-light tracking-wide uppercase font-mono"
                     />
                 </div>

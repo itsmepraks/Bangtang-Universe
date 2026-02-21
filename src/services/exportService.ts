@@ -119,7 +119,7 @@ export const exportFullArchive = (songs: Song[], members: Member[], albums: Albu
 
     const json = JSON.stringify(archive, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
-    saveAs(blob, 'bts-neural-archive.json');
+    saveAs(blob, 'bangtan-universe.json');
 };
 
 export default {

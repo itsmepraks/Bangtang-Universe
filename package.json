@@ -1,7 +1,7 @@
 {
-  "name": "bts-neural-archive",
+  "name": "bangtan-universe",
   "version": "0.1.0",
-  "description": "🌌 BTS Neural Archive - An immersive 3D cosmic data visualization exploring BTS's musical universe through interactive glass morphism UI, AI-powered semantic search, and real-time audio analysis. Built with React 19, TypeScript, Vite 7, and Tailwind CSS 4.",
+  "description": "🌌 Bangtan Universe - An immersive 3D cosmic data visualization exploring BTS's musical universe through interactive glass morphism UI, AI-powered semantic search, and real-time audio analysis. Built with React 19, TypeScript, Vite 7, and Tailwind CSS 4.",
   "private": true,
   "type": "module",
   "keywords": [
