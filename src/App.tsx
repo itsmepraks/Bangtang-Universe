@@ -1,9 +1,9 @@
 import { useState, Suspense, lazy } from 'react';
 
 // Import data and hooks
-import { MEMBER_DATA } from './data/members';
-import { SONGS, type Song } from './data/songs';
+// Import data and hooks
 import { useMembers, useSongs, useAlbums } from './hooks';
+import type { Song } from './types/database';
 
 // Lightweight components - imported directly
 import {
@@ -52,11 +52,12 @@ export default function App() {
   const [analyzingSong, setAnalyzingSong] = useState<Song | null>(null);
   const [playing, setPlaying] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  // Database hooks called for future features
-  // Currently using local SONGS constant directly
-  useSongs();
-  useAlbums();
-  useMembers();
+  // Database hooks
+  const { songs } = useSongs();
+  const { albums } = useAlbums();
+  const { members } = useMembers();
+
+  const getAlbumTitle = (id: number | null) => albums.find(a => a.id === id)?.title || 'Unknown Album';
 
   const handleSync = () => {
     setMode('dashboard');
@@ -157,14 +158,14 @@ export default function App() {
 
               {/* Member Selectors - Enhanced with cleaner hover states */}
               <div className="flex gap-3 bg-white/[0.03] backdrop-blur-3xl border border-white/[0.08] px-6 py-3 rounded-[2rem] shadow-2xl animate-in slide-in-from-right-10 duration-1000">
-                {MEMBER_DATA.map(m => (
+                {members.map(m => (
                   <button
                     key={m.id}
                     onClick={() => setActiveMemberId(m.id)}
                     className="w-14 h-10 rounded-xl flex items-center justify-center text-[11px] font-bold transition-all duration-500 border border-transparent hover:border-white/20 hover:bg-white/[0.06] relative group overflow-hidden"
-                    style={{ color: m.color }}
+                    style={{ color: m.color || '#fff' }}
                   >
-                    <span className="relative z-10 transition-all duration-500 group-hover:scale-110 group-hover:text-white">{m.name}</span>
+                    <span className="relative z-10 transition-all duration-500 group-hover:scale-110 group-hover:text-white uppercase">{m.stage_name}</span>
                     <div className="absolute inset-0 bg-current opacity-0 group-hover:opacity-[0.12] transition-opacity duration-500" />
                     <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2px] rounded-full bg-current opacity-0 group-hover:opacity-80 transition-all duration-500" />
                   </button>
@@ -185,13 +186,15 @@ export default function App() {
                         togglePlay={() => setPlaying(prev => !prev)}
                         song={analyzingSong}
                         onSelectSong={setAnalyzingSong}
+                        songs={songs}
+                        getAlbumTitle={getAlbumTitle}
                       />
                     </GlassHUD>
 
                     {/* Quick Picks Bar */}
                     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                       {['Butter', 'Dynamite', 'Spring Day', 'Run BTS', 'Mic Drop'].map(title => {
-                        const s = SONGS.find(song => song.title.toLowerCase() === title.toLowerCase());
+                        const s = songs.find(song => song.title.toLowerCase() === title.toLowerCase());
                         if (!s) return null;
                         return (
                           <button
@@ -245,6 +248,8 @@ export default function App() {
                       togglePlay={() => setPlaying(prev => !prev)}
                       song={analyzingSong}
                       onSelectSong={setAnalyzingSong}
+                      songs={songs}
+                      getAlbumTitle={getAlbumTitle}
                     />
                   </GlassHUD>
                 </div>

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Play, Pause, ChevronDown } from 'lucide-react';
-import { SONGS, type Song } from '../../data/songs';
+import type { Song } from '../../types/database';
 import { FloatingParticles } from '../visual';
 
 export interface SonicAnalyzerProps {
@@ -9,6 +9,8 @@ export interface SonicAnalyzerProps {
     song: Song | null;
     onSelectSong: (s: Song | null) => void;
     accentColor?: string;
+    songs: Song[];
+    getAlbumTitle: (id: number | null) => string;
 }
 
 export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
@@ -16,30 +18,34 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
     togglePlay,
     song,
     onSelectSong,
-    accentColor = "#A855F7"
+    accentColor = "#A855F7",
+    songs = [],
+    getAlbumTitle
 }) => {
     // Memoized global averages - single iteration instead of 4 separate reduces
     const globalAverages = useMemo(() => {
-        const totals = SONGS.reduce((acc, s) => ({
-            energy: acc.energy + s.energy,
-            valence: acc.valence + s.valence,
-            bpm: acc.bpm + s.bpm,
-            dance: acc.dance + s.danceability
+        if (!songs.length) return { energy: "0.80", valence: "0.50", bpm: 120, dance: "0.70" };
+
+        const totals = songs.reduce((acc, s) => ({
+            energy: acc.energy + (s.energy || 0),
+            valence: acc.valence + (s.valence || 0),
+            bpm: acc.bpm + (s.bpm || 0),
+            dance: acc.dance + (s.danceability || 0)
         }), { energy: 0, valence: 0, bpm: 0, dance: 0 });
-        const len = SONGS.length;
+        const len = songs.length;
         return {
             energy: (totals.energy / len).toFixed(2),
             valence: (totals.valence / len).toFixed(2),
             bpm: Math.round(totals.bpm / len),
             dance: (totals.dance / len).toFixed(2)
         };
-    }, []);
+    }, [songs]);
 
     // Use song metrics or global averages
     const metrics = song ? {
-        energy: song.energy.toFixed(2),
-        valence: song.valence.toFixed(2),
-        bpm: song.bpm,
+        energy: (song.energy || 0).toFixed(2),
+        valence: (song.valence || 0).toFixed(2),
+        bpm: song.bpm || 0,
         dance: song.danceability ? song.danceability.toFixed(2) : "0.75"
     } : globalAverages;
 
@@ -62,12 +68,12 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
                             className="w-full bg-transparent text-xl text-white font-light tracking-widest appearance-none focus:outline-none cursor-pointer py-1 border-b border-transparent hover:border-white/20 transition-colors [&>option]:text-black"
                             value={song?.id || ""}
                             onChange={(e) => {
-                                const s = SONGS.find(song => song.id === Number(e.target.value));
+                                const s = songs.find(song => song.id === Number(e.target.value));
                                 onSelectSong(s || null);
                             }}
                         >
                             <option value="">GLOBAL DISCOGRAPHY</option>
-                            {SONGS.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                            {songs.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
                         </select>
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
                             <ChevronDown size={14} className="text-white/40" />
@@ -76,7 +82,7 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
                 </div>
                 {song && (
                     <div className="px-3 py-1 bg-white/5 rounded border border-white/10 text-[9px] text-white/60 tracking-widest uppercase whitespace-nowrap">
-                        {song.album}
+                        {getAlbumTitle(song.album_id)}
                     </div>
                 )}
             </div>
