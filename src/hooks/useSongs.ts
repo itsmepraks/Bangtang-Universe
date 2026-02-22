@@ -138,4 +138,28 @@ export function useSongsSortedBy(feature: 'bpm' | 'energy' | 'valence' | 'dancea
     return { songs: sortedSongs, loading, error };
 }
 
+// Get songs where a specific member appears in member_credits
+export function useSongsByMember(memberName: string) {
+    const { songs, loading, error } = useSongs();
+    const filtered = useMemo(
+        () => songs.filter(s => (s.member_credits || []).some(
+            c => c.toLowerCase().includes(memberName.toLowerCase())
+        )),
+        [songs, memberName]
+    );
+    return { songs: filtered, loading, error };
+}
+
+// Get songs where a specific person appears in writers array
+export function useSongsByWriter(writerName: string) {
+    const { songs, loading, error } = useSongs();
+    const filtered = useMemo(
+        () => songs.filter(s => (s.writers || []).some(
+            w => w.toLowerCase().includes(writerName.toLowerCase())
+        )),
+        [songs, writerName]
+    );
+    return { songs: filtered, loading, error };
+}
+
 export default useSongs;

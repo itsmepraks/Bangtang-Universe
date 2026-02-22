@@ -1,0 +1,101 @@
+import { useMemo } from 'react';
+import { ChevronLeft, Disc } from 'lucide-react';
+import type { Song, Album } from '../../../../types/database';
+import Badge from '../../../ui/Badge';
+import DataTable from '../../../ui/DataTable';
+import { getSentimentColor } from '../../../../constants/colors';
+
+interface AlbumDetailProps {
+  album: Album;
+  songs: Song[];
+  onSelectSong: (songId: number) => void;
+  onBack: () => void;
+}
+
+function formatDuration(seconds: number | null) {
+  if (!seconds) return '--:--';
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+export default function AlbumDetail({ album, songs, onSelectSong, onBack }: AlbumDetailProps) {
+  const albumSongs = useMemo(() => songs.filter(s => s.album_id === album.id), [songs, album.id]);
+
+  const columns = [
+    {
+      key: 'num',
+      header: '#',
+      width: '48px',
+      render: (_: Song, i: number) => <span className="text-sm text-white/40">{i + 1}</span>,
+    },
+    {
+      key: 'title',
+      header: 'Title',
+      render: (s: Song) => (
+        <div>
+          <div className="text-sm text-white/80">{s.title}</div>
+          {s.title_korean && <div className="text-xs text-white/40">{s.title_korean}</div>}
+        </div>
+      ),
+    },
+    {
+      key: 'duration',
+      header: 'Duration',
+      width: '80px',
+      render: (s: Song) => <span className="text-sm text-white/50 font-mono">{formatDuration(s.duration_seconds)}</span>,
+    },
+    {
+      key: 'bpm',
+      header: 'BPM',
+      width: '70px',
+      render: (s: Song) => <span className="text-sm text-white/50 font-mono">{s.bpm || '—'}</span>,
+    },
+    {
+      key: 'sentiment',
+      header: 'Sentiment',
+      width: '120px',
+      render: (s: Song) => s.sentiment ? (
+        <Badge variant="sentiment" size="sm" color={getSentimentColor(s.sentiment)}>{s.sentiment}</Badge>
+      ) : null,
+    },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white text-xs tracking-wide uppercase transition-colors">
+        <ChevronLeft size={16} /> All Albums
+      </button>
+
+      {/* Album Header */}
+      <div className="flex gap-8">
+        <div
+          className="w-48 h-48 rounded-2xl flex-shrink-0 flex items-center justify-center"
+          style={{ background: `linear-gradient(135deg, ${album.cover_color || '#A855F7'}60, ${album.cover_color || '#A855F7'}15)` }}
+        >
+          <Disc size={56} className="text-white/20" />
+        </div>
+        <div className="flex flex-col justify-center space-y-2">
+          <Badge variant="purple" size="md">{album.type}</Badge>
+          <h2 className="text-2xl font-semibold text-white/95">{album.title}</h2>
+          {album.title_korean && <p className="text-base text-white/60">{album.title_korean}</p>}
+          <div className="flex items-center gap-3 text-sm text-white/50">
+            <span>{album.release_date?.slice(0, 4)}</span>
+            {album.era && <Badge variant="purple" size="sm">{album.era}</Badge>}
+            <span>{albumSongs.length} tracks</span>
+          </div>
+          {album.description && <p className="text-sm text-white/60 mt-2 max-w-lg leading-relaxed">{album.description}</p>}
+        </div>
+      </div>
+
+      {/* Track List */}
+      <DataTable
+        columns={columns}
+        data={albumSongs}
+        keyExtractor={(s) => s.id}
+        onRowClick={(s) => onSelectSong(s.id)}
+        emptyMessage="No tracks found"
+      />
+    </div>
+  );
+}

@@ -71,19 +71,38 @@ export const UNIVERSE_COLORS = {
  */
 export const UI_COLORS = {
   /** Glass panel background */
-  GLASS_BG: 'rgba(255, 255, 255, 0.02)',
+  GLASS_BG: 'rgba(255, 255, 255, 0.03)',
 
   /** Glass panel border */
-  GLASS_BORDER: 'rgba(255, 255, 255, 0.05)',
+  GLASS_BORDER: 'rgba(255, 255, 255, 0.08)',
 
   /** Text primary color */
-  TEXT_PRIMARY: 'rgba(255, 255, 255, 0.9)',
+  TEXT_PRIMARY: 'rgba(255, 255, 255, 0.95)',
 
   /** Text secondary color */
-  TEXT_SECONDARY: 'rgba(255, 255, 255, 0.4)',
+  TEXT_SECONDARY: 'rgba(255, 255, 255, 0.70)',
 
   /** Text muted color */
-  TEXT_MUTED: 'rgba(255, 255, 255, 0.2)',
+  TEXT_MUTED: 'rgba(255, 255, 255, 0.50)',
+} as const;
+
+/**
+ * Shared Recharts chart styling constants
+ */
+export const CHART_STYLES = {
+  AXIS: { fontSize: 12, fill: 'rgba(255,255,255,0.5)' },
+  GRID: { strokeDasharray: '3 3', stroke: 'rgba(255,255,255,0.06)' },
+  TOOLTIP: {
+    contentStyle: {
+      background: 'rgba(10, 8, 20, 0.95)',
+      border: '1px solid rgba(255,255,255,0.1)',
+      borderRadius: '12px',
+      padding: '12px 16px',
+      fontSize: '13px',
+      color: 'rgba(255,255,255,0.8)',
+    },
+    labelStyle: { color: 'rgba(255,255,255,0.95)', fontWeight: 600 },
+  },
 } as const;
 
 /**

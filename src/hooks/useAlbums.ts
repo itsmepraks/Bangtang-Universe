@@ -5,7 +5,7 @@
  * Falls back to local data if database is unavailable
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Album } from '../types/database';
 import { ALBUMS } from '../data/albums';
@@ -102,6 +102,31 @@ export function useAlbumById(id: number) {
         loading,
         error,
     };
+}
+
+// Get unique eras as a sorted list
+export function useEras() {
+    const { albums, loading, error } = useAlbums();
+    const eras = useMemo(
+        () => [...new Set(albums.map(a => a.era).filter(Boolean))].sort() as string[],
+        [albums]
+    );
+    return { eras, loading, error };
+}
+
+// Group albums by era
+export function useAlbumsGroupedByEra() {
+    const { albums, loading, error } = useAlbums();
+    const grouped = useMemo(() => {
+        const map: Record<string, Album[]> = {};
+        albums.forEach(a => {
+            const era = a.era || 'Unknown';
+            if (!map[era]) map[era] = [];
+            map[era].push(a);
+        });
+        return map;
+    }, [albums]);
+    return { grouped, loading, error };
 }
 
 export default useAlbums;

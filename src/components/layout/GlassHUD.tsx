@@ -21,9 +21,9 @@ export const GlassHUD: React.FC<GlassHUDProps> = ({
     accentColor = "#A855F7"
 }) => (
     <div className={`
-    relative rounded-3xl flex flex-col overflow-hidden
+    relative rounded-2xl flex flex-col overflow-hidden
     transition-all duration-500 group/hud
-    border border-white/[0.06] hover:border-purple-500/30
+    border border-white/[0.08] hover:border-purple-500/30
     ${className}
   `}
         style={{
@@ -41,7 +41,7 @@ export const GlassHUD: React.FC<GlassHUDProps> = ({
         <div className="px-7 py-6 border-b border-white/[0.04] bg-white/[0.015] flex items-center justify-between relative z-10">
             <div className="flex items-center gap-4">
                 {Icon && <Icon size={20} className="group-hover/hud:animate-pulse transition-colors duration-500" style={{ color: accentColor }} />}
-                <span className="text-xs font-bold tracking-[0.35em] text-white/50 uppercase group-hover/hud:text-white/80 transition-colors duration-500">{title}</span>
+                <span className="text-sm font-semibold tracking-wide text-white/70 uppercase group-hover/hud:text-white/90 transition-colors duration-500">{title}</span>
             </div>
             <div className="flex gap-2">
                 {headerAction}

@@ -14,7 +14,11 @@
       "WebFetch(domain:en.wikipedia.org)",
       "Bash(find:*)",
       "Bash(npx tsx:*)",
-      "Bash(npx skills find:*)"
+      "Bash(npx skills find:*)",
+      "Bash(npx skills add yonatangross/orchestkit@recharts-patterns -g -y)",
+      "Bash(npx skills add daffy0208/ai-dev-standards@data-visualizer -g -y)",
+      "Bash(npx skills add:*)",
+      "Bash(npm install:*)"
     ]
   }
 }

@@ -85,7 +85,13 @@ export type AppMode = 'landing' | 'warp' | 'dashboard';
 /**
  * Dashboard section identifiers
  */
-export type DashboardSection = 'overview' | 'sonic' | 'rag' | 'data';
+export type DashboardSection = 'home' | 'discography' | 'members' | 'sonic' | 'search' | 'studio';
+
+export interface DiscographyState {
+  selectedAlbumId: number | null;
+  selectedSongId: number | null;
+  view: 'grid' | 'album' | 'song';
+}
 
 /**
  * Props for Glass HUD component
@@ -370,5 +376,5 @@ export const isAppMode = (value: unknown): value is AppMode => {
  * Type guard to check if a value is a valid DashboardSection
  */
 export const isDashboardSection = (value: unknown): value is DashboardSection => {
-  return typeof value === 'string' && ['overview', 'sonic', 'rag', 'data'].includes(value);
+  return typeof value === 'string' && ['home', 'discography', 'members', 'sonic', 'search', 'studio'].includes(value);
 };

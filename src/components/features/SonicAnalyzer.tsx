@@ -22,7 +22,6 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
     songs = [],
     getAlbumTitle
 }) => {
-    // Memoized global averages - single iteration instead of 4 separate reduces
     const globalAverages = useMemo(() => {
         if (!songs.length) return { energy: "0.80", valence: "0.50", bpm: 120, dance: "0.70" };
 
@@ -41,7 +40,6 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
         };
     }, [songs]);
 
-    // Use song metrics or global averages
     const metrics = song ? {
         energy: (song.energy || 0).toFixed(2),
         valence: (song.valence || 0).toFixed(2),
@@ -51,13 +49,13 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
 
     return (
         <div className="h-full flex flex-col gap-6">
-            {/* Header for Analyzer */}
+            {/* Header */}
             <div className="flex justify-between items-end px-4 min-h-[40px]">
                 <div className="flex flex-col gap-1 w-full mr-4">
                     <div className="flex justify-between items-center w-full">
-                        <h3 className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/40">Target Signal</h3>
+                        <h3 className="text-xs font-medium uppercase tracking-wide text-white/50">Target Signal</h3>
                         {song && (
-                            <button onClick={() => onSelectSong(null)} className="text-[9px] text-white/40 hover:text-white uppercase tracking-widest border border-white/10 px-2 py-0.5 rounded hover:bg-white/10 transition-colors">
+                            <button onClick={() => onSelectSong(null)} className="text-xs text-white/50 hover:text-white uppercase tracking-wide border border-white/10 px-2.5 py-1 rounded hover:bg-white/10 transition-colors">
                                 Reset to Global
                             </button>
                         )}
@@ -65,7 +63,7 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
 
                     <div className="relative group">
                         <select
-                            className="w-full bg-transparent text-xl text-white font-light tracking-widest appearance-none focus:outline-none cursor-pointer py-1 border-b border-transparent hover:border-white/20 transition-colors [&>option]:text-black"
+                            className="w-full bg-transparent text-xl text-white font-semibold tracking-wide appearance-none focus:outline-none cursor-pointer py-1 border-b border-transparent hover:border-white/20 transition-colors [&>option]:text-black"
                             value={song?.id || ""}
                             onChange={(e) => {
                                 const s = songs.find(song => song.id === Number(e.target.value));
@@ -81,7 +79,7 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
                     </div>
                 </div>
                 {song && (
-                    <div className="px-3 py-1 bg-white/5 rounded border border-white/10 text-[9px] text-white/60 tracking-widest uppercase whitespace-nowrap">
+                    <div className="px-3 py-1.5 bg-white/[0.04] rounded-lg border border-white/[0.08] text-xs text-white/60 tracking-wide uppercase whitespace-nowrap">
                         {getAlbumTitle(song.album_id)}
                     </div>
                 )}
@@ -92,8 +90,6 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
                     style={{ background: `linear-gradient(to top, ${accentColor} 0%, transparent 100%)` }} />
                 <FloatingParticles />
                 {[...Array(24)].map((_, i) => {
-                    // If song is selected, use a seeded pattern based on its ID to make it look "unique"
-                    // Otherwise use the sine wave
                     const seed = song ? (song.id * 13 + i * 7) % 100 : Math.sin(i * 0.4) * 10 + 15;
                     const pausedHeight = song ? 10 + (seed % 60) : 15 + Math.sin(i * 0.4) * 10;
 
@@ -102,7 +98,7 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
                             key={i}
                             className="flex-1 rounded-full transition-all duration-500 ease-out shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                             style={{
-                                height: `${pausedHeight}%`, // Base height
+                                height: `${pausedHeight}%`,
                                 animation: playing ? `equalizer ${0.5 + (i % 5) * 0.1}s ease-in-out infinite alternate` : 'none',
                                 background: `linear-gradient(to top, ${accentColor} 0%, white 100%)`,
                                 filter: 'blur(0.5px)',
@@ -122,7 +118,6 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
                     </div>
                 </button>
 
-                {/* Inject custom keyframes for the equalizer if not present in global CSS */}
                 <style>{`
         @keyframes equalizer {
           0% { height: 15%; }
@@ -132,17 +127,17 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
       `}</style>
             </div>
 
-            <div className="grid grid-cols-4 gap-6 px-2">
+            <div className="grid grid-cols-4 gap-4 px-2">
                 {[
                     { label: 'Energy', value: metrics.energy },
                     { label: 'Valence', value: metrics.valence },
                     { label: 'Avg BPM', value: metrics.bpm },
                     { label: 'Dance', value: metrics.dance }
                 ].map(s => (
-                    <div key={s.label} className="bg-white/[0.01] rounded-[1.5rem] p-5 text-center border border-white/5 hover:border-white/10 hover:bg-white/[0.03] transition-all duration-700 cursor-pointer group relative overflow-hidden">
+                    <div key={s.label} className="bg-white/[0.02] rounded-2xl p-4 text-center border border-white/[0.06] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-500 cursor-pointer group relative overflow-hidden">
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-700" style={{ backgroundColor: accentColor }} />
-                        <div className="text-[9px] text-white/30 uppercase tracking-[0.3em] mb-2 group-hover:text-white/60 transition-colors relative z-10">{s.label}</div>
-                        <div className="text-3xl font-light text-white/90 font-mono tracking-tighter relative z-10">{s.value}</div>
+                        <div className="text-xs font-medium text-white/50 uppercase tracking-wide mb-2 group-hover:text-white/70 transition-colors relative z-10">{s.label}</div>
+                        <div className="text-2xl font-semibold text-white/90 font-mono tracking-tight relative z-10">{s.value}</div>
                     </div>
                 ))}
             </div>
