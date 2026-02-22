@@ -8,7 +8,13 @@
       "Bash(node -e:*)",
       "Bash(npm run build:*)",
       "Bash(npm run db:update-photos:*)",
-      "Bash(npm run db:verify:*)"
+      "Bash(npm run db:verify:*)",
+      "WebFetch(domain:musicbrainz.org)",
+      "WebFetch(domain:bts.fandom.com)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "Bash(find:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx skills find:*)"
     ]
   }
 }

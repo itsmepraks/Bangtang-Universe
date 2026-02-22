@@ -85,19 +85,32 @@
     "db:migrate": "npx tsx scripts/migrate-to-supabase.ts",
     "db:verify": "npx tsx scripts/verify-database.ts",
     "db:update-photos": "npx tsx scripts/update-member-photos.ts",
-    "db:upload-photos": "npx tsx scripts/upload-member-photos.ts"
+    "db:upload-photos": "npx tsx scripts/upload-member-photos.ts",
+    "scrape:musicbrainz": "npx tsx scripts/scrape-01-musicbrainz-discography.ts",
+    "scrape:wiki": "npx tsx scripts/scrape-02-wiki-metadata.ts",
+    "scrape:genius": "npx tsx scripts/scrape-03-genius-songs.ts",
+    "scrape:albums": "npx tsx scripts/scrape-04-upsert-albums.ts",
+    "scrape:songs": "npx tsx scripts/scrape-05-upsert-songs.ts",
+    "scrape:lyrics": "npx tsx scripts/scrape-06-genius-lyrics.ts",
+    "scrape:verify": "npx tsx scripts/scrape-07-verify-all.ts",
+    "scrape:all": "npm run scrape:musicbrainz && npm run scrape:wiki && npm run scrape:genius && npm run scrape:albums && npm run scrape:songs && npm run scrape:lyrics && npm run scrape:verify"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.3",
+    "axios": "^1.13.5",
+    "cheerio": "^1.2.0",
     "file-saver": "^2.0.5",
     "fuse.js": "^7.1.0",
     "lucide-react": "^0.562.0",
+    "musicbrainz-api": "^1.1.0",
+    "p-limit": "^7.3.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@tailwindcss/vite": "^4.1.18",
+    "@types/cheerio": "^0.22.35",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
