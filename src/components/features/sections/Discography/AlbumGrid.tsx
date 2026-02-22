@@ -56,7 +56,7 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
           <button
             key={album.id}
             onClick={() => onSelectAlbum(album.id)}
-            className="text-left group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
+            className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
           >
             <div
               className="h-32 w-full relative"

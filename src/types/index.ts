@@ -85,7 +85,7 @@ export type AppMode = 'landing' | 'warp' | 'dashboard';
 /**
  * Dashboard section identifiers
  */
-export type DashboardSection = 'home' | 'discography' | 'members' | 'sonic' | 'search' | 'studio';
+export type DashboardSection = 'overview' | 'discography' | 'members' | 'analytics' | 'search';
 
 export interface DiscographyState {
   selectedAlbumId: number | null;
@@ -376,5 +376,5 @@ export const isAppMode = (value: unknown): value is AppMode => {
  * Type guard to check if a value is a valid DashboardSection
  */
 export const isDashboardSection = (value: unknown): value is DashboardSection => {
-  return typeof value === 'string' && ['home', 'discography', 'members', 'sonic', 'search', 'studio'].includes(value);
+  return typeof value === 'string' && ['overview', 'discography', 'members', 'analytics', 'search'].includes(value);
 };

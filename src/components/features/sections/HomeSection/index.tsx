@@ -1,33 +1,25 @@
-import { useMemo, Suspense, lazy } from 'react';
-import { Activity, Music, Disc, BookOpen } from 'lucide-react';
+import { useMemo } from 'react';
+import { Music, Disc, Users, PenTool, Lightbulb } from 'lucide-react';
 import type { Song, Album, Member } from '../../../../types/database';
-import { GlassHUD } from '../../../layout/GlassHUD';
 import StatCard from './StatCard';
 import EraOverview from './EraOverview';
 import TitleTrackSpotlight from './TitleTrackSpotlight';
 import type { DashboardSection } from '../../../../types/index';
-
-const SonicAnalyzer = lazy(() => import('../../SonicAnalyzer'));
+import { generateInsights } from '../../../../services/analyticsService';
 
 interface HomeSectionProps {
   songs: Song[];
   albums: Album[];
   members: Member[];
-  lyricsCount: number;
-  analyzingSong: Song | null;
-  onSelectSong: (s: Song | null) => void;
   onNavigate: (section: DashboardSection, payload?: unknown) => void;
-  getAlbumTitle: (id: number | null) => string;
-  playing: boolean;
-  onTogglePlay: () => void;
 }
 
 export default function HomeSection({
-  songs, albums, members, lyricsCount,
-  analyzingSong, onSelectSong, onNavigate,
-  getAlbumTitle, playing, onTogglePlay,
+  songs, albums, members, onNavigate,
 }: HomeSectionProps) {
   const eras = useMemo(() => [...new Set(albums.map(a => a.era).filter(Boolean))], [albums]);
+  const totalKomca = useMemo(() => members.reduce((sum, m) => sum + (m.komca_credits || 0), 0), [members]);
+  const insights = useMemo(() => generateInsights(songs, albums, members), [songs, albums, members]);
 
   return (
     <div className="space-y-8">
@@ -35,45 +27,53 @@ export default function HomeSection({
       <div className="grid grid-cols-4 gap-4">
         <StatCard label="Songs" value={songs.length} icon={Music} subtitle={`across ${eras.length} eras`} />
         <StatCard label="Albums" value={albums.length} icon={Disc} accent="#818CF8" />
-        <StatCard label="Members" value={members.length} icon={Activity} accent="#C084FC" subtitle="7 active" />
-        <StatCard label="Lyrics" value={lyricsCount} icon={BookOpen} accent="#D8B4FE" />
+        <StatCard label="Members" value={members.length} icon={Users} accent="#C084FC" subtitle="7 artists" />
+        <StatCard label="KOMCA Credits" value={totalKomca} icon={PenTool} accent="#D8B4FE" subtitle="total production" />
       </div>
 
-      {/* Waveform + Title Tracks */}
+      {/* Quick Insights */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Lightbulb size={16} className="text-white/40" />
+          <h3 className="text-sm font-semibold text-white/70">Quick Insights</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {insights.slice(0, 6).map(insight => (
+            <div key={insight.id} className="p-5 bg-[#111118] border border-white/[0.06] rounded-2xl hover:border-white/[0.12] transition-all duration-300">
+              <p className="text-sm text-white/70 leading-relaxed">{insight.text}</p>
+              {insight.value && (
+                <p className="text-xl font-semibold text-white/90 mt-2">{insight.value}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Era Timeline + Title Tracks */}
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-8">
-          <GlassHUD title="Waveform Analysis" icon={Activity}>
-            <Suspense fallback={<div className="flex items-center justify-center h-40"><div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" /></div>}>
-              <SonicAnalyzer
-                playing={playing}
-                togglePlay={onTogglePlay}
-                song={analyzingSong}
-                onSelectSong={onSelectSong}
-                songs={songs}
-                getAlbumTitle={getAlbumTitle}
-              />
-            </Suspense>
-          </GlassHUD>
+          <div className="flex items-center gap-2 mb-4">
+            <Disc size={16} className="text-white/40" />
+            <h3 className="text-sm font-semibold text-white/70">Era Timeline</h3>
+          </div>
+          <EraOverview
+            albums={albums}
+            onNavigateToEra={(era) => onNavigate('discography', era)}
+          />
         </div>
         <div className="col-span-4">
-          <GlassHUD title="Title Tracks" icon={Music}>
+          <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Music size={16} className="text-white/40" />
+              <h3 className="text-sm font-semibold text-white/70">Title Tracks</h3>
+            </div>
             <TitleTrackSpotlight
               songs={songs}
-              analyzingSong={analyzingSong}
-              onSelectSong={(s) => onSelectSong(s)}
-              onTogglePlay={onTogglePlay}
+              onNavigate={onNavigate}
             />
-          </GlassHUD>
+          </div>
         </div>
       </div>
-
-      {/* Era Overview */}
-      <GlassHUD title="Eras & Albums" icon={Disc}>
-        <EraOverview
-          albums={albums}
-          onNavigateToEra={(era) => onNavigate('discography', era)}
-        />
-      </GlassHUD>
     </div>
   );
 }

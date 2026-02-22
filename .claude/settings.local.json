@@ -18,7 +18,11 @@
       "Bash(npx skills add yonatangross/orchestkit@recharts-patterns -g -y)",
       "Bash(npx skills add daffy0208/ai-dev-standards@data-visualizer -g -y)",
       "Bash(npx skills add:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(xargs:*)"
+    ],
+    "additionalDirectories": [
+      "c:\\Development\\BTS universe"
     ]
   }
 }

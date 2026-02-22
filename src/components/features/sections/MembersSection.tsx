@@ -23,7 +23,7 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
         <button
           key={m.id}
           onClick={() => onSelect(m.id)}
-          className="text-left group rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
+          className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:border-white/[0.12] hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
         >
           {/* Photo */}
           <div className="aspect-[3/4] relative overflow-hidden rounded-t-2xl">
@@ -176,7 +176,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
             <GlassHUD title="Solo Discography" icon={Disc}>
               <div className="grid grid-cols-2 gap-3">
                 {soloAlbums.map(sa => (
-                  <div key={sa.id} className="p-4 bg-white/[0.03] border border-white/[0.06] rounded-xl">
+                  <div key={sa.id} className="p-4 bg-[#111118] border border-white/[0.06] rounded-xl">
                     <div className="text-sm font-semibold text-white/80">{sa.title}</div>
                     <div className="flex items-center gap-2 text-xs text-white/50 mt-1">
                       <Badge variant="default" size="sm">{sa.type}</Badge>

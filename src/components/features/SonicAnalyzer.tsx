@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { Play, Pause, ChevronDown } from 'lucide-react';
 import type { Song } from '../../types/database';
-import { FloatingParticles } from '../visual';
 
 export interface SonicAnalyzerProps {
     playing: boolean;
@@ -88,7 +87,6 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
             <div className="flex-1 bg-black/20 border border-white/5 rounded-[2.5rem] flex items-end justify-center px-10 pb-10 gap-2 relative overflow-hidden group shadow-inner">
                 <div className="absolute inset-0 transition-opacity duration-1000 opacity-20 group-hover:opacity-40"
                     style={{ background: `linear-gradient(to top, ${accentColor} 0%, transparent 100%)` }} />
-                <FloatingParticles />
                 {[...Array(24)].map((_, i) => {
                     const seed = song ? (song.id * 13 + i * 7) % 100 : Math.sin(i * 0.4) * 10 + 15;
                     const pausedHeight = song ? 10 + (seed % 60) : 15 + Math.sin(i * 0.4) * 10;

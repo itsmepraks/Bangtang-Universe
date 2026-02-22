@@ -2,14 +2,11 @@ import { useState, useMemo, Suspense, lazy } from 'react';
 
 // Import data and hooks
 import { useMembers, useSongs, useAlbums, useLyrics } from './hooks';
-import type { Song } from './types/database';
 import type { DashboardSection, DiscographyState } from './types/index';
 
 // Lightweight components - imported directly
 import {
   BTSLogo,
-  NoiseOverlay,
-  FloatingParticles,
   GlassHUD,
 } from './components';
 import { Breadcrumb } from './components/ui';
@@ -24,13 +21,12 @@ const SectionTransition = lazy(() => import('./components/features/sections/Sect
 const HomeSection = lazy(() => import('./components/features/sections/HomeSection'));
 const DiscographySection = lazy(() => import('./components/features/sections/Discography'));
 const MembersSection = lazy(() => import('./components/features/sections/MembersSection'));
-const SonicSection = lazy(() => import('./components/features/sections/SonicSection'));
+const AnalyticsSection = lazy(() => import('./components/features/sections/AnalyticsSection'));
 const SearchSection = lazy(() => import('./components/features/sections/SearchSection'));
-const StudioSection = lazy(() => import('./components/features/sections/StudioSection'));
 
 // Loading fallback for lazy components
 const LoadingFallback = () => (
-  <div className="absolute inset-0 bg-[#020005] flex items-center justify-center">
+  <div className="absolute inset-0 bg-[#0a0a0f] flex items-center justify-center">
     <div className="flex flex-col items-center gap-4">
       <div className="w-12 h-12 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
       <span className="text-xs text-white/50 tracking-wider uppercase font-mono">Loading...</span>
@@ -45,40 +41,35 @@ const SectionSpinner = () => (
 );
 
 import {
-  Activity,
+  BarChart3,
   Search,
   Settings,
-  Mic2,
   Home,
   Disc,
   Users,
 } from 'lucide-react';
 
 const SECTION_TITLES: Record<DashboardSection, string> = {
-  home: 'Home',
+  overview: 'Overview',
   discography: 'Discography',
   members: 'Members',
-  sonic: 'Sonic Lab',
+  analytics: 'Analytics',
   search: 'Search',
-  studio: 'AI Studio',
 };
 
 const NAV_ITEMS: { id: DashboardSection; icon: React.ElementType; label: string }[] = [
-  { id: 'home', icon: Home, label: 'Home' },
-  { id: 'discography', icon: Disc, label: 'Disco' },
+  { id: 'overview', icon: Home, label: 'Overview' },
+  { id: 'discography', icon: Disc, label: 'Discography' },
   { id: 'members', icon: Users, label: 'Members' },
-  { id: 'sonic', icon: Activity, label: 'Sonic' },
+  { id: 'analytics', icon: BarChart3, label: 'Analytics' },
   { id: 'search', icon: Search, label: 'Search' },
-  { id: 'studio', icon: Mic2, label: 'Studio' },
 ];
 
 // --- MAIN APPLICATION ---
 export default function App() {
   const [mode, setMode] = useState<'landing' | 'warp' | 'dashboard'>('landing');
-  const [activeSection, setActiveSection] = useState<DashboardSection>('home');
+  const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
-  const [analyzingSong, setAnalyzingSong] = useState<Song | null>(null);
-  const [playing, setPlaying] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   // New state for expanded sections
@@ -93,8 +84,6 @@ export default function App() {
   const { albums } = useAlbums();
   const { members } = useMembers();
   const { lyrics } = useLyrics();
-
-  const getAlbumTitle = (id: number | null) => albums.find(a => a.id === id)?.title || 'Unknown Album';
 
   const handleSync = () => {
     setMode('dashboard');
@@ -155,13 +144,14 @@ export default function App() {
   }, [activeSection, selectedAlbum, selectedSong, selectedMember]);
 
   return (
-    <div className="relative w-screen h-screen bg-[#020005] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white">
-      <NoiseOverlay />
+    <div className="relative w-screen h-screen bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white">
 
-      {/* 1. UNIVERSE LAYER - PERSISTENT */}
-      <Suspense fallback={<LoadingFallback />}>
-        <Universe3D mode={mode} />
-      </Suspense>
+      {/* 1. UNIVERSE LAYER - Only shown during landing */}
+      {mode !== 'dashboard' && (
+        <Suspense fallback={<LoadingFallback />}>
+          <Universe3D mode={mode} />
+        </Suspense>
+      )}
 
       {/* 2. LANDING */}
       <Suspense fallback={<LoadingFallback />}>
@@ -172,79 +162,73 @@ export default function App() {
       {mode === 'dashboard' && !activeMemberId && (
         <div className="absolute inset-0 z-10 flex animate-in fade-in zoom-in-95 duration-1000">
 
-          {/* Dashboard Background Elements */}
+          {/* Dashboard Background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-[10%] right-[5%] w-[50%] h-[50%] bg-[radial-gradient(circle_at_center,_#3b0764_0%,_transparent_70%)] opacity-30 blur-[120px] animate-pulse" />
-            <div className="absolute bottom-[10%] left-[5%] w-[40%] h-[40%] bg-[radial-gradient(circle_at_center,_#1e1b4b_0%,_transparent_70%)] opacity-25 blur-[120px] animate-pulse" style={{ animationDelay: '-5s' }} />
-            <FloatingParticles />
+            <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full opacity-[0.05]"
+              style={{ background: 'radial-gradient(circle, #A855F7 0%, transparent 70%)', filter: 'blur(100px)' }} />
           </div>
 
-          {/* Sidebar — compact with icon + label */}
-          <div className="w-20 bg-black/40 backdrop-blur-3xl border-r border-white/[0.06] flex flex-col items-center py-6 z-50 shadow-2xl relative">
+          {/* Sidebar */}
+          <div className="w-56 bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-6 px-4 z-50">
             <div
               onClick={() => setMode('landing')}
-              className="w-12 h-12 bg-white/[0.03] border border-white/10 rounded-xl flex items-center justify-center group cursor-pointer hover:border-purple-500/50 transition-all duration-500 hover:bg-white/[0.05] mb-6"
+              className="flex items-center gap-3 px-2 mb-8 group cursor-pointer"
             >
-              <BTSLogo className="w-7 h-7 text-white group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(168,85,247,0.8)] transition-all duration-500" />
+              <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300" />
+              <span className="text-sm font-semibold text-white/80">Bangtan Universe</span>
             </div>
 
-            <nav className="flex flex-col gap-1 w-full px-2 flex-1">
+            <nav className="flex flex-col gap-1 flex-1">
               {NAV_ITEMS.map(item => (
                 <button
                   key={item.id}
                   onClick={() => setActiveSection(item.id)}
-                  className={`
-                    flex flex-col items-center gap-1 py-2.5 rounded-xl transition-all duration-300 relative
-                    ${activeSection === item.id
-                      ? 'bg-purple-500/10 text-purple-300 border-l-2 border-purple-500'
-                      : 'text-white/40 hover:text-white/60 hover:bg-white/[0.03] border-l-2 border-transparent'}
-                  `}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 w-full text-left ${
+                    activeSection === item.id
+                      ? 'bg-purple-500/10 text-white border-l-2 border-purple-500'
+                      : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border-l-2 border-transparent'
+                  }`}
                 >
-                  <item.icon size={20} />
-                  <span className="text-[10px] font-medium leading-none">{item.label}</span>
+                  <item.icon size={18} />
+                  <span className="text-sm font-medium">{item.label}</span>
                 </button>
               ))}
             </nav>
 
+            <div className="pt-4 border-t border-white/[0.06] space-y-1.5 px-2 mb-4">
+              <div className="text-xs text-white/40">{songs.length} songs</div>
+              <div className="text-xs text-white/40">{albums.length} albums</div>
+              <div className="text-xs text-white/40">{members.length} members</div>
+            </div>
+
             <button
               onClick={() => setShowSettings(true)}
-              className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-white/20 flex items-center justify-center transition-all duration-500 group hover:bg-white/[0.05] mt-4"
+              className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-white/40 hover:text-white/60 hover:bg-white/[0.03] transition-all duration-200 w-full text-left"
             >
-              <Settings size={18} className="text-white/30 group-hover:text-white/70 transition-colors duration-500 group-hover:rotate-90" />
+              <Settings size={18} />
+              <span className="text-sm font-medium">Settings</span>
             </button>
           </div>
 
           {/* Content Area */}
           <div className="flex-1 flex flex-col min-w-0 relative z-10">
 
-            {/* Header — compact with breadcrumbs */}
-            <header className="h-14 flex items-center justify-between px-12 bg-gradient-to-b from-black/40 to-transparent border-b border-white/[0.04]">
+            {/* Header */}
+            <header className="h-14 flex items-center justify-between px-8 bg-[#0c0c12]/50 border-b border-white/[0.06]">
               <Breadcrumb items={breadcrumbs} />
-              <button
-                onClick={() => setShowSettings(true)}
-                className="p-2 rounded-lg hover:bg-white/[0.04] transition-colors text-white/30 hover:text-white/60"
-              >
-                <Settings size={16} />
-              </button>
             </header>
 
             {/* Main Views */}
-            <main className="flex-1 p-12 pb-24 overflow-y-auto relative pretty-scrollbar">
+            <main className="flex-1 p-8 pb-16 overflow-y-auto relative pretty-scrollbar">
               <Suspense fallback={<SectionSpinner />}>
                 <SectionTransition sectionKey={activeSection}>
 
-                  {activeSection === 'home' && (
+                  {activeSection === 'overview' && (
                     <HomeSection
                       songs={songs}
                       albums={albums}
                       members={members}
-                      lyricsCount={lyrics.length}
-                      analyzingSong={analyzingSong}
-                      onSelectSong={setAnalyzingSong}
                       onNavigate={navigateTo}
-                      getAlbumTitle={getAlbumTitle}
-                      playing={playing}
-                      onTogglePlay={() => setPlaying(prev => !prev)}
                     />
                   )}
 
@@ -269,30 +253,19 @@ export default function App() {
                     />
                   )}
 
-                  {activeSection === 'sonic' && (
-                    <SonicSection
+                  {activeSection === 'analytics' && (
+                    <AnalyticsSection
                       songs={songs}
                       albums={albums}
-                      analyzingSong={analyzingSong}
-                      onSelectSong={setAnalyzingSong}
-                      playing={playing}
-                      onTogglePlay={() => setPlaying(prev => !prev)}
-                      getAlbumTitle={getAlbumTitle}
+                      members={members}
+                      lyrics={lyrics}
                     />
                   )}
 
                   {activeSection === 'search' && (
                     <SearchSection
-                      onSelectSong={(s) => { setAnalyzingSong(s); navigateTo('sonic'); }}
+                      onSelectSong={() => navigateTo('analytics')}
                       onNavigate={navigateTo}
-                    />
-                  )}
-
-                  {activeSection === 'studio' && (
-                    <StudioSection
-                      songs={songs}
-                      members={members}
-                      albums={albums}
                     />
                   )}
 
@@ -314,31 +287,18 @@ export default function App() {
       {showSettings && (
         <div className="absolute inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center animate-in fade-in duration-300">
           <div className="w-[500px] max-w-[90vw] h-[600px] max-h-[90vh]">
-            <GlassHUD title="System Configuration" icon={Settings} onClose={() => setShowSettings(false)}>
+            <GlassHUD title="Settings" icon={Settings} onClose={() => setShowSettings(false)}>
               <div className="space-y-8">
-                {/* Audio Section */}
+                {/* Display */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Audio Interface</h3>
-                  <div className="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-between group hover:bg-white/10 transition-colors">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-white/90">Dolby Atmos (Virtual)</span>
-                      <span className="text-xs text-white/50 uppercase tracking-wide">Spatial Audio Engine</span>
-                    </div>
-                    <div className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e] animate-pulse" />
-                  </div>
-                </div>
-
-                {/* Graphics Section */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Visual Processing</h3>
+                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Display</h3>
                   <div className="grid grid-cols-3 gap-3">
                     {['Eco', 'Balanced', 'Ultra'].map((m, i) => (
-                      <button key={m} className={`
-                        py-3 rounded-xl border text-xs font-medium tracking-wide uppercase transition-all duration-300
-                        ${i === 2
-                          ? 'bg-purple-500/20 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]'
-                          : 'bg-white/5 border-white/[0.06] text-white/50 hover:bg-white/10 hover:text-white/70'}
-                      `}>
+                      <button key={m} className={`py-3 rounded-xl border text-xs font-medium transition-all duration-300 ${
+                        i === 2
+                          ? 'bg-purple-500/20 border-purple-500 text-white'
+                          : 'bg-white/5 border-white/[0.06] text-white/50 hover:bg-white/10 hover:text-white/70'
+                      }`}>
                         {m}
                       </button>
                     ))}
@@ -347,9 +307,9 @@ export default function App() {
 
                 {/* Notifications */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Neural Link</h3>
+                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Notifications</h3>
                   <div className="space-y-3">
-                    {['System Alerts', 'Background Sync', 'Haptic Feedback'].map((item) => (
+                    {['Alerts', 'Background Sync'].map((item) => (
                       <div key={item} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
                         <span className="text-sm text-white/60 group-hover:text-white transition-colors">{item}</span>
                         <div className="w-10 h-5 bg-purple-900/40 rounded-full relative border border-white/10 transition-colors group-hover:border-purple-500/50">
@@ -360,11 +320,16 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* System Info */}
-                <div className="pt-6 border-t border-white/[0.06] text-center">
-                  <p className="text-xs text-white/40 font-mono uppercase tracking-wider">
-                    Bangtan Universe v3.0.0
-                  </p>
+                {/* Data */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Data</h3>
+                  <div className="p-4 bg-white/5 rounded-xl border border-white/[0.06] flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-white/80">{songs.length} songs, {albums.length} albums</span>
+                      <span className="text-xs text-white/40 mt-1">{members.length} members</span>
+                    </div>
+                    <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  </div>
                 </div>
               </div>
             </GlassHUD>

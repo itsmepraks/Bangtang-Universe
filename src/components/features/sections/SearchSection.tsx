@@ -92,7 +92,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
     <div className="space-y-6">
       {/* Search Bar */}
       <div className="relative">
-        <div className="flex items-center gap-4 bg-white/[0.03] backdrop-blur-xl border border-white/[0.08] rounded-2xl px-6 py-4 focus-within:border-purple-500/30 transition-colors">
+        <div className="flex items-center gap-4 bg-[#111118] border border-white/[0.06] rounded-2xl px-6 py-4 focus-within:border-purple-500/30 transition-colors">
           <Search size={20} className="text-white/40" />
           <input
             type="text"
@@ -114,7 +114,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
 
         {/* Suggestions dropdown */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full mt-2 left-0 right-0 bg-black/90 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden z-50">
+          <div className="absolute top-full mt-2 left-0 right-0 bg-[#111118] border border-white/[0.06] rounded-xl overflow-hidden z-50">
             {suggestions.map((s, i) => (
               <button
                 key={i}

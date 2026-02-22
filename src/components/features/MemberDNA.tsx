@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronLeft, PenTool, Disc, Award } from 'lucide-react';
 import { useMemberById } from '../../hooks';
-import { BTSLogo, FloatingParticles } from '../visual';
+import { BTSLogo } from '../visual';
 
 export interface MemberDNAProps {
     memberId: string;
@@ -27,7 +27,6 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                     style={{ background: `radial-gradient(circle at 30% 30%, ${member.color} 0%, transparent 50%)` }} />
                 <div className="absolute bottom-[-20%] right-[-20%] w-[140%] h-[140%] opacity-30 blur-[180px]"
                     style={{ background: `radial-gradient(circle at 70% 70%, ${member.color} 0%, transparent 50%)` }} />
-                <FloatingParticles />
             </div>
 
             {/* Top Bar */}
@@ -65,7 +64,7 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
 
                     {/* Left Column: ID Card */}
                     <div className="col-span-5 space-y-12 animate-in slide-in-from-left-12 duration-1000">
-                        <div className="relative aspect-[3/4.2] rounded-[3rem] overflow-hidden border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] group">
+                        <div className="relative aspect-[3/4.2] rounded-2xl overflow-hidden border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] group">
                             <div className="absolute inset-0 bg-[#0a0a0f]" />
 
                             <img
@@ -95,10 +94,10 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="p-8 bg-white/[0.02] backdrop-blur-2xl rounded-[2.5rem] border border-white/[0.06] hover:border-white/20 transition-all duration-700 shadow-2xl group">
+                        <div className="p-8 bg-[#111118] rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all duration-700 shadow-2xl group">
                             <div className="flex items-center gap-4 mb-6" style={{ color: member.color || '#fff' }}>
-                                <PenTool size={22} className="group-hover:animate-bounce" />
-                                <span className="text-xs font-semibold tracking-wide uppercase opacity-70">KOMCA Credits</span>
+                                <PenTool size={22} />
+                                <span className="text-xs font-semibold tracking-wide uppercase opacity-70">KOMCA credits</span>
                             </div>
                             <div className="flex items-end gap-4">
                                 <div className="text-6xl font-semibold text-white tracking-tight">{member.komca_credits || 0}</div>
@@ -125,7 +124,7 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                             <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wide">Solo Discography</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 {(member.solo_tracks || []).map((track, i) => (
-                                    <div key={track} className="p-6 bg-white/[0.02] rounded-2xl border border-white/[0.06] hover:bg-white/[0.05] hover:border-white/[0.15] transition-all duration-700 cursor-pointer group flex items-center gap-6">
+                                    <div key={track} className="p-6 bg-[#111118] rounded-2xl border border-white/[0.06] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-700 cursor-pointer group flex items-center gap-6">
                                         <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
                                             <Disc className="text-white/30 group-hover:text-white transition-colors" style={{ color: i === 0 ? member.color || '#fff' : '' }} size={28} />
                                         </div>

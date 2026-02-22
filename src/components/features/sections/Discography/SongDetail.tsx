@@ -3,6 +3,7 @@ import { ChevronLeft, Music } from 'lucide-react';
 import type { Song, Album } from '../../../../types/database';
 import { useLyricsBySongId } from '../../../../hooks';
 import { getSentimentColor } from '../../../../constants/colors';
+import { getRecommendations } from '../../../../services/recommendationService';
 import Badge from '../../../ui/Badge';
 import TabBar from '../../../ui/TabBar';
 import ProgressBar from '../../../ui/ProgressBar';
@@ -42,14 +43,9 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
   const [activeTab, setActiveTab] = useState('overview');
   const [lyricsTab, setLyricsTab] = useState('korean');
 
-  const similarSongs = useMemo(() => {
-    return songs.filter(s =>
-      s.id !== song.id && (
-        s.sentiment === song.sentiment ||
-        (song.bpm && s.bpm && Math.abs((s.bpm || 0) - (song.bpm || 0)) <= 10)
-      )
-    ).slice(0, 6);
-  }, [songs, song]);
+  const recommendations = useMemo(() => {
+    return getRecommendations(song, songs, albums, 6);
+  }, [song, songs, albums]);
 
   const features = [
     { label: 'Energy', value: song.energy },
@@ -113,7 +109,7 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
           </div>
 
           {/* Audio Feature Bars */}
-          <div className="space-y-4 p-6 bg-white/[0.02] rounded-2xl border border-white/[0.06]">
+          <div className="space-y-4 p-6 bg-[#111118] rounded-2xl border border-white/[0.06]">
             {features.map(f => (
               <ProgressBar
                 key={f.label}
@@ -159,7 +155,7 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
             </div>
           )}
 
-          <div className="max-h-[500px] overflow-y-auto pretty-scrollbar p-6 bg-white/[0.02] rounded-2xl border border-white/[0.06]">
+          <div className="max-h-[500px] overflow-y-auto pretty-scrollbar p-6 bg-[#111118] rounded-2xl border border-white/[0.06]">
             {lyricsContent ? (
               <pre className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap font-sans select-text">{lyricsContent}</pre>
             ) : (
@@ -171,7 +167,7 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
 
       {/* Tab: Credits */}
       {activeTab === 'credits' && (
-        <div className="space-y-6 p-6 bg-white/[0.02] rounded-2xl border border-white/[0.06]">
+        <div className="space-y-6 p-6 bg-[#111118] rounded-2xl border border-white/[0.06]">
           {song.writers && song.writers.length > 0 && (
             <div className="space-y-3">
               <h4 className="text-xs font-medium text-white/50 uppercase tracking-wide">Writers</h4>
@@ -211,19 +207,23 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
       {/* Tab: Similar Songs */}
       {activeTab === 'similar' && (
         <div>
-          {similarSongs.length > 0 ? (
+          {recommendations.length > 0 ? (
             <div className="grid grid-cols-3 gap-4">
-              {similarSongs.map(s => (
+              {recommendations.map(rec => (
                 <button
-                  key={s.id}
-                  onClick={() => onSelectSong(s.id)}
-                  className="text-left p-5 bg-white/[0.03] border border-white/[0.06] rounded-2xl hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-300 group"
+                  key={rec.song.id}
+                  onClick={() => onSelectSong(rec.song.id)}
+                  className="text-left p-5 bg-[#111118] border border-white/[0.06] rounded-2xl hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-300 group"
                 >
-                  <div className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{s.title}</div>
-                  <div className="text-xs text-white/50 mt-1.5">{s.bpm} BPM</div>
-                  {s.sentiment && (
+                  <div className="text-sm text-white/80 group-hover:text-white transition-colors truncate">{rec.song.title}</div>
+                  <div className="text-xs text-white/50 mt-1">{rec.albumTitle}</div>
+                  <div className="text-xs text-purple-400/70 font-mono mt-1.5">{(rec.similarity * 100).toFixed(0)}% match</div>
+                  {rec.reasons.length > 0 && (
+                    <div className="text-xs text-white/40 mt-1.5 truncate">{rec.reasons[0]}</div>
+                  )}
+                  {rec.song.sentiment && (
                     <div className="mt-2">
-                      <Badge variant="sentiment" size="sm" color={getSentimentColor(s.sentiment)}>{s.sentiment}</Badge>
+                      <Badge variant="sentiment" size="sm" color={getSentimentColor(rec.song.sentiment)}>{rec.song.sentiment}</Badge>
                     </div>
                   )}
                 </button>

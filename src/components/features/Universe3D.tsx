@@ -1,6 +1,6 @@
 import React from 'react';
 import { MEMBER_DATA } from '../../data/members';
-import { ShootingStar, PurpleOcean, Whalien, StarFieldCanvas } from '../visual';
+import { StarFieldCanvas } from '../visual';
 
 export interface UniverseProps {
     mode: 'landing' | 'warp' | 'dashboard';
@@ -18,21 +18,10 @@ export const Universe3D: React.FC<UniverseProps> = ({ mode }) => {
                 <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] bg-[radial-gradient(circle_at_50%_50%,_rgba(168,85,247,0.1)_0%,_transparent_50%)] animate-[galaxy-spin_120s_infinite_linear]" />
             </div>
 
-            {/* SHOOTING STARS */}
-            <ShootingStar />
-            <ShootingStar />
-            <ShootingStar />
-
             <div className="mist-layer opacity-20" />
             <div className="mist-layer opacity-15 blur-[180px]" style={{ animationDelay: '-45s' }} />
 
-            {/* THE PURPLE OCEAN (Bokeh Layer) */}
-            <PurpleOcean />
-
-            {/* The Space Whale Swimming in Background */}
-            <Whalien />
-
-            {/* Canvas-rendered star field (replaces 800 divs) */}
+            {/* Canvas-rendered star field */}
             <StarFieldCanvas mode={mode} />
 
             <div

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import type { Album } from '../../../../types/database';
-import { ChevronRight } from 'lucide-react';
 
 interface EraOverviewProps {
   albums: Album[];
@@ -25,29 +24,35 @@ export default function EraOverview({ albums, onNavigateToEra }: EraOverviewProp
   }, [albums]);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {eras.map(([name, data]) => (
-        <button
-          key={name}
-          onClick={() => onNavigateToEra(name)}
-          className="text-left p-5 bg-white/[0.03] border border-white/[0.06] rounded-2xl hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-500 group"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: data.color, boxShadow: `0 0 12px ${data.color}40` }}
-            />
-            <ChevronRight size={14} className="text-white/20 group-hover:text-purple-400 transition-colors duration-500" />
+    <div className="overflow-x-auto pretty-scrollbar pb-2">
+      <div className="flex gap-3 min-w-max">
+        {eras.map(([name, data], i) => (
+          <div key={name} className="flex items-center">
+            <button
+              onClick={() => onNavigateToEra(name)}
+              className="w-44 p-4 bg-[#111118] border border-white/[0.06] rounded-xl hover:border-white/[0.12] transition-all duration-300 text-left group flex-shrink-0"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <div
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: data.color }}
+                />
+                <span className="text-sm font-semibold text-white/90 group-hover:text-white truncate">{name}</span>
+              </div>
+              <div className="text-xs text-white/50">
+                {data.albums.length} album{data.albums.length !== 1 ? 's' : ''}
+              </div>
+              <div className="text-xs text-white/30 mt-0.5">
+                {data.minDate.slice(0, 4)}{data.minDate.slice(0, 4) !== data.maxDate.slice(0, 4) ? `–${data.maxDate.slice(0, 4)}` : ''}
+              </div>
+            </button>
+            {/* Connector line between eras */}
+            {i < eras.length - 1 && (
+              <div className="w-6 h-px bg-white/[0.08] flex-shrink-0" />
+            )}
           </div>
-          <h3 className="text-base font-semibold text-white/90 mb-1 group-hover:text-white transition-colors">{name}</h3>
-          <p className="text-sm text-white/60">
-            {data.albums.length} album{data.albums.length !== 1 ? 's' : ''}
-          </p>
-          <p className="text-xs text-white/40 mt-0.5">
-            {data.minDate.slice(0, 4)}–{data.maxDate.slice(0, 4)}
-          </p>
-        </button>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

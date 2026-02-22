@@ -30,7 +30,7 @@ export default function StatCard({ label, value, icon: Icon, accent = '#A855F7',
   }, [value]);
 
   return (
-    <div className="p-5 bg-white/[0.03] border border-white/[0.08] rounded-2xl hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-500 group">
+    <div className="p-5 bg-[#111118] border border-white/[0.06] rounded-2xl hover:border-white/[0.12] transition-all duration-300 group">
       <div className="h-0.5 w-10 rounded-full mb-4" style={{ backgroundColor: accent }} />
       <div className="flex items-start justify-between">
         <div>
