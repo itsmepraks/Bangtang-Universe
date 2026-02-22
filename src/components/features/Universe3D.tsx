@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
-import { generateStars } from '../../utils/helpers';
+import React from 'react';
 import { MEMBER_DATA } from '../../data/members';
-import { ShootingStar, PurpleOcean, Whalien } from '../visual';
+import { ShootingStar, PurpleOcean, Whalien, StarFieldCanvas } from '../visual';
 
 export interface UniverseProps {
     mode: 'landing' | 'warp' | 'dashboard';
 }
 
 export const Universe3D: React.FC<UniverseProps> = ({ mode }) => {
-    const [stars] = useState(() => generateStars(800));
-
     return (
         <div className="absolute inset-0 bg-[#020005] overflow-hidden perspective-[1200px]">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(88,28,135,0.4),_rgba(0,0,0,1)_95%)]" />
@@ -34,6 +31,9 @@ export const Universe3D: React.FC<UniverseProps> = ({ mode }) => {
 
             {/* The Space Whale Swimming in Background */}
             <Whalien />
+
+            {/* Canvas-rendered star field (replaces 800 divs) */}
+            <StarFieldCanvas mode={mode} />
 
             <div
                 className={`absolute inset-0 flex items-center justify-center transform-style-3d transition-all duration-[2500ms] cubic-bezier(0.4, 0, 0.2, 1)
@@ -64,28 +64,6 @@ export const Universe3D: React.FC<UniverseProps> = ({ mode }) => {
                         })}
                         <div className="absolute w-2 h-2 bg-white rounded-full shadow-[0_0_100px_white]" />
                     </div>
-
-                    {/* THE ARMY (Purple Ocean) */}
-                    {stars.map((s, i) => {
-                        const x = s.r * Math.sin(s.phi) * Math.cos(s.theta);
-                        const y = s.r * Math.sin(s.phi) * Math.sin(s.theta);
-                        const z = s.r * Math.cos(s.phi);
-                        return (
-                            <div
-                                key={i}
-                                className="absolute rounded-full"
-                                style={{
-                                    transform: `translate3d(${x}px, ${y}px, ${z}px)`,
-                                    width: `${s.size}px`,
-                                    height: `${s.size}px`,
-                                    backgroundColor: s.color,
-                                    boxShadow: `0 0 ${s.size * 2}px ${s.color}`,
-                                    opacity: 0.8,
-                                    animation: `twinkle 4s infinite ${s.delay}s`
-                                }}
-                            />
-                        )
-                    })}
                 </div>
             </div>
         </div>

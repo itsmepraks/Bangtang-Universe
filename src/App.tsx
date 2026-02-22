@@ -11,9 +11,6 @@ import {
   NoiseOverlay,
   FloatingParticles,
   GlassHUD,
-  SonicAnalyzer,
-  RAGNetwork,
-  LyricistAI,
 } from './components';
 
 // Heavy components - lazy loaded for code-splitting
@@ -21,6 +18,9 @@ const Universe3D = lazy(() => import('./components/features/Universe3D'));
 const LandingRitual = lazy(() => import('./components/features/LandingRitual'));
 const MemberDNA = lazy(() => import('./components/features/MemberDNA'));
 const DataHub = lazy(() => import('./components/features/DataHub'));
+const SonicAnalyzer = lazy(() => import('./components/features/SonicAnalyzer'));
+const RAGNetwork = lazy(() => import('./components/features/RAGNetwork'));
+const LyricistAI = lazy(() => import('./components/features/LyricistAI'));
 
 // Loading fallback for lazy components
 const LoadingFallback = () => (
@@ -175,6 +175,7 @@ export default function App() {
 
             {/* Main Views */}
             <main className="flex-1 p-12 pb-24 overflow-y-auto relative pretty-scrollbar">
+              <Suspense fallback={<div className="flex items-center justify-center h-full"><div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" /></div>}>
 
               {/* OVERVIEW MODE */}
               {activeSection === 'overview' && (
@@ -279,6 +280,7 @@ export default function App() {
                 </div>
               )}
 
+              </Suspense>
             </main>
           </div>
         </div>

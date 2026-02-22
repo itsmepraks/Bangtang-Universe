@@ -25,16 +25,17 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // ==================== MEMBER PHOTOS ====================
-// Using local photos from public/assets/members/
-const MEMBER_PHOTOS: Record<string, string> = {
-    'rm': '/assets/members/rm.jpg',
-    'jin': '/assets/members/jin.jpg',
-    'suga': '/assets/members/suga.jpg',
-    'jh': '/assets/members/jh.jpg',
-    'jm': '/assets/members/jm.jpg',
-    'v': '/assets/members/v.jpg',
-    'jk': '/assets/members/jk.jpg',
-};
+// Using Supabase Storage public URLs from member-photos bucket
+const BUCKET = 'member-photos';
+const MEMBER_IDS = ['rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'];
+
+// Build public URLs from Supabase Storage
+const MEMBER_PHOTOS: Record<string, string> = Object.fromEntries(
+    MEMBER_IDS.map(id => [
+        id,
+        `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${id}.jpg`
+    ])
+);
 
 async function updateMemberPhotos() {
     console.log('\n📸 Updating Member Photos\n');

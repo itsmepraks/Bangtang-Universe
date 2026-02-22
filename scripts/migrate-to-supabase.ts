@@ -151,6 +151,32 @@ const SONGS = [
     { id: 57, title: 'Take Two', title_korean: null, album_id: 15, release_date: '2023-06-09', duration_seconds: 212, bpm: 120, energy: 0.78, valence: 0.72, danceability: 0.68, acousticness: 0.15, sentiment: 'Gratitude', keywords: ['take two', 'new chapter', 'ARMY'], writers: ['Pdogg', 'RM', 'SUGA', 'j-hope'], producers: ['Pdogg'], member_credits: ['rm', 'suga', 'jh'], is_title_track: true, has_mv: false }
 ];
 
+// ==================== SOLO ALBUMS DATA (15 solo albums) ====================
+const SOLO_ALBUMS = [
+    // RM
+    { id: 1, member_id: 'rm', title: 'RM (Mixtape)', release_date: '2015-03-20', type: 'Mixtape', tracks: ['Voice', 'Do You', 'Awakening', 'Monster', 'Throw Away', 'Joke', 'God Rap', 'Rush', 'Life', 'Adrift'] },
+    { id: 2, member_id: 'rm', title: 'mono.', release_date: '2018-10-23', type: 'Mixtape', tracks: ['tokyo', 'seoul', 'moonchild', 'badbye', 'uhgood', 'everythingoes', 'forever rain'] },
+    { id: 3, member_id: 'rm', title: 'Indigo', release_date: '2022-12-02', type: 'Studio', tracks: ['Yun', 'Still Life', 'All Day', 'Lonely', 'Change pt.2', 'Closer', 'Wild Flower', 'Hectic', 'Forg_tful', 'No.2'] },
+    { id: 4, member_id: 'rm', title: 'Right Place, Wrong Person', release_date: '2024-05-24', type: 'Studio', tracks: ['Right Place, Wrong Person', 'Nuts', 'out of love', 'Domodachi', 'Heaven', 'Lost', 'LOST!!!', 'Around the world in a day', 'Groin', 'Come back to me', '?'] },
+    // JIN
+    { id: 5, member_id: 'jin', title: 'Happy', release_date: '2024-11-15', type: 'Studio', tracks: ['Running Wild', "I'll Be There", 'Another Level', 'Until It Reaches You', 'Heart on the Window', 'In Yearning/Longing'] },
+    // SUGA
+    { id: 6, member_id: 'suga', title: 'Agust D', release_date: '2016-08-15', type: 'Mixtape', tracks: ['Intro: Dt sugA', 'Agust D', 'Give It To Me', 'Skit', 'Tony Montana', 'Interlude: Dream, Reality', 'So Far Away', 'The Last', '724148'] },
+    { id: 7, member_id: 'suga', title: 'D-2', release_date: '2020-05-22', type: 'Mixtape', tracks: ['Moonlight', 'Daechwita', 'What Do You Think?', 'Strange', '28', 'Burn It', 'People', 'Honsool', 'Interlude: Set Me Free', 'Dear My Friend'] },
+    { id: 8, member_id: 'suga', title: 'D-DAY', release_date: '2023-04-21', type: 'Studio', tracks: ['D-Day', 'Haegeum', 'Amygdala', 'SDL', 'People Pt.2', 'Polar Night', 'Interlude: Dawn', 'AMYGDALA', 'Snooze', 'Life Goes On'] },
+    // J-HOPE
+    { id: 9, member_id: 'jh', title: 'Hope World', release_date: '2018-03-02', type: 'Mixtape', tracks: ['Hope World', 'P.O.P (Piece of Peace) Pt.1', 'Daydream', 'Base Line', 'Hangsang', 'Airplane', 'Blue Side'] },
+    { id: 10, member_id: 'jh', title: 'Jack In The Box', release_date: '2022-07-15', type: 'Studio', tracks: ['Intro', "Pandora's Box", 'MORE', 'STOP', 'Equal Sign', '= (Equal Sign)', 'Music Box: Reflection', 'What If...', 'Safety Zone', 'Future', 'Arson'] },
+    { id: 11, member_id: 'jh', title: 'HOPE ON THE STREET VOL.1', release_date: '2024-03-29', type: 'EP', tracks: ['on the street', 'i wonder...', 'lock / unlock', "i don't know", 'NEURON', 'Dejavu'] },
+    // JIMIN
+    { id: 12, member_id: 'jm', title: 'FACE', release_date: '2023-03-24', type: 'Studio', tracks: ['Face-Off', 'Interlude: Dive', 'Like Crazy', 'Alone', 'Set Me Free Pt.2', 'Letter'] },
+    { id: 13, member_id: 'jm', title: 'MUSE', release_date: '2024-07-19', type: 'Studio', tracks: ['Rebirth (Intro)', 'Interlude: Showtime', 'Slow Motion', 'Be Mine', 'Smeraldo Garden Marching Band (feat. Loco)', 'Who', 'Closer Than This'] },
+    // V
+    { id: 14, member_id: 'v', title: 'Layover', release_date: '2023-09-08', type: 'EP', tracks: ['Rainy Days', 'Blue', 'Love Me Again', 'Slow Dancing', 'For Us'] },
+    // JK
+    { id: 15, member_id: 'jk', title: 'GOLDEN', release_date: '2023-11-03', type: 'Studio', tracks: ['Standing Next to You', 'Yes or No', "Please Don't Change", 'Hate You', 'Too Sad to Dance', 'Shot Glass of Tears', '3D', 'Closer to You', 'Seven', 'Somebody'] }
+];
+
 // ==================== MIGRATION FUNCTIONS ====================
 
 async function migrateAlbums() {
@@ -204,6 +230,23 @@ async function migrateSongs() {
     return true;
 }
 
+async function migrateSoloAlbums() {
+    console.log('💿 Migrating solo albums...');
+
+    const { data, error } = await supabase
+        .from('solo_albums')
+        .upsert(SOLO_ALBUMS, { onConflict: 'id' })
+        .select();
+
+    if (error) {
+        console.error('❌ Solo albums migration failed:', error.message);
+        return false;
+    }
+
+    console.log(`✅ Migrated ${data.length} solo albums`);
+    return true;
+}
+
 async function runMigration() {
     console.log('\n🚀 Starting BTS Universe Database Migration\n');
     console.log('━'.repeat(50));
@@ -211,11 +254,17 @@ async function runMigration() {
     const albumsOk = await migrateAlbums();
     const membersOk = await migrateMembers();
     const songsOk = await migrateSongs();
+    const soloAlbumsOk = await migrateSoloAlbums();
 
     console.log('━'.repeat(50));
 
-    if (albumsOk && membersOk && songsOk) {
+    if (albumsOk && membersOk && songsOk && soloAlbumsOk) {
         console.log('\n✨ Migration completed successfully! 💜\n');
+        console.log('💡 TIP: Run the following in Supabase SQL Editor to fix serial sequences:');
+        console.log("   SELECT setval('albums_id_seq', (SELECT MAX(id) FROM albums));");
+        console.log("   SELECT setval('songs_id_seq', (SELECT MAX(id) FROM songs));");
+        console.log("   SELECT setval('solo_albums_id_seq', (SELECT MAX(id) FROM solo_albums));");
+        console.log('');
     } else {
         console.log('\n⚠️ Migration completed with errors. Check above for details.\n');
     }

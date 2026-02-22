@@ -6,7 +6,9 @@
       "Bash(npm run type-check:*)",
       "Bash(npx tsc:*)",
       "Bash(node -e:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npm run db:update-photos:*)",
+      "Bash(npm run db:verify:*)"
     ]
   }
 }

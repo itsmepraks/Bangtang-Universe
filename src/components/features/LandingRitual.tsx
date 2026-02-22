@@ -1,113 +1,13 @@
 import React, { useMemo } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { MEMBER_DATA } from '../../data/members';
-import { BTSLogo } from '../visual';
+import { BTSLogo, ArmyBombCanvas } from '../visual';
 
 export interface LandingRitualProps {
     onSync: () => void;
 }
 
 export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
-    // Generate ARMY bomb positions - MASSIVE 180-DEGREE SURROUNDING EFFECT
-    const armyBombs = useMemo(() => {
-        const bombs: { x: number; y: number; z: number; size: number; color: string; delay: number; brightness: number }[] = [];
-
-        // ARMY BOMB PURPLE PALETTE - vibrant purples with occasional white
-        const colors = [
-            '#A855F7', '#9333EA', '#7C3AED', '#8B5CF6', '#C084FC', '#B47EE5', // Core purples
-            '#D8B4FE', '#E9D5FF', '#F3E8FF', // Light purples
-            '#FFFFFF', '#F5F3FF', // White accents
-        ];
-
-        const getColor = () => {
-            const rand = Math.random();
-            if (rand < 0.88) return colors[Math.floor(Math.random() * 9)];
-            return colors[9 + Math.floor(Math.random() * 2)];
-        };
-
-        // === 180-DEGREE SEMICIRCLE AROUND THE STAGE ===
-        const numArcs = 20;
-
-        for (let arc = 0; arc < numArcs; arc++) {
-            const radiusPercent = 15 + arc * 4;
-            const baseY = 35 - arc * 1.5;
-            const pointsInArc = 35 + arc * 5;
-
-            for (let p = 0; p < pointsInArc; p++) {
-                const angle = (p / (pointsInArc - 1)) * Math.PI;
-                const x = 50 + radiusPercent * Math.cos(angle);
-                const y = baseY + radiusPercent * 0.4 * Math.sin(angle);
-                const perspectiveScale = 0.4 + (1 - arc / numArcs) * 0.6;
-
-                bombs.push({
-                    x: x + (Math.random() - 0.5) * 4,
-                    y: Math.max(3, y + (Math.random() - 0.5) * 3),
-                    z: 100 - arc * 3 + Math.random() * 10,
-                    size: (2 + Math.random() * 3) * perspectiveScale,
-                    color: getColor(),
-                    delay: Math.random() * 5,
-                    brightness: 0.5 + Math.random() * 0.5,
-                });
-            }
-        }
-
-        // === LEFT STADIUM WALL ===
-        for (let row = 0; row < 12; row++) {
-            const rowY = 10 + row * 5;
-            const bombsInRow = 10 + row * 2;
-            for (let i = 0; i < bombsInRow; i++) {
-                bombs.push({
-                    x: 2 + i * 1.2 + Math.pow(row / 12, 1.5) * 10,
-                    y: rowY + (Math.random() - 0.5) * 2,
-                    z: 50 + Math.random() * 30,
-                    size: 2.5 + Math.random() * 3,
-                    color: getColor(),
-                    delay: Math.random() * 5,
-                    brightness: 0.55 + Math.random() * 0.4,
-                });
-            }
-        }
-
-        // === RIGHT STADIUM WALL ===
-        for (let row = 0; row < 12; row++) {
-            const rowY = 10 + row * 5;
-            const bombsInRow = 10 + row * 2;
-            for (let i = 0; i < bombsInRow; i++) {
-                bombs.push({
-                    x: 98 - i * 1.2 - Math.pow(row / 12, 1.5) * 10,
-                    y: rowY + (Math.random() - 0.5) * 2,
-                    z: 50 + Math.random() * 30,
-                    size: 2.5 + Math.random() * 3,
-                    color: getColor(),
-                    delay: Math.random() * 5,
-                    brightness: 0.55 + Math.random() * 0.4,
-                });
-            }
-        }
-
-        // === BOTTOM CROWD (closest to camera) ===
-        for (let row = 0; row < 10; row++) {
-            const rowY = 72 + row * 2.5;
-            const bombsInRow = 80 - row * 6;
-            const rowWidth = 95 - row * 7;
-
-            for (let i = 0; i < bombsInRow; i++) {
-                const xPercent = (50 - rowWidth / 2) + (i / (bombsInRow - 1)) * rowWidth;
-                bombs.push({
-                    x: xPercent + (Math.random() - 0.5) * 2,
-                    y: rowY + (Math.random() - 0.5) * 1,
-                    z: 10 + row * 5 + Math.random() * 5,
-                    size: 5 + Math.random() * 4 - row * 0.2,
-                    color: getColor(),
-                    delay: Math.random() * 3,
-                    brightness: 0.8 + Math.random() * 0.2,
-                });
-            }
-        }
-
-        return bombs;
-    }, []);
-
     // Enhanced UNIVERSE/GALAXY stars for cosmic backdrop
     const universeStars = useMemo(() => {
         const stars: { x: number; y: number; size: number; delay: number; duration: number; type: 'star' | 'galaxy' | 'nebula' }[] = [];
@@ -251,26 +151,8 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 <div className="absolute top-0 left-0 right-0 h-[15%] bg-gradient-to-b from-black to-transparent" />
             </div>
 
-            {/* ARMY Bomb Ocean - Purple Universe Effect */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {armyBombs.map((bomb, i) => (
-                    <div
-                        key={`bomb-${i}`}
-                        className="absolute rounded-full"
-                        style={{
-                            left: `${bomb.x}%`,
-                            top: `${bomb.y}%`,
-                            width: `${bomb.size}px`,
-                            height: `${bomb.size}px`,
-                            backgroundColor: bomb.color,
-                            opacity: bomb.brightness,
-                            boxShadow: `0 0 ${bomb.size}px ${bomb.color}, 0 0 ${bomb.size * 2.5}px ${bomb.color}90, 0 0 ${bomb.size * 5}px ${bomb.color}40`,
-                            animation: `star-twinkle ${2.5 + Math.random() * 2.5}s ease-in-out infinite`,
-                            animationDelay: `${bomb.delay}s`,
-                        }}
-                    />
-                ))}
-            </div>
+            {/* ARMY Bomb Ocean - Canvas-rendered for performance (replaces 2,684 divs) */}
+            <ArmyBombCanvas />
 
             {/* Stage Spotlights */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
