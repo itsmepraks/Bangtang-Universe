@@ -33,7 +33,7 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
   return (
     <div className="space-y-6">
       <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2" role="tablist" aria-label="Tours views">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -41,6 +41,8 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
             return (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
@@ -48,7 +50,7 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
                     : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4" aria-hidden="true" />
                 <span className="whitespace-nowrap">{tab.label}</span>
               </button>
             );
@@ -56,7 +58,7 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
         </div>
       </div>
 
-      <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6">
+      <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6" role="tabpanel">
         <Suspense
           fallback={
             <div className="flex items-center justify-center h-64">

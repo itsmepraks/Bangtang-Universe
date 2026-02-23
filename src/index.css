@@ -177,6 +177,12 @@
   /* Increased opacity for interaction feedback */
 }
 
+/* Firefox scrollbar support */
+.pretty-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(168, 85, 247, 0.2) transparent;
+}
+
 /**
  * Usage Example:
  * 
@@ -1055,12 +1061,17 @@ body,
   /* Default text color */
   font-family: 'Inter', system-ui, sans-serif;
   /* Modern, readable font */
-  user-select: none;
-  /* Prevent text selection (app-like) */
-  -webkit-user-select: none;
-  /* Safari/Chrome */
+  color-scheme: dark;
+  /* Render form controls (select, input, scrollbar) in dark mode */
   -webkit-touch-callout: none;
   /* iOS Safari */
+}
+
+/* Dark theme for native select dropdowns */
+select,
+select option {
+  background-color: #111118;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /**
@@ -1098,6 +1109,23 @@ body,
  *   #020005;
  * background-size: 200px 200px;
  */
+
+/* ============================================================================
+   FOCUS-VISIBLE STYLES
+   ============================================================================
+
+   Keyboard-only focus ring for accessibility. Only shows when navigating
+   with keyboard (Tab), not on mouse clicks.
+*/
+:focus-visible {
+  outline: 2px solid rgba(168, 85, 247, 0.6);
+  outline-offset: 2px;
+}
+
+/* Suppress default outline for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
 
 /* ============================================================================
    3D TRANSFORM UTILITIES
@@ -1629,15 +1657,22 @@ body,
 */
 
 /* ============================================================================
+   ACCESSIBILITY: REDUCED MOTION
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================================
    END OF STYLESHEET
    ============================================================================
-   
-   "You are my galaxy, my cosmos, my universe." 💜
-   
+
    Made with 보라해 (Borahae) for BTS & ARMY
-   
-   For questions or contributions, see:
-   - README.md
-   - CONTRIBUTING.md
-   - docs/ARCHITECTURE.md
 */

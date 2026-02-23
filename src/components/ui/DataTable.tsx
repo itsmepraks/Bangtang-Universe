@@ -23,7 +23,7 @@ export default function DataTable<T>({ columns, data, onRowClick, maxHeight, emp
 
   return (
     <div
-      className="rounded-2xl border border-white/[0.06] overflow-hidden"
+      className={`rounded-2xl border border-white/[0.06] overflow-hidden ${maxHeight ? 'pretty-scrollbar' : ''}`}
       style={maxHeight ? { maxHeight, overflowY: 'auto' } : undefined}
     >
       <table className="w-full">

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Search, Network, RefreshCw, Music, Disc, User, Sparkles, Trophy, MapPin } from 'lucide-react';
 import { useSearch, type SearchResult } from '../../../hooks';
 import { MOOD_MAP } from '../../../services/searchService';
@@ -31,22 +31,39 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
   const [hoveredResult, setHoveredResult] = useState<SearchResult | null>(null);
 
   const { searchAll, searchByMood, getSuggestions } = useSearch();
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node) &&
+          inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const suggestions = useMemo(() => {
     if (query.length < 2) return [];
     return getSuggestions(query, 5);
   }, [query, getSuggestions]);
 
-  const handleSearch = async () => {
-    if (!query.trim()) return;
+  const runSearch = useCallback((searchQuery: string) => {
+    if (!searchQuery.trim()) return;
     setSearching(true);
     setActiveMood(null);
     setShowSuggestions(false);
-    await new Promise(r => setTimeout(r, 200));
-    const res = searchAll(query);
-    setResults(res);
-    setSearching(false);
-  };
+    setTimeout(() => {
+      const res = searchAll(searchQuery);
+      setResults(res);
+      setSearching(false);
+    }, 200);
+  }, [searchAll]);
+
+  const handleSearch = () => runSearch(query);
 
   const handleMoodSearch = (mood: string) => {
     setActiveMood(mood);
@@ -103,14 +120,16 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
       {/* Search Bar */}
       <div className="relative">
         <div className="flex items-center gap-4 bg-[#111118] border border-white/[0.06] rounded-2xl px-6 py-4 focus-within:border-purple-500/30 transition-colors">
-          <Search size={20} className="text-white/40" />
+          <Search size={20} className="text-white/40" aria-hidden="true" />
           <input
+            ref={inputRef}
             type="text"
             value={query}
             onChange={(e) => { setQuery(e.target.value); setShowSuggestions(true); }}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             onFocus={() => setShowSuggestions(true)}
             placeholder="Search songs, albums, members..."
+            aria-label="Search the archive"
             className="flex-1 bg-transparent text-base text-white/80 outline-none placeholder:text-white/30"
           />
           <button
@@ -124,11 +143,11 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
 
         {/* Suggestions dropdown */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute top-full mt-2 left-0 right-0 bg-[#111118] border border-white/[0.06] rounded-xl overflow-hidden z-50">
+          <div ref={suggestionsRef} className="absolute top-full mt-2 left-0 right-0 bg-[#111118] border border-white/[0.06] rounded-xl overflow-hidden z-50">
             {suggestions.map((s, i) => (
               <button
                 key={i}
-                onClick={() => { setQuery(s); setShowSuggestions(false); handleSearch(); }}
+                onClick={() => { setQuery(s); setShowSuggestions(false); runSearch(s); }}
                 className="w-full text-left px-6 py-3 text-sm text-white/60 hover:bg-white/[0.05] hover:text-white transition-colors"
               >
                 {s}

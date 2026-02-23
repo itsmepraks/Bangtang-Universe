@@ -1,3 +1,5 @@
+import { withAlpha } from '../../constants/colors';
+
 interface BadgeProps {
   children: React.ReactNode;
   variant?: 'default' | 'purple' | 'blue' | 'sentiment';
@@ -28,9 +30,9 @@ export default function Badge({ children, variant = 'default', size = 'sm', colo
       <span
         className={`${base} ${sizeClass} border ${className}`}
         style={{
-          backgroundColor: `${color}15`,
-          borderColor: `${color}40`,
-          color: `${color}cc`,
+          backgroundColor: withAlpha(color, 0.08),
+          borderColor: withAlpha(color, 0.25),
+          color: withAlpha(color, 0.8),
         }}
       >
         {children}
