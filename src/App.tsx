@@ -96,7 +96,7 @@ export default function App() {
   const { chartEntries: _chartEntries } = useChartEntries();
   const { concerts } = useConcerts();
   const { collaborations: _collaborations } = useCollaborations();
-  const { memberEvents: _memberEvents } = useMemberEvents();
+  const { memberEvents } = useMemberEvents();
 
   const handleSync = () => {
     setMode('dashboard');
@@ -243,6 +243,9 @@ export default function App() {
                       songs={songs}
                       albums={albums}
                       members={members}
+                      awards={awards}
+                      concerts={concerts}
+                      memberEvents={memberEvents}
                       onNavigate={navigateTo}
                     />
                   )}

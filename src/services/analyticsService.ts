@@ -7,7 +7,7 @@
  * sentiment analysis, correlations, and auto-generated insights.
  */
 
-import type { Song, Album, Member } from '../types/database';
+import type { Song, Album, Member, Award, Concert } from '../types/database';
 
 // ==================== CONSTANTS ====================
 
@@ -555,6 +555,8 @@ export function generateInsights(
   songs: Song[],
   albums: Album[],
   members: Member[],
+  awards?: Award[],
+  concerts?: Concert[],
 ): Insight[] {
   const insights: Insight[] = [];
 
@@ -695,6 +697,57 @@ export function generateInsights(
     value: String(uniqueWriters),
     category: 'writing',
   });
+
+  // --- Awards insights ---
+  if (awards && awards.length > 0) {
+    const awardsWon = awards.filter(a => a.result === 'won').length;
+    const ceremonies = new Set(awards.map(a => a.ceremony));
+    const ceremonyCounts = new Map<string, number>();
+    for (const award of awards.filter(a => a.result === 'won')) {
+      ceremonyCounts.set(award.ceremony, (ceremonyCounts.get(award.ceremony) ?? 0) + 1);
+    }
+    const topCeremony = [...ceremonyCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+    insights.push({
+      id: 'awards-overview',
+      text: `BTS has won ${awardsWon} awards across ${ceremonies.size} ceremonies${topCeremony ? `, with most wins at ${topCeremony[0]}` : ''}`,
+      value: String(awardsWon),
+      category: 'general',
+    });
+  }
+
+  // --- Concert insights ---
+  if (concerts && concerts.length > 0) {
+    const countries = new Set(concerts.map(c => c.country));
+    const tours = new Set(concerts.map(c => c.tour_name));
+    insights.push({
+      id: 'concerts-overview',
+      text: `BTS has performed ${concerts.length} concerts across ${countries.size} countries, with ${tours.size} different tours`,
+      value: String(concerts.length),
+      category: 'general',
+    });
+  }
+
+  // --- Chart-friendly era insight ---
+  if (eras.length > 0) {
+    const eraTitleTrackCounts = eras.map(era => {
+      const albumMap = buildAlbumMap(albums);
+      const eraTitleTracks = songs.filter(s => {
+        if (!s.is_title_track || s.album_id === null) return false;
+        const album = albumMap.get(s.album_id);
+        return album?.era === era.era;
+      });
+      return { era: era.era, count: eraTitleTracks.length };
+    }).sort((a, b) => b.count - a.count);
+
+    if (eraTitleTrackCounts.length > 0 && eraTitleTrackCounts[0].count > 0) {
+      insights.push({
+        id: 'era-most-title-tracks',
+        text: `The era with the most title tracks is ${eraTitleTrackCounts[0].era} with ${eraTitleTrackCounts[0].count} title tracks`,
+        value: String(eraTitleTrackCounts[0].count),
+        category: 'era',
+      });
+    }
+  }
 
   return insights;
 }
