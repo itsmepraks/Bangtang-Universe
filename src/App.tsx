@@ -23,6 +23,8 @@ const DiscographySection = lazy(() => import('./components/features/sections/Dis
 const MembersSection = lazy(() => import('./components/features/sections/MembersSection'));
 const AnalyticsSection = lazy(() => import('./components/features/sections/AnalyticsSection'));
 const SearchSection = lazy(() => import('./components/features/sections/SearchSection'));
+const AwardsSection = lazy(() => import('./components/features/sections/AwardsSection'));
+const ToursSection = lazy(() => import('./components/features/sections/ToursSection'));
 
 // Loading fallback for lazy components
 const LoadingFallback = () => (
@@ -276,19 +278,11 @@ export default function App() {
                   )}
 
                   {activeSection === 'awards' && (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                      <Trophy size={48} className="text-white/20 mb-4" />
-                      <h2 className="text-lg font-semibold text-white/60 mb-2">Awards</h2>
-                      <p className="text-sm text-white/40">Coming soon — {awards.length} awards loaded</p>
-                    </div>
+                    <AwardsSection awards={awards} members={members} />
                   )}
 
                   {activeSection === 'tours' && (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                      <MapPin size={48} className="text-white/20 mb-4" />
-                      <h2 className="text-lg font-semibold text-white/60 mb-2">Tours</h2>
-                      <p className="text-sm text-white/40">Coming soon — {concerts.length} concerts loaded</p>
-                    </div>
+                    <ToursSection concerts={concerts} />
                   )}
 
                   {activeSection === 'search' && (

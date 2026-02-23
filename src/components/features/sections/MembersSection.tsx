@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
-import { ChevronLeft, PenTool, Disc, Award, Music, ExternalLink, User, GitCompare } from 'lucide-react';
+import { ChevronLeft, PenTool, Disc, Award, Music, ExternalLink, User, GitCompare, Trophy, GitMerge, Calendar } from 'lucide-react';
 import type { Song, Album, Member } from '../../../types/database';
 import { GlassHUD } from '../../layout/GlassHUD';
-import { useSoloAlbumsByMember } from '../../../hooks';
+import { useSoloAlbumsByMember, useAwardsByMember, useCollaborationsByMember, useMemberEventsByMember } from '../../../hooks';
+import MemberTimeline from './Members/MemberTimeline';
 import Badge from '../../ui/Badge';
 import MetricCard from '../../ui/MetricCard';
 import MemberComparison from '../comparison/MemberComparison';
@@ -68,6 +69,9 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
   onBack: () => void; onOpenFullProfile: () => void;
 }) {
   const { soloAlbums } = useSoloAlbumsByMember(member.id);
+  const { awards: memberAwards } = useAwardsByMember(member.id);
+  const { collaborations: memberCollabs } = useCollaborationsByMember(member.id);
+  const { memberEvents } = useMemberEventsByMember(member.id);
 
   const memberSongs = useMemo(() => {
     const name = member.stage_name.toLowerCase();
@@ -77,13 +81,20 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
     );
   }, [songs, member.stage_name]);
 
-  const personalInfo = [
+  const personalInfo: { label: string; value: string | null | undefined }[] = [
     { label: 'Birth Date', value: member.birth_date },
     { label: 'Birth Place', value: member.birth_place },
     { label: 'Height', value: member.height },
     { label: 'MBTI', value: member.mbti },
     { label: 'Zodiac', value: member.zodiac },
-  ].filter(p => p.value);
+  ];
+  if (member.enlistment_start) {
+    personalInfo.push({ label: 'Enlistment', value: member.enlistment_start });
+  }
+  if (member.enlistment_end) {
+    personalInfo.push({ label: 'Discharged', value: member.enlistment_end });
+  }
+  const filteredPersonalInfo = personalInfo.filter(p => p.value);
 
   return (
     <div className="space-y-8">
@@ -134,10 +145,10 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
         {/* Left */}
         <div className="col-span-5 space-y-6">
           {/* Personal Info */}
-          {personalInfo.length > 0 && (
+          {filteredPersonalInfo.length > 0 && (
             <GlassHUD title="Personal Info" icon={User}>
               <div className="grid grid-cols-2 gap-4">
-                {personalInfo.map(p => (
+                {filteredPersonalInfo.map(p => (
                   <div key={p.label}>
                     <span className="text-xs font-medium text-white/50 uppercase tracking-wide block mb-1">{p.label}</span>
                     <span className="text-sm text-white/80">{p.value}</span>
@@ -148,9 +159,9 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
           )}
 
           {/* Bio */}
-          {member.bio && (
+          {(member.bio_long || member.bio) && (
             <GlassHUD title="Biography" icon={User}>
-              <p className="text-sm text-white/70 leading-relaxed">{member.bio}</p>
+              <p className="text-sm text-white/70 leading-relaxed">{member.bio_long || member.bio}</p>
             </GlassHUD>
           )}
 
@@ -207,6 +218,49 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
                 {memberSongs.length > 30 && (
                   <p className="text-xs text-white/40 text-center py-2">+{memberSongs.length - 30} more</p>
                 )}
+              </div>
+            </GlassHUD>
+          )}
+
+          {/* Career Timeline */}
+          {memberEvents.length > 0 && (
+            <GlassHUD title="Career Timeline" icon={Calendar}>
+              <MemberTimeline events={memberEvents} />
+            </GlassHUD>
+          )}
+
+          {/* Awards */}
+          {memberAwards.length > 0 && (
+            <GlassHUD title={`Awards (${memberAwards.filter(a => a.result === 'won').length} won)`} icon={Trophy}>
+              <div className="space-y-2 max-h-[250px] overflow-y-auto pretty-scrollbar">
+                {memberAwards.map(a => (
+                  <div key={a.id} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/[0.04] transition-colors">
+                    <div>
+                      <span className="text-sm text-white/70">{a.name || a.category}</span>
+                      <span className="text-xs text-white/40 ml-2">{a.ceremony} ({a.year})</span>
+                    </div>
+                    <Badge variant={a.result === 'won' ? 'purple' : 'default'} size="sm">
+                      {a.result}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </GlassHUD>
+          )}
+
+          {/* Collaborations */}
+          {memberCollabs.length > 0 && (
+            <GlassHUD title="Collaborations" icon={GitMerge}>
+              <div className="space-y-2 max-h-[250px] overflow-y-auto pretty-scrollbar">
+                {memberCollabs.map(c => (
+                  <div key={c.id} className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/[0.04] transition-colors">
+                    <div>
+                      <span className="text-sm text-white/70">{c.title}</span>
+                      <span className="text-xs text-white/40 ml-2">with {c.artist}</span>
+                    </div>
+                    <Badge variant="default" size="sm">{c.type}</Badge>
+                  </div>
+                ))}
               </div>
             </GlassHUD>
           )}
