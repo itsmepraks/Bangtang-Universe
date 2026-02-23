@@ -131,7 +131,7 @@ export const mapAwardResult = (r: FuseResult<Award>): SearchResult => ({
     subtitle: `${r.item.ceremony} (${r.item.year})`,
     score: Math.round((1 - (r.score || 0)) * 100),
     context: `${r.item.result === 'won' ? 'Won' : 'Nominated'} \u2014 ${r.item.work_title || ''}`,
-    item: r.item as any,
+    item: r.item,
 });
 
 export const mapConcertResult = (r: FuseResult<Concert>): SearchResult => ({
@@ -141,7 +141,7 @@ export const mapConcertResult = (r: FuseResult<Concert>): SearchResult => ({
     subtitle: `${r.item.city}, ${r.item.country}`,
     score: Math.round((1 - (r.score || 0)) * 100),
     context: `${r.item.venue} \u2014 ${r.item.date}`,
-    item: r.item as any,
+    item: r.item,
 });
 
 // ============ MOOD MAP ============
