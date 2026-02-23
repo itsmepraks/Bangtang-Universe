@@ -19,7 +19,14 @@
       "Bash(npx skills add daffy0208/ai-dev-standards@data-visualizer -g -y)",
       "Bash(npx skills add:*)",
       "Bash(npm install:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "WebFetch(domain:colorcodedlyrics.com)",
+      "WebFetch(domain:www.azlyrics.com)",
+      "WebFetch(domain:getsongbpm.com)",
+      "Bash(git checkout:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(npm run scrape:all:*)"
     ],
     "additionalDirectories": [
       "c:\\Development\\BTS universe"
