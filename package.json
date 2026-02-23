@@ -93,6 +93,10 @@
     "scrape:songs": "npx tsx scripts/scrape-05-upsert-songs.ts",
     "scrape:lyrics": "npx tsx scripts/scrape-06-genius-lyrics.ts",
     "scrape:verify": "npx tsx scripts/scrape-07-verify-all.ts",
+    "scrape:expand-discography": "npx tsx scripts/scrape-08-expand-discography.ts",
+    "scrape:cover-art": "npx tsx scripts/scrape-09-cover-art.ts",
+    "scrape:lyrics-translations": "npx tsx scripts/scrape-10-lyrics-translations.ts",
+    "scrape:awards": "npx tsx scripts/scrape-11-awards.ts",
     "scrape:all": "npm run scrape:musicbrainz && npm run scrape:wiki && npm run scrape:genius && npm run scrape:albums && npm run scrape:songs && npm run scrape:lyrics && npm run scrape:verify"
   },
   "dependencies": {
