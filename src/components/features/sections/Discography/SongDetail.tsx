@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { ChevronLeft, Music } from 'lucide-react';
 import type { Song, Album } from '../../../../types/database';
-import { useLyricsBySongId } from '../../../../hooks';
 import { getSentimentColor } from '../../../../constants/colors';
 import { getRecommendations } from '../../../../services/recommendationService';
 import Badge from '../../../ui/Badge';
 import TabBar from '../../../ui/TabBar';
 import ProgressBar from '../../../ui/ProgressBar';
 import MetricCard from '../../../ui/MetricCard';
+import LyricsViewer from './LyricsViewer';
 
 interface SongDetailProps {
   song: Song;
@@ -31,17 +31,9 @@ const SONG_TABS = [
   { value: 'similar', label: 'Similar' },
 ];
 
-const LYRIC_TABS = [
-  { value: 'korean', label: 'Korean' },
-  { value: 'english', label: 'English' },
-  { value: 'romanized', label: 'Romanized' },
-];
-
 export default function SongDetail({ song, songs, albums, onBack, onSelectSong }: SongDetailProps) {
   const album = useMemo(() => albums.find(a => a.id === song.album_id), [albums, song.album_id]);
-  const { lyric: lyrics } = useLyricsBySongId(song.id);
   const [activeTab, setActiveTab] = useState('overview');
-  const [lyricsTab, setLyricsTab] = useState('korean');
 
   const recommendations = useMemo(() => {
     return getRecommendations(song, songs, albums, 6);
@@ -53,10 +45,6 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
     { label: 'Danceability', value: song.danceability },
     { label: 'Acousticness', value: song.acousticness },
   ];
-
-  const lyricsContent = lyrics
-    ? (lyricsTab === 'korean' ? lyrics.lyrics_korean : lyricsTab === 'english' ? lyrics.lyrics_english : lyrics.lyrics_romanized)
-    : null;
 
   return (
     <div className="space-y-6">
@@ -85,6 +73,8 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
           <div className="flex gap-2 mt-2">
             {song.is_title_track && <Badge variant="purple" size="md">Title Track</Badge>}
             {song.has_mv && <Badge variant="blue" size="md">Music Video</Badge>}
+            {song.is_solo && <Badge variant="purple" size="sm">Solo</Badge>}
+            {song.is_collab && <Badge variant="blue" size="sm">Collaboration</Badge>}
             {song.sentiment && <Badge variant="sentiment" size="md" color={getSentimentColor(song.sentiment)}>{song.sentiment}</Badge>}
           </div>
         </div>
@@ -135,35 +125,7 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
       )}
 
       {/* Tab: Lyrics */}
-      {activeTab === 'lyrics' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <TabBar tabs={LYRIC_TABS} active={lyricsTab} onChange={setLyricsTab} />
-            {lyrics?.genius_url && (
-              <a href={lyrics.genius_url} target="_blank" rel="noopener noreferrer"
-                className="text-xs text-purple-400/60 hover:text-purple-300 tracking-wide transition-colors">
-                View on Genius
-              </a>
-            )}
-          </div>
-
-          {lyrics?.themes && lyrics.themes.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {lyrics.themes.map((theme, i) => (
-                <Badge key={i} variant="purple" size="sm">{theme}</Badge>
-              ))}
-            </div>
-          )}
-
-          <div className="max-h-[500px] overflow-y-auto pretty-scrollbar p-6 bg-[#111118] rounded-2xl border border-white/[0.06]">
-            {lyricsContent ? (
-              <pre className="text-sm text-white/70 leading-relaxed whitespace-pre-wrap font-sans select-text">{lyricsContent}</pre>
-            ) : (
-              <p className="text-sm text-white/40 italic">No {lyricsTab} lyrics available</p>
-            )}
-          </div>
-        </div>
-      )}
+      {activeTab === 'lyrics' && <LyricsViewer song={song} />}
 
       {/* Tab: Credits */}
       {activeTab === 'credits' && (
