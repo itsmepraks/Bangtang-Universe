@@ -40,6 +40,13 @@ function convertLocalSong(s: LocalSong): Song {
         has_mv: s.hasMV,
         spotify_id: null,
         created_at: new Date().toISOString(),
+        lyrics_ko: null,
+        lyrics_en: null,
+        lyrics_romanized: null,
+        music_video_url: null,
+        is_solo: false,
+        is_collab: false,
+        featured_members: null,
     };
 }
 

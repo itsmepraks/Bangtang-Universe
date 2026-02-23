@@ -39,6 +39,9 @@ export function useAlbums(): UseAlbumsResult {
                 spotify_id: null,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
+                cover_art_url: null,
+                total_sales: null,
+                label: null,
             })));
             setLoading(false);
             return;
@@ -72,6 +75,9 @@ export function useAlbums(): UseAlbumsResult {
                 spotify_id: null,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
+                cover_art_url: null,
+                total_sales: null,
+                label: null,
             })));
         } finally {
             setLoading(false);

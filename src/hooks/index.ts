@@ -10,3 +10,8 @@ export { useMembers, useMemberById, useMemberColor, useMembersByCredits, useTota
 export { useSoloAlbums, useSoloAlbumsByMember } from './useSoloAlbums';
 export { useLyrics, useLyricsBySongId } from './useLyrics';
 export { useSearch, type SearchResult } from './useSearch';
+export { useAwards, useAwardsByMember, useAwardsByCeremony } from './useAwards';
+export { useChartEntries, useChartEntriesBySong, useChartEntriesByChart } from './useChartEntries';
+export { useConcerts, useConcertsByTour, useConcertsByCountry } from './useConcerts';
+export { useCollaborations, useCollaborationsByMember, useCollaborationsByArtist } from './useCollaborations';
+export { useMemberEvents, useMemberEventsByMember, useMemberEventsByType } from './useMemberEvents';

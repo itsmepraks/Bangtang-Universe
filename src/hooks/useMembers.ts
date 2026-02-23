@@ -41,6 +41,13 @@ function convertLocalMember(m: typeof MEMBER_DATA[0]): Member {
         producer_credits: m.producerCredits,
         writer_credits: m.writerCredits,
         created_at: new Date().toISOString(),
+        birth_name_ko: null,
+        education: null,
+        enlistment_start: null,
+        enlistment_end: null,
+        solo_debut_date: null,
+        instagram_handle: m.instagram || null,
+        bio_long: null,
     };
 }
 
