@@ -1,7 +1,7 @@
 import { useState, useMemo, Suspense, lazy } from 'react';
 
 // Import data and hooks
-import { useMembers, useSongs, useAlbums, useLyrics } from './hooks';
+import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useCollaborations, useMemberEvents } from './hooks';
 import type { DashboardSection, DiscographyState } from './types/index';
 
 // Lightweight components - imported directly
@@ -47,6 +47,8 @@ import {
   Home,
   Disc,
   Users,
+  Trophy,
+  MapPin,
 } from 'lucide-react';
 
 const SECTION_TITLES: Record<DashboardSection, string> = {
@@ -54,6 +56,8 @@ const SECTION_TITLES: Record<DashboardSection, string> = {
   discography: 'Discography',
   members: 'Members',
   analytics: 'Analytics',
+  awards: 'Awards',
+  tours: 'Tours',
   search: 'Search',
 };
 
@@ -62,6 +66,8 @@ const NAV_ITEMS: { id: DashboardSection; icon: React.ElementType; label: string 
   { id: 'discography', icon: Disc, label: 'Discography' },
   { id: 'members', icon: Users, label: 'Members' },
   { id: 'analytics', icon: BarChart3, label: 'Analytics' },
+  { id: 'awards', icon: Trophy, label: 'Awards' },
+  { id: 'tours', icon: MapPin, label: 'Tours' },
   { id: 'search', icon: Search, label: 'Search' },
 ];
 
@@ -84,6 +90,11 @@ export default function App() {
   const { albums } = useAlbums();
   const { members } = useMembers();
   const { lyrics } = useLyrics();
+  const { awards } = useAwards();
+  const { chartEntries: _chartEntries } = useChartEntries();
+  const { concerts } = useConcerts();
+  const { collaborations: _collaborations } = useCollaborations();
+  const { memberEvents: _memberEvents } = useMemberEvents();
 
   const handleSync = () => {
     setMode('dashboard');
@@ -199,6 +210,8 @@ export default function App() {
               <div className="text-xs text-white/40">{songs.length} songs</div>
               <div className="text-xs text-white/40">{albums.length} albums</div>
               <div className="text-xs text-white/40">{members.length} members</div>
+              <div className="text-xs text-white/40">{awards.length} awards</div>
+              <div className="text-xs text-white/40">{concerts.length} concerts</div>
             </div>
 
             <button
@@ -260,6 +273,22 @@ export default function App() {
                       members={members}
                       lyrics={lyrics}
                     />
+                  )}
+
+                  {activeSection === 'awards' && (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                      <Trophy size={48} className="text-white/20 mb-4" />
+                      <h2 className="text-lg font-semibold text-white/60 mb-2">Awards</h2>
+                      <p className="text-sm text-white/40">Coming soon — {awards.length} awards loaded</p>
+                    </div>
+                  )}
+
+                  {activeSection === 'tours' && (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                      <MapPin size={48} className="text-white/20 mb-4" />
+                      <h2 className="text-lg font-semibold text-white/60 mb-2">Tours</h2>
+                      <p className="text-sm text-white/40">Coming soon — {concerts.length} concerts loaded</p>
+                    </div>
                   )}
 
                   {activeSection === 'search' && (

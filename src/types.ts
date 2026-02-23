@@ -1250,7 +1250,7 @@ export type AppMode = 'landing' | 'warp' | 'dashboard';
  * @validation
  * - Must be one of: 'overview', 'sonic', 'rag', or 'data'
  */
-export type DashboardSection = 'overview' | 'discography' | 'members' | 'analytics' | 'search';
+export type DashboardSection = 'overview' | 'discography' | 'members' | 'analytics' | 'awards' | 'tours' | 'search';
 
 /**
  * Application state container.
