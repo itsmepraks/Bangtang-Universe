@@ -2,12 +2,17 @@ import { useState } from 'react';
 import { MessageSquare, Send, Sparkles } from 'lucide-react';
 import { qaService, SUGGESTED_QUESTIONS } from '../../../../services/qaService';
 import type { QAResponse } from '../../../../services/qaService';
-import type { Song, Album, Member } from '../../../../types/database';
+import type { Song, Album, Member, Award, ChartEntry, Concert, Collaboration, MemberEvent } from '../../../../types/database';
 
 interface QAPanelProps {
   songs: Song[];
   albums: Album[];
   members: Member[];
+  awards?: Award[];
+  chartEntries?: ChartEntry[];
+  concerts?: Concert[];
+  collaborations?: Collaboration[];
+  memberEvents?: MemberEvent[];
 }
 
 interface QAHistoryEntry {
@@ -21,7 +26,7 @@ function getConfidenceLabel(confidence: number): { label: string; color: string 
   return { label: 'Low', color: 'text-red-400' };
 }
 
-export default function QAPanel({ songs, albums, members }: QAPanelProps) {
+export default function QAPanel({ songs, albums, members, awards, chartEntries, concerts, collaborations, memberEvents }: QAPanelProps) {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState<QAResponse | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState('');
@@ -31,7 +36,10 @@ export default function QAPanel({ songs, albums, members }: QAPanelProps) {
     const query = (q ?? question).trim();
     if (!query) return;
 
-    const response = qaService.answer(query, { songs, albums, members });
+    const response = qaService.answer(query, {
+      songs, albums, members,
+      awards, chartEntries, concerts, collaborations, memberEvents,
+    });
 
     setCurrentQuestion(query);
     setAnswer(response);

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Network, RefreshCw, Music, Disc, User, Sparkles } from 'lucide-react';
+import { Search, Network, RefreshCw, Music, Disc, User, Sparkles, Trophy, MapPin } from 'lucide-react';
 import { useSearch, type SearchResult } from '../../../hooks';
 import { MOOD_MAP } from '../../../services/searchService';
 import type { Song } from '../../../types/database';
@@ -25,7 +25,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
-  const [typeFilter, setTypeFilter] = useState<'all' | 'song' | 'album' | 'member'>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | 'song' | 'album' | 'member' | 'award' | 'concert'>('all');
   const [activeMood, setActiveMood] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [hoveredResult, setHoveredResult] = useState<SearchResult | null>(null);
@@ -84,7 +84,17 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
       case 'song': return Music;
       case 'album': return Disc;
       case 'member': return User;
+      case 'award': return Trophy;
+      case 'concert': return MapPin;
       default: return Search;
+    }
+  };
+
+  const resultAccent = (type: string) => {
+    switch (type) {
+      case 'award': return 'text-yellow-400/70';
+      case 'concert': return 'text-green-400/70';
+      default: return 'text-purple-400/70';
     }
   };
 
@@ -151,7 +161,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
 
       {/* Type Filter + Results Count */}
       <div className="flex items-center gap-2">
-        {(['all', 'song', 'album', 'member'] as const).map(t => (
+        {(['all', 'song', 'album', 'member', 'award', 'concert'] as const).map(t => (
           <button
             key={t}
             onClick={() => setTypeFilter(t)}
@@ -189,7 +199,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge variant="default" size="sm">{r.type}</Badge>
-                    <span className="text-xs text-purple-400/70 font-mono">{r.score}%</span>
+                    <span className={`text-xs font-mono ${resultAccent(r.type)}`}>{r.score}%</span>
                   </div>
                 </button>
               );
@@ -290,6 +300,62 @@ function PreviewPanel({ result }: { result: SearchResult }) {
         {member.role && <Badge variant="purple" size="sm">{member.role}</Badge>}
         {member.komca_credits != null && (
           <p className="text-xs text-white/60">{member.komca_credits} KOMCA credits</p>
+        )}
+      </div>
+    );
+  }
+
+  if (result.type === 'award') {
+    const award = result.item as { name: string; ceremony: string; year: number; category?: string | null; result: string; work_title?: string | null };
+    return (
+      <div className="space-y-4">
+        <div
+          className="h-20 rounded-xl flex items-center justify-center"
+          style={{ background: 'linear-gradient(135deg, rgba(234,179,8,0.3), rgba(234,179,8,0.08))' }}
+        >
+          <Trophy size={32} className="text-yellow-400/60" />
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-white/90">{award.name}</h4>
+          <p className="text-xs text-white/50 mt-0.5">{award.ceremony} ({award.year})</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Badge variant={award.result === 'won' ? 'purple' : 'default'} size="sm">
+            {award.result === 'won' ? 'Won' : 'Nominated'}
+          </Badge>
+          {award.category && <Badge variant="default" size="sm">{award.category}</Badge>}
+        </div>
+        {award.work_title && <p className="text-xs text-white/60">{award.work_title}</p>}
+      </div>
+    );
+  }
+
+  if (result.type === 'concert') {
+    const concert = result.item as { tour_name: string; venue: string; city: string; country: string; date: string; attendance?: number | null };
+    return (
+      <div className="space-y-4">
+        <div
+          className="h-20 rounded-xl flex items-center justify-center"
+          style={{ background: 'linear-gradient(135deg, rgba(34,197,94,0.3), rgba(34,197,94,0.08))' }}
+        >
+          <MapPin size={32} className="text-green-400/60" />
+        </div>
+        <div>
+          <h4 className="text-sm font-semibold text-white/90">{concert.tour_name}</h4>
+          <p className="text-xs text-white/50 mt-0.5">{concert.venue}</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 text-xs">
+          <div>
+            <span className="text-white/40">Location</span>
+            <div className="text-white/70 mt-0.5">{concert.city}, {concert.country}</div>
+          </div>
+          <div>
+            <span className="text-white/40">Date</span>
+            <div className="text-white/70 mt-0.5">{concert.date}</div>
+          </div>
+        </div>
+        {concert.attendance != null && (
+          <p className="text-xs text-white/60">{concert.attendance.toLocaleString()} attendance</p>
         )}
       </div>
     );

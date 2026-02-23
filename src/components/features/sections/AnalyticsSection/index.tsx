@@ -1,6 +1,6 @@
 import { useState, Suspense, lazy } from 'react';
-import { BarChart3, TrendingUp, Network, Heart, Sparkles, MessageSquare, BookOpen } from 'lucide-react';
-import type { Song, Album, Member, Lyrics } from '../../../../types/database';
+import { BarChart3, TrendingUp, Network, Heart, Sparkles, MessageSquare, BookOpen, Trophy, Calendar } from 'lucide-react';
+import type { Song, Album, Member, Lyrics, Award, ChartEntry, Concert, MemberEvent } from '../../../../types/database';
 
 const AudioExplorer = lazy(() => import('./AudioExplorer'));
 const EraEvolution = lazy(() => import('./EraEvolution'));
@@ -9,12 +9,18 @@ const SentimentDashboard = lazy(() => import('./SentimentDashboard'));
 const SongRecommender = lazy(() => import('./SongRecommender'));
 const QAPanel = lazy(() => import('./QAPanel'));
 const LyricsPanel = lazy(() => import('./LyricsPanel'));
+const AwardsAnalytics = lazy(() => import('./AwardsAnalytics'));
+const CareerTimeline = lazy(() => import('./CareerTimeline'));
 
 interface AnalyticsSectionProps {
   songs: Song[];
   albums: Album[];
   members: Member[];
   lyrics: Lyrics[];
+  awards?: Award[];
+  chartEntries?: ChartEntry[];
+  concerts?: Concert[];
+  memberEvents?: MemberEvent[];
 }
 
 const TABS = [
@@ -23,13 +29,15 @@ const TABS = [
   { id: 'writing', label: 'Writing Network', icon: Network },
   { id: 'sentiment', label: 'Sentiment', icon: Heart },
   { id: 'recommendations', label: 'Recommendations', icon: Sparkles },
+  { id: 'awards-charts', label: 'Awards & Charts', icon: Trophy },
+  { id: 'career', label: 'Career Timeline', icon: Calendar },
   { id: 'qa', label: 'Q&A', icon: MessageSquare },
   { id: 'lyrics', label: 'Lyrics', icon: BookOpen },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
 
-export default function AnalyticsSection({ songs, albums, members, lyrics }: AnalyticsSectionProps) {
+export default function AnalyticsSection({ songs, albums, members, lyrics, awards, chartEntries, concerts, memberEvents }: AnalyticsSectionProps) {
   const [activeTab, setActiveTab] = useState<TabId>('audio');
 
   const renderPanel = () => {
@@ -44,8 +52,12 @@ export default function AnalyticsSection({ songs, albums, members, lyrics }: Ana
         return <SentimentDashboard songs={songs} albums={albums} />;
       case 'recommendations':
         return <SongRecommender songs={songs} albums={albums} />;
+      case 'awards-charts':
+        return <AwardsAnalytics awards={awards || []} chartEntries={chartEntries || []} songs={songs} />;
+      case 'career':
+        return <CareerTimeline albums={albums} awards={awards || []} concerts={concerts || []} memberEvents={memberEvents || []} />;
       case 'qa':
-        return <QAPanel songs={songs} albums={albums} members={members} />;
+        return <QAPanel songs={songs} albums={albums} members={members} awards={awards} chartEntries={chartEntries} concerts={concerts} memberEvents={memberEvents} />;
       case 'lyrics':
         return <LyricsPanel lyrics={lyrics} songs={songs} albums={albums} />;
       default:

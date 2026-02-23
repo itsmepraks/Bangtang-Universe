@@ -10,14 +10,20 @@ import Fuse from 'fuse.js';
 import { useSongs } from './useSongs';
 import { useMembers } from './useMembers';
 import { useAlbums } from './useAlbums';
+import { useAwards } from './useAwards';
+import { useConcerts } from './useConcerts';
 import type { Song } from '../types/database';
 import {
     SONG_FUSE_OPTIONS,
     MEMBER_FUSE_OPTIONS,
     ALBUM_FUSE_OPTIONS,
+    AWARD_FUSE_OPTIONS,
+    CONCERT_FUSE_OPTIONS,
     mapSongResult,
     mapMemberResult,
     mapAlbumResult,
+    mapAwardResult,
+    mapConcertResult,
     MOOD_MAP,
     type SearchResult,
 } from '../services/searchService';
@@ -28,6 +34,8 @@ interface UseSearchResult {
     searchSongs: (query: string, limit?: number) => SearchResult[];
     searchMembers: (query: string, limit?: number) => SearchResult[];
     searchAlbums: (query: string, limit?: number) => SearchResult[];
+    searchAwards: (query: string, limit?: number) => SearchResult[];
+    searchConcerts: (query: string, limit?: number) => SearchResult[];
     searchAll: (query: string, limit?: number) => SearchResult[];
     getSuggestions: (query: string, limit?: number) => string[];
     searchByMood: (mood: string) => Song[];
@@ -38,12 +46,16 @@ export function useSearch(): UseSearchResult {
     const { songs, loading: songsLoading } = useSongs();
     const { members, loading: membersLoading } = useMembers();
     const { albums, loading: albumsLoading } = useAlbums();
+    const { awards, loading: awardsLoading } = useAwards();
+    const { concerts, loading: concertsLoading } = useConcerts();
 
     const songFuse = useMemo(() => new Fuse(songs, SONG_FUSE_OPTIONS), [songs]);
     const memberFuse = useMemo(() => new Fuse(members, MEMBER_FUSE_OPTIONS), [members]);
     const albumFuse = useMemo(() => new Fuse(albums, ALBUM_FUSE_OPTIONS), [albums]);
+    const awardFuse = useMemo(() => new Fuse(awards, AWARD_FUSE_OPTIONS), [awards]);
+    const concertFuse = useMemo(() => new Fuse(concerts, CONCERT_FUSE_OPTIONS), [concerts]);
 
-    const loading = songsLoading || membersLoading || albumsLoading;
+    const loading = songsLoading || membersLoading || albumsLoading || awardsLoading || concertsLoading;
 
     const searchSongs = useCallback((query: string, limit = 10): SearchResult[] => {
         if (!query.trim()) return [];
@@ -60,19 +72,31 @@ export function useSearch(): UseSearchResult {
         return albumFuse.search(query, { limit }).map(mapAlbumResult);
     }, [albumFuse]);
 
+    const searchAwards = useCallback((query: string, limit = 10): SearchResult[] => {
+        if (!query.trim()) return [];
+        return awardFuse.search(query, { limit }).map(mapAwardResult);
+    }, [awardFuse]);
+
+    const searchConcerts = useCallback((query: string, limit = 10): SearchResult[] => {
+        if (!query.trim()) return [];
+        return concertFuse.search(query, { limit }).map(mapConcertResult);
+    }, [concertFuse]);
+
     const searchAll = useCallback((query: string, limit = 15): SearchResult[] => {
         if (!query.trim()) return [];
 
         const allResults = [
             ...searchSongs(query, limit),
             ...searchMembers(query, limit),
-            ...searchAlbums(query, limit)
+            ...searchAlbums(query, limit),
+            ...searchAwards(query, limit),
+            ...searchConcerts(query, limit),
         ]
             .sort((a, b) => b.score - a.score)
             .slice(0, limit);
 
         return allResults;
-    }, [searchSongs, searchMembers, searchAlbums]);
+    }, [searchSongs, searchMembers, searchAlbums, searchAwards, searchConcerts]);
 
     const getSuggestions = useCallback((query: string, limit = 5): string[] => {
         if (!query.trim() || query.length < 2) return [];
@@ -102,6 +126,8 @@ export function useSearch(): UseSearchResult {
         searchSongs,
         searchMembers,
         searchAlbums,
+        searchAwards,
+        searchConcerts,
         searchAll,
         getSuggestions,
         searchByMood,

@@ -6,19 +6,19 @@
  */
 
 import type { IFuseOptions, FuseResult } from 'fuse.js';
-import type { Song, Member, Album } from '../types/database';
+import type { Song, Member, Album, Award, Concert } from '../types/database';
 
 // ============ SEARCH RESULT TYPES ============
 
 export interface SearchResult {
     id: number | string;
-    type: 'song' | 'member' | 'album';
+    type: 'song' | 'member' | 'album' | 'award' | 'concert' | 'collaboration';
     title: string;
     subtitle: string;
     score: number;
     context: string;
     color?: string;
-    item: Song | Member | Album;
+    item: Song | Member | Album | Award | Concert;
 }
 
 // ============ FUSE CONFIGURATIONS ============
@@ -64,6 +64,32 @@ export const ALBUM_FUSE_OPTIONS: IFuseOptions<Album> = {
     minMatchCharLength: 2
 };
 
+export const AWARD_FUSE_OPTIONS: IFuseOptions<Award> = {
+    keys: [
+        { name: 'name', weight: 0.3 },
+        { name: 'ceremony', weight: 0.3 },
+        { name: 'category', weight: 0.2 },
+        { name: 'work_title', weight: 0.2 },
+    ],
+    includeScore: true,
+    threshold: 0.4,
+    ignoreLocation: true,
+    minMatchCharLength: 2,
+};
+
+export const CONCERT_FUSE_OPTIONS: IFuseOptions<Concert> = {
+    keys: [
+        { name: 'tour_name', weight: 0.3 },
+        { name: 'venue', weight: 0.3 },
+        { name: 'city', weight: 0.2 },
+        { name: 'country', weight: 0.2 },
+    ],
+    includeScore: true,
+    threshold: 0.4,
+    ignoreLocation: true,
+    minMatchCharLength: 2,
+};
+
 // ============ RESULT MAPPERS ============
 
 export const mapSongResult = (r: FuseResult<Song>): SearchResult => ({
@@ -96,6 +122,26 @@ export const mapAlbumResult = (r: FuseResult<Album>): SearchResult => ({
     context: r.item.era || '',
     color: r.item.cover_color || undefined,
     item: r.item
+});
+
+export const mapAwardResult = (r: FuseResult<Award>): SearchResult => ({
+    id: r.item.id,
+    type: 'award',
+    title: r.item.name || r.item.category || 'Award',
+    subtitle: `${r.item.ceremony} (${r.item.year})`,
+    score: Math.round((1 - (r.score || 0)) * 100),
+    context: `${r.item.result === 'won' ? 'Won' : 'Nominated'} \u2014 ${r.item.work_title || ''}`,
+    item: r.item as any,
+});
+
+export const mapConcertResult = (r: FuseResult<Concert>): SearchResult => ({
+    id: r.item.id,
+    type: 'concert',
+    title: r.item.tour_name,
+    subtitle: `${r.item.city}, ${r.item.country}`,
+    score: Math.round((1 - (r.score || 0)) * 100),
+    context: `${r.item.venue} \u2014 ${r.item.date}`,
+    item: r.item as any,
 });
 
 // ============ MOOD MAP ============
