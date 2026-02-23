@@ -263,7 +263,7 @@ async function upsertToSupabase(results: LyricsTranslation[]) {
                 lyrics_korean: result.lyrics_ko,
                 lyrics_english: result.lyrics_en,
                 lyrics_romanized: result.lyrics_romanized,
-                colorcodedlyrics_url: result.source_url,
+                genius_url: result.source_url,
             }, { onConflict: 'song_id' });
 
         if (lyricsErr) {

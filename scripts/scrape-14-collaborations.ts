@@ -28,17 +28,36 @@ import {
 } from './scrape-utils.js';
 
 const USER_AGENT = 'BangtanUniverse/1.0 (https://github.com/itsmepraks/BTS-universe)';
-const DISCOGRAPHY_URL = 'https://en.wikipedia.org/wiki/BTS_discography';
+const DISCOGRAPHY_URL = 'https://en.wikipedia.org/wiki/BTS_singles_discography';
 
-// Individual member Wikipedia URLs
-const MEMBER_PAGES: { name: string; member_id: string; url: string }[] = [
-    { name: 'RM', member_id: 'rm', url: 'https://en.wikipedia.org/wiki/RM_(rapper)' },
-    { name: 'Jin', member_id: 'jin', url: 'https://en.wikipedia.org/wiki/Jin_(singer)' },
-    { name: 'Suga', member_id: 'suga', url: 'https://en.wikipedia.org/wiki/Suga_(rapper)' },
-    { name: 'J-Hope', member_id: 'jh', url: 'https://en.wikipedia.org/wiki/J-Hope' },
-    { name: 'Jimin', member_id: 'jm', url: 'https://en.wikipedia.org/wiki/Jimin_(singer)' },
-    { name: 'V', member_id: 'v', url: 'https://en.wikipedia.org/wiki/V_(singer)' },
-    { name: 'Jungkook', member_id: 'jk', url: 'https://en.wikipedia.org/wiki/Jungkook' },
+// Individual member discography Wikipedia pages (preferred) with fallback to main pages
+const MEMBER_PAGES: { name: string; member_id: string; urls: string[] }[] = [
+    { name: 'RM', member_id: 'rm', urls: [
+        'https://en.wikipedia.org/wiki/RM_discography',
+        'https://en.wikipedia.org/wiki/RM_(rapper)',
+    ]},
+    { name: 'Jin', member_id: 'jin', urls: [
+        'https://en.wikipedia.org/wiki/Jin_(singer)',  // No dedicated discography page; Jin_discography is a different artist
+    ]},
+    { name: 'Suga', member_id: 'suga', urls: [
+        'https://en.wikipedia.org/wiki/Suga_discography',
+        'https://en.wikipedia.org/wiki/Suga_(rapper)',
+    ]},
+    { name: 'J-Hope', member_id: 'jh', urls: [
+        'https://en.wikipedia.org/wiki/J-Hope_discography',
+        'https://en.wikipedia.org/wiki/J-Hope',
+    ]},
+    { name: 'Jimin', member_id: 'jm', urls: [
+        'https://en.wikipedia.org/wiki/Jimin_discography',
+        'https://en.wikipedia.org/wiki/Jimin_(singer)',
+    ]},
+    { name: 'V', member_id: 'v', urls: [
+        'https://en.wikipedia.org/wiki/V_(singer)',  // V_discography is a disambiguation page
+    ]},
+    { name: 'Jungkook', member_id: 'jk', urls: [
+        'https://en.wikipedia.org/wiki/Jung_Kook_discography',
+        'https://en.wikipedia.org/wiki/Jungkook',
+    ]},
 ];
 
 interface Collaboration {
@@ -103,10 +122,143 @@ function findMemberId(text: string): string | null {
 }
 
 /**
- * Scrape the BTS discography page for collaborations
+ * Extract heading text from a Wikipedia element, handling both old (<h2>) and new (<div class="mw-heading">) structures
+ */
+function getHeadingText($el: cheerio.Cheerio<cheerio.Element>, $: cheerio.CheerioAPI): string | null {
+    const tagName = $el.prop('tagName')?.toLowerCase() || '';
+    const classes = $el.attr('class') || '';
+
+    if (tagName === 'h2' || tagName === 'h3' || tagName === 'h4' || classes.includes('mw-heading')) {
+        return cleanCell(
+            $el.find('h2, h3, h4').first().text() || $el.find('.mw-headline').text() || $el.text()
+        ).replace(/\[edit\]/gi, '').trim();
+    }
+    return null;
+}
+
+/**
+ * Extract artist name from a featured-artist title string.
+ * Wikipedia formats these as: "Title"(Artist featuring Member) or "Title" (Artist feat. Member)
+ */
+function extractArtistFromTitle(rawTitle: string): { title: string; artist: string } {
+    // Pattern: "Song Title"(Artist featuring someone)  or  "Song Title" (Artist feat. someone)
+    const match = rawTitle.match(/^[""\u201c]?(.+?)[""\u201d]?\s*\((.+?)\)\s*$/);
+    if (match) {
+        return { title: match[1].trim(), artist: match[2].trim() };
+    }
+    // Pattern: "Song Title" Artist featuring someone (no parens)
+    const match2 = rawTitle.match(/^[""\u201c]?(.+?)[""\u201d]?\s+(.+?(?:featuring|feat\.?|ft\.?).+)$/i);
+    if (match2) {
+        return { title: match2[1].trim(), artist: match2[2].trim() };
+    }
+    return { title: rawTitle, artist: '' };
+}
+
+/**
+ * Parse table rows into an array of cell arrays, handling rowspan/colspan and multi-row headers.
+ * Returns { headerRowCount, columns, dataRows } where columns is a flat list of column names.
+ */
+function parseWikiTable(
+    $: cheerio.CheerioAPI,
+    $table: cheerio.Cheerio<cheerio.Element>
+): { columns: string[]; headerRowCount: number; dataRows: string[][] } {
+    const rows = $table.find('tr');
+    const firstRowCells = rows.eq(0).find('th');
+
+    // Check if multi-row header
+    let hasMultiRowHeader = false;
+    firstRowCells.each((_, th) => {
+        const rs = parseInt($(th).attr('rowspan') || '1', 10);
+        const cs = parseInt($(th).attr('colspan') || '1', 10);
+        if (rs > 1 || cs > 1) hasMultiRowHeader = true;
+    });
+
+    let columns: string[];
+    let headerRowCount: number;
+
+    if (!hasMultiRowHeader) {
+        columns = [];
+        firstRowCells.each((_, th) => {
+            columns.push(cleanCell($(th).text()).toLowerCase());
+        });
+        headerRowCount = 1;
+    } else {
+        // Multi-row header: resolve rowspan/colspan across first 2 rows
+        const grid: (string | undefined)[][] = [[], []];
+
+        let colPos = 0;
+        firstRowCells.each((_, th) => {
+            const text = cleanCell($(th).text()).toLowerCase();
+            const rs = parseInt($(th).attr('rowspan') || '1', 10);
+            const cs = parseInt($(th).attr('colspan') || '1', 10);
+            for (let c = 0; c < cs; c++) {
+                grid[0][colPos + c] = text;
+                if (rs > 1) grid[1][colPos + c] = text;
+            }
+            colPos += cs;
+        });
+
+        const row1Cells = rows.eq(1).find('th');
+        let r1Idx = 0;
+        for (let c = 0; c < grid[0].length; c++) {
+            if (grid[1][c] === undefined && r1Idx < row1Cells.length) {
+                grid[1][c] = cleanCell($(row1Cells[r1Idx]).text()).toLowerCase();
+                r1Idx++;
+            }
+        }
+
+        columns = [];
+        for (let c = 0; c < grid[0].length; c++) {
+            const r0 = grid[0][c] || '';
+            const r1 = grid[1]?.[c] || '';
+            columns.push(r0 === r1 ? r0 : r1);
+        }
+        headerRowCount = 2;
+    }
+
+    // Parse data rows
+    const rowspanTracker: Map<number, { value: string; remaining: number }> = new Map();
+    const dataRows: string[][] = [];
+
+    rows.each((rowIdx, row) => {
+        if (rowIdx < headerRowCount) return;
+        const cells = $(row).find('td, th');
+        if (cells.length === 0) return;
+
+        const rowCells: string[] = [];
+        let cellIdx = 0;
+
+        for (let colPos = 0; colPos < columns.length + 5; colPos++) {
+            const span = rowspanTracker.get(colPos);
+            if (span && span.remaining > 0) {
+                rowCells.push(span.value);
+                span.remaining--;
+                if (span.remaining === 0) rowspanTracker.delete(colPos);
+            } else if (cellIdx < cells.length) {
+                const $cell = $(cells[cellIdx]);
+                const text = $cell.text().trim();
+                const rowspan = parseInt($cell.attr('rowspan') || '1', 10);
+                if (rowspan > 1) {
+                    rowspanTracker.set(colPos, { value: text, remaining: rowspan - 1 });
+                }
+                rowCells.push(text);
+                cellIdx++;
+            } else {
+                rowCells.push('');
+            }
+        }
+
+        dataRows.push(rowCells);
+    });
+
+    return { columns, headerRowCount, dataRows };
+}
+
+/**
+ * Scrape the BTS singles discography page for collaborations
  */
 async function scrapeDiscographyPage(): Promise<Collaboration[]> {
-    console.log('   Fetching BTS discography page for collaborations...');
+    console.log('   Fetching BTS singles discography page for collaborations...');
     const { data: html } = await axios.get(DISCOGRAPHY_URL, {
         headers: { 'User-Agent': USER_AGENT },
         timeout: 30000,
@@ -115,73 +267,55 @@ async function scrapeDiscographyPage(): Promise<Collaboration[]> {
     const $ = cheerio.load(html);
     const collabs: Collaboration[] = [];
 
-    // Look for sections with "Other charted songs", "Featured in", "Collaborations", "Guest appearances"
-    const targetSections = /other\s+chart|featured|collaboration|guest\s+appear|promotional\s+single/i;
+    // Target sections: "As featured artist", "Other collaborations", "Promotional singles"
+    const targetSections = /featured\s+artist|other\s+collaborat|promotional\s+single/i;
 
     let inTargetSection = false;
+    let currentSection = '';
     const contentElements = $('#mw-content-text > .mw-parser-output').children();
 
     contentElements.each((_, el) => {
         const $el = $(el);
         const tagName = el.type === 'tag' ? (el as cheerio.TagElement).tagName : '';
 
-        if (tagName === 'h2' || tagName === 'h3') {
-            const headingText = cleanCell($el.find('.mw-headline').text() || $el.text());
+        // Handle Wikipedia's new heading structure (div.mw-heading wrapping h2/h3)
+        const headingText = getHeadingText($el, $);
+        if (headingText !== null) {
             inTargetSection = targetSections.test(headingText);
+            currentSection = headingText;
             return;
         }
 
         if (!inTargetSection || tagName !== 'table') return;
+        if (!$el.hasClass('wikitable')) return;
 
-        // Parse table headers
-        const headers: string[] = [];
-        $el.find('tr').first().find('th').each((_, th) => {
-            headers.push(cleanCell($(th).text()).toLowerCase());
-        });
+        console.log(`   Parsing discography table under "${currentSection}"...`);
 
-        const titleIdx = headers.findIndex(h => /title|song|single/i.test(h));
-        const artistIdx = headers.findIndex(h => /artist|with|featuring/i.test(h));
-        const yearIdx = headers.findIndex(h => /year|date|released/i.test(h));
+        const { columns, dataRows } = parseWikiTable($, $el);
+
+        const titleIdx = columns.findIndex(h => /title|song|single/i.test(h));
+        const artistIdx = columns.findIndex(h => /other\s+artist|artist|with|featuring|members/i.test(h));
+        const yearIdx = columns.findIndex(h => /year|date|released/i.test(h));
+        const albumIdx = columns.findIndex(h => /album/i.test(h));
 
         if (titleIdx === -1) return;
 
-        // Parse rows with rowspan handling
-        const rowspanTracker: Map<number, { value: string; remaining: number }> = new Map();
+        for (const rowCells of dataRows) {
+            let rawTitle = cleanCell(rowCells[titleIdx] || '').replace(/^[""\u201c]|[""\u201d]$/g, '');
+            if (!rawTitle || rawTitle === '\u2014' || rawTitle.length > 200) continue;
 
-        $el.find('tr').each((rowIdx, row) => {
-            if (rowIdx === 0) return;
+            let rawArtist = artistIdx >= 0 ? cleanCell(rowCells[artistIdx]) : '';
+            const releaseDate = yearIdx >= 0 ? parseReleaseDate(rowCells[yearIdx]) : null;
 
-            const cells = $(row).find('td, th');
-            if (cells.length === 0) return;
-
-            const rowCells: string[] = [];
-            let cellIdx = 0;
-
-            for (let colPos = 0; colPos <= headers.length + 3; colPos++) {
-                const span = rowspanTracker.get(colPos);
-                if (span && span.remaining > 0) {
-                    rowCells.push(span.value);
-                    span.remaining--;
-                    if (span.remaining === 0) rowspanTracker.delete(colPos);
-                } else if (cellIdx < cells.length) {
-                    const $cell = $(cells[cellIdx]);
-                    const text = $cell.text().trim();
-                    const rowspan = parseInt($cell.attr('rowspan') || '1', 10);
-                    if (rowspan > 1) {
-                        rowspanTracker.set(colPos, { value: text, remaining: rowspan - 1 });
-                    }
-                    rowCells.push(text);
-                    cellIdx++;
-                } else {
-                    rowCells.push('');
+            // For "As featured artist" tables, the artist info is often embedded in the title
+            // e.g. '"Ashes" (재)(Lim Jeong-hee featuring BTS)'
+            if (/featured/i.test(currentSection) && !rawArtist) {
+                const extracted = extractArtistFromTitle(rawTitle);
+                if (extracted.artist) {
+                    rawTitle = extracted.title;
+                    rawArtist = extracted.artist;
                 }
             }
-
-            const rawTitle = cleanCell(rowCells[titleIdx] || '').replace(/^[""\u201c]|["""\u201d]$/g, '');
-            if (!rawTitle || rawTitle === '\u2014' || rawTitle.length > 200) return;
-
-            const rawArtist = artistIdx >= 0 ? cleanCell(rowCells[artistIdx]) : '';
-            const releaseDate = yearIdx >= 0 ? parseReleaseDate(rowCells[yearIdx]) : null;
 
             // Determine collaborating artist (remove "BTS" from the artist field)
             let artist = rawArtist
@@ -202,14 +336,14 @@ async function scrapeDiscographyPage(): Promise<Collaboration[]> {
             const memberId = findMemberId(fullRowText);
 
             collabs.push({
-                title: rawTitle,
+                title: rawTitle.replace(/^[""\u201c]|[""\u201d]$/g, '').trim(),
                 artist,
                 member_id: memberId,
                 type,
                 release_date: releaseDate,
                 song_id: null,
             });
-        });
+        }
     });
 
     logSuccess(`Found ${collabs.length} collaborations from discography page`);
@@ -217,34 +351,56 @@ async function scrapeDiscographyPage(): Promise<Collaboration[]> {
 }
 
 /**
- * Scrape individual member Wikipedia pages for solo collaborations
+ * Scrape individual member Wikipedia pages for solo collaborations.
+ * Uses dedicated discography pages (e.g., RM_discography) which have
+ * "As featured artist", "Other songs", "Other appearances" tables.
  */
 async function scrapeMemberPages(): Promise<Collaboration[]> {
     const collabs: Collaboration[] = [];
 
     for (let i = 0; i < MEMBER_PAGES.length; i++) {
         const member = MEMBER_PAGES[i];
-        logProgress(i + 1, MEMBER_PAGES.length, `Fetching ${member.name}'s Wikipedia page`);
+        logProgress(i + 1, MEMBER_PAGES.length, `Fetching ${member.name}'s discography page`);
 
         await delay(2000); // Rate limit
 
-        let html: string;
-        try {
-            const resp = await axios.get(member.url, {
-                headers: { 'User-Agent': USER_AGENT },
-                timeout: 30000,
-            });
-            html = resp.data;
-        } catch (err: any) {
-            logWarning(`Failed to fetch ${member.name}'s page: ${err.message}`);
+        // Try each URL in order (prefer discography page, fall back to main page)
+        let html: string | null = null;
+        let usedUrl = '';
+        for (const url of member.urls) {
+            try {
+                const resp = await axios.get(url, {
+                    headers: { 'User-Agent': USER_AGENT },
+                    timeout: 30000,
+                });
+                // Verify we got a page with wikitables (not a disambiguation/redirect to empty)
+                const testLoad = cheerio.load(resp.data);
+                if (testLoad('table.wikitable').length > 0) {
+                    html = resp.data;
+                    usedUrl = url;
+                    break;
+                }
+            } catch (err: any) {
+                // Try next URL
+            }
+            await delay(1000);
+        }
+
+        if (!html) {
+            logWarning(`Failed to fetch any working page for ${member.name}`);
             continue;
         }
 
         const $ = cheerio.load(html);
+        let memberCollabCount = 0;
 
-        // Look for discography/collaboration tables in member pages
-        const targetSections = /discography|collaboration|featured|guest|other\s+song|single|charted/i;
+        // Target sections with collaboration data
+        const targetSections = /as\s+featured|other\s+song|other\s+appear|other\s+collaborat|as\s+lead\s+artist|^singles$/i;
+        // Skip sections that aren't useful for collaboration detection
+        const skipSections = /studio\s+album|extended\s+play|mixtape|music\s+video|writing\s+credit|production\s+credit|filmograph|television|award|note|reference|see\s+also|videograph/i;
+
         let inTargetSection = false;
+        let currentSection = '';
 
         const contentElements = $('#mw-content-text > .mw-parser-output').children();
 
@@ -252,63 +408,52 @@ async function scrapeMemberPages(): Promise<Collaboration[]> {
             const $el = $(el);
             const tagName = el.type === 'tag' ? (el as cheerio.TagElement).tagName : '';
 
-            if (tagName === 'h2' || tagName === 'h3') {
-                const headingText = cleanCell($el.find('.mw-headline').text() || $el.text());
-                inTargetSection = targetSections.test(headingText);
+            // Handle heading detection (new div.mw-heading and old h2/h3)
+            const headingText = getHeadingText($el, $);
+            if (headingText !== null) {
+                if (skipSections.test(headingText)) {
+                    inTargetSection = false;
+                } else if (targetSections.test(headingText)) {
+                    inTargetSection = true;
+                    currentSection = headingText;
+                } else {
+                    // Reset for unknown sections
+                    inTargetSection = false;
+                }
                 return;
             }
 
             if (!inTargetSection || tagName !== 'table') return;
+            if (!$el.hasClass('wikitable')) return;
 
-            // Parse table headers
-            const headers: string[] = [];
-            $el.find('tr').first().find('th').each((_, th) => {
-                headers.push(cleanCell($(th).text()).toLowerCase());
-            });
+            const { columns, dataRows } = parseWikiTable($, $el);
 
-            const titleIdx = headers.findIndex(h => /title|song|single/i.test(h));
-            const artistIdx = headers.findIndex(h => /artist|with|featuring/i.test(h));
-            const yearIdx = headers.findIndex(h => /year|date|released/i.test(h));
+            const titleIdx = columns.findIndex(h => /title|song|single/i.test(h));
+            const artistIdx = columns.findIndex(h => /other\s+artist|artist|with|featuring/i.test(h));
+            const yearIdx = columns.findIndex(h => /year|date|released/i.test(h));
+            const albumIdx = columns.findIndex(h => /album/i.test(h));
 
             if (titleIdx === -1) return;
 
-            // Parse rows with rowspan handling
-            const rowspanTracker: Map<number, { value: string; remaining: number }> = new Map();
+            for (const rowCells of dataRows) {
+                let rawTitle = cleanCell(rowCells[titleIdx] || '').replace(/^[""\u201c]|[""\u201d]$/g, '');
+                if (!rawTitle || rawTitle === '\u2014' || rawTitle.length > 200) continue;
 
-            $el.find('tr').each((rowIdx, row) => {
-                if (rowIdx === 0) return;
+                let rawArtist = artistIdx >= 0 ? cleanCell(rowCells[artistIdx]) : '';
+                const releaseDate = yearIdx >= 0 ? parseReleaseDate(rowCells[yearIdx]) : null;
 
-                const cells = $(row).find('td, th');
-                if (cells.length === 0) return;
-
-                const rowCells: string[] = [];
-                let cellIdx = 0;
-
-                for (let colPos = 0; colPos <= headers.length + 3; colPos++) {
-                    const span = rowspanTracker.get(colPos);
-                    if (span && span.remaining > 0) {
-                        rowCells.push(span.value);
-                        span.remaining--;
-                        if (span.remaining === 0) rowspanTracker.delete(colPos);
-                    } else if (cellIdx < cells.length) {
-                        const $cell = $(cells[cellIdx]);
-                        const text = $cell.text().trim();
-                        const rowspan = parseInt($cell.attr('rowspan') || '1', 10);
-                        if (rowspan > 1) {
-                            rowspanTracker.set(colPos, { value: text, remaining: rowspan - 1 });
-                        }
-                        rowCells.push(text);
-                        cellIdx++;
-                    } else {
-                        rowCells.push('');
+                // For "As featured artist" and "As lead artist" tables, artist info is often in the title
+                // e.g. '"BuckuBucku" MFBTY featuring EE, RM' or '"Perfect Christmas"(with Jo Kwon, ...)'
+                if (/featured|lead\s+artist/i.test(currentSection) && !rawArtist) {
+                    const extracted = extractArtistFromTitle(rawTitle);
+                    if (extracted.artist) {
+                        rawTitle = extracted.title;
+                        rawArtist = extracted.artist;
                     }
                 }
 
-                const rawTitle = cleanCell(rowCells[titleIdx] || '').replace(/^[""\u201c]|["""\u201d]$/g, '');
-                if (!rawTitle || rawTitle === '\u2014' || rawTitle.length > 200) return;
-
-                const rawArtist = artistIdx >= 0 ? cleanCell(rowCells[artistIdx]) : '';
-                const releaseDate = yearIdx >= 0 ? parseReleaseDate(rowCells[yearIdx]) : null;
+                // Skip entries with "None" as artist (solo non-collab tracks)
+                if (/^none$/i.test(rawArtist)) continue;
 
                 let artist = rawArtist
                     .replace(/\bBTS\b/gi, '')
@@ -324,17 +469,18 @@ async function scrapeMemberPages(): Promise<Collaboration[]> {
                 const type = inferCollabType(fullRowText);
 
                 collabs.push({
-                    title: rawTitle,
+                    title: rawTitle.replace(/^[""\u201c]|[""\u201d]$/g, '').trim(),
                     artist,
                     member_id: member.member_id,
                     type,
                     release_date: releaseDate,
                     song_id: null,
                 });
-            });
+                memberCollabCount++;
+            }
         });
 
-        logSuccess(`${member.name}: found collaborations from page`);
+        logSuccess(`${member.name}: found ${memberCollabCount} collaborations from ${usedUrl.split('/').pop()}`);
     }
 
     return collabs;

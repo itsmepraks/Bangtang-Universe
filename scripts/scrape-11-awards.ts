@@ -23,7 +23,7 @@ interface AwardEntry {
     year: string;
     ceremony: string;
     category: string;
-    nominated_work: string;
+    work_title: string;
     result: 'won' | 'nominated';
     scope: 'group';
 }
@@ -146,7 +146,7 @@ function parseAwardTables($: cheerio.CheerioAPI): AwardEntry[] {
                 year: cleanYear,
                 ceremony: cleanText(ceremony),
                 category: cleanText(category),
-                nominated_work: cleanText(workTitle),
+                work_title: cleanText(workTitle),
                 result,
                 scope: 'group',
             });
@@ -174,10 +174,11 @@ async function upsertToSupabase(awards: AwardEntry[]) {
         const { error } = await supabase
             .from('awards')
             .insert({
+                name: award.category || award.work_title || 'Award',
                 year: award.year,
                 ceremony: award.ceremony,
                 category: award.category,
-                nominated_work: award.nominated_work,
+                work_title: award.work_title,
                 result: award.result,
                 scope: award.scope,
             });

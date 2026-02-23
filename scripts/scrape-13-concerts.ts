@@ -153,8 +153,12 @@ async function fetchConcerts(): Promise<Concert[]> {
         const tagName = el.type === 'tag' ? (el as cheerio.TagElement).tagName : '';
 
         // Track headings for tour names
-        if (tagName === 'h2' || tagName === 'h3') {
-            const headingText = cleanCell($el.find('.mw-headline').text() || $el.text());
+        // Wikipedia now wraps headings in <div class="mw-heading mw-heading2"> instead of bare <h2>/<h3>
+        const classes = $el.attr('class') || '';
+        if (tagName === 'h2' || tagName === 'h3' || classes.includes('mw-heading')) {
+            const headingText = cleanCell(
+                $el.find('h2, h3, h4').first().text() || $el.find('.mw-headline').text() || $el.text()
+            ).replace(/\[edit\]/gi, '').trim();
             // Skip non-tour headings like "See also", "References", etc.
             if (!/see also|references|notes|external|further/i.test(headingText)) {
                 currentTourName = headingText;
@@ -175,6 +179,7 @@ async function fetchConcerts(): Promise<Concert[]> {
         if (headers.length < 2) return;
 
         // Find relevant column indices
+        const titleIdx = headers.findIndex(h => /^title$|^event$|^showcase$/i.test(h));
         const dateIdx = headers.findIndex(h => /date/i.test(h));
         const cityIdx = headers.findIndex(h => /city|location/i.test(h));
         const countryIdx = headers.findIndex(h => /country|region/i.test(h));
@@ -243,8 +248,12 @@ async function fetchConcerts(): Promise<Concert[]> {
 
             if (!country) country = 'Unknown';
 
+            // Use the row's own Title/Event column if available, otherwise the section heading
+            const rowTitle = titleIdx >= 0 ? cleanCell(rowCells[titleIdx]) : '';
+            const tourName = rowTitle || currentTourName;
+
             concerts.push({
-                tour_name: currentTourName,
+                tour_name: tourName,
                 venue: rawVenue || 'Unknown',
                 city,
                 country,
