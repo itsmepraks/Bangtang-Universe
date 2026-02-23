@@ -8,7 +8,7 @@
  * for an AI-backed provider without changing call sites.
  */
 
-import type { Song, Album, Member } from '../types/database';
+import type { Song, Album, Member, Award, ChartEntry, Concert, Collaboration, MemberEvent } from '../types/database';
 import { getRecommendations } from './recommendationService';
 
 // ==================== TYPES ====================
@@ -17,6 +17,11 @@ export interface QAContext {
   songs: Song[];
   albums: Album[];
   members: Member[];
+  awards?: Award[];
+  chartEntries?: ChartEntry[];
+  concerts?: Concert[];
+  collaborations?: Collaboration[];
+  memberEvents?: MemberEvent[];
 }
 
 export interface QAResponse {
@@ -162,6 +167,64 @@ class RuleBasedQA implements QAProvider {
     if (/(?:about|tell me about)\s+(.+)/i.test(q)) {
       const match = q.match(/(?:about|tell me about)\s+(.+)/i)!;
       return this.handleAboutMember(match[1].trim(), members);
+    }
+
+    // ---- 16. How many awards / total awards ----
+    if (/how many awards|total awards/i.test(q)) {
+      return this.handleAwardCount(context);
+    }
+
+    // ---- 17. Awards at [ceremony] / [ceremony] awards ----
+    if (/awards?\s+at\s+(.+)/i.test(q)) {
+      const match = q.match(/awards?\s+at\s+(.+)/i)!;
+      return this.handleAwardsByCeremony(match[1].trim(), context);
+    }
+    if (/(.+?)\s+awards?/i.test(q)) {
+      const match = q.match(/(.+?)\s+awards?/i)!;
+      return this.handleAwardsByCeremony(match[1].trim(), context);
+    }
+
+    // ---- 18. Awards in [year] ----
+    if (/awards?\s+in\s+(\d{4})/i.test(q)) {
+      const match = q.match(/awards?\s+in\s+(\d{4})/i)!;
+      return this.handleAwardsByYear(parseInt(match[1], 10), context);
+    }
+
+    // ---- 19. How many concerts / total concerts / how many shows ----
+    if (/how many concerts|total concerts|how many shows/i.test(q)) {
+      return this.handleConcertCount(context);
+    }
+
+    // ---- 20. [tour name] tour ----
+    if (/(.+?)\s+tour/i.test(q)) {
+      const match = q.match(/(.+?)\s+tour/i)!;
+      return this.handleConcertsByTour(match[1].trim(), context);
+    }
+
+    // ---- 21. Concerts in [country] / shows in [country] ----
+    if (/concerts?\s+in\s+(.+)/i.test(q) || /shows?\s+in\s+(.+)/i.test(q)) {
+      const match = q.match(/(?:concerts?|shows?)\s+in\s+(.+)/i)!;
+      return this.handleConcertsByCountry(match[1].trim(), context);
+    }
+
+    // ---- 22. Billboard / Hot 100 / chart ----
+    if (/billboard|hot 100|chart/i.test(q)) {
+      return this.handleChartEntries(context);
+    }
+
+    // ---- 23. Number one / #1 / first place ----
+    if (/number one|#1|first place/i.test(q)) {
+      return this.handleNumberOnes(context);
+    }
+
+    // ---- 24. Collaborations / featured / worked with ----
+    if (/collaborat|featured|worked with/i.test(q)) {
+      return this.handleCollaborations(context);
+    }
+
+    // ---- 25. Enlistment / military / service ----
+    if (/enlist|military|service/i.test(q)) {
+      return this.handleEnlistment(context);
     }
 
     // ---- Fallback ----
@@ -519,6 +582,292 @@ class RuleBasedQA implements QAProvider {
     };
   }
 
+  // -------------------- new handler methods (awards/charts/concerts/collabs/events) --------------------
+
+  private handleAwardCount(context: QAContext): QAResponse {
+    const awards = context.awards || [];
+    if (awards.length === 0) {
+      return { text: 'No award data available.', type: 'text', confidence: 0.5 };
+    }
+    const won = awards.filter((a) => a.result === 'won');
+    const nominated = awards.filter((a) => a.result === 'nominated');
+    return {
+      text: `BTS has won ${won.length} awards out of ${awards.length} total nominations.`,
+      data: [
+        { stat: 'Total Awards Won', value: won.length },
+        { stat: 'Total Nominations', value: nominated.length },
+        { stat: 'Total Entries', value: awards.length },
+      ],
+      type: 'stat',
+      confidence: 0.95,
+    };
+  }
+
+  private handleAwardsByCeremony(ceremony: string, context: QAContext): QAResponse {
+    const awards = context.awards || [];
+    if (awards.length === 0) {
+      return { text: 'No award data available.', type: 'text', confidence: 0.5 };
+    }
+    const ceremonyLower = ceremony.toLowerCase();
+    const matching = awards.filter((a) =>
+      a.ceremony.toLowerCase().includes(ceremonyLower),
+    );
+    if (matching.length === 0) {
+      return {
+        text: `No awards found for "${ceremony}".`,
+        type: 'text',
+        confidence: 0.4,
+      };
+    }
+    const won = matching.filter((a) => a.result === 'won');
+    return {
+      text: `Found ${matching.length} entries at ${matching[0].ceremony} (${won.length} won):`,
+      data: matching.map((a) => ({
+        name: a.name,
+        category: a.category ?? 'N/A',
+        year: a.year,
+        result: a.result,
+      })),
+      type: 'list',
+      confidence: 0.85,
+    };
+  }
+
+  private handleAwardsByYear(year: number, context: QAContext): QAResponse {
+    const awards = context.awards || [];
+    if (awards.length === 0) {
+      return { text: 'No award data available.', type: 'text', confidence: 0.5 };
+    }
+    const matching = awards.filter((a) => a.year === year);
+    if (matching.length === 0) {
+      return {
+        text: `No awards found for the year ${year}.`,
+        type: 'text',
+        confidence: 0.4,
+      };
+    }
+    const won = matching.filter((a) => a.result === 'won');
+    return {
+      text: `In ${year}, BTS had ${matching.length} award entries (${won.length} won):`,
+      data: matching.map((a) => ({
+        name: a.name,
+        ceremony: a.ceremony,
+        category: a.category ?? 'N/A',
+        result: a.result,
+      })),
+      type: 'list',
+      confidence: 0.9,
+    };
+  }
+
+  private handleConcertCount(context: QAContext): QAResponse {
+    const concerts = context.concerts || [];
+    if (concerts.length === 0) {
+      return { text: 'No concert data available.', type: 'text', confidence: 0.5 };
+    }
+    const tours = new Set(concerts.map((c) => c.tour_name));
+    const countries = new Set(concerts.map((c) => c.country));
+    const totalAttendance = concerts.reduce(
+      (sum, c) => sum + (c.attendance || 0),
+      0,
+    );
+    return {
+      text: `BTS has performed ${concerts.length} concerts across ${tours.size} tours in ${countries.size} countries.`,
+      data: [
+        { stat: 'Total Shows', value: concerts.length },
+        { stat: 'Total Tours', value: tours.size },
+        { stat: 'Countries Visited', value: countries.size },
+        ...(totalAttendance > 0
+          ? [{ stat: 'Total Attendance', value: totalAttendance }]
+          : []),
+      ],
+      type: 'stat',
+      confidence: 0.95,
+    };
+  }
+
+  private handleConcertsByTour(tourQuery: string, context: QAContext): QAResponse {
+    const concerts = context.concerts || [];
+    if (concerts.length === 0) {
+      return { text: 'No concert data available.', type: 'text', confidence: 0.5 };
+    }
+    const tourLower = tourQuery.toLowerCase();
+    const matching = concerts.filter((c) =>
+      c.tour_name.toLowerCase().includes(tourLower),
+    );
+    if (matching.length === 0) {
+      return {
+        text: `No concerts found for tour matching "${tourQuery}".`,
+        type: 'text',
+        confidence: 0.4,
+      };
+    }
+    const sorted = [...matching].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
+    return {
+      text: `Found ${sorted.length} shows for the ${sorted[0].tour_name} tour:`,
+      data: sorted.map((c) => ({
+        venue: c.venue,
+        city: c.city,
+        country: c.country,
+        date: c.date,
+        attendance: c.attendance ?? 'N/A',
+      })),
+      type: 'list',
+      confidence: 0.85,
+    };
+  }
+
+  private handleConcertsByCountry(countryQuery: string, context: QAContext): QAResponse {
+    const concerts = context.concerts || [];
+    if (concerts.length === 0) {
+      return { text: 'No concert data available.', type: 'text', confidence: 0.5 };
+    }
+    const countryLower = countryQuery.toLowerCase();
+    const matching = concerts.filter(
+      (c) =>
+        c.country.toLowerCase().includes(countryLower) ||
+        c.city.toLowerCase().includes(countryLower),
+    );
+    if (matching.length === 0) {
+      return {
+        text: `No concerts found in "${countryQuery}".`,
+        type: 'text',
+        confidence: 0.4,
+      };
+    }
+    return {
+      text: `Found ${matching.length} concerts in ${countryQuery}:`,
+      data: matching.map((c) => ({
+        tour: c.tour_name,
+        venue: c.venue,
+        city: c.city,
+        country: c.country,
+        date: c.date,
+      })),
+      type: 'list',
+      confidence: 0.85,
+    };
+  }
+
+  private handleChartEntries(context: QAContext): QAResponse {
+    const chartEntries = context.chartEntries || [];
+    const songs = context.songs;
+    if (chartEntries.length === 0) {
+      return { text: 'No chart data available.', type: 'text', confidence: 0.5 };
+    }
+    const numberOnes = chartEntries.filter((ce) => ce.peak_position === 1);
+    const sorted = [...chartEntries].sort(
+      (a, b) => a.peak_position - b.peak_position,
+    );
+    const top = sorted.slice(0, 10);
+    return {
+      text: `BTS has ${chartEntries.length} chart entries, including ${numberOnes.length} #1 hits.`,
+      data: top.map((ce) => {
+        const song = songs.find((s) => s.id === ce.song_id);
+        return {
+          chart: ce.chart_name,
+          peakPosition: ce.peak_position,
+          song: song?.title ?? ce.chart_name,
+          weeksOnChart: ce.weeks_on_chart ?? 'N/A',
+          certification: ce.certification ?? 'N/A',
+        };
+      }),
+      type: 'ranking',
+      confidence: 0.9,
+    };
+  }
+
+  private handleNumberOnes(context: QAContext): QAResponse {
+    const chartEntries = context.chartEntries || [];
+    const songs = context.songs;
+    if (chartEntries.length === 0) {
+      return { text: 'No chart data available.', type: 'text', confidence: 0.5 };
+    }
+    const numberOnes = chartEntries.filter((ce) => ce.peak_position === 1);
+    if (numberOnes.length === 0) {
+      return {
+        text: 'No #1 chart entries found in the database.',
+        type: 'text',
+        confidence: 0.7,
+      };
+    }
+    return {
+      text: `BTS has achieved ${numberOnes.length} #1 chart positions:`,
+      data: numberOnes.map((ce) => {
+        const song = songs.find((s) => s.id === ce.song_id);
+        return {
+          chart: ce.chart_name,
+          song: song?.title ?? 'Unknown',
+          weeksOnChart: ce.weeks_on_chart ?? 'N/A',
+          date: ce.entry_date ?? 'N/A',
+        };
+      }),
+      type: 'list',
+      confidence: 0.9,
+    };
+  }
+
+  private handleCollaborations(context: QAContext): QAResponse {
+    const collaborations = context.collaborations || [];
+    const members = context.members;
+    if (collaborations.length === 0) {
+      return { text: 'No collaboration data available.', type: 'text', confidence: 0.5 };
+    }
+    return {
+      text: `BTS has ${collaborations.length} collaborations:`,
+      data: collaborations.map((c) => {
+        const member = members.find((m) => m.id === c.member_id);
+        return {
+          title: c.title,
+          artist: c.artist,
+          type: c.type,
+          member: member?.stage_name ?? 'Group',
+          releaseDate: c.release_date ?? 'N/A',
+        };
+      }),
+      type: 'list',
+      confidence: 0.85,
+    };
+  }
+
+  private handleEnlistment(context: QAContext): QAResponse {
+    const memberEvents = context.memberEvents || [];
+    const members = context.members;
+    if (memberEvents.length === 0) {
+      return { text: 'No member event data available.', type: 'text', confidence: 0.5 };
+    }
+    const enlistmentEvents = memberEvents.filter(
+      (e) =>
+        e.event_type === 'enlistment_start' || e.event_type === 'enlistment_end',
+    );
+    if (enlistmentEvents.length === 0) {
+      return {
+        text: 'No enlistment records found in the database.',
+        type: 'text',
+        confidence: 0.6,
+      };
+    }
+    const sorted = [...enlistmentEvents].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
+    return {
+      text: `Found ${sorted.length} enlistment events:`,
+      data: sorted.map((e) => {
+        const member = members.find((m) => m.id === e.member_id);
+        return {
+          member: member?.stage_name ?? e.member_id,
+          event: e.event_type === 'enlistment_start' ? 'Enlisted' : 'Discharged',
+          date: e.date,
+          description: e.description ?? 'N/A',
+        };
+      }),
+      type: 'list',
+      confidence: 0.9,
+    };
+  }
+
   private fallback(): QAResponse {
     return {
       text: "I'm not sure how to answer that. Try asking about:",
@@ -530,6 +879,9 @@ class RuleBasedQA implements QAProvider {
         { suggestion: 'Songs similar to Dynamite' },
         { suggestion: 'How many songs are there?' },
         { suggestion: 'What are the title tracks?' },
+        { suggestion: 'How many awards has BTS won?' },
+        { suggestion: 'Billboard Hot 100 entries' },
+        { suggestion: 'When did BTS members enlist?' },
       ],
       type: 'list',
       confidence: 0,
@@ -550,4 +902,10 @@ export const SUGGESTED_QUESTIONS = [
   'Songs similar to Dynamite',
   'Which era has the highest energy?',
   'How many title tracks are there?',
+  'How many awards has BTS won?',
+  'Awards at Billboard Music Awards',
+  'How many concerts has BTS performed?',
+  'Love Yourself tour',
+  'Billboard Hot 100 entries',
+  'When did BTS members enlist?',
 ];
