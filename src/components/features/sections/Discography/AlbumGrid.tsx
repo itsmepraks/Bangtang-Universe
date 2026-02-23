@@ -163,10 +163,19 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
                 className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
               >
                 <div
-                  className="h-32 w-full relative"
+                  className="h-32 w-full relative overflow-hidden"
                   style={{ background: `linear-gradient(135deg, ${album.cover_color || '#A855F7'}40, ${album.cover_color || '#A855F7'}10)` }}
                 >
-                  <Disc size={32} className="absolute bottom-3 right-3 text-white/10 group-hover:text-white/20 transition-colors" />
+                  {album.cover_art_url ? (
+                    <img
+                      src={album.cover_art_url}
+                      alt={album.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <Disc size={32} className="absolute bottom-3 right-3 text-white/10 group-hover:text-white/20 transition-colors" />
+                  )}
                 </div>
                 <div className="p-4 space-y-2">
                   <h3 className="text-sm font-semibold text-white/85 group-hover:text-white transition-colors truncate">{album.title}</h3>

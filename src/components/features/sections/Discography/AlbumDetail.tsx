@@ -70,10 +70,21 @@ export default function AlbumDetail({ album, songs, onSelectSong, onBack }: Albu
       {/* Album Header */}
       <div className="flex flex-col md:flex-row gap-4 md:gap-8">
         <div
-          className="w-32 h-32 md:w-48 md:h-48 rounded-2xl flex-shrink-0 flex items-center justify-center"
+          className="w-32 h-32 md:w-48 md:h-48 rounded-2xl flex-shrink-0 overflow-hidden"
           style={{ background: `linear-gradient(135deg, ${album.cover_color || '#A855F7'}60, ${album.cover_color || '#A855F7'}15)` }}
         >
-          <Disc size={56} className="text-white/20" />
+          {album.cover_art_url ? (
+            <img
+              src={album.cover_art_url}
+              alt={album.title}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Disc size={56} className="text-white/20" />
+            </div>
+          )}
         </div>
         <div className="flex flex-col justify-center space-y-2">
           <Badge variant="purple" size="md">{album.type}</Badge>

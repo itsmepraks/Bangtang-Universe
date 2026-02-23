@@ -9,6 +9,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Album } from '../types/database';
 import { ALBUMS } from '../data/albums';
+import { getCoverArtUrl } from '../data/coverArt';
 
 interface UseAlbumsResult {
     albums: Album[];
@@ -39,7 +40,7 @@ export function useAlbums(): UseAlbumsResult {
                 spotify_id: null,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
-                cover_art_url: null,
+                cover_art_url: a.coverArtUrl || null,
                 total_sales: null,
                 label: null,
             })));
@@ -56,7 +57,16 @@ export function useAlbums(): UseAlbumsResult {
 
             if (dbError) throw dbError;
 
-            setAlbums(data || []);
+            // Enrich albums missing cover art with local lookup
+            const albums = (data || []) as Album[];
+            const enriched = albums.map(album => {
+                if (!album.cover_art_url) {
+                    const url = getCoverArtUrl(album.title);
+                    if (url) return { ...album, cover_art_url: url };
+                }
+                return album;
+            });
+            setAlbums(enriched);
             console.log(`📀 Loaded ${data?.length || 0} albums from database`);
         } catch (err) {
             console.error('Failed to fetch albums:', err);
@@ -75,7 +85,7 @@ export function useAlbums(): UseAlbumsResult {
                 spotify_id: null,
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
-                cover_art_url: null,
+                cover_art_url: a.coverArtUrl || null,
                 total_sales: null,
                 label: null,
             })));
