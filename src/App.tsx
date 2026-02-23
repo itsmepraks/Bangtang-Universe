@@ -1,13 +1,12 @@
 import { useState, useMemo, Suspense, lazy } from 'react';
 
 // Import data and hooks
-import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useCollaborations, useMemberEvents } from './hooks';
+import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useMemberEvents } from './hooks';
 import type { DashboardSection, DiscographyState } from './types/index';
 
 // Lightweight components - imported directly
 import {
   BTSLogo,
-  GlassHUD,
 } from './components';
 import { Breadcrumb } from './components/ui';
 
@@ -45,7 +44,6 @@ const SectionSpinner = () => (
 import {
   BarChart3,
   Search,
-  Settings,
   Home,
   Disc,
   Users,
@@ -78,7 +76,6 @@ export default function App() {
   const [mode, setMode] = useState<'landing' | 'warp' | 'dashboard'>('landing');
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
-  const [showSettings, setShowSettings] = useState(false);
 
   // New state for expanded sections
   const [discographyState, setDiscographyState] = useState<DiscographyState>({
@@ -95,7 +92,6 @@ export default function App() {
   const { awards } = useAwards();
   const { chartEntries } = useChartEntries();
   const { concerts } = useConcerts();
-  const { collaborations } = useCollaborations();
   const { memberEvents } = useMemberEvents();
 
   const handleSync = () => {
@@ -216,13 +212,6 @@ export default function App() {
               <div className="text-xs text-white/40">{concerts.length} concerts</div>
             </div>
 
-            <button
-              onClick={() => setShowSettings(true)}
-              className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-white/40 hover:text-white/60 hover:bg-white/[0.03] transition-all duration-200 w-full text-left"
-            >
-              <Settings size={18} />
-              <span className="text-sm font-medium">Settings</span>
-            </button>
           </div>
 
           {/* Content Area */}
@@ -313,60 +302,6 @@ export default function App() {
         )}
       </Suspense>
 
-      {/* 5. SETTINGS OVERLAY */}
-      {showSettings && (
-        <div className="absolute inset-0 z-[100] bg-black/60 backdrop-blur-md flex items-center justify-center animate-in fade-in duration-300">
-          <div className="w-[500px] max-w-[90vw] h-[600px] max-h-[90vh]">
-            <GlassHUD title="Settings" icon={Settings} onClose={() => setShowSettings(false)}>
-              <div className="space-y-8">
-                {/* Display */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Display</h3>
-                  <div className="grid grid-cols-3 gap-3">
-                    {['Eco', 'Balanced', 'Ultra'].map((m, i) => (
-                      <button key={m} className={`py-3 rounded-xl border text-xs font-medium transition-all duration-300 ${
-                        i === 2
-                          ? 'bg-purple-500/20 border-purple-500 text-white'
-                          : 'bg-white/5 border-white/[0.06] text-white/50 hover:bg-white/10 hover:text-white/70'
-                      }`}>
-                        {m}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Notifications */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Notifications</h3>
-                  <div className="space-y-3">
-                    {['Alerts', 'Background Sync'].map((item) => (
-                      <div key={item} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors cursor-pointer group">
-                        <span className="text-sm text-white/60 group-hover:text-white transition-colors">{item}</span>
-                        <div className="w-10 h-5 bg-purple-900/40 rounded-full relative border border-white/10 transition-colors group-hover:border-purple-500/50">
-                          <div className="absolute right-1 top-1 bottom-1 w-3 bg-purple-400 rounded-full shadow-lg" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Data */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Data</h3>
-                  <div className="p-4 bg-white/5 rounded-xl border border-white/[0.06] flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-sm text-white/80">{songs.length} songs, {albums.length} albums</span>
-                      <span className="text-xs text-white/40 mt-1">{members.length} members, {awards.length} awards, {concerts.length} concerts</span>
-                      <span className="text-xs text-white/40 mt-0.5">{chartEntries.length} chart entries, {collaborations.length} collaborations</span>
-                    </div>
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                  </div>
-                </div>
-              </div>
-            </GlassHUD>
-          </div>
-        </div>
-      )}
 
     </div>
   );
