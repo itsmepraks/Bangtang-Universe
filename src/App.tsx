@@ -93,9 +93,9 @@ export default function App() {
   const { members } = useMembers();
   const { lyrics } = useLyrics();
   const { awards } = useAwards();
-  const { chartEntries: _chartEntries } = useChartEntries();
+  const { chartEntries } = useChartEntries();
   const { concerts } = useConcerts();
-  const { collaborations: _collaborations } = useCollaborations();
+  const { collaborations } = useCollaborations();
   const { memberEvents } = useMemberEvents();
 
   const handleSync = () => {
@@ -277,6 +277,10 @@ export default function App() {
                       albums={albums}
                       members={members}
                       lyrics={lyrics}
+                      awards={awards}
+                      chartEntries={chartEntries}
+                      concerts={concerts}
+                      memberEvents={memberEvents}
                     />
                   )}
 
@@ -352,7 +356,8 @@ export default function App() {
                   <div className="p-4 bg-white/5 rounded-xl border border-white/[0.06] flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-sm text-white/80">{songs.length} songs, {albums.length} albums</span>
-                      <span className="text-xs text-white/40 mt-1">{members.length} members</span>
+                      <span className="text-xs text-white/40 mt-1">{members.length} members, {awards.length} awards, {concerts.length} concerts</span>
+                      <span className="text-xs text-white/40 mt-0.5">{chartEntries.length} chart entries, {collaborations.length} collaborations</span>
                     </div>
                     <div className="w-2 h-2 bg-green-500 rounded-full" />
                   </div>
