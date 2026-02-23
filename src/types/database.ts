@@ -19,6 +19,9 @@ export interface Album {
     spotify_id: string | null;
     created_at: string;
     updated_at: string;
+    cover_art_url?: string | null;
+    total_sales?: number | null;
+    label?: string | null;
 }
 
 export interface Song {
@@ -42,6 +45,13 @@ export interface Song {
     has_mv: boolean;
     spotify_id: string | null;
     created_at: string;
+    lyrics_ko?: string | null;
+    lyrics_en?: string | null;
+    lyrics_romanized?: string | null;
+    music_video_url?: string | null;
+    is_solo?: boolean;
+    is_collab?: boolean;
+    featured_members?: string[] | null;
 }
 
 export interface Member {
@@ -66,6 +76,13 @@ export interface Member {
     producer_credits: number;
     writer_credits: number;
     created_at: string;
+    birth_name_ko?: string | null;
+    education?: string | null;
+    enlistment_start?: string | null;
+    enlistment_end?: string | null;
+    solo_debut_date?: string | null;
+    instagram_handle?: string | null;
+    bio_long?: string | null;
 }
 
 export interface SoloAlbum {
@@ -87,6 +104,67 @@ export interface Lyrics {
     genius_url: string | null;
     sentiment_score: number | null;
     themes: string[] | null;
+    created_at: string;
+}
+
+export interface Award {
+    id: number;
+    name: string;
+    ceremony: string;
+    year: number;
+    category: string | null;
+    result: 'won' | 'nominated';
+    scope: 'group' | 'solo' | 'unit';
+    member_id: string | null;
+    work_title: string | null;
+    created_at: string;
+}
+
+export interface ChartEntry {
+    id: number;
+    song_id: number | null;
+    album_id: number | null;
+    chart_name: string;
+    peak_position: number;
+    weeks_on_chart: number | null;
+    entry_date: string | null;
+    certification: string | null;
+    region: string;
+    created_at: string;
+}
+
+export interface Concert {
+    id: number;
+    tour_name: string;
+    venue: string;
+    city: string;
+    country: string;
+    date: string;
+    attendance: number | null;
+    setlist: string[] | null;
+    notes: string | null;
+    created_at: string;
+}
+
+export interface Collaboration {
+    id: number;
+    song_id: number | null;
+    title: string;
+    artist: string;
+    member_id: string | null;
+    type: 'feature' | 'production' | 'remix' | 'ost';
+    release_date: string | null;
+    created_at: string;
+}
+
+export interface MemberEvent {
+    id: number;
+    member_id: string;
+    event_type: string;
+    title: string;
+    date: string;
+    description: string | null;
+    source_url: string | null;
     created_at: string;
 }
 
@@ -120,6 +198,31 @@ export interface Database {
                 Insert: Omit<Lyrics, 'id' | 'created_at'>;
                 Update: Partial<Omit<Lyrics, 'id' | 'created_at'>>;
             };
+            awards: {
+                Row: Award;
+                Insert: Omit<Award, 'id' | 'created_at'>;
+                Update: Partial<Omit<Award, 'id' | 'created_at'>>;
+            };
+            chart_entries: {
+                Row: ChartEntry;
+                Insert: Omit<ChartEntry, 'id' | 'created_at'>;
+                Update: Partial<Omit<ChartEntry, 'id' | 'created_at'>>;
+            };
+            concerts: {
+                Row: Concert;
+                Insert: Omit<Concert, 'id' | 'created_at'>;
+                Update: Partial<Omit<Concert, 'id' | 'created_at'>>;
+            };
+            collaborations: {
+                Row: Collaboration;
+                Insert: Omit<Collaboration, 'id' | 'created_at'>;
+                Update: Partial<Omit<Collaboration, 'id' | 'created_at'>>;
+            };
+            member_events: {
+                Row: MemberEvent;
+                Insert: Omit<MemberEvent, 'id' | 'created_at'>;
+                Update: Partial<Omit<MemberEvent, 'id' | 'created_at'>>;
+            };
         };
     };
 }
@@ -130,6 +233,11 @@ export type AlbumInsert = Database['public']['Tables']['albums']['Insert'];
 export type SongInsert = Database['public']['Tables']['songs']['Insert'];
 export type MemberInsert = Database['public']['Tables']['members']['Insert'];
 export type SoloAlbumInsert = Database['public']['Tables']['solo_albums']['Insert'];
+export type AwardInsert = Database['public']['Tables']['awards']['Insert'];
+export type ChartEntryInsert = Database['public']['Tables']['chart_entries']['Insert'];
+export type ConcertInsert = Database['public']['Tables']['concerts']['Insert'];
+export type CollaborationInsert = Database['public']['Tables']['collaborations']['Insert'];
+export type MemberEventInsert = Database['public']['Tables']['member_events']['Insert'];
 
 // Song with joined album data
 export interface SongWithAlbum extends Song {
