@@ -108,8 +108,8 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
       </div>
 
       {/* Header */}
-      <div className="flex gap-8">
-        <div className="w-52 h-64 rounded-2xl overflow-hidden flex-shrink-0 relative">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8">
+        <div className="w-36 h-44 md:w-52 md:h-64 rounded-2xl overflow-hidden flex-shrink-0 relative">
           {member.image_url ? (
             <img src={member.image_url} alt={member.stage_name} className="w-full h-full object-cover" />
           ) : (
@@ -141,9 +141,9 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
         {/* Left */}
-        <div className="col-span-5 space-y-6">
+        <div className="md:col-span-5 space-y-6">
           {/* Personal Info */}
           {filteredPersonalInfo.length > 0 && (
             <GlassHUD title="Personal Info" icon={User}>
@@ -181,7 +181,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
         </div>
 
         {/* Right */}
-        <div className="col-span-7 space-y-6">
+        <div className="md:col-span-7 space-y-6">
           {/* Solo Discography */}
           {soloAlbums.length > 0 && (
             <GlassHUD title="Solo Discography" icon={Disc}>

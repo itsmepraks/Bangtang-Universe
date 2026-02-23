@@ -147,7 +147,7 @@ export default function CareerTimeline({ albums, awards, concerts, memberEvents 
         {/* Vertical line */}
         <div className="absolute left-[7px] top-0 bottom-0 w-px bg-white/[0.08]" />
 
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
           {years.map((year) => (
             <div key={year}>
               {/* Year marker */}
@@ -157,14 +157,14 @@ export default function CareerTimeline({ albums, awards, concerts, memberEvents 
               </div>
 
               {/* Entries for this year */}
-              <div className="ml-8 space-y-3">
+              <div className="ml-6 md:ml-8 space-y-3">
                 {yearGroups[year].map((entry, i) => (
                   <div
                     key={`${entry.date}-${i}`}
                     className="relative flex items-start gap-3"
                   >
                     {/* Dot connector */}
-                    <div className="absolute -left-[25px] top-1.5">
+                    <div className="absolute -left-[21px] md:-left-[25px] top-1.5">
                       <div
                         className="w-2.5 h-2.5 rounded-full"
                         style={{ backgroundColor: CATEGORY_COLORS[entry.category] }}

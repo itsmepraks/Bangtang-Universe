@@ -68,9 +68,9 @@ export default function AlbumDetail({ album, songs, onSelectSong, onBack }: Albu
       </button>
 
       {/* Album Header */}
-      <div className="flex gap-8">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8">
         <div
-          className="w-48 h-48 rounded-2xl flex-shrink-0 flex items-center justify-center"
+          className="w-32 h-32 md:w-48 md:h-48 rounded-2xl flex-shrink-0 flex items-center justify-center"
           style={{ background: `linear-gradient(135deg, ${album.cover_color || '#A855F7'}60, ${album.cover_color || '#A855F7'}15)` }}
         >
           <Disc size={56} className="text-white/20" />

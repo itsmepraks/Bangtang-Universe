@@ -55,7 +55,7 @@ export default function SongComparison({ songs, initialSongA, initialSongB }: So
   return (
     <div className="space-y-6">
       {/* Song Selectors */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <div>
           <label className="text-xs font-medium text-white/50 uppercase tracking-wide block mb-2">Song A</label>
           <select
@@ -100,7 +100,7 @@ export default function SongComparison({ songs, initialSongA, initialSongB }: So
           </div>
 
           {/* Side-by-side Metrics */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {songA && (
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold text-purple-300">{songA.title}</h4>

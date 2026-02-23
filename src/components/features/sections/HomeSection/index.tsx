@@ -29,7 +29,7 @@ export default function HomeSection({
   return (
     <div className="space-y-8">
       {/* Stats Bar */}
-      <div className="grid grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
         <StatCard label="Songs" value={songs.length} icon={Music} subtitle={`across ${eras.length} eras`} />
         <StatCard label="Albums" value={albums.length} icon={Disc} accent="#818CF8" />
         <StatCard label="Members" value={members.length} icon={Users} accent="#C084FC" subtitle="7 artists" />
@@ -44,7 +44,7 @@ export default function HomeSection({
           <Lightbulb size={16} className="text-white/40" />
           <h3 className="text-sm font-semibold text-white/70">Quick Insights</h3>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           {insights.slice(0, 6).map(insight => (
             <div key={insight.id} className="p-5 bg-[#111118] border border-white/[0.06] rounded-2xl hover:border-white/[0.12] transition-all duration-300">
               <p className="text-sm text-white/70 leading-relaxed">{insight.text}</p>
@@ -63,7 +63,7 @@ export default function HomeSection({
             <Calendar size={16} className="text-white/40" />
             <h3 className="text-sm font-semibold text-white/70">Recent Milestones</h3>
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
             {memberEvents
               .sort((a, b) => b.date.localeCompare(a.date))
               .slice(0, 6)
@@ -84,8 +84,8 @@ export default function HomeSection({
       )}
 
       {/* Era Timeline + Title Tracks */}
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-8">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+        <div className="md:col-span-8">
           <div className="flex items-center gap-2 mb-4">
             <Disc size={16} className="text-white/40" />
             <h3 className="text-sm font-semibold text-white/70">Era Timeline</h3>
@@ -95,7 +95,7 @@ export default function HomeSection({
             onNavigateToEra={(era) => onNavigate('discography', era)}
           />
         </div>
-        <div className="col-span-4">
+        <div className="md:col-span-4">
           <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Music size={16} className="text-white/40" />

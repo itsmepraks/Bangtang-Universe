@@ -31,10 +31,10 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
 
             {/* Top Bar */}
             <div
-                className="h-20 flex items-center justify-between px-16 border-b border-white/[0.06] relative z-10"
+                className="h-20 flex items-center justify-between px-4 md:px-16 border-b border-white/[0.06] relative z-10"
                 style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%)' }}
             >
-                <div className="flex items-center gap-8">
+                <div className="flex items-center gap-4 md:gap-8">
                     <button onClick={onClose} className="p-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-all duration-500 hover:scale-105 group border border-white/[0.06] hover:border-white/20">
                         <ChevronLeft size={24} className="text-white group-hover:text-purple-300 transition-colors" />
                     </button>
@@ -59,11 +59,11 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                 </div>
             </div>
 
-            <div className="flex-1 p-16 overflow-y-auto pretty-scrollbar relative z-10">
-                <div className="max-w-7xl mx-auto grid grid-cols-12 gap-16 items-start">
+            <div className="flex-1 p-4 md:p-8 lg:p-16 overflow-y-auto pretty-scrollbar relative z-10">
+                <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 lg:gap-16 items-start">
 
                     {/* Left Column: ID Card */}
-                    <div className="col-span-5 space-y-12 animate-in slide-in-from-left-12 duration-1000">
+                    <div className="md:col-span-5 space-y-8 md:space-y-12 animate-in slide-in-from-left-12 duration-1000">
                         <div className="relative aspect-[3/4.2] rounded-2xl overflow-hidden border border-white/10 shadow-[0_40px_100px_rgba(0,0,0,0.8)] group">
                             <div className="absolute inset-0 bg-[#0a0a0f]" />
 
@@ -85,8 +85,8 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                             <div className="absolute inset-0 opacity-40 group-hover:opacity-60 transition-opacity duration-1000 mix-blend-overlay"
                                 style={{ background: `radial-gradient(circle at center, ${member.color} 0%, transparent 80%)` }} />
 
-                            <div className="absolute bottom-0 left-0 w-full p-12 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
-                                <h2 className="text-6xl font-semibold text-white mb-4 tracking-tight drop-shadow-2xl">{member.stage_name}</h2>
+                            <div className="absolute bottom-0 left-0 w-full p-6 md:p-12 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
+                                <h2 className="text-3xl md:text-6xl font-semibold text-white mb-4 tracking-tight drop-shadow-2xl">{member.stage_name}</h2>
                                 <p className="text-xl font-normal tracking-wide opacity-60" style={{ color: member.color || '#fff' }}>{member.full_name}</p>
                                 <div className="mt-8 flex gap-3">
                                     <div className="px-4 py-2 bg-white/[0.04] border border-white/[0.08] rounded-xl text-xs font-medium tracking-wide text-white/50 uppercase">Mic: {member.mic_color || 'N/A'}</div>
@@ -94,13 +94,13 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                             </div>
                         </div>
 
-                        <div className="p-8 bg-[#111118] rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all duration-700 shadow-2xl group">
+                        <div className="p-4 md:p-8 bg-[#111118] rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all duration-700 shadow-2xl group">
                             <div className="flex items-center gap-4 mb-6" style={{ color: member.color || '#fff' }}>
                                 <PenTool size={22} />
                                 <span className="text-xs font-semibold tracking-wide uppercase opacity-70">KOMCA credits</span>
                             </div>
                             <div className="flex items-end gap-4">
-                                <div className="text-6xl font-semibold text-white tracking-tight">{member.komca_credits || 0}</div>
+                                <div className="text-3xl md:text-6xl font-semibold text-white tracking-tight">{member.komca_credits || 0}</div>
                                 <div className="text-xs text-white/50 mb-3 tracking-wide uppercase">Verified Productions</div>
                             </div>
                             <div className="mt-8 h-1 w-full bg-white/5 rounded-full overflow-hidden">
@@ -110,11 +110,11 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                     </div>
 
                     {/* Right Column: Data */}
-                    <div className="col-span-7 space-y-16 animate-in slide-in-from-right-12 duration-1000">
+                    <div className="md:col-span-7 space-y-8 md:space-y-16 animate-in slide-in-from-right-12 duration-1000">
                         {/* Bio */}
                         <div className="space-y-6">
                             <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wide">Biography</h3>
-                            <p className="text-2xl text-white/80 leading-[1.6] font-normal border-l-4 pl-12 transition-all duration-1000 hover:border-white/40" style={{ borderColor: member.color || '#fff' }}>
+                            <p className="text-lg md:text-2xl text-white/80 leading-[1.6] font-normal border-l-4 pl-6 md:pl-12 transition-all duration-1000 hover:border-white/40" style={{ borderColor: member.color || '#fff' }}>
                                 {member.bio}
                             </p>
                         </div>
@@ -122,7 +122,7 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                         {/* Solo Discography */}
                         <div className="space-y-8">
                             <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wide">Solo Discography</h3>
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                                 {(member.solo_tracks || []).map((track, i) => (
                                     <div key={track} className="p-6 bg-[#111118] rounded-2xl border border-white/[0.06] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-700 cursor-pointer group flex items-center gap-6">
                                         <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">

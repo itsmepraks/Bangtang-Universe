@@ -177,7 +177,7 @@ export default function TourList({ concerts }: TourListProps) {
               {/* Tour Header */}
               <button
                 onClick={() => toggleTour(group.tourName)}
-                className="w-full flex items-center gap-4 px-5 py-4 hover:bg-white/[0.02] transition-colors text-left"
+                className="w-full flex items-center gap-4 px-3 md:px-5 py-3 md:py-4 hover:bg-white/[0.02] transition-colors text-left"
               >
                 <div className="text-white/40">
                   {isExpanded ? (

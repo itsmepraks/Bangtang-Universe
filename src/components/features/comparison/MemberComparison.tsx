@@ -50,7 +50,7 @@ export default function MemberComparison({ members, songs }: MemberComparisonPro
   return (
     <div className="space-y-6">
       {/* Member Selectors */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <div>
           <label className="text-xs font-medium text-white/50 uppercase tracking-wide block mb-2">Member A</label>
           <select

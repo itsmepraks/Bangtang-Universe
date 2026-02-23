@@ -1,4 +1,4 @@
-import { useState, useMemo, Suspense, lazy } from 'react';
+import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 
 // Import data and hooks
 import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useMemberEvents } from './hooks';
@@ -49,6 +49,8 @@ import {
   Users,
   Trophy,
   MapPin,
+  Menu,
+  X,
 } from 'lucide-react';
 
 const SECTION_TITLES: Record<DashboardSection, string> = {
@@ -76,6 +78,12 @@ export default function App() {
   const [mode, setMode] = useState<'landing' | 'warp' | 'dashboard'>('landing');
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close sidebar on navigation (mobile)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [activeSection]);
 
   // New state for expanded sections
   const [discographyState, setDiscographyState] = useState<DiscographyState>({
@@ -179,8 +187,16 @@ export default function App() {
               style={{ background: 'radial-gradient(circle, #A855F7 0%, transparent 70%)', filter: 'blur(100px)' }} />
           </div>
 
+          {/* Mobile sidebar backdrop */}
+          {sidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black/60 z-40 md:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
+
           {/* Sidebar */}
-          <div className="w-56 bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-6 px-4 z-50">
+          <div className={`fixed inset-y-0 left-0 w-56 bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-6 px-4 z-50 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:transition-none`}>
             <div
               onClick={() => setMode('landing')}
               className="flex items-center gap-3 px-2 mb-8 group cursor-pointer"
@@ -231,12 +247,21 @@ export default function App() {
           <div className="flex-1 flex flex-col min-w-0 relative z-10">
 
             {/* Header */}
-            <header className="h-14 flex items-center justify-between px-8 bg-[#0c0c12]/50 border-b border-white/[0.06]">
-              <Breadcrumb items={breadcrumbs} />
+            <header className="h-14 flex items-center justify-between px-4 md:px-8 bg-[#0c0c12]/50 border-b border-white/[0.06]">
+              <div className="flex items-center">
+                <button
+                  onClick={() => setSidebarOpen(prev => !prev)}
+                  className="md:hidden p-2 -ml-2 mr-2 text-white/60 hover:text-white"
+                  aria-label="Toggle navigation"
+                >
+                  {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
+                <Breadcrumb items={breadcrumbs} />
+              </div>
             </header>
 
             {/* Main Views */}
-            <main className="flex-1 p-8 pb-16 overflow-y-auto relative pretty-scrollbar">
+            <main className="flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar">
               <Suspense fallback={<SectionSpinner />}>
                 <SectionTransition sectionKey={activeSection}>
 

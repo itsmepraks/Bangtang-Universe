@@ -78,7 +78,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
   return (
     <div className="space-y-6">
       {/* ==================== MOOD QUADRANT ==================== */}
-      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-6">
+      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
         <h3 className="text-sm font-semibold text-white/70 mb-4">Mood Quadrant</h3>
 
         <div className="relative">
@@ -151,7 +151,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
       </div>
 
       {/* ==================== AUDIO FEATURE DISTRIBUTIONS ==================== */}
-      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-6">
+      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
         <h3 className="text-sm font-semibold text-white/70 mb-4">Audio Feature Distributions</h3>
 
         {/* Feature filter pills */}
@@ -206,7 +206,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
       </div>
 
       {/* ==================== SONG RANKINGS ==================== */}
-      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-6">
+      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
         <h3 className="text-sm font-semibold text-white/70 mb-4">Song Rankings</h3>
 
         {/* Ranking category pills */}

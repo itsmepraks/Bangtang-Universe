@@ -196,9 +196,9 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
 
       {/* Results */}
       {filteredResults.length > 0 ? (
-        <div className="grid grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
           {/* Results list */}
-          <div className="col-span-8 space-y-2">
+          <div className="md:col-span-8 space-y-2">
             {filteredResults.map(r => {
               const Icon = resultIcon(r.type);
               return (
@@ -226,7 +226,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
           </div>
 
           {/* Preview Panel */}
-          <div className="col-span-4">
+          <div className="hidden md:block md:col-span-4">
             <div className="sticky top-6 p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl min-h-[200px]">
               {hoveredResult ? (
                 <PreviewPanel result={hoveredResult} />
