@@ -42,7 +42,7 @@ export default function EraOverview({ albums, onNavigateToEra }: EraOverviewProp
               <div className="text-xs text-white/50">
                 {data.albums.length} album{data.albums.length !== 1 ? 's' : ''}
               </div>
-              <div className="text-xs text-white/30 mt-0.5">
+              <div className="text-xs text-white/40 mt-0.5">
                 {data.minDate.slice(0, 4)}{data.minDate.slice(0, 4) !== data.maxDate.slice(0, 4) ? `–${data.maxDate.slice(0, 4)}` : ''}
               </div>
             </button>

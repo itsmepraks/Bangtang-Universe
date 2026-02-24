@@ -29,7 +29,7 @@ export const GlassHUD: React.FC<GlassHUDProps> = ({
             <div className="flex gap-2">
                 {headerAction}
                 {onClose && (
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-xl transition-all text-white/30 hover:text-white">
+                    <button onClick={onClose} aria-label="Close" className="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">
                         <X size={16} />
                     </button>
                 )}

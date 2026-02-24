@@ -194,7 +194,7 @@ export default function AwardStats({ awards }: AwardStatsProps) {
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <div className="text-xs text-white/30 mt-1">{pct}%</div>
+                <div className="text-xs text-white/40 mt-1">{pct}%</div>
               </div>
             );
           })}

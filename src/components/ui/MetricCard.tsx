@@ -13,7 +13,7 @@ const padding = { sm: 'p-3', md: 'p-5', lg: 'p-6' };
 
 export default function MetricCard({ label, value, icon: Icon, accent, subtitle, size = 'md', className = '' }: MetricCardProps) {
   return (
-    <div className={`${padding[size]} rounded-2xl bg-white/[0.03] border border-white/[0.08] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.05] ${className}`}>
+    <div className={`${padding[size]} rounded-2xl bg-white/[0.03] border border-white/[0.06] transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.05] ${className}`}>
       {accent && <div className="h-0.5 w-12 rounded-full mb-3" style={{ backgroundColor: accent }} />}
       <div className="flex items-start justify-between">
         <div>

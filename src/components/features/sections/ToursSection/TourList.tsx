@@ -312,7 +312,7 @@ export default function TourList({ concerts }: TourListProps) {
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-1.5">
                           {concert.setlist!.map((song, idx) => (
                             <div key={idx} className="flex items-center gap-2">
-                              <span className="text-[10px] text-white/30 tabular-nums w-5 text-right shrink-0">
+                              <span className="text-[10px] text-white/40 tabular-nums w-5 text-right shrink-0">
                                 {idx + 1}.
                               </span>
                               <span className="text-xs text-white/60 truncate">{song}</span>
@@ -331,11 +331,11 @@ export default function TourList({ concerts }: TourListProps) {
       {/* Summary */}
       {tourGroups.length > 0 && (
         <div className="flex items-center justify-center gap-4 pt-2">
-          <span className="text-xs text-white/30">
+          <span className="text-xs text-white/40">
             {tourGroups.length} {tourGroups.length === 1 ? 'tour' : 'tours'}
           </span>
           <span className="text-xs text-white/20">|</span>
-          <span className="text-xs text-white/30">
+          <span className="text-xs text-white/40">
             {tourGroups.reduce((sum, g) => sum + g.showCount, 0)} concerts
           </span>
         </div>

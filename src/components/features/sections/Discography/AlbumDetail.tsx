@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
-import { ChevronLeft, Disc } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import type { Song, Album } from '../../../../types/database';
 import Badge from '../../../ui/Badge';
 import DataTable from '../../../ui/DataTable';
+import BtsLogo from '../../../ui/BtsLogo';
 import { getSentimentColor } from '../../../../constants/colors';
 
 interface AlbumDetailProps {
@@ -82,7 +83,7 @@ export default function AlbumDetail({ album, songs, onSelectSong, onBack }: Albu
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Disc size={56} className="text-white/20" />
+              <BtsLogo size={56} className="text-white/[0.15]" />
             </div>
           )}
         </div>

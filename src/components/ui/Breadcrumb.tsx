@@ -17,7 +17,7 @@ export default function Breadcrumb({ items }: BreadcrumbProps) {
           const isLast = i === items.length - 1;
           return (
             <li key={i} className="flex items-center gap-1.5">
-              {i > 0 && <ChevronRight size={14} className="text-white/30" aria-hidden="true" />}
+              {i > 0 && <ChevronRight size={14} className="text-white/40" aria-hidden="true" />}
               {isLast ? (
                 <span className="text-sm text-white/95 font-semibold" aria-current="page">{item.label}</span>
               ) : (

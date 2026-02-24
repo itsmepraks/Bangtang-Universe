@@ -109,7 +109,7 @@ export default function CareerTimeline({ albums, awards, concerts, memberEvents 
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-sm text-white/40">No timeline data available yet.</p>
-        <p className="text-xs text-white/30 mt-2">
+        <p className="text-xs text-white/40 mt-2">
           Timeline milestones will appear here once albums, awards, concerts, and events are loaded.
         </p>
       </div>
@@ -178,7 +178,7 @@ export default function CareerTimeline({ albums, awards, concerts, memberEvents 
                           <p className="text-sm font-medium text-white/85">{entry.title}</p>
                           <p className="text-xs text-white/50 mt-0.5">{entry.description}</p>
                         </div>
-                        <span className="text-xs text-white/30 whitespace-nowrap">{entry.date}</span>
+                        <span className="text-xs text-white/40 whitespace-nowrap">{entry.date}</span>
                       </div>
                       <div className="mt-2">
                         <span

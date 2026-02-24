@@ -18,9 +18,9 @@ interface SongDetailProps {
 }
 
 function formatDuration(seconds: number | null) {
-  if (!seconds) return '--:--';
+  if (seconds == null) return '--:--';
   const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
+  const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
@@ -39,12 +39,14 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
     return getRecommendations(song, songs, albums, 6);
   }, [song, songs, albums]);
 
-  const features = [
+  const allFeatures = [
     { label: 'Energy', value: song.energy },
     { label: 'Valence', value: song.valence },
     { label: 'Danceability', value: song.danceability },
     { label: 'Acousticness', value: song.acousticness },
   ];
+  const hasAnyFeatures = allFeatures.some(f => f.value != null);
+  const availableFeatures = allFeatures.filter(f => f.value != null);
 
   return (
     <div className="space-y-6">
@@ -53,24 +55,24 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
       </button>
 
       {/* Song Header */}
-      <div className="flex gap-8 items-start">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
         <div
-          className="w-32 h-32 rounded-2xl flex-shrink-0 flex items-center justify-center"
+          className="w-24 h-24 md:w-32 md:h-32 rounded-2xl flex-shrink-0 flex items-center justify-center"
           style={{ background: `linear-gradient(135deg, ${album?.cover_color || '#A855F7'}60, ${album?.cover_color || '#A855F7'}15)` }}
         >
           <Music size={36} className="text-white/20" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-semibold text-white/95">{song.title}</h2>
-          {song.title_korean && <p className="text-lg text-white/60">{song.title_korean}</p>}
-          <div className="flex items-center gap-3 text-sm text-white/50">
+          <h2 className="text-xl md:text-2xl font-semibold text-white/95">{song.title}</h2>
+          {song.title_korean && <p className="text-base md:text-lg text-white/60">{song.title_korean}</p>}
+          <div className="flex items-center gap-3 text-sm text-white/50 flex-wrap">
             {album && <span>{album.title}</span>}
             <span className="text-white/20">·</span>
             <span>{song.release_date?.slice(0, 4)}</span>
-            {song.duration_seconds && <><span className="text-white/20">·</span><span>{formatDuration(song.duration_seconds)}</span></>}
-            {song.bpm && <><span className="text-white/20">·</span><span>{song.bpm} BPM</span></>}
+            {song.duration_seconds != null && <><span className="text-white/20">·</span><span>{formatDuration(song.duration_seconds)}</span></>}
+            {song.bpm != null && <><span className="text-white/20">·</span><span>{song.bpm} BPM</span></>}
           </div>
-          <div className="flex gap-2 mt-2">
+          <div className="flex flex-wrap gap-2 mt-2">
             {song.is_title_track && <Badge variant="purple" size="md">Title Track</Badge>}
             {song.has_mv && <Badge variant="blue" size="md">Music Video</Badge>}
             {song.is_solo && <Badge variant="purple" size="sm">Solo</Badge>}
@@ -86,29 +88,41 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
       {/* Tab: Overview */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          {/* Audio Feature Metrics */}
-          <div className="grid grid-cols-4 gap-4">
-            {features.map(f => (
-              <MetricCard
-                key={f.label}
-                label={f.label}
-                value={f.value != null ? `${(f.value * 100).toFixed(0)}%` : '—'}
-                size="sm"
-              />
-            ))}
-          </div>
+          {hasAnyFeatures ? (
+            <>
+              {/* Audio Feature Metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {allFeatures.map(f => (
+                  <MetricCard
+                    key={f.label}
+                    label={f.label}
+                    value={f.value != null ? `${(f.value * 100).toFixed(0)}%` : '—'}
+                    size="sm"
+                  />
+                ))}
+              </div>
 
-          {/* Audio Feature Bars */}
-          <div className="space-y-4 p-6 bg-[#111118] rounded-2xl border border-white/[0.06]">
-            {features.map(f => (
-              <ProgressBar
-                key={f.label}
-                value={f.value || 0}
-                label={f.label}
-                showPercent
-              />
-            ))}
-          </div>
+              {/* Audio Feature Bars — only show features with data */}
+              {availableFeatures.length > 0 && (
+                <div className="space-y-4 p-4 md:p-6 bg-[#111118] rounded-2xl border border-white/[0.06]">
+                  {availableFeatures.map(f => (
+                    <ProgressBar
+                      key={f.label}
+                      value={f.value!}
+                      label={f.label}
+                      showPercent
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Music size={32} className="text-white/20 mb-3" />
+              <p className="text-sm text-white/50 mb-1">Audio analysis not available</p>
+              <p className="text-xs text-white/40">Detailed audio features have not been analyzed for this track yet</p>
+            </div>
+          )}
 
           {/* Keywords */}
           {song.keywords && song.keywords.length > 0 && (
@@ -170,7 +184,7 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
       {activeTab === 'similar' && (
         <div>
           {recommendations.length > 0 ? (
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {recommendations.map(rec => (
                 <button
                   key={rec.song.id}

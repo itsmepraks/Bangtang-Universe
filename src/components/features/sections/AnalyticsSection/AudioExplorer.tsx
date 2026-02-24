@@ -83,16 +83,16 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
 
         <div className="relative">
           {/* Quadrant corner labels */}
-          <div className="absolute top-0 left-0 z-10 text-xs text-white/30 pl-10 pt-1">
+          <div className="absolute top-0 left-0 z-10 text-xs text-white/40 pl-10 pt-1">
             Sad &amp; Calm
           </div>
-          <div className="absolute top-0 right-0 z-10 text-xs text-white/30 pr-2 pt-1">
+          <div className="absolute top-0 right-0 z-10 text-xs text-white/40 pr-2 pt-1">
             Happy &amp; Calm
           </div>
-          <div className="absolute bottom-0 left-0 z-10 text-xs text-white/30 pl-10 pb-6">
+          <div className="absolute bottom-0 left-0 z-10 text-xs text-white/40 pl-10 pb-6">
             Sad &amp; Intense
           </div>
-          <div className="absolute bottom-0 right-0 z-10 text-xs text-white/30 pr-2 pb-6">
+          <div className="absolute bottom-0 right-0 z-10 text-xs text-white/40 pr-2 pb-6">
             Happy &amp; Intense
           </div>
 
@@ -238,7 +238,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
                 className="flex items-center justify-between p-3 border-b border-white/[0.04]"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-white/30 w-5 text-right">{index + 1}</span>
+                  <span className="text-xs text-white/40 w-5 text-right">{index + 1}</span>
                   <div>
                     <p className="text-sm text-white/80">{song.title}</p>
                     {song.album && <p className="text-xs text-white/40">{song.album}</p>}

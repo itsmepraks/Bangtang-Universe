@@ -80,7 +80,7 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask a question..."
-          className="bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm p-3 pr-12 w-full placeholder:text-white/30 focus:outline-none focus:border-purple-500/30"
+          className="bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm p-3 pr-12 w-full placeholder:text-white/40 focus:outline-none focus:border-purple-500/30"
         />
         <button
           onClick={() => handleSubmit()}
@@ -217,7 +217,7 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
       {/* History */}
       {history.length > 1 && (
         <div className="space-y-3">
-          <h4 className="text-xs font-medium text-white/30 uppercase tracking-wider">
+          <h4 className="text-xs font-medium text-white/40 uppercase tracking-wider">
             Previous Questions
           </h4>
           <div className="space-y-2 max-h-64 overflow-y-auto">

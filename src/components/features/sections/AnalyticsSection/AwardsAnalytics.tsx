@@ -85,7 +85,7 @@ export default function AwardsAnalytics({ awards, chartEntries, songs }: AwardsA
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-sm text-white/40">No award or chart data available yet.</p>
-        <p className="text-xs text-white/30 mt-2">Data will appear here once awards and chart entries are loaded.</p>
+        <p className="text-xs text-white/40 mt-2">Data will appear here once awards and chart entries are loaded.</p>
       </div>
     );
   }

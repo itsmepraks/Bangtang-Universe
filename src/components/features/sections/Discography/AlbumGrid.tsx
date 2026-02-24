@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Disc, Music, Users } from 'lucide-react';
+import { Music, Users } from 'lucide-react';
 import type { Song, Album } from '../../../../types/database';
 import FilterBar from '../../../ui/FilterBar';
 import Badge from '../../../ui/Badge';
+import BtsLogo from '../../../ui/BtsLogo';
 
 type Category = 'all' | 'group' | 'solo' | 'collab';
 
@@ -174,7 +175,9 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
                       loading="lazy"
                     />
                   ) : (
-                    <Disc size={32} className="absolute bottom-3 right-3 text-white/10 group-hover:text-white/20 transition-colors" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <BtsLogo size={40} className="text-white/[0.08] group-hover:text-white/[0.15] transition-colors" />
+                    </div>
                   )}
                 </div>
                 <div className="p-4 space-y-2">

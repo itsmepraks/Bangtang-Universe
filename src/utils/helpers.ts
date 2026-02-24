@@ -1290,7 +1290,8 @@ export const formatNumber = (num: number): string =>
  * @performance O(1) - Simple arithmetic and padding
  * @browser All browsers
  */
-export const formatDuration = (seconds: number): string => {
+export const formatDuration = (seconds: number | null | undefined): string => {
+  if (seconds == null) return '--:--';
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;

@@ -46,7 +46,7 @@ export default function LyricsViewer({ song }: LyricsViewerProps) {
             <div className="flex flex-col items-center justify-center py-16 text-center">
                 <BookOpen size={32} className="text-white/20 mb-3" />
                 <p className="text-sm text-white/50 mb-1">No lyrics available</p>
-                <p className="text-xs text-white/30">Run the lyrics scraper to populate</p>
+                <p className="text-xs text-white/40">Lyrics for this song haven't been added yet</p>
             </div>
         );
     }

@@ -126,7 +126,7 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                                 {(member.solo_tracks || []).map((track, i) => (
                                     <div key={track} className="p-6 bg-[#111118] rounded-2xl border border-white/[0.06] hover:bg-white/[0.05] hover:border-white/[0.12] transition-all duration-700 cursor-pointer group flex items-center gap-6">
                                         <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
-                                            <Disc className="text-white/30 group-hover:text-white transition-colors" style={{ color: i === 0 ? member.color || '#fff' : '' }} size={28} />
+                                            <Disc className="text-white/40 group-hover:text-white transition-colors" style={{ color: i === 0 ? member.color || '#fff' : '' }} size={28} />
                                         </div>
                                         <div>
                                             <div className="font-semibold text-lg text-white/80 group-hover:text-purple-200 transition-colors tracking-tight">{track}</div>

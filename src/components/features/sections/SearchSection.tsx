@@ -130,7 +130,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
             onFocus={() => setShowSuggestions(true)}
             placeholder="Search songs, albums, members..."
             aria-label="Search the archive"
-            className="flex-1 bg-transparent text-base text-white/80 outline-none placeholder:text-white/30"
+            className="flex-1 bg-transparent text-base text-white/80 outline-none placeholder:text-white/40"
           />
           <button
             onClick={handleSearch}
@@ -245,7 +245,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
           <p className="text-sm text-white/40">
             {query || activeMood ? 'No results found' : 'Search the archive'}
           </p>
-          <p className="text-xs text-white/30 mt-2">Try searching for a song, album, or member</p>
+          <p className="text-xs text-white/40 mt-2">Try searching for a song, album, or member</p>
         </div>
       )}
     </div>

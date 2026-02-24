@@ -34,7 +34,7 @@ export const RAGNetwork: React.FC<RAGNetworkProps> = ({ accentColor = "#A855F7" 
                         onKeyDown={e => e.key === 'Enter' && handleSearch()}
                         type="text"
                         placeholder="Search the archive..."
-                        className="bg-transparent border-none text-sm text-white focus:outline-none w-full placeholder:text-white/30 tracking-wide"
+                        className="bg-transparent border-none text-sm text-white focus:outline-none w-full placeholder:text-white/40 tracking-wide"
                     />
                 </div>
                 <button

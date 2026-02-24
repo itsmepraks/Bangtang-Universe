@@ -135,11 +135,13 @@ export function useSongsSortedBy(feature: 'bpm' | 'energy' | 'valence' | 'dancea
     const { songs, loading, error } = useSongs();
 
     const sortedSongs = useMemo(() => {
-        return [...songs].sort((a, b) => {
-            const aVal = a[feature] ?? 0;
-            const bVal = b[feature] ?? 0;
-            return ascending ? aVal - bVal : bVal - aVal;
-        });
+        return [...songs]
+            .filter(s => s[feature] != null)
+            .sort((a, b) => {
+                const aVal = a[feature]!;
+                const bVal = b[feature]!;
+                return ascending ? aVal - bVal : bVal - aVal;
+            });
     }, [songs, feature, ascending]);
 
     return { songs: sortedSongs, loading, error };
