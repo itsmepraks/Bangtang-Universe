@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { ChevronLeft, PenTool, Disc, Award, Music, ExternalLink, User, GitCompare, Trophy, GitMerge, Calendar } from 'lucide-react';
-import type { Song, Album, Member } from '../../../types/database';
+import type { Song, Member } from '../../../types/database';
 import { GlassHUD } from '../../layout/GlassHUD';
 import { useSoloAlbumsByMember, useAwardsByMember, useCollaborationsByMember, useMemberEventsByMember } from '../../../hooks';
 import MemberTimeline from './Members/MemberTimeline';
@@ -11,7 +11,6 @@ import MemberComparison from '../comparison/MemberComparison';
 interface MembersSectionProps {
   members: Member[];
   songs: Song[];
-  albums: Album[];
   selectedMemberId: string | null;
   onSelectMember: (id: string | null) => void;
   onOpenFullProfile: (id: string) => void;

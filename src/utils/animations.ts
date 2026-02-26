@@ -9,7 +9,7 @@
  * @see {@link ../types.ts} for type definitions
  */
 
-import type { FloatingParticle, BokehBubble, Star } from '../types';
+import type { FloatingParticle, BokehBubble, Star } from '../types/index';
 
 // ============================================================================
 // PARTICLE GENERATION

@@ -58,7 +58,6 @@ export function useMembers(): UseMembersResult {
 
     const fetchMembers = async () => {
         if (!isSupabaseConfigured()) {
-            console.log('👥 Using local member data (Supabase not configured)');
             setMembers(MEMBER_DATA.map(convertLocalMember));
             setLoading(false);
             return;
@@ -74,7 +73,6 @@ export function useMembers(): UseMembersResult {
             if (dbError) throw dbError;
 
             setMembers(data || []);
-            console.log(`👥 Loaded ${data?.length || 0} members from database`);
         } catch (err) {
             console.error('Failed to fetch members:', err);
             setError(err as Error);

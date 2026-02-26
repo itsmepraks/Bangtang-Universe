@@ -26,7 +26,6 @@ export function useAlbums(): UseAlbumsResult {
     const fetchAlbums = async () => {
         // If Supabase isn't configured, use local data
         if (!isSupabaseConfigured()) {
-            console.log('📀 Using local album data (Supabase not configured)');
             setAlbums(ALBUMS.map(a => ({
                 id: a.id,
                 title: a.title,
@@ -67,7 +66,6 @@ export function useAlbums(): UseAlbumsResult {
                 return album;
             });
             setAlbums(enriched);
-            console.log(`📀 Loaded ${data?.length || 0} albums from database`);
         } catch (err) {
             console.error('Failed to fetch albums:', err);
             setError(err as Error);

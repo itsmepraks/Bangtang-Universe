@@ -116,8 +116,8 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
           {/* Answer Text */}
           <p className="text-base text-white/80 leading-relaxed">{answer.text}</p>
 
-          {/* Confidence Badge */}
-          {(() => {
+          {/* Confidence Badge — only shown when confidence is meaningful */}
+          {answer.confidence >= 0.5 && (() => {
             const { label, color } = getConfidenceLabel(answer.confidence);
             return (
               <span className={`text-xs ${color}`}>

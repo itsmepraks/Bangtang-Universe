@@ -291,7 +291,6 @@ export default function App() {
                     <MembersSection
                       members={members}
                       songs={songs}
-                      albums={albums}
                       selectedMemberId={memberSectionId}
                       onSelectMember={setMemberSectionId}
                       onOpenFullProfile={(id) => setActiveMemberId(id)}
@@ -321,7 +320,20 @@ export default function App() {
 
                   {activeSection === 'search' && (
                     <SearchSection
-                      onSelectSong={() => navigateTo('analytics')}
+                      songs={songs}
+                      members={members}
+                      albums={albums}
+                      awards={awards}
+                      concerts={concerts}
+                      onSelectSong={(song) => {
+                        const album = albums.find(a => a.id === song.album_id);
+                        setDiscographyState({
+                          selectedAlbumId: album?.id ?? null,
+                          selectedSongId: song.id,
+                          view: 'song',
+                        });
+                        setActiveSection('discography');
+                      }}
                       onNavigate={navigateTo}
                     />
                   )}

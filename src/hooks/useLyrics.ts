@@ -23,7 +23,6 @@ export function useLyrics(): UseLyricsResult {
 
     const fetchLyrics = async () => {
         if (!isSupabaseConfigured()) {
-            console.log('📝 Lyrics unavailable (Supabase not configured)');
             setLoading(false);
             return;
         }
@@ -38,7 +37,6 @@ export function useLyrics(): UseLyricsResult {
             if (dbError) throw dbError;
 
             setLyrics(data || []);
-            console.log(`📝 Loaded ${data?.length || 0} lyrics from database`);
         } catch (err) {
             console.error('Failed to fetch lyrics:', err);
             setError(err as Error);

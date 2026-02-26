@@ -76,8 +76,10 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
             return (
               <button
                 key={tab.id}
+                id={`analytics-tab-${tab.id}`}
                 role="tab"
                 aria-selected={isActive}
+                aria-controls="analytics-tabpanel"
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
@@ -93,7 +95,12 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
         </div>
       </div>
 
-      <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-3 md:p-6" role="tabpanel">
+      <div
+        id="analytics-tabpanel"
+        role="tabpanel"
+        aria-labelledby={`analytics-tab-${activeTab}`}
+        className="bg-[#111118] rounded-2xl border border-white/[0.06] p-3 md:p-6"
+      >
         <Suspense
           fallback={
             <div className="flex items-center justify-center h-64">

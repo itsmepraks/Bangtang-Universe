@@ -1,18 +1,14 @@
 /**
  * useSearch Hook
  *
- * Wraps Fuse.js search with live data from Supabase hooks.
- * Fuse instances are recreated when data changes.
+ * Builds Fuse.js search indexes from pre-loaded data passed in as arguments.
+ * Data fetching is the caller's responsibility (App.tsx already has all data).
+ * This avoids duplicate Supabase requests.
  */
 
 import { useMemo, useCallback } from 'react';
 import Fuse from 'fuse.js';
-import { useSongs } from './useSongs';
-import { useMembers } from './useMembers';
-import { useAlbums } from './useAlbums';
-import { useAwards } from './useAwards';
-import { useConcerts } from './useConcerts';
-import type { Song } from '../types/database';
+import type { Song, Member, Album, Award, Concert } from '../types/database';
 import {
     SONG_FUSE_OPTIONS,
     MEMBER_FUSE_OPTIONS,
@@ -39,23 +35,20 @@ interface UseSearchResult {
     searchAll: (query: string, limit?: number) => SearchResult[];
     getSuggestions: (query: string, limit?: number) => string[];
     searchByMood: (mood: string) => Song[];
-    loading: boolean;
 }
 
-export function useSearch(): UseSearchResult {
-    const { songs, loading: songsLoading } = useSongs();
-    const { members, loading: membersLoading } = useMembers();
-    const { albums, loading: albumsLoading } = useAlbums();
-    const { awards, loading: awardsLoading } = useAwards();
-    const { concerts, loading: concertsLoading } = useConcerts();
-
+export function useSearch(
+    songs: Song[],
+    members: Member[],
+    albums: Album[],
+    awards: Award[],
+    concerts: Concert[],
+): UseSearchResult {
     const songFuse = useMemo(() => new Fuse(songs, SONG_FUSE_OPTIONS), [songs]);
     const memberFuse = useMemo(() => new Fuse(members, MEMBER_FUSE_OPTIONS), [members]);
     const albumFuse = useMemo(() => new Fuse(albums, ALBUM_FUSE_OPTIONS), [albums]);
     const awardFuse = useMemo(() => new Fuse(awards, AWARD_FUSE_OPTIONS), [awards]);
     const concertFuse = useMemo(() => new Fuse(concerts, CONCERT_FUSE_OPTIONS), [concerts]);
-
-    const loading = songsLoading || membersLoading || albumsLoading || awardsLoading || concertsLoading;
 
     const searchSongs = useCallback((query: string, limit = 10): SearchResult[] => {
         if (!query.trim()) return [];
@@ -131,7 +124,6 @@ export function useSearch(): UseSearchResult {
         searchAll,
         getSuggestions,
         searchByMood,
-        loading
     };
 }
 

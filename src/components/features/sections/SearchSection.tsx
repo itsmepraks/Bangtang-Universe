@@ -2,12 +2,18 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Search, Network, RefreshCw, Music, Disc, User, Sparkles, Trophy, MapPin } from 'lucide-react';
 import { useSearch, type SearchResult } from '../../../hooks';
 import { MOOD_MAP } from '../../../services/searchService';
-import type { Song } from '../../../types/database';
+import { getSentimentColor } from '../../../constants/colors';
+import type { Song, Member, Album, Award, Concert } from '../../../types/database';
 import type { DashboardSection } from '../../../types/index';
 import Badge from '../../ui/Badge';
 import ProgressBar from '../../ui/ProgressBar';
 
 interface SearchSectionProps {
+  songs: Song[];
+  members: Member[];
+  albums: Album[];
+  awards: Award[];
+  concerts: Concert[];
   onSelectSong: (s: Song) => void;
   onNavigate: (section: DashboardSection, payload?: unknown) => void;
 }
@@ -21,7 +27,7 @@ const MOOD_LABELS: Record<string, string> = {
   motivational: 'Motivational',
 };
 
-export default function SearchSection({ onSelectSong, onNavigate }: SearchSectionProps) {
+export default function SearchSection({ songs, members, albums, awards, concerts, onSelectSong, onNavigate }: SearchSectionProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -30,7 +36,7 @@ export default function SearchSection({ onSelectSong, onNavigate }: SearchSectio
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [hoveredResult, setHoveredResult] = useState<SearchResult | null>(null);
 
-  const { searchAll, searchByMood, getSuggestions } = useSearch();
+  const { searchAll, searchByMood, getSuggestions } = useSearch(songs, members, albums, awards, concerts);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -269,7 +275,7 @@ function PreviewPanel({ result }: { result: SearchResult }) {
           <div>
             <span className="text-white/40">Sentiment</span>
             <div className="mt-0.5">
-              {song.sentiment ? <Badge variant="sentiment" size="sm" color="">{song.sentiment}</Badge> : <span className="text-white/40">—</span>}
+              {song.sentiment ? <Badge variant="sentiment" size="sm" color={getSentimentColor(song.sentiment)}>{song.sentiment}</Badge> : <span className="text-white/40">—</span>}
             </div>
           </div>
         </div>

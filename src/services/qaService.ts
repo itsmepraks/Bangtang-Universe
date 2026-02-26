@@ -884,7 +884,7 @@ class RuleBasedQA implements QAProvider {
         { suggestion: 'When did BTS members enlist?' },
       ],
       type: 'list',
-      confidence: 0,
+      confidence: 0.1,
     };
   }
 }

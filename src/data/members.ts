@@ -5,7 +5,7 @@
  * Last updated: January 2026
  */
 
-import type { Member } from '../types';
+import type { Member } from '../types/index';
 
 // Extended member interface with additional fields
 export interface ExtendedMember extends Member {

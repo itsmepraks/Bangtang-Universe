@@ -19,7 +19,7 @@
  * @see {@link ../types.ts} for type definitions
  */
 
-import type { Position3D, Star, BokehBubble, FloatingParticle } from '../types';
+import type { Position3D, Star, BokehBubble, FloatingParticle } from '../types/index';
 
 // ============================================================================
 // ANIMATION HELPERS

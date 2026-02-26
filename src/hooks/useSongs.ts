@@ -57,8 +57,7 @@ export function useSongs(): UseSongsResult {
 
     const fetchSongs = async () => {
         if (!isSupabaseConfigured()) {
-            console.log('🎵 Using local song data (Supabase not configured)');
-            setSongs(SONGS.map(convertLocalSong));
+                setSongs(SONGS.map(convertLocalSong));
             setLoading(false);
             return;
         }
@@ -73,7 +72,6 @@ export function useSongs(): UseSongsResult {
             if (dbError) throw dbError;
 
             setSongs(data || []);
-            console.log(`🎵 Loaded ${data?.length || 0} songs from database`);
         } catch (err) {
             console.error('Failed to fetch songs:', err);
             setError(err as Error);

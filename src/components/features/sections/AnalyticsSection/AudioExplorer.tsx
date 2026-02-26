@@ -82,18 +82,18 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
         <h3 className="text-sm font-semibold text-white/70 mb-4">Mood Quadrant</h3>
 
         <div className="relative">
-          {/* Quadrant corner labels */}
+          {/* Quadrant corner labels — Y-axis: Energy (high=top), X-axis: Valence (high=right) */}
           <div className="absolute top-0 left-0 z-10 text-xs text-white/40 pl-10 pt-1">
-            Sad &amp; Calm
-          </div>
-          <div className="absolute top-0 right-0 z-10 text-xs text-white/40 pr-2 pt-1">
-            Happy &amp; Calm
-          </div>
-          <div className="absolute bottom-0 left-0 z-10 text-xs text-white/40 pl-10 pb-6">
             Sad &amp; Intense
           </div>
-          <div className="absolute bottom-0 right-0 z-10 text-xs text-white/40 pr-2 pb-6">
+          <div className="absolute top-0 right-0 z-10 text-xs text-white/40 pr-2 pt-1">
             Happy &amp; Intense
+          </div>
+          <div className="absolute bottom-0 left-0 z-10 text-xs text-white/40 pl-10 pb-6">
+            Sad &amp; Calm
+          </div>
+          <div className="absolute bottom-0 right-0 z-10 text-xs text-white/40 pr-2 pb-6">
+            Happy &amp; Calm
           </div>
 
           <ResponsiveContainer width="100%" height={360}>
@@ -116,7 +116,6 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
                 tick={CHART_STYLES.AXIS}
                 tickLine={false}
                 axisLine={false}
-                reversed
               />
               <Tooltip
                 {...CHART_STYLES.TOOLTIP}
