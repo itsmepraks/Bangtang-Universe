@@ -82,41 +82,43 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
         <h3 className="text-sm font-semibold text-white/70 mb-4">Mood Quadrant</h3>
 
         <div className="relative">
-          {/* Quadrant corner labels — Y-axis: Energy (high=top), X-axis: Valence (high=right) */}
-          <div className="absolute top-0 left-0 z-10 text-xs text-white/40 pl-10 pt-1">
-            Sad &amp; Intense
-          </div>
-          <div className="absolute top-0 right-0 z-10 text-xs text-white/40 pr-2 pt-1">
-            Happy &amp; Intense
-          </div>
-          <div className="absolute bottom-0 left-0 z-10 text-xs text-white/40 pl-10 pb-6">
-            Sad &amp; Calm
-          </div>
-          <div className="absolute bottom-0 right-0 z-10 text-xs text-white/40 pr-2 pb-6">
-            Happy &amp; Calm
+          {/* Quadrant axis labels */}
+          <div className="flex justify-between text-xs text-white/30 mb-1 px-1">
+            <span>← Sad</span>
+            <span className="text-center">Valence</span>
+            <span>Happy →</span>
           </div>
 
-          <ResponsiveContainer width="100%" height={360}>
-            <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-              <CartesianGrid {...CHART_STYLES.GRID} />
-              <XAxis
-                type="number"
-                dataKey="valence"
-                domain={[0, 1]}
-                name="Valence"
-                tick={CHART_STYLES.AXIS}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                type="number"
-                dataKey="energy"
-                domain={[0, 1]}
-                name="Energy"
-                tick={CHART_STYLES.AXIS}
-                tickLine={false}
-                axisLine={false}
-              />
+          <div className="flex gap-2">
+            {/* Y-axis label */}
+            <div className="flex flex-col justify-between text-xs text-white/30 py-1 shrink-0 w-14 text-right">
+              <span>Intense ↑</span>
+              <span>Energy</span>
+              <span>↓ Calm</span>
+            </div>
+
+            <div className="flex-1">
+              <ResponsiveContainer width="100%" height={340}>
+                <ScatterChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+                  <CartesianGrid {...CHART_STYLES.GRID} />
+                  <XAxis
+                    type="number"
+                    dataKey="valence"
+                    domain={[0, 1]}
+                    name="Valence"
+                    tick={false}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    type="number"
+                    dataKey="energy"
+                    domain={[0, 1]}
+                    name="Energy"
+                    tick={false}
+                    tickLine={false}
+                    axisLine={false}
+                  />
               <Tooltip
                 {...CHART_STYLES.TOOLTIP}
                 content={({ payload }) => {
@@ -144,8 +146,10 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
                   <Cell key={`scatter-${index}`} fill={entry.color} fillOpacity={0.75} r={5} />
                 ))}
               </Scatter>
-            </ScatterChart>
-          </ResponsiveContainer>
+                </ScatterChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
       </div>
 
