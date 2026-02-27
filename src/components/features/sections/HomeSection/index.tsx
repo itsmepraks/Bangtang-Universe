@@ -246,7 +246,7 @@ export default function HomeSection({
           ]}
           onExplore={() => onNavigate('members')}
         >
-          <ResponsiveContainer width="100%" height={160}>
+          <ResponsiveContainer width="100%" height={196}>
             <BarChart
               data={memberChartData}
               layout="vertical"
@@ -260,6 +260,7 @@ export default function HomeSection({
                 tickLine={false}
                 axisLine={false}
                 width={50}
+                interval={0}
               />
               <Tooltip {...CHART_STYLES.TOOLTIP} />
               <Bar dataKey="value" radius={[0, 3, 3, 0]} isAnimationActive={false} name="KOMCA">
