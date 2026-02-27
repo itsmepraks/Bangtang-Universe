@@ -33,6 +33,21 @@ interface HomeSectionProps {
   onNavigate: (section: DashboardSection, payload?: unknown) => void;
 }
 
+/** Produce a short but unique era label for the Music area chart x-axis.
+ *  "Love Yourself: Her" → "LY:Her"  |  "WINGS" → "WINGS"  |  "Dark & Wild" → "D&W"
+ */
+function abbreviateEra(era: string): string {
+  if (era.includes(':')) {
+    const [main, sub] = era.split(':').map((s) => s.trim());
+    const initials = main.split(/\s+/).map((w) => w[0]?.toUpperCase() ?? '').join('');
+    const subFirst = sub.split(/\s+/)[0].slice(0, 3);
+    return `${initials}:${subFirst}`;
+  }
+  const words = era.split(/\s+/);
+  if (words.length === 1) return era.slice(0, 6);
+  return words.map((w) => w[0]?.toUpperCase() ?? '').join('');
+}
+
 export default function HomeSection({
   songs,
   albums,
@@ -61,7 +76,7 @@ export default function HomeSection({
   const musicChartData = useMemo(
     () =>
       eraStats.map((e) => ({
-        era: e.era.split(' ')[0],
+        era: abbreviateEra(e.era),
         energy: e.avgEnergy,
         valence: e.avgValence,
       })),
@@ -122,12 +137,34 @@ export default function HomeSection({
       .map(([year, count]) => ({ year: `'${String(year).slice(2)}`, count: Number(count) }));
   }, [awards]);
 
+  // ── CONCERTS card ─────────────────────────────────────────────
+  const uniqueCountries = useMemo(
+    () => new Set(concerts.map((c) => c.country)).size,
+    [concerts],
+  );
+  const concertChartData = useMemo(() => {
+    const map: Record<string, number> = {};
+    concerts.forEach((c) => {
+      map[c.tour_name] = (map[c.tour_name] || 0) + 1;
+    });
+    return Object.entries(map)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([name, count]) => ({ name, count }));
+  }, [concerts]);
+
   return (
     <main className="space-y-6">
-      {/* ── Page title ──────────────────────────────────────────── */}
-      <h1 className="text-xs font-semibold text-white/40 uppercase tracking-widest pt-1">
-        Bangtan Universe
-      </h1>
+      {/* ── Page title + tagline ─────────────────────────────────── */}
+      <div className="pt-1">
+        <h1 className="text-xs font-semibold text-white/40 uppercase tracking-widest">
+          Bangtan Universe
+        </h1>
+        <p className="text-sm text-white/35 mt-1">
+          A complete data archive of BTS — music, members, awards, concerts, and deep audio
+          analytics across every era.
+        </p>
+      </div>
 
       {/* ── Stats strip ─────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
@@ -152,7 +189,18 @@ export default function HomeSection({
           ]}
           onExplore={() => onNavigate('discography')}
         >
-          <ResponsiveContainer width="100%" height={140}>
+          {/* Legend */}
+          <div className="flex items-center gap-3 mb-2">
+            <span className="flex items-center gap-1.5 text-[10px] text-white/35">
+              <span className="w-3 h-0.5 rounded bg-[#A855F7] inline-block" />
+              Energy
+            </span>
+            <span className="flex items-center gap-1.5 text-[10px] text-white/35">
+              <span className="w-3 h-0.5 rounded bg-[#C084FC] inline-block" />
+              Valence
+            </span>
+          </div>
+          <ResponsiveContainer width="100%" height={120}>
             <AreaChart data={musicChartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
               <XAxis
                 dataKey="era"
@@ -233,51 +281,66 @@ export default function HomeSection({
           onExplore={() => onNavigate('analytics')}
           className="lg:row-span-2 lg:col-span-1"
         >
-          <ResponsiveContainer width="100%" height={300}>
-            <ScatterChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-              <CartesianGrid {...CHART_STYLES.GRID} />
-              <XAxis
-                type="number"
-                dataKey="valence"
-                domain={[0, 1]}
-                name="Valence"
-                tick={false}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                type="number"
-                dataKey="energy"
-                domain={[0, 1]}
-                name="Energy"
-                tick={false}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip
-                content={({ payload }) => {
-                  if (!payload?.length) return null;
-                  const d = payload[0].payload as (typeof scatterData)[number];
-                  return (
-                    <div style={CHART_STYLES.TOOLTIP.contentStyle}>
-                      <p style={CHART_STYLES.TOOLTIP.labelStyle}>{d.title}</p>
-                      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>
-                        {d.sentiment} · V:{d.valence.toFixed(2)} E:{d.energy.toFixed(2)}
-                      </p>
-                    </div>
-                  );
-                }}
-              />
-              <Scatter data={scatterData} isAnimationActive={false}>
-                {scatterData.map((entry, i) => (
-                  <Cell key={`scatter-${i}`} fill={entry.color} fillOpacity={0.75} />
-                ))}
-              </Scatter>
-            </ScatterChart>
-          </ResponsiveContainer>
+          {/* Quadrant axis labels overlaid on the chart */}
+          <div className="relative">
+            <span className="absolute top-0 inset-x-0 text-center text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
+              Energetic ↑
+            </span>
+            <span className="absolute bottom-1 inset-x-0 text-center text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
+              ↓ Calm
+            </span>
+            <span className="absolute top-1/2 left-0 -translate-y-1/2 text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
+              Sad
+            </span>
+            <span className="absolute top-1/2 right-0 -translate-y-1/2 text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
+              Happy
+            </span>
+            <ResponsiveContainer width="100%" height={300}>
+              <ScatterChart margin={{ top: 18, right: 28, bottom: 18, left: 24 }}>
+                <CartesianGrid {...CHART_STYLES.GRID} />
+                <XAxis
+                  type="number"
+                  dataKey="valence"
+                  domain={[0, 1]}
+                  name="Valence"
+                  tick={false}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="number"
+                  dataKey="energy"
+                  domain={[0, 1]}
+                  name="Energy"
+                  tick={false}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  content={({ payload }) => {
+                    if (!payload?.length) return null;
+                    const d = payload[0].payload as (typeof scatterData)[number];
+                    return (
+                      <div style={CHART_STYLES.TOOLTIP.contentStyle}>
+                        <p style={CHART_STYLES.TOOLTIP.labelStyle}>{d.title}</p>
+                        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>
+                          {d.sentiment} · V:{d.valence.toFixed(2)} E:{d.energy.toFixed(2)}
+                        </p>
+                      </div>
+                    );
+                  }}
+                />
+                <Scatter data={scatterData} isAnimationActive={false}>
+                  {scatterData.map((entry, i) => (
+                    <Cell key={`scatter-${i}`} fill={entry.color} fillOpacity={0.75} />
+                  ))}
+                </Scatter>
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
         </BentoCard>
 
-        {/* AWARDS — cols 1+2, row 2 (wide) */}
+        {/* AWARDS — col 1, row 2 */}
         <BentoCard
           title="Awards"
           metrics={[
@@ -286,7 +349,6 @@ export default function HomeSection({
             { value: uniqueCeremonies, label: 'ceremonies' },
           ]}
           onExplore={() => onNavigate('awards')}
-          className="lg:col-span-2"
         >
           <ResponsiveContainer width="100%" height={140}>
             <BarChart data={winsByYear} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
@@ -310,6 +372,44 @@ export default function HomeSection({
                 radius={[3, 3, 0, 0]}
                 isAnimationActive={false}
                 name="Wins"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </BentoCard>
+
+        {/* CONCERTS — col 2, row 2 */}
+        <BentoCard
+          title="Concerts"
+          metrics={[
+            { value: concerts.length, label: 'shows' },
+            { value: uniqueCountries, label: 'countries' },
+            { value: uniqueTours, label: 'tours' },
+          ]}
+          onExplore={() => onNavigate('tours')}
+        >
+          <ResponsiveContainer width="100%" height={140}>
+            <BarChart
+              data={concertChartData}
+              layout="vertical"
+              margin={{ top: 0, right: 8, bottom: 0, left: 8 }}
+            >
+              <XAxis type="number" tick={false} axisLine={false} tickLine={false} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.4)' }}
+                tickLine={false}
+                axisLine={false}
+                width={65}
+              />
+              <Tooltip {...CHART_STYLES.TOOLTIP} />
+              <Bar
+                dataKey="count"
+                fill="#10B981"
+                fillOpacity={0.75}
+                radius={[0, 3, 3, 0]}
+                isAnimationActive={false}
+                name="Shows"
               />
             </BarChart>
           </ResponsiveContainer>

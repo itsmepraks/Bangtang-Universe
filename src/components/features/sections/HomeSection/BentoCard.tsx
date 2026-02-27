@@ -24,7 +24,8 @@ export default function BentoCard({
     <div
       role="region"
       aria-labelledby={`bento-${title.toLowerCase().replace(/\s+/g, '-')}`}
-      className={`bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-5 flex flex-col gap-4 hover:border-white/[0.10] transition-all duration-300 ${className}`}
+      onClick={onExplore}
+      className={`bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-5 flex flex-col gap-4 hover:border-white/[0.10] transition-all duration-300 ${onExplore ? 'cursor-pointer' : ''} ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -37,9 +38,9 @@ export default function BentoCard({
         {onExplore && (
           <button
             type="button"
-            onClick={onExplore}
+            onClick={(e) => { e.stopPropagation(); onExplore(); }}
             aria-label={`Explore ${title}`}
-            className="text-white/20 hover:text-purple-400/70 transition-colors duration-200 text-sm leading-none p-1.5"
+            className="text-white/40 hover:text-purple-400/70 transition-colors duration-200 text-sm leading-none p-1.5"
           >
             {'\u2192'}
           </button>
