@@ -87,8 +87,12 @@ const CATEGORY_LABELS: Record<CeremonyCategory, string> = {
   specialty: 'Specialty',
 };
 
-function getCeremonyCategory(ceremony: string): CeremonyCategory {
-  return CEREMONY_CATEGORY_MAP[ceremony] ?? 'regional';
+const CATEGORY_FILTER_ORDER: (CeremonyCategory | null)[] = [
+  null, 'global', 'regional', 'fan', 'specialty',
+];
+
+function getCeremonyCategory(ceremony: string): CeremonyCategory | undefined {
+  return CEREMONY_CATEGORY_MAP[ceremony];
 }
 
 export default function AwardGrid({ awards, members }: AwardGridProps) {
@@ -170,11 +174,12 @@ export default function AwardGrid({ awards, members }: AwardGridProps) {
           <span className="text-xs text-white/40 uppercase tracking-wide">Ceremony</span>
           <div className="flex flex-wrap items-center gap-2">
             {/* Category pills */}
-            {([null, 'global', 'regional', 'fan', 'specialty'] as (CeremonyCategory | null)[]).map((cat) => (
+            {CATEGORY_FILTER_ORDER.map((cat) => (
               <button
+                type="button"
                 key={cat ?? 'all'}
                 onClick={() => { setCategoryFilter(cat); setSpecificCeremonyFilter(null); }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 ${
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors duration-200 ${
                   categoryFilter === cat
                     ? 'bg-purple-500/15 border-purple-500/30 text-purple-300'
                     : 'bg-white/[0.03] border-white/[0.08] text-white/50 hover:text-white/70 hover:border-white/15'
@@ -187,6 +192,7 @@ export default function AwardGrid({ awards, members }: AwardGridProps) {
             {/* Scoped ceremony dropdown — only visible when a category is active */}
             {categoryFilter && ceremoniesInCategory.length > 0 && (
               <select
+                aria-label={`Filter by ${CATEGORY_LABELS[categoryFilter]} ceremony`}
                 value={specificCeremonyFilter ?? ''}
                 onChange={(e) => setSpecificCeremonyFilter(e.target.value || null)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 bg-[#111118] cursor-pointer outline-none ${
