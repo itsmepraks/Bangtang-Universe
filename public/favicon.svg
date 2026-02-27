@@ -1,0 +1,8 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Purple background -->
+  <rect width="64" height="64" rx="12" fill="#7C3AED"/>
+  <!-- Left door panel -->
+  <path d="M28 8L10 8L18 56L28 56Z" fill="white"/>
+  <!-- Right door panel -->
+  <path d="M36 8L54 8L46 56L36 56Z" fill="white"/>
+</svg>
