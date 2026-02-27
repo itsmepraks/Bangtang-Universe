@@ -1,24 +1,28 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
+import { Music, Disc, Users, PenTool, Trophy, MapPin } from 'lucide-react';
 import {
-  Music,
-  Disc,
-  Users,
-  PenTool,
-  Trophy,
-  MapPin,
-  BarChart3,
-  Sparkles,
-} from 'lucide-react';
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Cell,
+  ResponsiveContainer,
+} from 'recharts';
 import type { Song, Album, Member, Award, Concert } from '../../../../types/database';
 import type { DashboardSection } from '../../../../types/index';
 import StatCard from './StatCard';
-import SectionCard from './SectionCard';
+import BentoCard from './BentoCard';
 import {
   computeEraEvolution,
-  computeSentimentDistribution,
-  generateInsights,
+  computeMemberContributions,
 } from '../../../../services/analyticsService';
-import { getSentimentColor } from '../../../../constants/colors';
+import { getSentimentColor, CHART_STYLES } from '../../../../constants/colors';
 
 interface HomeSectionProps {
   songs: Song[];
@@ -37,7 +41,7 @@ export default function HomeSection({
   concerts,
   onNavigate,
 }: HomeSectionProps) {
-  // ── Top-level stats ──────────────────────────────────────────
+  // ── Stats strip ───────────────────────────────────────────────
   const eras = useMemo(
     () => [...new Set(albums.map((a) => a.era).filter(Boolean))],
     [albums],
@@ -47,74 +51,85 @@ export default function HomeSection({
     [members],
   );
   const awardsWon = useMemo(() => awards.filter((a) => a.result === 'won').length, [awards]);
-  const uniqueTours = useMemo(() => new Set(concerts.map((c) => c.tour_name)).size, [concerts]);
-
-  // ── Music card ───────────────────────────────────────────────
-  const eraStats = useMemo(() => computeEraEvolution(songs, albums), [songs, albums]);
-  const eraColorMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    albums.forEach((a) => {
-      if (a.era && a.cover_color && !map[a.era]) map[a.era] = a.cover_color;
-    });
-    return map;
-  }, [albums]);
-  const maxEraSongs = useMemo(
-    () => eraStats.reduce((m, e) => Math.max(m, e.songCount), 1),
-    [eraStats],
-  );
-
-  // ── Analytics card ───────────────────────────────────────────
-  const sentiments = useMemo(() => computeSentimentDistribution(songs), [songs]);
-
-  // ── Concerts card ────────────────────────────────────────────
-  const uniqueCountries = useMemo(
-    () => new Set(concerts.map((c) => c.country)).size,
+  const uniqueTours = useMemo(
+    () => new Set(concerts.map((c) => c.tour_name)).size,
     [concerts],
   );
-  const topTours = useMemo(() => {
-    const map: Record<string, number> = {};
-    concerts.forEach((c) => {
-      map[c.tour_name] = (map[c.tour_name] || 0) + 1;
-    });
-    return Object.entries(map)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
-  }, [concerts]);
 
-  // ── Insights card ────────────────────────────────────────────
-  const insights = useMemo(
-    () => generateInsights(songs, albums, members, awards, concerts),
-    [songs, albums, members, awards, concerts],
+  // ── MUSIC card ────────────────────────────────────────────────
+  const eraStats = useMemo(() => computeEraEvolution(songs, albums), [songs, albums]);
+  const musicChartData = useMemo(
+    () =>
+      eraStats.map((e) => ({
+        era: e.era.split(' ')[0],
+        energy: e.avgEnergy,
+        valence: e.avgValence,
+      })),
+    [eraStats],
   );
-  const [insightIdx, setInsightIdx] = useState(0);
-  useEffect(() => {
-    if (insights.length === 0) return;
-    const timer = setInterval(
-      () => setInsightIdx((i) => (i + 1) % insights.length),
-      4000,
-    );
-    return () => clearInterval(timer);
-  }, [insights.length]);
-  const currentInsight = insights[insightIdx] ?? null;
+  const titleTracksCount = useMemo(
+    () => songs.filter((s) => s.is_title_track).length,
+    [songs],
+  );
 
-  // ── Awards card helpers ───────────────────────────────────────
-  const wonPct = awards.length > 0 ? (awardsWon / awards.length) * 100 : 0;
-  const nomPct = 100 - wonPct;
+  // ── MEMBERS card ──────────────────────────────────────────────
+  const contributions = useMemo(
+    () => computeMemberContributions(members, songs),
+    [members, songs],
+  );
+  const memberChartData = useMemo(
+    () => contributions.map((c) => ({ name: c.stageName, value: c.komcaCredits, color: c.color })),
+    [contributions],
+  );
+  const topContributor = contributions[0]?.stageName ?? '—';
+
+  // ── MOOD card ─────────────────────────────────────────────────
+  const scatterData = useMemo(
+    () =>
+      songs
+        .filter((s) => s.valence != null && s.energy != null)
+        .map((s) => ({
+          valence: s.valence as number,
+          energy: s.energy as number,
+          sentiment: s.sentiment ?? 'Unknown',
+          color: getSentimentColor(s.sentiment ?? ''),
+          title: s.title,
+        })),
+    [songs],
+  );
+  const topSentiment = useMemo(() => {
+    const counts: Record<string, number> = {};
+    songs.forEach((s) => {
+      if (s.sentiment) counts[s.sentiment] = (counts[s.sentiment] || 0) + 1;
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
+  }, [songs]);
+
+  // ── AWARDS card ───────────────────────────────────────────────
+  const uniqueCeremonies = useMemo(
+    () => new Set(awards.map((a) => a.ceremony)).size,
+    [awards],
+  );
+  const winsByYear = useMemo(() => {
+    const map: Record<number, number> = {};
+    awards
+      .filter((a) => a.result === 'won')
+      .forEach((a) => {
+        map[a.year] = (map[a.year] || 0) + 1;
+      });
+    return Object.entries(map)
+      .sort(([a], [b]) => Number(a) - Number(b))
+      .map(([year, count]) => ({ year: `'${String(year).slice(2)}`, count: Number(count) }));
+  }, [awards]);
 
   return (
-    <main className="space-y-8">
-      {/* ── Hero ────────────────────────────────────────────────── */}
-      <div className="pt-2">
-        <h1 className="text-3xl md:text-4xl font-bold text-white/95 tracking-tight">
-          Bangtan Universe
-        </h1>
-        <p className="mt-2 text-sm text-white/50 max-w-xl leading-relaxed">
-          A complete data archive of BTS — music, members, awards, concerts, and
-          deep audio analytics across every era.
-        </p>
-      </div>
+    <main className="space-y-6">
+      {/* ── Page title ──────────────────────────────────────────── */}
+      <h1 className="text-xs font-semibold text-white/40 uppercase tracking-widest pt-1">
+        Bangtan Universe
+      </h1>
 
-      {/* ── Stats Strip ─────────────────────────────────────────── */}
+      {/* ── Stats strip ─────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
         <StatCard label="Songs" value={songs.length} icon={Music} subtitle={`across ${eras.length} eras`} />
         <StatCard label="Albums" value={albums.length} icon={Disc} accent="#818CF8" />
@@ -124,164 +139,182 @@ export default function HomeSection({
         <StatCard label="Concerts" value={concerts.length} icon={MapPin} accent="#10B981" subtitle={`${uniqueTours} tours`} />
       </div>
 
-      {/* ── Section Cards ───────────────────────────────────────── */}
+      {/* ── Bento grid ──────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
-        {/* Music */}
-        <SectionCard
-          icon={Music}
-          label="Music"
-          headline={`${songs.length} songs`}
-          subheadline={`across ${eras.length} eras`}
+        {/* MUSIC — col 1, row 1 */}
+        <BentoCard
+          title="Music"
+          metrics={[
+            { value: songs.length, label: 'songs' },
+            { value: eras.length, label: 'eras' },
+            { value: titleTracksCount, label: 'title tracks' },
+          ]}
           onExplore={() => onNavigate('discography')}
         >
-          <div className="space-y-1.5">
-            {eraStats.slice(0, 4).map((era) => (
-              <div key={era.era} className="flex items-center gap-2">
-                <span className="text-xs text-white/40 w-20 shrink-0 truncate">{era.era}</span>
-                <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${(era.songCount / maxEraSongs) * 100}%`,
-                      backgroundColor: eraColorMap[era.era] ?? '#A855F7',
-                    }}
-                  />
-                </div>
-                <span className="text-xs text-white/30 w-5 text-right shrink-0">
-                  {era.songCount}
-                </span>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
+          <ResponsiveContainer width="100%" height={140}>
+            <AreaChart data={musicChartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+              <XAxis
+                dataKey="era"
+                tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis domain={[0, 1]} tick={false} axisLine={false} tickLine={false} />
+              <Tooltip {...CHART_STYLES.TOOLTIP} />
+              <Area
+                type="monotone"
+                dataKey="energy"
+                stroke="#A855F7"
+                fill="#A855F7"
+                fillOpacity={0.15}
+                strokeWidth={2}
+                dot={false}
+                name="Energy"
+                isAnimationActive={false}
+              />
+              <Area
+                type="monotone"
+                dataKey="valence"
+                stroke="#C084FC"
+                fill="#C084FC"
+                fillOpacity={0.10}
+                strokeWidth={1.5}
+                dot={false}
+                name="Valence"
+                isAnimationActive={false}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </BentoCard>
 
-        {/* Members */}
-        <SectionCard
-          icon={Users}
-          label="Members"
-          headline={`${members.length} artists`}
-          subheadline={`${totalKomca.toLocaleString()} KOMCA credits`}
+        {/* MEMBERS — col 2, row 1 */}
+        <BentoCard
+          title="Members"
+          metrics={[
+            { value: members.length, label: 'artists' },
+            { value: totalKomca.toLocaleString(), label: 'KOMCA' },
+            { value: topContributor, label: 'top writer' },
+          ]}
           onExplore={() => onNavigate('members')}
         >
-          <div className="space-y-1.5">
-            {members.map((m) => (
-              <div key={m.id} className="flex items-center gap-2">
-                <div
-                  className="w-3.5 h-3.5 rounded-full shrink-0"
-                  style={{ backgroundColor: m.color ?? '#A855F7' }}
-                />
-                <span className="text-xs text-white/60">{m.stage_name}</span>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
+          <ResponsiveContainer width="100%" height={160}>
+            <BarChart
+              data={memberChartData}
+              layout="vertical"
+              margin={{ top: 0, right: 8, bottom: 0, left: 8 }}
+            >
+              <XAxis type="number" tick={false} axisLine={false} tickLine={false} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }}
+                tickLine={false}
+                axisLine={false}
+                width={50}
+              />
+              <Tooltip {...CHART_STYLES.TOOLTIP} />
+              <Bar dataKey="value" radius={[0, 3, 3, 0]} isAnimationActive={false} name="KOMCA">
+                {memberChartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.85} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </BentoCard>
 
-        {/* Awards */}
-        <SectionCard
-          icon={Trophy}
-          label="Awards"
-          headline={`${awardsWon} won`}
-          subheadline={`from ${awards.length} nominations`}
+        {/* MOOD QUADRANT — col 3, rows 1+2 (tall) */}
+        <BentoCard
+          title="Mood Quadrant"
+          metrics={[
+            { value: scatterData.length, label: 'songs plotted' },
+            { value: topSentiment, label: 'top sentiment' },
+          ]}
+          onExplore={() => onNavigate('analytics')}
+          className="lg:row-span-2 md:col-span-2 lg:col-span-1"
+        >
+          <ResponsiveContainer width="100%" height={300}>
+            <ScatterChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
+              <CartesianGrid {...CHART_STYLES.GRID} />
+              <XAxis
+                type="number"
+                dataKey="valence"
+                domain={[0, 1]}
+                name="Valence"
+                tick={false}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                type="number"
+                dataKey="energy"
+                domain={[0, 1]}
+                name="Energy"
+                tick={false}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                {...CHART_STYLES.TOOLTIP}
+                content={({ payload }) => {
+                  if (!payload?.length) return null;
+                  const d = payload[0].payload as (typeof scatterData)[number];
+                  return (
+                    <div style={CHART_STYLES.TOOLTIP.contentStyle}>
+                      <p style={CHART_STYLES.TOOLTIP.labelStyle}>{d.title}</p>
+                      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>
+                        {d.sentiment} · V:{d.valence.toFixed(2)} E:{d.energy.toFixed(2)}
+                      </p>
+                    </div>
+                  );
+                }}
+              />
+              <Scatter data={scatterData} isAnimationActive={false}>
+                {scatterData.map((entry, i) => (
+                  <Cell key={`scatter-${i}`} fill={entry.color} fillOpacity={0.75} />
+                ))}
+              </Scatter>
+            </ScatterChart>
+          </ResponsiveContainer>
+        </BentoCard>
+
+        {/* AWARDS — cols 1+2, row 2 (wide) */}
+        <BentoCard
+          title="Awards"
+          metrics={[
+            { value: awardsWon, label: 'won' },
+            { value: awards.length - awardsWon, label: 'nominated' },
+            { value: uniqueCeremonies, label: 'ceremonies' },
+          ]}
           onExplore={() => onNavigate('awards')}
+          className="lg:col-span-2"
         >
-          <div className="space-y-2.5">
-            <div>
-              <div className="flex justify-between text-xs text-white/40 mb-1">
-                <span>Won</span>
-                <span>{awardsWon}</span>
-              </div>
-              <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-yellow-400 transition-all duration-500"
-                  style={{ width: `${wonPct}%` }}
-                  role="progressbar"
-                  aria-valuenow={Math.round(wonPct)}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label="Awards won percentage"
-                />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-xs text-white/40 mb-1">
-                <span>Nominated</span>
-                <span>{awards.length - awardsWon}</span>
-              </div>
-              <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-purple-400 transition-all duration-500"
-                  style={{ width: `${nomPct}%` }}
-                  role="progressbar"
-                  aria-valuenow={Math.round(nomPct)}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label="Nominations not won percentage"
-                />
-              </div>
-            </div>
-          </div>
-        </SectionCard>
-
-        {/* Analytics */}
-        <SectionCard
-          icon={BarChart3}
-          label="Analytics"
-          headline={sentiments[0]?.sentiment ?? 'Audio Data'}
-          subheadline="top sentiment"
-          onExplore={() => onNavigate('analytics')}
-        >
-          <div className="space-y-1.5">
-            {sentiments.slice(0, 3).map((s) => (
-              <div key={s.sentiment}>
-                <div className="flex justify-between text-xs text-white/40 mb-1">
-                  <span>{s.sentiment}</span>
-                  <span>{s.percentage}%</span>
-                </div>
-                <div className="h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${s.percentage}%`,
-                      backgroundColor: getSentimentColor(s.sentiment),
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-
-        {/* Concerts */}
-        <SectionCard
-          icon={MapPin}
-          label="Concerts"
-          headline={`${concerts.length} shows`}
-          subheadline={`across ${uniqueCountries} countries`}
-          onExplore={() => onNavigate('tours')}
-        >
-          <div className="space-y-1.5">
-            {topTours.map(([name, count]) => (
-              <div key={name} className="flex items-center justify-between">
-                <span className="text-xs text-white/60 truncate mr-2">{name}</span>
-                <span className="text-xs text-white/30 shrink-0">{count}</span>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-
-        {/* Insights */}
-        <SectionCard
-          icon={Sparkles}
-          label="Insights"
-          headline={currentInsight ? currentInsight.value ?? '—' : '—'}
-          subheadline="rotating data fact"
-          onExplore={() => onNavigate('analytics')}
-        >
-          <p className="text-xs text-white/50 leading-relaxed">
-            {currentInsight?.text ?? 'Loading insights\u2026'}
-          </p>
-        </SectionCard>
+          <ResponsiveContainer width="100%" height={140}>
+            <BarChart data={winsByYear} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+              <XAxis
+                dataKey="year"
+                tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }}
+                tickLine={false}
+                axisLine={false}
+                allowDecimals={false}
+              />
+              <Tooltip {...CHART_STYLES.TOOLTIP} />
+              <Bar
+                dataKey="count"
+                fill="#A855F7"
+                fillOpacity={0.8}
+                radius={[3, 3, 0, 0]}
+                isAnimationActive={false}
+                name="Wins"
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </BentoCard>
 
       </div>
     </main>
