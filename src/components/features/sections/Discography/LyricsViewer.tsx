@@ -12,15 +12,22 @@ interface LyricsViewerProps {
 /**
  * Strip Genius page navigation that gets stored before the actual lyrics.
  * e.g. "15 ContributorsTranslationsRomanizationEnglish... [가사] [Intro: RM]..."
- * → "[Intro: RM]..."
+ * → "[가사] [Intro: RM]..."
+ *
+ * Genius navigation is always a single run-on block with no newlines before
+ * the first section bracket. If no newline appears before the first '[',
+ * everything before it is navigation junk and should be stripped.
+ * Works for both English ([Intro:]) and Korean ([가사], [인트로:]) section markers.
  */
 function cleanLyrics(raw: string): string {
-    const sectionPattern = /\[(?:Intro|Verse|Chorus|Pre-Chorus|Bridge|Outro|Hook|Interlude|Rap|Part|Refrain|Coda|Skit)/i;
-    const match = raw.match(sectionPattern);
-    if (match?.index !== undefined && match.index > 0) {
-        return raw.slice(match.index).trim();
+    const trimmed = raw.trim();
+    const firstBracket = trimmed.indexOf('[');
+    if (firstBracket <= 0) return trimmed;
+    const textBeforeBracket = trimmed.slice(0, firstBracket);
+    if (!textBeforeBracket.includes('\n')) {
+        return trimmed.slice(firstBracket).trim();
     }
-    return raw.trim();
+    return trimmed;
 }
 
 type LyricsMode = 'english' | 'korean' | 'romanized' | 'side-by-side';
