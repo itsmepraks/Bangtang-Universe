@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
 interface SectionCardProps {
@@ -6,7 +7,7 @@ interface SectionCardProps {
   headline: string;
   subheadline?: string;
   onExplore: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function SectionCard({
@@ -45,9 +46,10 @@ export default function SectionCard({
       <button
         type="button"
         onClick={onExplore}
+        aria-label={`Explore ${label}`}
         className="text-xs text-purple-400/70 hover:text-purple-300 transition-colors duration-200 text-left"
       >
-        Explore →
+        Explore {'\u2192'}
       </button>
     </div>
   );
