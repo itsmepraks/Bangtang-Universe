@@ -9,7 +9,7 @@ import {
   BarChart3,
   Sparkles,
 } from 'lucide-react';
-import type { Song, Album, Member, Award, Concert, MemberEvent } from '../../../../types/database';
+import type { Song, Album, Member, Award, Concert } from '../../../../types/database';
 import type { DashboardSection } from '../../../../types/index';
 import StatCard from './StatCard';
 import SectionCard from './SectionCard';
@@ -26,7 +26,6 @@ interface HomeSectionProps {
   members: Member[];
   awards: Award[];
   concerts: Concert[];
-  memberEvents: MemberEvent[];
   onNavigate: (section: DashboardSection, payload?: unknown) => void;
 }
 
@@ -60,7 +59,7 @@ export default function HomeSection({
     return map;
   }, [albums]);
   const maxEraSongs = useMemo(
-    () => Math.max(...eraStats.map((e) => e.songCount), 1),
+    () => eraStats.reduce((m, e) => Math.max(m, e.songCount), 1),
     [eraStats],
   );
 
@@ -96,6 +95,9 @@ export default function HomeSection({
     );
     return () => clearInterval(timer);
   }, [insights.length]);
+  useEffect(() => {
+    setInsightIdx(0);
+  }, [insights.length]);
   const currentInsight = insights[insightIdx] ?? null;
 
   // ── Awards card helpers ───────────────────────────────────────
@@ -103,7 +105,7 @@ export default function HomeSection({
   const nomPct = 100 - wonPct;
 
   return (
-    <div className="space-y-8">
+    <main className="space-y-8">
       {/* ── Hero ────────────────────────────────────────────────── */}
       <div className="pt-2">
         <h1 className="text-3xl md:text-4xl font-bold text-white/95 tracking-tight">
@@ -119,7 +121,7 @@ export default function HomeSection({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
         <StatCard label="Songs" value={songs.length} icon={Music} subtitle={`across ${eras.length} eras`} />
         <StatCard label="Albums" value={albums.length} icon={Disc} accent="#818CF8" />
-        <StatCard label="Members" value={members.length} icon={Users} accent="#C084FC" subtitle="7 artists" />
+        <StatCard label="Members" value={members.length} icon={Users} accent="#C084FC" subtitle={`${members.length} artists`} />
         <StatCard label="KOMCA Credits" value={totalKomca} icon={PenTool} accent="#D8B4FE" subtitle="total production" />
         <StatCard label="Awards Won" value={awardsWon} icon={Trophy} accent="#FBBF24" subtitle={`${awards.length} nominations`} />
         <StatCard label="Concerts" value={concerts.length} icon={MapPin} accent="#10B981" subtitle={`${uniqueTours} tours`} />
@@ -161,7 +163,7 @@ export default function HomeSection({
         <SectionCard
           icon={Users}
           label="Members"
-          headline="7 artists"
+          headline={`${members.length} artists`}
           subheadline={`${totalKomca.toLocaleString()} KOMCA credits`}
           onExplore={() => onNavigate('members')}
         >
@@ -196,6 +198,11 @@ export default function HomeSection({
                 <div
                   className="h-full rounded-full bg-yellow-400 transition-all duration-500"
                   style={{ width: `${wonPct}%` }}
+                  role="progressbar"
+                  aria-valuenow={Math.round(wonPct)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="Awards won percentage"
                 />
               </div>
             </div>
@@ -208,6 +215,11 @@ export default function HomeSection({
                 <div
                   className="h-full rounded-full bg-purple-400 transition-all duration-500"
                   style={{ width: `${nomPct}%` }}
+                  role="progressbar"
+                  aria-valuenow={Math.round(nomPct)}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="Nominations not won percentage"
                 />
               </div>
             </div>
@@ -275,6 +287,6 @@ export default function HomeSection({
         </SectionCard>
 
       </div>
-    </div>
+    </main>
   );
 }

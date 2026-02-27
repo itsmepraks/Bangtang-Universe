@@ -26,9 +26,9 @@ export default function SectionCard({
           size={16}
           className="text-white/40 group-hover:text-purple-400/60 transition-colors duration-500"
         />
-        <span className="text-xs font-semibold text-white/50 uppercase tracking-wide">
+        <h2 className="text-xs font-semibold text-white/50 uppercase tracking-wide">
           {label}
-        </span>
+        </h2>
       </div>
 
       {/* Headline */}
