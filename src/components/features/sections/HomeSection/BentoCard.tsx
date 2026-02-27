@@ -54,7 +54,7 @@ export default function BentoCard({
               <p className="text-2xl font-bold text-white/95 tabular-nums leading-none">
                 {typeof m.value === 'number' ? m.value.toLocaleString() : m.value}
               </p>
-              <p className="text-[10px] text-white/40 uppercase tracking-wide mt-1">
+              <p className="text-[10px] text-white/40 uppercase tracking-wide mt-0.5">
                 {m.label}
               </p>
             </div>

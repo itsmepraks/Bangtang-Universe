@@ -193,7 +193,7 @@ export default function HomeSection({
           title="Members"
           metrics={[
             { value: members.length, label: 'artists' },
-            { value: totalKomca.toLocaleString(), label: 'KOMCA' },
+            { value: totalKomca, label: 'KOMCA' },
             { value: topContributor, label: 'top writer' },
           ]}
           onExplore={() => onNavigate('members')}
@@ -231,7 +231,7 @@ export default function HomeSection({
             { value: topSentiment, label: 'top sentiment' },
           ]}
           onExplore={() => onNavigate('analytics')}
-          className="lg:row-span-2 md:col-span-2 lg:col-span-1"
+          className="lg:row-span-2 lg:col-span-1"
         >
           <ResponsiveContainer width="100%" height={300}>
             <ScatterChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
