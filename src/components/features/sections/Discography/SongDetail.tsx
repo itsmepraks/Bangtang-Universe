@@ -88,9 +88,14 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
       {/* Tab: Overview */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
+          {/* Song description */}
+          {song.description && (
+            <p className="text-sm text-white/60 leading-relaxed whitespace-pre-wrap">{song.description}</p>
+          )}
+
+          {/* Audio features */}
           {hasAnyFeatures ? (
             <>
-              {/* Audio Feature Metrics */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {allFeatures.map(f => (
                   <MetricCard
@@ -102,7 +107,6 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
                 ))}
               </div>
 
-              {/* Audio Feature Bars — only show features with data */}
               {availableFeatures.length > 0 && (
                 <div className="space-y-4 p-4 md:p-6 bg-[#111118] rounded-2xl border border-white/[0.06]">
                   {availableFeatures.map(f => (
@@ -117,11 +121,13 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
               )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Music size={32} className="text-white/20 mb-3" />
-              <p className="text-sm text-white/50 mb-1">Audio analysis not available</p>
-              <p className="text-xs text-white/40">Detailed audio features have not been analyzed for this track yet</p>
-            </div>
+            !song.description && (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Music size={32} className="text-white/20 mb-3" />
+                <p className="text-sm text-white/50 mb-1">No overview available</p>
+                <p className="text-xs text-white/40">Audio features and description haven't been added for this track yet</p>
+              </div>
+            )
           )}
 
           {/* Keywords */}

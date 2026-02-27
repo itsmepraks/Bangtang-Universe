@@ -9,15 +9,32 @@ interface LyricsViewerProps {
     song: Song;
 }
 
+/**
+ * Strip Genius page navigation that gets stored before the actual lyrics.
+ * e.g. "15 ContributorsTranslationsRomanizationEnglish... [가사] [Intro: RM]..."
+ * → "[Intro: RM]..."
+ */
+function cleanLyrics(raw: string): string {
+    const sectionPattern = /\[(?:Intro|Verse|Chorus|Pre-Chorus|Bridge|Outro|Hook|Interlude|Rap|Part|Refrain|Coda|Skit)/i;
+    const match = raw.match(sectionPattern);
+    if (match?.index !== undefined && match.index > 0) {
+        return raw.slice(match.index).trim();
+    }
+    return raw.trim();
+}
+
 type LyricsMode = 'english' | 'korean' | 'romanized' | 'side-by-side';
 
 export default function LyricsViewer({ song }: LyricsViewerProps) {
     const { lyric: lyrics } = useLyricsBySongId(song.id);
 
-    // Get lyrics from either the lyrics table or the song's direct fields
-    const lyricsKo = lyrics?.lyrics_korean || song.lyrics_ko || null;
-    const lyricsEn = lyrics?.lyrics_english || song.lyrics_en || null;
-    const lyricsRom = lyrics?.lyrics_romanized || song.lyrics_romanized || null;
+    // Get lyrics from either the lyrics table or the song's direct fields, stripped of Genius navigation
+    const rawKo = lyrics?.lyrics_korean || song.lyrics_ko || null;
+    const rawEn = lyrics?.lyrics_english || song.lyrics_en || null;
+    const rawRom = lyrics?.lyrics_romanized || song.lyrics_romanized || null;
+    const lyricsKo = rawKo ? cleanLyrics(rawKo) : null;
+    const lyricsEn = rawEn ? cleanLyrics(rawEn) : null;
+    const lyricsRom = rawRom ? cleanLyrics(rawRom) : null;
 
     const hasAnyLyrics = lyricsKo || lyricsEn || lyricsRom;
 

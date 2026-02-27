@@ -96,7 +96,10 @@ export default function AlbumDetail({ album, songs, onSelectSong, onBack }: Albu
             {album.era && <Badge variant="purple" size="sm">{album.era}</Badge>}
             <span>{albumSongs.length} tracks</span>
           </div>
-          {album.description && <p className="text-sm text-white/60 mt-2 max-w-lg leading-relaxed">{album.description}</p>}
+          {album.description
+            ? <p className="text-sm text-white/60 mt-2 max-w-lg leading-relaxed whitespace-pre-wrap">{album.description}</p>
+            : <p className="text-sm text-white/30 mt-2 italic">No description available</p>
+          }
         </div>
       </div>
 
