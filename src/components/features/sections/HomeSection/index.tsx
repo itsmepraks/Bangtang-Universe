@@ -283,7 +283,7 @@ export default function HomeSection({
           className="lg:row-span-2 lg:col-span-1"
         >
           {/* Quadrant axis labels overlaid on the chart */}
-          <div className="relative">
+          <div className="relative h-full">
             <span className="absolute top-0 inset-x-0 text-center text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
               Energetic ↑
             </span>
@@ -296,7 +296,7 @@ export default function HomeSection({
             <span className="absolute top-1/2 right-0 -translate-y-1/2 text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
               Happy
             </span>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height="100%">
               <ScatterChart margin={{ top: 18, right: 28, bottom: 18, left: 24 }}>
                 <CartesianGrid {...CHART_STYLES.GRID} />
                 <XAxis
