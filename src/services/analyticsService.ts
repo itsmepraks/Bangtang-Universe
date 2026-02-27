@@ -157,7 +157,7 @@ export function computeEraEvolution(songs: Song[], albums: Album[]): EraStats[] 
   for (const song of songs) {
     if (song.album_id === null) continue;
     const album = albumMap.get(song.album_id);
-    if (!album || album.era === null) continue;
+    if (!album || !album.era || !ERA_ORDER.includes(album.era)) continue;
 
     const era = album.era;
     if (!eraMap.has(era)) {
@@ -332,7 +332,7 @@ export function computeSentimentByEra(
   for (const song of songs) {
     if (song.album_id === null) continue;
     const album = albumMap.get(song.album_id);
-    if (!album || album.era === null) continue;
+    if (!album || !album.era || !ERA_ORDER.includes(album.era)) continue;
     if (!eraSongs.has(album.era)) {
       eraSongs.set(album.era, []);
     }
@@ -482,7 +482,7 @@ export function computeAlbumStats(songs: Song[], albums: Album[]): AlbumStats[] 
     stats.push({
       albumId: album.id,
       title: album.title,
-      era: album.era ?? 'Unknown',
+      era: album.era ?? 'Unclassified',
       songCount: albumSongs.length,
       avgBpm: round(mean(extractNumeric(albumSongs, 'bpm'))),
       avgEnergy: round(mean(extractNumeric(albumSongs, 'energy'))),

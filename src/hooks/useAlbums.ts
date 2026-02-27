@@ -134,9 +134,9 @@ export function useAlbumsGroupedByEra() {
     const grouped = useMemo(() => {
         const map: Record<string, Album[]> = {};
         albums.forEach(a => {
-            const era = a.era || 'Unknown';
-            if (!map[era]) map[era] = [];
-            map[era].push(a);
+            if (!a.era) return;
+            if (!map[a.era]) map[a.era] = [];
+            map[a.era].push(a);
         });
         return map;
     }, [albums]);
