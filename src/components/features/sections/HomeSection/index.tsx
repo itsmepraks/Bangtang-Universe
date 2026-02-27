@@ -321,12 +321,34 @@ export default function HomeSection({
                   content={({ payload }) => {
                     if (!payload?.length) return null;
                     const d = payload[0].payload as (typeof scatterData)[number];
+                    const valPct = Math.round(d.valence * 100);
+                    const engPct = Math.round(d.energy * 100);
                     return (
-                      <div style={CHART_STYLES.TOOLTIP.contentStyle}>
+                      <div style={{ ...CHART_STYLES.TOOLTIP.contentStyle, minWidth: 160 }}>
                         <p style={CHART_STYLES.TOOLTIP.labelStyle}>{d.title}</p>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, marginTop: 2 }}>
-                          {d.sentiment} · V:{d.valence.toFixed(2)} E:{d.energy.toFixed(2)}
+                        <p style={{ color: d.color, fontSize: 11, marginTop: 3, marginBottom: 8 }}>
+                          {d.sentiment}
                         </p>
+                        {/* Valence bar */}
+                        <div style={{ marginBottom: 6 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>Valence</span>
+                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>{valPct}%</span>
+                          </div>
+                          <div style={{ height: 3, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
+                            <div style={{ height: '100%', width: `${valPct}%`, background: '#C084FC', borderRadius: 2 }} />
+                          </div>
+                        </div>
+                        {/* Energy bar */}
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>Energy</span>
+                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>{engPct}%</span>
+                          </div>
+                          <div style={{ height: 3, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
+                            <div style={{ height: '100%', width: `${engPct}%`, background: '#A855F7', borderRadius: 2 }} />
+                          </div>
+                        </div>
                       </div>
                     );
                   }}
