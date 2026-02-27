@@ -387,32 +387,24 @@ export default function HomeSection({
           ]}
           onExplore={() => onNavigate('tours')}
         >
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart
-              data={concertChartData}
-              layout="vertical"
-              margin={{ top: 0, right: 8, bottom: 0, left: 8 }}
-            >
-              <XAxis type="number" tick={false} axisLine={false} tickLine={false} />
-              <YAxis
-                type="category"
-                dataKey="name"
-                tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.4)' }}
-                tickLine={false}
-                axisLine={false}
-                width={65}
-              />
-              <Tooltip {...CHART_STYLES.TOOLTIP} />
-              <Bar
-                dataKey="count"
-                fill="#10B981"
-                fillOpacity={0.75}
-                radius={[0, 3, 3, 0]}
-                isAnimationActive={false}
-                name="Shows"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="space-y-2">
+            {concertChartData.map((tour) => (
+              <div key={tour.name} className="flex items-center gap-2">
+                <span className="text-[10px] text-white/50 flex-[2] min-w-0 truncate">
+                  {tour.name}
+                </span>
+                <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden min-w-[32px]">
+                  <div
+                    className="h-full rounded-full bg-emerald-500/70"
+                    style={{ width: `${(tour.count / (concertChartData[0]?.count ?? 1)) * 100}%` }}
+                  />
+                </div>
+                <span className="text-[10px] text-white/30 shrink-0 w-5 text-right tabular-nums">
+                  {tour.count}
+                </span>
+              </div>
+            ))}
+          </div>
         </BentoCard>
 
       </div>
