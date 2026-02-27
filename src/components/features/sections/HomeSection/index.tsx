@@ -95,9 +95,6 @@ export default function HomeSection({
     );
     return () => clearInterval(timer);
   }, [insights.length]);
-  useEffect(() => {
-    setInsightIdx(0);
-  }, [insights.length]);
   const currentInsight = insights[insightIdx] ?? null;
 
   // ── Awards card helpers ───────────────────────────────────────

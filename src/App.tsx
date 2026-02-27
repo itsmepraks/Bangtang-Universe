@@ -272,7 +272,6 @@ export default function App() {
                       members={members}
                       awards={awards}
                       concerts={concerts}
-                      memberEvents={memberEvents}
                       onNavigate={navigateTo}
                     />
                   )}
