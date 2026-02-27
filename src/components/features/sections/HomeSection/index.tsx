@@ -133,7 +133,7 @@ export default function HomeSection({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
         <StatCard label="Songs" value={songs.length} icon={Music} subtitle={`across ${eras.length} eras`} />
         <StatCard label="Albums" value={albums.length} icon={Disc} accent="#818CF8" />
-        <StatCard label="Members" value={members.length} icon={Users} accent="#C084FC" subtitle={`${members.length} artists`} />
+        <StatCard label="Members" value={members.length} icon={Users} accent="#C084FC" subtitle="active artists" />
         <StatCard label="KOMCA Credits" value={totalKomca} icon={PenTool} accent="#D8B4FE" subtitle="total production" />
         <StatCard label="Awards Won" value={awardsWon} icon={Trophy} accent="#FBBF24" subtitle={`${awards.length} nominations`} />
         <StatCard label="Concerts" value={concerts.length} icon={MapPin} accent="#10B981" subtitle={`${uniqueTours} tours`} />
@@ -255,7 +255,6 @@ export default function HomeSection({
                 tickLine={false}
               />
               <Tooltip
-                {...CHART_STYLES.TOOLTIP}
                 content={({ payload }) => {
                   if (!payload?.length) return null;
                   const d = payload[0].payload as (typeof scatterData)[number];
