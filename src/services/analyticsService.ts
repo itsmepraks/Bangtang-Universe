@@ -16,7 +16,7 @@ const ERA_ORDER: string[] = [
   'HYYH',
   'Wings',
   'Love Yourself',
-  'MOTS',
+  'Map of the Soul',
   'BE',
   'Butter',
   'Proof',
