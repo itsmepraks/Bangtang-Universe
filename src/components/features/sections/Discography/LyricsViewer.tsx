@@ -10,19 +10,30 @@ interface LyricsViewerProps {
 }
 
 /**
- * Strip Genius page navigation that gets stored before the actual lyrics.
- * e.g. "15 ContributorsTranslationsRomanizationEnglish... [가사] [Intro: RM]..."
- * → "[가사] [Intro: RM]..."
+ * Clean lyrics text stored from Genius scraping.
  *
- * Genius navigation is always a single run-on block with no newlines before
- * the first section bracket. If no newline appears before the first '[',
- * everything before it is navigation junk and should be stripped.
+ * Two types of bad data can appear:
+ * 1. Genius page navigation prepended before actual lyrics:
+ *    "15 ContributorsTranslationsRomanizationEnglish... [가사] [Intro: RM]..."
+ *    → strip everything before the first '[' when no newline precedes it.
+ *
+ * 2. Album tracklist/metadata stored instead of lyrics (scraper error):
+ *    "Tracklist:01. Song Name02. ..." or content with "Release Date:"
+ *    → return '' so the caller can treat it as no lyrics available.
+ *
  * Works for both English ([Intro:]) and Korean ([가사], [인트로:]) section markers.
  */
 function cleanLyrics(raw: string): string {
     const trimmed = raw.trim();
+
+    // Reject album metadata / tracklist content stored instead of actual lyrics
+    if (/^Tracklist:/i.test(trimmed) || /^Release Date:/i.test(trimmed)) {
+        return '';
+    }
+
     const firstBracket = trimmed.indexOf('[');
     if (firstBracket <= 0) return trimmed;
+    // Genius navigation is a run-on block with no newlines before the first bracket.
     const textBeforeBracket = trimmed.slice(0, firstBracket);
     if (!textBeforeBracket.includes('\n')) {
         return trimmed.slice(firstBracket).trim();
@@ -39,9 +50,9 @@ export default function LyricsViewer({ song }: LyricsViewerProps) {
     const rawKo = lyrics?.lyrics_korean || song.lyrics_ko || null;
     const rawEn = lyrics?.lyrics_english || song.lyrics_en || null;
     const rawRom = lyrics?.lyrics_romanized || song.lyrics_romanized || null;
-    const lyricsKo = rawKo ? cleanLyrics(rawKo) : null;
-    const lyricsEn = rawEn ? cleanLyrics(rawEn) : null;
-    const lyricsRom = rawRom ? cleanLyrics(rawRom) : null;
+    const lyricsKo = rawKo ? (cleanLyrics(rawKo) || null) : null;
+    const lyricsEn = rawEn ? (cleanLyrics(rawEn) || null) : null;
+    const lyricsRom = rawRom ? (cleanLyrics(rawRom) || null) : null;
 
     const hasAnyLyrics = lyricsKo || lyricsEn || lyricsRom;
 
