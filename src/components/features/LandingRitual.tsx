@@ -370,7 +370,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           7 MEMBER SILHOUETTES
       ══════════════════════════════════════════ */}
       <div
-        className="absolute z-[6]"
+        className="absolute"
         style={{
           bottom: 'calc(22% + 62px)',
           left: '50%',
@@ -380,6 +380,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           justifyContent: 'center',
           gap: 'clamp(2px, 1.8vw, 22px)',
           width: 'min(860px, 92%)',
+          zIndex: 6,
         }}
       >
         {SILHOUETTE_CONFIGS.map((m) => {
@@ -426,7 +427,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
       ══════════════════════════════════════════ */}
       <div
         className="absolute inset-x-0 bottom-0 pointer-events-none"
-        style={{ height: '18%', zIndex: 8 }}
+        style={{ height: '18%', zIndex: 7 }}
       >
         {FOREGROUND_BOMBS.map((b, i) => (
           <div
