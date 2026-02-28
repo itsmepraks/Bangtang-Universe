@@ -1,20 +1,20 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { BTSLogo, ArmyBombCanvas } from '../visual';
-import MemberSilhouette from '../visual/MemberSilhouette';
 
 export interface LandingRitualProps {
     onSync: () => void;
 }
 
-const SILHOUETTE_CONFIGS = [
-  { id: 'rm',    name: 'RM',     pose: 1 as const, delay: 0.0  },
-  { id: 'jin',   name: 'Jin',    pose: 2 as const, delay: 0.35 },
-  { id: 'suga',  name: 'Suga',   pose: 3 as const, delay: 0.70 },
-  { id: 'jhope', name: 'J-Hope', pose: 4 as const, delay: 0.15 },
-  { id: 'jimin', name: 'Jimin',  pose: 5 as const, delay: 0.50 },
-  { id: 'v',     name: 'V',      pose: 6 as const, delay: 0.80 },
-  { id: 'jk',    name: 'JK',     pose: 7 as const, delay: 0.25 },
+// 7 colored concert light pillars — one per member in their signature color
+const MEMBER_LIGHTS = [
+  { color: '#3B82F6', delay: 0.00 },  // RM    — blue
+  { color: '#EC4899', delay: 0.30 },  // Jin   — pink
+  { color: '#94A3B8', delay: 0.55 },  // Suga  — silver
+  { color: '#FFFFFF', delay: 0.15 },  // JHope — white
+  { color: '#F59E0B', delay: 0.45 },  // Jimin — amber
+  { color: '#10B981', delay: 0.70 },  // V     — green
+  { color: '#8B5CF6', delay: 0.25 },  // JK    — purple
 ] as const;
 
 // Precomputed foreground army bomb orbs — large blurry bokeh simulating
@@ -80,8 +80,6 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
 
         return stars;
     }, []);
-
-    const [hoveredMember, setHoveredMember] = useState<string | null>(null);
 
     return (
         <div className="absolute inset-0 z-50 flex flex-col overflow-hidden select-none bg-gradient-to-b from-[#050010] via-[#0a0018] to-[#080012]">
@@ -367,58 +365,44 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
       </div>
 
       {/* ══════════════════════════════════════════
-          7 MEMBER SILHOUETTES
+          CONCERT LIGHT PILLARS
+          7 soft colored beams rising from stage —
+          one per member, pure light no figures
       ══════════════════════════════════════════ */}
       <div
-        className="absolute"
+        className="absolute pointer-events-none"
         style={{
-          bottom: 'calc(22% + 62px)',
+          bottom: 'calc(22% + 66px)',
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
-          gap: 'clamp(2px, 1.8vw, 22px)',
-          width: 'min(860px, 92%)',
+          gap: 'clamp(10px, 3.5vw, 52px)',
+          width: 'min(780px, 90%)',
           zIndex: 6,
         }}
       >
-        {SILHOUETTE_CONFIGS.map((m) => {
-          const isHovered = hoveredMember === m.id;
-          return (
-            <div
-              key={m.id}
-              className="relative flex flex-col items-center cursor-pointer"
-              onMouseEnter={() => setHoveredMember(m.id)}
-              onMouseLeave={() => setHoveredMember(null)}
-              style={{
-                transition: 'transform 0.35s ease',
-                transform: isHovered ? 'scale(1.1) translateY(-8px)' : 'scale(1)',
-              }}
-            >
-              <MemberSilhouette
-                pose={m.pose}
-                size={150}
-                delay={m.delay}
-                glowing={isHovered}
-              />
-              {/* Name label */}
-              <span style={{
-                marginTop: '5px',
-                fontSize: '8px',
-                fontWeight: 700,
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-                color: isHovered ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.38)',
-                textShadow: isHovered ? '0 0 10px rgba(255,255,255,0.6)' : 'none',
-                transition: 'all 0.35s ease',
-                whiteSpace: 'nowrap',
-              }}>
-                {m.name}
-              </span>
-            </div>
-          );
-        })}
+        {MEMBER_LIGHTS.map((m, i) => (
+          <div
+            key={i}
+            style={{
+              width: '22px',
+              height: '270px',
+              background: `linear-gradient(to top,
+                ${m.color}dd 0%,
+                ${m.color}99 20%,
+                ${m.color}55 45%,
+                ${m.color}22 65%,
+                transparent 100%)`,
+              filter: 'blur(18px)',
+              borderRadius: '50%',
+              flexShrink: 0,
+              animation: `led-pulse ${3.0 + m.delay * 0.8}s ease-in-out infinite`,
+              animationDelay: `${m.delay}s`,
+            }}
+          />
+        ))}
       </div>
 
       {/* ══════════════════════════════════════════
