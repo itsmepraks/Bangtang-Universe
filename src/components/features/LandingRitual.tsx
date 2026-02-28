@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { MEMBER_DATA } from '../../data/members';
 import { BTSLogo, ArmyBombCanvas } from '../visual';
 import DancingFigure from '../visual/DancingFigure';
 
@@ -21,7 +20,7 @@ const MEMBER_CONFIGS = [
 export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
     // Enhanced UNIVERSE/GALAXY stars for cosmic backdrop
     const universeStars = useMemo(() => {
-        const stars: { x: number; y: number; size: number; delay: number; duration: number; type: 'star' | 'galaxy' | 'nebula' }[] = [];
+        const stars: { x: number; y: number; size: number; delay: number; duration: number; type: 'star' | 'galaxy' | 'nebula'; rotation?: number; baseOpacity?: number }[] = [];
 
         // Regular stars
         for (let i = 0; i < 80; i++) {
@@ -31,7 +30,8 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 size: 0.5 + Math.random() * 1.5,
                 delay: Math.random() * 5,
                 duration: 3 + Math.random() * 4,
-                type: 'star'
+                type: 'star',
+                baseOpacity: 0.4 + Math.random() * 0.4,
             });
         }
 
@@ -43,7 +43,8 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 size: 3 + Math.random() * 4,
                 delay: Math.random() * 8,
                 duration: 8 + Math.random() * 6,
-                type: 'galaxy'
+                type: 'galaxy',
+                rotation: Math.random() * 60 - 30,
             });
         }
 
@@ -61,19 +62,6 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
 
         return stars;
     }, []);
-
-    // Member silhouette colors
-    const brightColors = [
-        '#3B82F6', // RM - Bright Blue
-        '#EC4899', // Jin - Hot Pink
-        '#94A3B8', // Suga - Silver Gray
-        '#FFFFFF', // J-Hope - White (center)
-        '#F59E0B', // Jimin - Orange/Amber
-        '#10B981', // V - Emerald Green
-        '#8B5CF6', // JK - Purple
-    ];
-
-    const bodyHeights = [120, 135, 110, 150, 130, 115, 140];
 
     const [hoveredMember, setHoveredMember] = useState<string | null>(null);
 
@@ -116,7 +104,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                                     borderRadius: '50%',
                                     filter: 'blur(1px)',
                                     opacity: 0.4,
-                                    transform: `rotate(${Math.random() * 60 - 30}deg)`,
+                                    transform: `rotate(${star.rotation}deg)`,
                                     animation: `star-twinkle ${star.duration}s ease-in-out infinite`,
                                     animationDelay: `${star.delay}s`,
                                 }}
@@ -133,7 +121,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                                 top: `${star.y}%`,
                                 width: `${star.size}px`,
                                 height: `${star.size}px`,
-                                opacity: 0.4 + Math.random() * 0.4,
+                                opacity: star.baseOpacity,
                                 boxShadow: '0 0 2px rgba(255,255,255,0.8)',
                                 animation: `star-twinkle ${star.duration}s ease-in-out infinite`,
                                 animationDelay: `${star.delay}s`,
