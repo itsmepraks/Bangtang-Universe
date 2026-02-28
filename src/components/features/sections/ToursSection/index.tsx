@@ -62,7 +62,10 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
         </div>
       </div>
 
-      <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6" role="tabpanel">
+      <div
+        className={`bg-[#111118] rounded-2xl border border-white/[0.06] ${activeTab === 'map' ? 'p-0 overflow-hidden' : 'p-6'}`}
+        role="tabpanel"
+      >
         <Suspense
           fallback={
             <div className="flex items-center justify-center h-64">

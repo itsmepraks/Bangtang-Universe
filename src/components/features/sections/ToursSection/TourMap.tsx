@@ -32,20 +32,17 @@ export default function TourMap({ concerts }: TourMapProps) {
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([10, 10]);
 
-  // Derive sorted list of years from concert data
   const years = useMemo(() => {
     const yearSet = new Set<number>();
     concerts.forEach((c) => yearSet.add(new Date(c.date).getFullYear()));
     return Array.from(yearSet).sort();
   }, [concerts]);
 
-  // Filter concerts by selected year
   const filtered = useMemo(() => {
     if (selectedYear === null) return concerts;
     return concerts.filter((c) => new Date(c.date).getFullYear() === selectedYear);
   }, [concerts, selectedYear]);
 
-  // Group by city, resolve coordinates, build pins
   const pins = useMemo((): CityPin[] => {
     const map = new Map<string, CityPin>();
     filtered.forEach((c) => {
@@ -55,18 +52,9 @@ export default function TourMap({ concerts }: TourMapProps) {
       const existing = map.get(key);
       if (existing) {
         existing.showCount += 1;
-        if (!existing.tours.includes(c.tour_name)) {
-          existing.tours.push(c.tour_name);
-        }
+        if (!existing.tours.includes(c.tour_name)) existing.tours.push(c.tour_name);
       } else {
-        map.set(key, {
-          cityKey: key,
-          city: c.city,
-          country: c.country,
-          coords,
-          showCount: 1,
-          tours: [c.tour_name],
-        });
+        map.set(key, { cityKey: key, city: c.city, country: c.country, coords, showCount: 1, tours: [c.tour_name] });
       }
     });
     return Array.from(map.values());
@@ -83,177 +71,174 @@ export default function TourMap({ concerts }: TourMapProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Year filter pills */}
-      <div className="flex flex-wrap items-center gap-2">
-        <button
-          onClick={() => setSelectedYear(null)}
-          className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
-            selectedYear === null
-              ? 'bg-purple-500/10 border-purple-500/30 text-white'
-              : 'border-white/[0.08] text-white/50 hover:text-white/70 hover:border-white/20'
-          }`}
+    /* Full-bleed map container — fills the rounded card edge-to-edge */
+    <div
+      className="relative w-full overflow-hidden rounded-2xl bg-[#080810]"
+      style={{ height: 'calc(100vh - 220px)', minHeight: '560px' }}
+      onMouseLeave={() => setTooltip(null)}
+    >
+      {/* Subtle vignette overlay for depth */}
+      <div
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at center, transparent 55%, rgba(8,8,16,0.55) 100%)',
+        }}
+      />
+
+      {/* Map */}
+      <ComposableMap
+        projectionConfig={{ scale: 155, center: [10, 10] }}
+        style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
+      >
+        <ZoomableGroup
+          zoom={zoom}
+          center={center}
+          minZoom={1}
+          maxZoom={12}
+          onMoveEnd={({ zoom: z, coordinates: c }) => {
+            setZoom(z);
+            setCenter(c as [number, number]);
+          }}
         >
-          All
-        </button>
-        {years.map((year) => (
+          <Geographies geography={worldData}>
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="rgba(255,255,255,0.04)"
+                  stroke="rgba(168,85,247,0.18)"
+                  strokeWidth={0.5 / zoom}
+                  style={{
+                    outline: 'none',
+                    default: { outline: 'none' },
+                    hover: { outline: 'none', fill: 'rgba(168,85,247,0.10)' },
+                    pressed: { outline: 'none' },
+                  }}
+                />
+              ))
+            }
+          </Geographies>
+
+          {pins.map((pin) => {
+            const baseR = 4 + Math.sqrt(pin.showCount) * 2.2;
+            const r = baseR / zoom;
+            return (
+              <Marker
+                key={pin.cityKey}
+                coordinates={pin.coords}
+                onMouseEnter={(e: React.MouseEvent<SVGElement>) => {
+                  const container = (e.target as SVGElement).closest('.relative')?.getBoundingClientRect();
+                  if (container) {
+                    setTooltip({ pin, x: e.clientX - container.left, y: e.clientY - container.top });
+                  }
+                }}
+                onMouseLeave={() => setTooltip(null)}
+              >
+                {/* Glow ring */}
+                <circle r={r * 1.8} fill="rgba(168,85,247,0.12)" />
+                {/* Core dot */}
+                <circle
+                  r={r}
+                  fill="#A855F7"
+                  fillOpacity={0.92}
+                  stroke="#C084FC"
+                  strokeWidth={0.8 / zoom}
+                  style={{ cursor: 'pointer' }}
+                  onMouseMove={(e: React.MouseEvent<SVGCircleElement>) => {
+                    const container = (e.target as SVGElement).closest('.relative')?.getBoundingClientRect();
+                    if (container) {
+                      setTooltip((prev) =>
+                        prev ? { ...prev, x: e.clientX - container.left, y: e.clientY - container.top } : null
+                      );
+                    }
+                  }}
+                />
+              </Marker>
+            );
+          })}
+        </ZoomableGroup>
+      </ComposableMap>
+
+      {/* ── Year filter overlay — top-left ── */}
+      <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-1.5">
+        {[null, ...years].map((year) => (
           <button
-            key={year}
+            key={year ?? 'all'}
             onClick={() => setSelectedYear(year === selectedYear ? null : year)}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
+            className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm transition-all duration-150 ${
               selectedYear === year
-                ? 'bg-purple-500/10 border-purple-500/30 text-white'
-                : 'border-white/[0.08] text-white/50 hover:text-white/70 hover:border-white/20'
+                ? 'bg-purple-500/20 border-purple-400/40 text-white shadow-[0_0_12px_rgba(168,85,247,0.3)]'
+                : 'bg-black/30 border-white/[0.10] text-white/50 hover:text-white/80 hover:border-white/25'
             }`}
           >
-            {year}
+            {year ?? 'All'}
           </button>
         ))}
       </div>
 
-      {/* Map */}
-      <div
-        className="relative rounded-xl overflow-hidden border border-white/[0.06] bg-[#0c0c12] min-h-[420px]"
-        onMouseLeave={() => setTooltip(null)}
-      >
-        <ComposableMap
-          projectionConfig={{ scale: 147, center: [10, 10] }}
-          style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
-        >
-          <ZoomableGroup
-            zoom={zoom}
-            center={center}
-            minZoom={1}
-            maxZoom={10}
-            onMoveEnd={({ zoom: z, coordinates: c }) => {
-              setZoom(z);
-              setCenter(c as [number, number]);
-            }}
-          >
-            <Geographies geography={worldData}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill="rgba(255,255,255,0.04)"
-                    stroke="rgba(255,255,255,0.12)"
-                    strokeWidth={0.5 / zoom}
-                    style={{ outline: 'none', default: { outline: 'none' }, hover: { outline: 'none', fill: 'rgba(168,85,247,0.08)' }, pressed: { outline: 'none' } }}
-                  />
-                ))
-              }
-            </Geographies>
-
-            {pins.map((pin) => {
-              // Markers scale inversely with zoom so they stay visually consistent
-              const baseR = 4 + Math.sqrt(pin.showCount) * 2;
-              const r = baseR / zoom;
-              return (
-                <Marker
-                  key={pin.cityKey}
-                  coordinates={pin.coords}
-                  onMouseEnter={(e: React.MouseEvent<SVGElement>) => {
-                    const container = (e.target as SVGElement)
-                      .closest('.relative')
-                      ?.getBoundingClientRect();
-                    if (container) {
-                      setTooltip({
-                        pin,
-                        x: e.clientX - container.left,
-                        y: e.clientY - container.top,
-                      });
-                    }
-                  }}
-                  onMouseLeave={() => setTooltip(null)}
-                >
-                  <circle
-                    r={r}
-                    fill="#A855F7"
-                    fillOpacity={0.9}
-                    stroke="#7C3AED"
-                    strokeWidth={0.8 / zoom}
-                    style={{ cursor: 'pointer' }}
-                    onMouseMove={(e: React.MouseEvent<SVGCircleElement>) => {
-                      const container = (e.target as SVGElement)
-                        .closest('.relative')
-                        ?.getBoundingClientRect();
-                      if (container) {
-                        setTooltip((prev) =>
-                          prev ? { ...prev, x: e.clientX - container.left, y: e.clientY - container.top } : null
-                        );
-                      }
-                    }}
-                  />
-                </Marker>
-              );
-            })}
-          </ZoomableGroup>
-        </ComposableMap>
-
-        {/* Zoom controls */}
-        <div className="absolute top-3 right-3 flex flex-col gap-1 z-10">
-          <button
-            onClick={() => setZoom((z) => Math.min(z * 2, 10))}
-            className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/60 hover:text-white hover:bg-white/[0.10] transition-colors"
-            title="Zoom in"
-          >
-            <Plus className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setZoom((z) => Math.max(z / 2, 1))}
-            className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/60 hover:text-white hover:bg-white/[0.10] transition-colors"
-            title="Zoom out"
-          >
-            <Minus className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => { setZoom(1); setCenter([10, 10]); }}
-            className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/[0.06] border border-white/[0.10] text-white/60 hover:text-white hover:bg-white/[0.10] transition-colors"
-            title="Reset view"
-          >
-            <RotateCcw className="w-3 h-3" />
-          </button>
+      {/* ── Stats overlay — bottom-left ── */}
+      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-3">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.08] backdrop-blur-sm">
+          <span className="text-purple-400 font-semibold text-sm tabular-nums">{pins.length}</span>
+          <span className="text-white/40 text-xs">{pins.length === 1 ? 'city' : 'cities'}</span>
         </div>
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.08] backdrop-blur-sm">
+          <span className="text-purple-400 font-semibold text-sm tabular-nums">{filtered.length}</span>
+          <span className="text-white/40 text-xs">
+            {filtered.length === 1 ? 'show' : 'shows'}{selectedYear ? ` in ${selectedYear}` : ''}
+          </span>
+        </div>
+      </div>
 
-        {/* Tooltip */}
-        {tooltip && (
-          <div
-            className="pointer-events-none absolute z-10 bg-[#1a1a2e] border border-white/[0.10] rounded-xl px-3 py-2.5 text-xs shadow-xl"
-            style={{
-              left: tooltip.x + 12,
-              top: tooltip.y - 8,
-              transform: tooltip.x > 600 ? 'translateX(-110%)' : undefined,
-            }}
-          >
-            <div className="font-semibold text-white/90 mb-0.5">{tooltip.pin.city}</div>
-            <div className="text-white/50 mb-2">{tooltip.pin.country}</div>
-            <div className="border-t border-white/[0.08] pt-2 space-y-1">
-              <div className="text-white/70">
-                <span className="text-purple-400 font-medium">{tooltip.pin.showCount}</span>{' '}
-                {tooltip.pin.showCount === 1 ? 'show' : 'shows'}
-              </div>
-              {tooltip.pin.tours.map((t) => (
-                <div key={t} className="text-white/40 truncate max-w-[200px]">
-                  {t}
-                </div>
-              ))}
+      {/* ── Zoom controls — bottom-right ── */}
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-1">
+        <button
+          onClick={() => setZoom((z) => Math.min(z * 2, 12))}
+          className="w-7 h-7 flex items-center justify-center rounded-lg bg-black/40 border border-white/[0.10] text-white/50 hover:text-white hover:bg-black/60 backdrop-blur-sm transition-colors"
+          title="Zoom in"
+        >
+          <Plus className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={() => setZoom((z) => Math.max(z / 2, 1))}
+          className="w-7 h-7 flex items-center justify-center rounded-lg bg-black/40 border border-white/[0.10] text-white/50 hover:text-white hover:bg-black/60 backdrop-blur-sm transition-colors"
+          title="Zoom out"
+        >
+          <Minus className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={() => { setZoom(1); setCenter([10, 10]); }}
+          className="w-7 h-7 flex items-center justify-center rounded-lg bg-black/40 border border-white/[0.10] text-white/50 hover:text-white hover:bg-black/60 backdrop-blur-sm transition-colors"
+          title="Reset"
+        >
+          <RotateCcw className="w-3 h-3" />
+        </button>
+      </div>
+
+      {/* ── Hover tooltip ── */}
+      {tooltip && (
+        <div
+          className="pointer-events-none absolute z-20 backdrop-blur-md bg-black/70 border border-purple-500/20 rounded-xl px-3 py-2.5 text-xs shadow-2xl"
+          style={{
+            left: tooltip.x + 14,
+            top: tooltip.y - 10,
+            transform: tooltip.x > 700 ? 'translateX(-110%)' : undefined,
+          }}
+        >
+          <div className="font-semibold text-white mb-0.5">{tooltip.pin.city}</div>
+          <div className="text-white/40 mb-2 text-[11px]">{tooltip.pin.country}</div>
+          <div className="border-t border-white/[0.08] pt-1.5 space-y-1">
+            <div className="text-white/70">
+              <span className="text-purple-400 font-semibold">{tooltip.pin.showCount}</span>{' '}
+              {tooltip.pin.showCount === 1 ? 'show' : 'shows'}
             </div>
+            {tooltip.pin.tours.map((t) => (
+              <div key={t} className="text-white/35 truncate max-w-[200px] text-[11px]">{t}</div>
+            ))}
           </div>
-        )}
-      </div>
-
-      {/* Summary line */}
-      <div className="flex items-center gap-4">
-        <span className="text-xs text-white/40">
-          {pins.length} {pins.length === 1 ? 'city' : 'cities'}
-        </span>
-        <span className="text-xs text-white/20">|</span>
-        <span className="text-xs text-white/40">
-          {filtered.length} {filtered.length === 1 ? 'show' : 'shows'}
-          {selectedYear ? ` in ${selectedYear}` : ' total'}
-        </span>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
