@@ -11,15 +11,15 @@ interface ToursSectionProps {
 }
 
 const TABS = [
+  { id: 'map', label: 'World Map', icon: Globe },
   { id: 'list', label: 'Tour List', icon: MapPin },
   { id: 'stats', label: 'Statistics', icon: BarChart3 },
-  { id: 'map', label: 'World Map', icon: Globe },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
 
 export default function ToursSection({ concerts }: ToursSectionProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('list');
+  const [activeTab, setActiveTab] = useState<TabId>('map');
 
   const renderPanel = () => {
     switch (activeTab) {
