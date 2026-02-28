@@ -1,10 +1,11 @@
 import { useState, Suspense, lazy } from 'react';
-import { Trophy, Calendar, BarChart3 } from 'lucide-react';
+import { Trophy, Calendar, BarChart3, LayoutList } from 'lucide-react';
 import type { Award, Member } from '../../../../types/database';
 
 const AwardGrid = lazy(() => import('./AwardGrid'));
 const AwardTimeline = lazy(() => import('./AwardTimeline'));
 const AwardStats = lazy(() => import('./AwardStats'));
+const AwardPodium = lazy(() => import('./AwardPodium'));
 
 interface AwardsSectionProps {
   awards: Award[];
@@ -12,9 +13,10 @@ interface AwardsSectionProps {
 }
 
 const TABS = [
-  { id: 'grid', label: 'Trophy Room', icon: Trophy },
-  { id: 'timeline', label: 'Timeline', icon: Calendar },
-  { id: 'stats', label: 'Statistics', icon: BarChart3 },
+  { id: 'grid',     label: 'Trophy Room', icon: Trophy },
+  { id: 'podium',   label: 'Podium',      icon: LayoutList },
+  { id: 'timeline', label: 'Timeline',    icon: Calendar },
+  { id: 'stats',    label: 'Statistics',  icon: BarChart3 },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -28,6 +30,8 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
         return <AwardGrid awards={awards} members={members} />;
       case 'timeline':
         return <AwardTimeline awards={awards} members={members} />;
+      case 'podium':
+        return <AwardPodium awards={awards} members={members} />;
       case 'stats':
         return <AwardStats awards={awards} members={members} />;
       default:
