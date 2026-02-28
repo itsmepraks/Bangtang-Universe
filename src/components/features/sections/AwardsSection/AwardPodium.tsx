@@ -64,7 +64,7 @@ const CEREMONY_REGION_MAP: Record<string, Region> = {
   'Myx Music Awards': 'usa',
   'MTV Millennial Awards': 'usa',
   'MTV Millennial Awards Brazil': 'usa',
-  'UK Music Video Awards': 'usa',
+  'UK Music Video Awards': 'global',
   // Global
   'IFPI Awards': 'global',
   'MTV Europe Music Awards': 'global',
@@ -75,6 +75,15 @@ const CEREMONY_REGION_MAP: Record<string, Region> = {
   'Asia Artist Awards': 'global',
   'BraVo Music Awards': 'global',
   'Anugerah Bintang Popular Berita Harian': 'global',
+  // Europe / Other regional
+  'NRJ Music Awards': 'global',
+  'LOS40 Music Awards': 'global',
+  'Rockbjörnen': 'global',
+  'Gaffa-Prisen': 'global',
+  'BBC Radio1 Teen Awards': 'global',
+  'Swiss Music Awards': 'global',
+  'Telehit Awards': 'global',
+  'Planeta Awards': 'global',
   // Japan
   'Japan Gold Disc Awards': 'japan',
   'Music Awards Japan': 'japan',
@@ -86,6 +95,12 @@ const MEMBER_ORDER = ['RM', 'Jin', 'Suga', 'J-Hope', 'Jimin', 'V', 'Jungkook'];
 
 function getRegion(ceremony: string): Region {
   return CEREMONY_REGION_MAP[ceremony] ?? 'other';
+}
+
+function toggle(set: Set<string>, key: string): Set<string> {
+  const next = new Set(set);
+  next.has(key) ? next.delete(key) : next.add(key);
+  return next;
 }
 
 export default function AwardPodium({ awards, members }: AwardPodiumProps) {
@@ -175,12 +190,6 @@ export default function AwardPodium({ awards, members }: AwardPodiumProps) {
       });
   }, [filtered, mode, memberMap]);
 
-  const toggle = (set: Set<string>, key: string): Set<string> => {
-    const next = new Set(set);
-    next.has(key) ? next.delete(key) : next.add(key);
-    return next;
-  };
-
   return (
     <div className="space-y-5">
       {/* ── Mode toggle + filters ── */}
@@ -189,6 +198,7 @@ export default function AwardPodium({ awards, members }: AwardPodiumProps) {
           {(['group', 'solo'] as const).map((m) => (
             <button
               key={m}
+              type="button"
               onClick={() => setMode(m)}
               className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 mode === m
@@ -207,6 +217,7 @@ export default function AwardPodium({ awards, members }: AwardPodiumProps) {
             {[null, ...years].map((y) => (
               <button
                 key={y ?? 'all'}
+                type="button"
                 onClick={() => setYearFilter(y)}
                 className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
                   yearFilter === y
@@ -223,6 +234,7 @@ export default function AwardPodium({ awards, members }: AwardPodiumProps) {
             {([null, 'won', 'nominated'] as const).map((r) => (
               <button
                 key={r ?? 'all'}
+                type="button"
                 onClick={() => setResultFilter(r)}
                 className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
                   resultFilter === r
@@ -246,6 +258,7 @@ export default function AwardPodium({ awards, members }: AwardPodiumProps) {
               <div key={rn.region} className="rounded-xl border border-white/[0.06] overflow-hidden">
                 {/* Region header */}
                 <button
+                  type="button"
                   onClick={() => setOpenRegions(toggle(openRegions, rn.region))}
                   className={`w-full flex items-center gap-3 px-4 py-3 transition-colors hover:bg-white/[0.02] ${
                     isOpen ? 'bg-white/[0.03] border-b border-white/[0.06]' : 'bg-[#0c0c12]'
@@ -273,6 +286,7 @@ export default function AwardPodium({ awards, members }: AwardPodiumProps) {
                       return (
                         <div key={cn.ceremony} className="border-t border-white/[0.04] first:border-t-0">
                           <button
+                            type="button"
                             onClick={() => setOpenCeremonies(toggle(openCeremonies, cerKey))}
                             className={`w-full flex items-center gap-3 pl-10 pr-4 py-2.5 transition-colors hover:bg-white/[0.02] ${
                               isCerOpen ? 'bg-white/[0.02]' : ''
@@ -342,6 +356,7 @@ export default function AwardPodium({ awards, members }: AwardPodiumProps) {
             return (
               <div key={mn.memberId} className="rounded-xl border border-white/[0.06] overflow-hidden">
                 <button
+                  type="button"
                   onClick={() => setOpenMembers(toggle(openMembers, mn.memberId))}
                   className={`w-full flex items-center gap-3 px-4 py-3 transition-colors hover:bg-white/[0.02] ${
                     isOpen ? 'bg-white/[0.03] border-b border-white/[0.06]' : 'bg-[#0c0c12]'
