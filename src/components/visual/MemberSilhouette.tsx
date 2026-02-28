@@ -12,7 +12,7 @@ interface MemberSilhouetteProps {
 }
 
 // [leftArmDeg, rightArmDeg] — 0=horizontal, -90=straight up, +90=straight down
-const POSES: Record<number, [number, number]> = {
+const POSES: Record<1 | 2 | 3 | 4 | 5 | 6 | 7, [number, number]> = {
   1: [-30,  20],  // RM    — left arm raised, right relaxed
   2: [-50, -50],  // Jin   — V-shape, both arms raised
   3: [ 55,  -5],  // Suga  — chill, left hanging, right neutral
@@ -22,6 +22,9 @@ const POSES: Record<number, [number, number]> = {
   7: [-85, -35],  // JK    — left fist pump, right raised
 };
 
+// Dark near-black fill for silhouette effect
+const SILHOUETTE_FILL = 'rgba(15,8,25,0.95)';
+
 export default function MemberSilhouette({
   pose,
   size = 150,
@@ -30,12 +33,10 @@ export default function MemberSilhouette({
 }: MemberSilhouetteProps) {
   const rawId = useId();
   const id = `ms${rawId.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const [la, ra] = POSES[pose] ?? [0, 0];
+  const [la, ra] = POSES[pose];
 
   const svgW = Math.round(size * 0.55);
   const svgH = size;
-  // Dark near-black fill for silhouette effect
-  const fill = 'rgba(15,8,25,0.95)';
 
   return (
     <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'flex-end' }}>
@@ -54,7 +55,7 @@ export default function MemberSilhouette({
           filter: `blur(${glowing ? 16 : 10}px)`,
           pointerEvents: 'none',
           zIndex: 0,
-          transition: 'all 0.35s ease',
+          transition: 'background 0.35s ease, filter 0.35s ease',
         }}
       />
 
@@ -83,40 +84,41 @@ export default function MemberSilhouette({
 
         {/* ── Whole-body bounce group ── */}
         <g style={{
+          // Duration varies slightly per instance so bounces never sync up perfectly
           animation: `bounce-${id} ${(2.8 + delay * 0.4).toFixed(2)}s ease-in-out infinite`,
           animationDelay: `${delay.toFixed(2)}s`,
         }}>
           {/* Head */}
-          <circle cx="40" cy="14" r="12" fill={fill} />
+          <circle cx="40" cy="14" r="12" fill={SILHOUETTE_FILL} />
 
           {/* Torso — trapezoid wider at shoulders, narrower at waist */}
-          <path d="M 17 28 L 63 28 L 56 94 L 24 94 Z" fill={fill} />
+          <path d="M 17 28 L 63 28 L 56 94 L 24 94 Z" fill={SILHOUETTE_FILL} />
 
           {/* Hips */}
-          <path d="M 24 94 L 56 94 L 59 110 L 21 110 Z" fill={fill} />
+          <path d="M 24 94 L 56 94 L 59 110 L 21 110 Z" fill={SILHOUETTE_FILL} />
 
           {/* Left upper leg */}
-          <rect x="21" y="110" width="18" height="40" rx="7" fill={fill} />
+          <rect x="21" y="110" width="18" height="40" rx="7" fill={SILHOUETTE_FILL} />
           {/* Left lower leg */}
-          <rect x="23" y="147" width="14" height="37" rx="5" fill={fill} />
+          <rect x="23" y="147" width="14" height="37" rx="5" fill={SILHOUETTE_FILL} />
 
           {/* Right upper leg */}
-          <rect x="41" y="110" width="18" height="40" rx="7" fill={fill} />
+          <rect x="41" y="110" width="18" height="40" rx="7" fill={SILHOUETTE_FILL} />
           {/* Right lower leg */}
-          <rect x="43" y="147" width="14" height="37" rx="5" fill={fill} />
+          <rect x="43" y="147" width="14" height="37" rx="5" fill={SILHOUETTE_FILL} />
 
           {/* Feet */}
-          <ellipse cx="30" cy="186" rx="13" ry="6" fill={fill} />
-          <ellipse cx="50" cy="186" rx="13" ry="6" fill={fill} />
+          <ellipse cx="30" cy="186" rx="13" ry="6" fill={SILHOUETTE_FILL} />
+          <ellipse cx="50" cy="186" rx="13" ry="6" fill={SILHOUETTE_FILL} />
 
           {/* Left arm — pivots at right end = shoulder (17, 36) */}
-          <g transform="translate(17,36)" style={{ transform: `translate(17px,36px) rotate(${la}deg)` }}>
-            <rect x="-32" y="-5.5" width="32" height="11" rx="5.5" fill={fill} />
+          <g style={{ transform: `translate(17px,36px) rotate(${la}deg)` }}>
+            <rect x="-32" y="-5.5" width="32" height="11" rx="5.5" fill={SILHOUETTE_FILL} />
           </g>
 
           {/* Right arm — pivots at left end = shoulder (63, 36) */}
-          <g transform="translate(63,36)" style={{ transform: `translate(63px,36px) rotate(${ra}deg)` }}>
-            <rect x="0" y="-5.5" width="32" height="11" rx="5.5" fill={fill} />
+          <g style={{ transform: `translate(63px,36px) rotate(${ra}deg)` }}>
+            <rect x="0" y="-5.5" width="32" height="11" rx="5.5" fill={SILHOUETTE_FILL} />
           </g>
         </g>
       </svg>
