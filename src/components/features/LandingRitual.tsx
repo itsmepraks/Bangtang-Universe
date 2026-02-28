@@ -1,11 +1,22 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { MEMBER_DATA } from '../../data/members';
 import { BTSLogo, ArmyBombCanvas } from '../visual';
+import DancingFigure from '../visual/DancingFigure';
 
 export interface LandingRitualProps {
     onSync: () => void;
 }
+
+const MEMBER_CONFIGS = [
+  { id: 'rm',     name: 'RM',     color: '#3B82F6', variant: 'a' as const, delay: 0.0  },
+  { id: 'jin',    name: 'Jin',    color: '#EC4899', variant: 'b' as const, delay: 0.18 },
+  { id: 'suga',   name: 'Suga',   color: '#94A3B8', variant: 'c' as const, delay: 0.35 },
+  { id: 'jhope',  name: 'J-Hope', color: '#FFFFFF', variant: 'a' as const, delay: 0.52 },
+  { id: 'jimin',  name: 'Jimin',  color: '#F59E0B', variant: 'b' as const, delay: 0.28 },
+  { id: 'v',      name: 'V',      color: '#10B981', variant: 'c' as const, delay: 0.44 },
+  { id: 'jk',     name: 'JK',     color: '#8B5CF6', variant: 'a' as const, delay: 0.12 },
+];
 
 export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
     // Enhanced UNIVERSE/GALAXY stars for cosmic backdrop
@@ -63,6 +74,8 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
     ];
 
     const bodyHeights = [120, 135, 110, 150, 130, 115, 140];
+
+    const [hoveredMember, setHoveredMember] = useState<string | null>(null);
 
     return (
         <div className="absolute inset-0 z-50 flex flex-col overflow-hidden select-none bg-gradient-to-b from-[#050010] via-[#0a0018] to-[#080012]">
@@ -271,109 +284,249 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 />
             </div>
 
-            {/* Stage Platform Glow */}
-            <div className="absolute top-[62%] left-1/2 -translate-x-1/2 pointer-events-none">
+      {/* ══════════════════════════════════════════
+          CONCERT STAGE
+      ══════════════════════════════════════════ */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: '18%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'min(1100px, 100%)',
+        }}
+      >
+        {/* ── Back wall ── */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '110px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '78%',
+            height: '190px',
+            background: 'linear-gradient(180deg, #0a0015 0%, #100020 100%)',
+            borderTop: '1px solid rgba(168,85,247,0.2)',
+            borderLeft: '1px solid rgba(168,85,247,0.1)',
+            borderRight: '1px solid rgba(168,85,247,0.1)',
+          }}
+        >
+          {/* Left LED screen */}
+          <div style={{
+            position: 'absolute', left: '24px', top: '12px',
+            width: '110px', height: '165px',
+            background: 'linear-gradient(160deg, #2d0050 0%, #1a0035 100%)',
+            border: '2px solid rgba(168,85,247,0.45)',
+            borderRadius: '4px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.45) 50%, transparent 100%)',
+              backgroundSize: '100% 30px',
+              animation: 'scanline 2.4s linear infinite',
+            }} />
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(160deg, rgba(168,85,247,0.08) 0%, rgba(236,72,153,0.06) 100%)',
+              animation: 'led-pulse 3s ease-in-out infinite',
+            }} />
+          </div>
+
+          {/* Right LED screen */}
+          <div style={{
+            position: 'absolute', right: '24px', top: '12px',
+            width: '110px', height: '165px',
+            background: 'linear-gradient(200deg, #2d0050 0%, #1a0035 100%)',
+            border: '2px solid rgba(168,85,247,0.45)',
+            borderRadius: '4px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.45) 50%, transparent 100%)',
+              backgroundSize: '100% 30px',
+              animation: 'scanline 2.4s linear infinite',
+              animationDelay: '-1.2s',
+            }} />
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(200deg, rgba(168,85,247,0.08) 0%, rgba(236,72,153,0.06) 100%)',
+              animation: 'led-pulse 3s ease-in-out infinite',
+              animationDelay: '-1.5s',
+            }} />
+          </div>
+
+          {/* Center banner screen */}
+          <div style={{
+            position: 'absolute', left: '50%', top: '12px',
+            transform: 'translateX(-50%)',
+            width: '38%', height: '130px',
+            background: 'linear-gradient(180deg, #1a0030 0%, #0d001e 100%)',
+            border: '2px solid rgba(168,85,247,0.25)',
+            borderRadius: '6px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+          }}>
+            <span style={{
+              color: 'rgba(168,85,247,0.5)',
+              fontSize: '13px',
+              letterSpacing: '0.35em',
+              fontFamily: 'ui-monospace, SFMono-Regular, monospace',
+              fontWeight: 700,
+              animation: 'led-pulse 4s ease-in-out infinite',
+            }}>
+              BTS
+            </span>
+            {/* Shimmer sweep */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'linear-gradient(90deg, transparent 0%, rgba(168,85,247,0.12) 50%, transparent 100%)',
+              backgroundSize: '200% 100%',
+              animation: 'stage-shimmer 3s linear infinite',
+            }} />
+          </div>
+
+          {/* Left speaker stack */}
+          <div style={{
+            position: 'absolute', left: '142px', top: '20px',
+            width: '38px', height: '155px',
+            background: 'linear-gradient(180deg, #1a1a2e 0%, #0d0d1f 100%)',
+            border: '1px solid rgba(168,85,247,0.15)',
+            borderRadius: '3px',
+            animation: 'truss-glow 4s ease-in-out infinite',
+          }} />
+
+          {/* Right speaker stack */}
+          <div style={{
+            position: 'absolute', right: '142px', top: '20px',
+            width: '38px', height: '155px',
+            background: 'linear-gradient(180deg, #1a1a2e 0%, #0d0d1f 100%)',
+            border: '1px solid rgba(168,85,247,0.15)',
+            borderRadius: '3px',
+            animation: 'truss-glow 4s ease-in-out infinite',
+            animationDelay: '-2s',
+          }} />
+        </div>
+
+        {/* ── Stage floor (trapezoid via clip-path) ── */}
+        <div style={{
+          position: 'relative',
+          height: '120px',
+          background: 'linear-gradient(180deg, #1e1a35 0%, #0d0d1f 100%)',
+          clipPath: 'polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%)',
+        }}>
+          {/* Subtle grid lines on floor */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(168,85,247,0.06) 60px)',
+            clipPath: 'polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%)',
+          }} />
+          {/* Front edge purple glow */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px',
+            background: 'linear-gradient(90deg, transparent 0%, rgba(168,85,247,0.85) 20%, rgba(255,255,255,0.7) 50%, rgba(168,85,247,0.85) 80%, transparent 100%)',
+            boxShadow: '0 0 18px rgba(168,85,247,0.6)',
+          }} />
+          {/* Floor shimmer */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(90deg, transparent, rgba(168,85,247,0.05), transparent)',
+            backgroundSize: '200% 100%',
+            animation: 'stage-shimmer 4s linear infinite',
+          }} />
+        </div>
+
+        {/* Catwalk (narrow forward strip) */}
+        <div style={{
+          position: 'absolute',
+          bottom: '-28px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '120px',
+          height: '32px',
+          background: 'linear-gradient(180deg, #1e1a35 0%, #0d0d1f 100%)',
+          borderLeft: '1px solid rgba(168,85,247,0.2)',
+          borderRight: '1px solid rgba(168,85,247,0.2)',
+          borderBottom: '2px solid rgba(168,85,247,0.5)',
+        }} />
+      </div>
+
+      {/* ══════════════════════════════════════════
+          7 DANCING MEMBERS ON STAGE
+      ══════════════════════════════════════════ */}
+      <div
+        className="absolute z-10"
+        style={{
+          bottom: 'calc(18% + 118px)',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          gap: 'clamp(4px, 2vw, 28px)',
+          width: 'min(900px, 90%)',
+        }}
+      >
+        {MEMBER_CONFIGS.map((m) => {
+          const isHovered = hoveredMember === m.id;
+          return (
+            <div
+              key={m.id}
+              className="relative flex flex-col items-center cursor-pointer"
+              onMouseEnter={() => setHoveredMember(m.id)}
+              onMouseLeave={() => setHoveredMember(null)}
+              style={{ transition: 'transform 0.3s ease', transform: isHovered ? 'scale(1.12) translateY(-6px)' : 'scale(1)' }}
+            >
+              {/* Spotlight cone when hovered */}
+              {isHovered && (
                 <div
-                    className="w-[900px] h-10 rounded-full opacity-80"
-                    style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(168,85,247,0.5) 20%, rgba(255,255,255,0.35) 50%, rgba(168,85,247,0.5) 80%, transparent 100%)',
-                        filter: 'blur(15px)',
-                    }}
+                  style={{
+                    position: 'absolute',
+                    bottom: '100%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '80px',
+                    height: '120px',
+                    background: `linear-gradient(to top, ${m.color}30, transparent)`,
+                    clipPath: 'polygon(30% 100%, 70% 100%, 100% 0%, 0% 0%)',
+                    pointerEvents: 'none',
+                  }}
                 />
-                <div
-                    className="absolute top-2 left-1/2 -translate-x-1/2 w-[700px] h-3 rounded-full"
-                    style={{
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%)',
-                        filter: 'blur(4px)',
-                    }}
-                />
+              )}
+
+              {/* Dancer */}
+              <DancingFigure
+                color={m.color}
+                variant={m.variant}
+                delay={m.delay}
+                speed={isHovered ? 1.5 : 1}
+                size={110}
+                glowing={isHovered}
+              />
+
+              {/* Name label */}
+              <span
+                style={{
+                  marginTop: '6px',
+                  fontSize: isHovered ? '11px' : '9px',
+                  fontWeight: 700,
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: m.color,
+                  textShadow: isHovered
+                    ? `0 0 8px ${m.color}, 0 0 16px ${m.color}cc`
+                    : `0 0 6px ${m.color}80`,
+                  transition: 'all 0.3s ease',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {m.name}
+              </span>
             </div>
-
-            {/* Floor Reflection Grid */}
-            <div className="absolute top-[60%] left-0 right-0 h-[15%] pointer-events-none overflow-hidden opacity-20">
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        background: 'repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(168,85,247,0.1) 30px, rgba(168,85,247,0.1) 31px)',
-                        maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
-                        WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)',
-                    }}
-                />
-            </div>
-
-            {/* 7 Member Silhouettes */}
-            <div className="absolute top-[30%] left-1/2 -translate-x-1/2 flex items-end justify-center gap-3 sm:gap-5 md:gap-8 pointer-events-none z-10">
-                {MEMBER_DATA.map((member, i) => {
-                    const headSize = i === 3 ? 26 : 22;
-                    const bodyWidth = i === 3 ? 22 : 18;
-                    const solidColor = brightColors[i];
-
-                    return (
-                        <div key={member.id} className="relative flex flex-col items-center">
-                            {/* Outer glow effect */}
-                            <div
-                                className="absolute"
-                                style={{
-                                    width: '70px',
-                                    height: `${bodyHeights[i] + headSize + 60}px`,
-                                    top: '-20px',
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    background: `radial-gradient(ellipse at center, ${solidColor}60 0%, ${solidColor}30 40%, transparent 70%)`,
-                                    filter: 'blur(18px)',
-                                }}
-                            />
-
-                            {/* HEAD */}
-                            <div
-                                className="relative z-10"
-                                style={{
-                                    width: `${headSize}px`,
-                                    height: `${headSize}px`,
-                                    backgroundColor: solidColor,
-                                    borderRadius: '50%',
-                                    boxShadow: `
-                    0 0 10px ${solidColor},
-                    0 0 20px ${solidColor}cc,
-                    0 0 40px ${solidColor}80,
-                    0 0 60px ${solidColor}50
-                  `,
-                                    marginBottom: '4px',
-                                }}
-                            />
-
-                            {/* BODY */}
-                            <div
-                                className="relative z-10"
-                                style={{
-                                    width: `${bodyWidth}px`,
-                                    height: `${bodyHeights[i]}px`,
-                                    backgroundColor: solidColor,
-                                    borderRadius: '50px',
-                                    boxShadow: `
-                    0 0 10px ${solidColor},
-                    0 0 25px ${solidColor}cc,
-                    0 0 50px ${solidColor}80,
-                    0 0 80px ${solidColor}50,
-                    0 0 120px ${solidColor}30
-                  `,
-                                }}
-                            />
-
-                            {/* Name below */}
-                            <span
-                                className="mt-4 text-[9px] sm:text-[11px] font-bold tracking-[0.2em] uppercase whitespace-nowrap relative z-10"
-                                style={{
-                                    color: solidColor,
-                                    textShadow: `0 0 8px ${solidColor}, 0 0 15px ${solidColor}cc`,
-                                }}
-                            >
-                                {member.name}
-                            </span>
-                        </div>
-                    );
-                })}
-            </div>
+          );
+        })}
+      </div>
 
 
             {/* TITLE - At top */}
