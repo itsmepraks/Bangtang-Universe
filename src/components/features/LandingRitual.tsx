@@ -342,8 +342,8 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
-          gap: 'clamp(8px, 3vw, 46px)',
-          width: 'min(820px, 92%)',
+          gap: 'clamp(6px, 2.2vw, 36px)',
+          width: 'min(700px, 78%)',
           height: '460px',
           zIndex: 6,
         }}
