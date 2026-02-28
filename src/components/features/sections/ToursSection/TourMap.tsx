@@ -3,8 +3,9 @@ import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps
 import { MapPin } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
 import { resolveCoords } from '../../../../data/cityCoords';
-
-const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore – world-atlas ships plain JSON with no type declarations
+import worldData from 'world-atlas/countries-110m.json';
 
 interface TourMapProps {
   concerts: Concert[];
@@ -110,14 +111,14 @@ export default function TourMap({ concerts }: TourMapProps) {
 
       {/* Map */}
       <div
-        className="relative rounded-xl overflow-hidden border border-white/[0.06] bg-[#0c0c12]"
+        className="relative rounded-xl overflow-hidden border border-white/[0.06] bg-[#0c0c12] min-h-[380px]"
         onMouseLeave={() => setTooltip(null)}
       >
         <ComposableMap
           projectionConfig={{ scale: 147, center: [10, 10] }}
-          style={{ width: '100%', height: 'auto' }}
+          style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
         >
-          <Geographies geography={GEO_URL}>
+          <Geographies geography={worldData}>
             {({ geographies }) =>
               geographies.map((geo) => (
                 <Geography
