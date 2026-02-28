@@ -1,9 +1,10 @@
 import { useState, Suspense, lazy } from 'react';
-import { MapPin, BarChart3 } from 'lucide-react';
+import { MapPin, BarChart3, Globe } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
 
 const TourList = lazy(() => import('./TourList'));
 const TourStats = lazy(() => import('./TourStats'));
+const TourMap = lazy(() => import('./TourMap'));
 
 interface ToursSectionProps {
   concerts: Concert[];
@@ -12,6 +13,7 @@ interface ToursSectionProps {
 const TABS = [
   { id: 'list', label: 'Tour List', icon: MapPin },
   { id: 'stats', label: 'Statistics', icon: BarChart3 },
+  { id: 'map', label: 'World Map', icon: Globe },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -25,6 +27,8 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
         return <TourList concerts={concerts} />;
       case 'stats':
         return <TourStats concerts={concerts} />;
+      case 'map':
+        return <TourMap concerts={concerts} />;
       default:
         return null;
     }
