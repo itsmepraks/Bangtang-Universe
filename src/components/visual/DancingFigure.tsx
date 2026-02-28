@@ -49,12 +49,14 @@ export default function DancingFigure({
   glowing = false,
 }: DancingFigureProps) {
   const rawId = useId();
-  const id = rawId.replace(/[^a-zA-Z0-9]/g, '');
+  const id = `fig${rawId.replace(/[^a-zA-Z0-9]/g, '')}`;
 
   const v = VARIANTS[variant];
-  const dur = (base: number) => `${(base / speed).toFixed(3)}s`;
+  const safeSpeed = Math.max(speed, 0.01);
+  const dur = (base: number) => `${(base / safeSpeed).toFixed(3)}s`;
   const del = (offset = 0) => `${(delay + offset).toFixed(3)}s`;
-  const half = (base: number) => (base / speed / 2);
+  // Offset right-side limbs by half a cycle so they alternate with the left side
+  const half = (base: number) => (base / safeSpeed / 2);
 
   return (
     <svg
