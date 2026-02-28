@@ -6,15 +6,15 @@ export interface LandingRitualProps {
     onSync: () => void;
 }
 
-// 7 colored concert light pillars — one per member in their signature color
-const MEMBER_LIGHTS = [
-  { color: '#3B82F6', delay: 0.00 },  // RM    — blue
-  { color: '#EC4899', delay: 0.30 },  // Jin   — pink
-  { color: '#94A3B8', delay: 0.55 },  // Suga  — silver
-  { color: '#FFFFFF', delay: 0.15 },  // JHope — white
-  { color: '#F59E0B', delay: 0.45 },  // Jimin — amber
-  { color: '#10B981', delay: 0.70 },  // V     — green
-  { color: '#8B5CF6', delay: 0.25 },  // JK    — purple
+// 7 BTS members — signature concert color, pulse delay, stage name
+const MEMBERS = [
+  { color: '#3B82F6', delay: 0.00, name: 'RM'     },  // blue
+  { color: '#EC4899', delay: 0.30, name: 'JIN'    },  // pink
+  { color: '#94A3B8', delay: 0.55, name: 'SUGA'   },  // silver
+  { color: '#FFFFFF', delay: 0.15, name: 'J-HOPE' },  // white
+  { color: '#F59E0B', delay: 0.45, name: 'JIMIN'  },  // amber
+  { color: '#10B981', delay: 0.70, name: 'V'      },  // green
+  { color: '#8B5CF6', delay: 0.25, name: 'JK'     },  // purple
 ] as const;
 
 // Precomputed foreground army bomb orbs — large blurry bokeh simulating
@@ -290,55 +290,23 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
 
       {/* ══════════════════════════════════════════
           CENTRAL STAGE BACKLIGHT BLOOM
-          Creates the dramatic silhouette effect —
-          bright light from behind the performers
+          Massive backlight behind performers —
+          like the giant LED wall at a stadium show
       ══════════════════════════════════════════ */}
       <div
         className="absolute pointer-events-none"
         style={{
-          bottom: '20%',
+          bottom: '28%',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: '800px',
-          height: '420px',
-          background: 'radial-gradient(ellipse at 50% 85%, rgba(255,255,255,0.22) 0%, rgba(220,200,255,0.14) 25%, rgba(168,85,247,0.07) 55%, transparent 75%)',
-          filter: 'blur(28px)',
+          width: '1100px',
+          height: '520px',
+          background: 'radial-gradient(ellipse at 50% 80%, rgba(255,255,255,0.28) 0%, rgba(230,210,255,0.18) 22%, rgba(168,85,247,0.10) 50%, rgba(100,50,180,0.04) 68%, transparent 80%)',
+          filter: 'blur(32px)',
           zIndex: 3,
         }}
       />
 
-      {/* ══════════════════════════════════════════
-          BTS ARCH — glowing neon gate behind members
-      ══════════════════════════════════════════ */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: 'calc(22% + 62px)',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 4,
-        }}
-      >
-        <svg viewBox="0 0 320 240" width="320" height="240" style={{ overflow: 'visible' }}>
-          {/* Outer glowing arch */}
-          <path
-            d="M 24 240 L 24 96 L 160 12 L 296 96 L 296 240"
-            fill="none"
-            stroke="rgba(255,255,255,0.55)"
-            strokeWidth="1.8"
-            style={{
-              filter: 'drop-shadow(0 0 6px rgba(168,85,247,1)) drop-shadow(0 0 18px rgba(255,255,255,0.5))',
-            }}
-          />
-          {/* Inner accent arch */}
-          <path
-            d="M 54 240 L 54 108 L 160 36 L 266 108 L 266 240"
-            fill="none"
-            stroke="rgba(168,85,247,0.35)"
-            strokeWidth="1"
-          />
-        </svg>
-      </div>
 
       {/* ══════════════════════════════════════════
           STAGE FLOOR
@@ -346,7 +314,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
       <div
         className="absolute pointer-events-none"
         style={{
-          bottom: '22%',
+          bottom: '32%',
           left: '50%',
           transform: 'translateX(-50%)',
           width: 'min(860px, 96%)',
@@ -356,52 +324,101 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           zIndex: 5,
         }}
       >
-        {/* Front edge glow */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
-          background: 'linear-gradient(90deg, transparent, rgba(168,85,247,0.9) 20%, rgba(255,255,255,0.75) 50%, rgba(168,85,247,0.9) 80%, transparent)',
-          boxShadow: '0 0 16px rgba(168,85,247,0.65)',
-        }} />
       </div>
 
       {/* ══════════════════════════════════════════
-          CONCERT LIGHT PILLARS
-          7 soft colored beams rising from stage —
-          one per member, pure light no figures
+          MEMBER CONCERT SPOTLIGHTS
+          7 stage spotlights in cue — each one a tall
+          beam from the lighting rig above, narrowing
+          to a bright floor pool at each member's mark
       ══════════════════════════════════════════ */}
       <div
         className="absolute pointer-events-none"
         style={{
-          bottom: 'calc(22% + 66px)',
+          bottom: '32%',
           left: '50%',
           transform: 'translateX(-50%)',
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
-          gap: 'clamp(10px, 3.5vw, 52px)',
-          width: 'min(780px, 90%)',
+          gap: 'clamp(8px, 3vw, 46px)',
+          width: 'min(820px, 92%)',
+          height: '460px',
           zIndex: 6,
         }}
       >
-        {MEMBER_LIGHTS.map((m, i) => (
+        {MEMBERS.map((m, i) => (
           <div
             key={i}
-            style={{
-              width: '22px',
-              height: '270px',
+            style={{ position: 'relative', flexShrink: 0, width: '44px', height: '460px' }}
+          >
+            {/* Atmospheric cone — wide soft halo, narrow at top (rig), wider at bottom (floor) */}
+            <div style={{
+              position: 'absolute',
+              bottom: '58px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '44px',
+              height: '390px',
               background: `linear-gradient(to top,
-                ${m.color}dd 0%,
-                ${m.color}99 20%,
-                ${m.color}55 45%,
-                ${m.color}22 65%,
+                ${m.color}99 0%,
+                ${m.color}55 22%,
+                ${m.color}22 50%,
+                ${m.color}0a 75%,
                 transparent 100%)`,
-              filter: 'blur(18px)',
-              borderRadius: '50%',
-              flexShrink: 0,
+              clipPath: 'polygon(35% 100%, 65% 100%, 100% 0%, 0% 0%)',
+              filter: 'blur(14px)',
               animation: `led-pulse ${3.0 + m.delay * 0.8}s ease-in-out infinite`,
               animationDelay: `${m.delay}s`,
-            }}
-          />
+            }} />
+            {/* Core beam — bright tight shaft of light */}
+            <div style={{
+              position: 'absolute',
+              bottom: '58px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '6px',
+              height: '390px',
+              background: `linear-gradient(to top,
+                ${m.color}ff 0%,
+                ${m.color}dd 15%,
+                ${m.color}88 40%,
+                ${m.color}33 65%,
+                transparent 100%)`,
+              filter: 'blur(2px)',
+              animation: `led-pulse ${3.0 + m.delay * 0.8}s ease-in-out infinite`,
+              animationDelay: `${m.delay}s`,
+            }} />
+            {/* Floor spotlight pool — elliptical bright spot at performer's mark */}
+            <div style={{
+              position: 'absolute',
+              bottom: '46px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '78px',
+              height: '20px',
+              background: `radial-gradient(ellipse, ${m.color}cc 0%, ${m.color}66 40%, transparent 72%)`,
+              filter: 'blur(5px)',
+              animation: `led-pulse ${3.0 + m.delay * 0.8}s ease-in-out infinite`,
+              animationDelay: `${m.delay}s`,
+            }} />
+            {/* Member name — lit by their spotlight */}
+            <div style={{
+              position: 'absolute',
+              bottom: '16px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '11px',
+              fontWeight: '700',
+              letterSpacing: '0.12em',
+              color: m.color,
+              textShadow: `0 0 8px ${m.color}dd, 0 1px 4px rgba(0,0,0,0.95)`,
+              whiteSpace: 'nowrap',
+              fontFamily: 'ui-monospace, SFMono-Regular, monospace',
+            }}>
+              {m.name}
+            </div>
+          </div>
         ))}
       </div>
 
@@ -450,7 +467,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
             </div>
 
             {/* ENTER THE UNIVERSE */}
-            <div className="absolute top-[76%] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-auto">
+            <div className="absolute top-[82%] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 pointer-events-auto">
                 {/* BTS Logo - Primary CTA */}
                 <button
                     onClick={onSync}
