@@ -333,7 +333,13 @@
      * 
      * Prevents accidental side effects that could break the build.
      */
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* ==================== PATH ALIASES ==================== */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   
   /**

@@ -78,6 +78,9 @@ yarn install
 # Copy environment variables (optional)
 cp .env.example .env.local
 
+# Optional: Configure Supabase for live data (see docs/SETUP_SUPABASE.md)
+# Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to .env
+
 # Start development server
 npm run dev
 ```

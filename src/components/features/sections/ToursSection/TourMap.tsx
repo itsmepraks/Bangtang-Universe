@@ -95,14 +95,14 @@ export default function TourMap({ concerts }: TourMapProps) {
           center={center}
           minZoom={1}
           maxZoom={12}
-          onMoveEnd={({ zoom: z, coordinates: c }) => {
+          onMoveEnd={({ zoom: z, coordinates: c }: { zoom: number; coordinates: [number, number] }) => {
             setZoom(z);
-            setCenter(c as [number, number]);
+            setCenter(c);
           }}
         >
           <Geographies geography={worldData}>
-            {({ geographies }) =>
-              geographies.map((geo) => (
+            {({ geographies }: { geographies: { rsmKey: string; [key: string]: unknown }[] }) =>
+              geographies.map((geo: { rsmKey: string; [key: string]: unknown }) => (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}

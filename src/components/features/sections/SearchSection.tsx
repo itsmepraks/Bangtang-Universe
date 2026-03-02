@@ -36,7 +36,7 @@ export default function SearchSection({ songs, members, albums, awards, concerts
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [hoveredResult, setHoveredResult] = useState<SearchResult | null>(null);
 
-  const { searchAll, searchByMood, getSuggestions } = useSearch(songs, members, albums, awards, concerts);
+  const { searchAllAsync, searchByMood, getSuggestions, isAiSearchConfigured, isSupabaseSearchEnabled } = useSearch(songs, members, albums, awards, concerts);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,17 +57,18 @@ export default function SearchSection({ songs, members, albums, awards, concerts
     return getSuggestions(query, 5);
   }, [query, getSuggestions]);
 
-  const runSearch = useCallback((searchQuery: string) => {
+  const runSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
     setSearching(true);
     setActiveMood(null);
     setShowSuggestions(false);
-    setTimeout(() => {
-      const res = searchAll(searchQuery);
+    try {
+      const res = await searchAllAsync(searchQuery);
       setResults(res);
+    } finally {
       setSearching(false);
-    }, 200);
-  }, [searchAll]);
+    }
+  }, [searchAllAsync]);
 
   const handleSearch = () => runSearch(query);
 
@@ -126,7 +127,17 @@ export default function SearchSection({ songs, members, albums, awards, concerts
       {/* Search Bar */}
       <div className="relative">
         <div className="flex items-center gap-4 bg-[#111118] border border-white/[0.06] rounded-2xl px-6 py-4 focus-within:border-purple-500/30 transition-colors">
-          <Search size={20} className="text-white/40" aria-hidden="true" />
+          <Search size={20} className="text-white/40 shrink-0" aria-hidden="true" />
+          {isAiSearchConfigured() && (
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase tracking-wide shrink-0">
+              AI
+            </span>
+          )}
+          {!isAiSearchConfigured() && isSupabaseSearchEnabled() && (
+            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wide shrink-0">
+              Supabase
+            </span>
+          )}
           <input
             ref={inputRef}
             type="text"

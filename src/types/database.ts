@@ -28,6 +28,7 @@ export interface Song {
     id: number;
     title: string;
     title_korean: string | null;
+    description?: string | null;
     album_id: number | null;
     release_date: string | null;
     duration_seconds: number | null;

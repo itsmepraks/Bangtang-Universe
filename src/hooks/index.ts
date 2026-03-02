@@ -9,7 +9,7 @@ export { useSongs, useSongsByAlbum, useSongsBySentiment, useTitleTracks, useSong
 export { useMembers, useMemberById, useMemberColor, useMembersByCredits, useTotalKOMCACredits } from './useMembers';
 export { useSoloAlbums, useSoloAlbumsByMember } from './useSoloAlbums';
 export { useLyrics, useLyricsBySongId } from './useLyrics';
-export { useSearch, type SearchResult } from './useSearch';
+export { useSearch, type SearchResult, isAiSearchConfigured } from './useSearch';
 export { useAwards, useAwardsByMember, useAwardsByCeremony } from './useAwards';
 export { useChartEntries, useChartEntriesBySong, useChartEntriesByChart } from './useChartEntries';
 export { useConcerts, useConcertsByTour, useConcertsByCountry } from './useConcerts';

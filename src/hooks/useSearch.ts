@@ -4,6 +4,9 @@
  * Builds Fuse.js search indexes from pre-loaded data passed in as arguments.
  * Data fetching is the caller's responsibility (App.tsx already has all data).
  * This avoids duplicate Supabase requests.
+ *
+ * When AI search is configured (VITE_ENABLE_AI_SEARCH + VITE_AI_SEARCH_API_URL),
+ * searchAllAsync calls the RAG API; otherwise it falls back to local Fuse.js.
  */
 
 import { useMemo, useCallback } from 'react';
@@ -23,8 +26,12 @@ import {
     MOOD_MAP,
     type SearchResult,
 } from '../services/searchService';
+import { isAiSearchConfigured, searchWithAi } from '../services/aiSearchService';
+import { searchWithSupabase } from '../services/supabaseSearchService';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 export { type SearchResult } from '../services/searchService';
+export { isAiSearchConfigured } from '../services/aiSearchService';
 
 interface UseSearchResult {
     searchSongs: (query: string, limit?: number) => SearchResult[];
@@ -33,8 +40,11 @@ interface UseSearchResult {
     searchAwards: (query: string, limit?: number) => SearchResult[];
     searchConcerts: (query: string, limit?: number) => SearchResult[];
     searchAll: (query: string, limit?: number) => SearchResult[];
+    searchAllAsync: (query: string, limit?: number) => Promise<SearchResult[]>;
     getSuggestions: (query: string, limit?: number) => string[];
     searchByMood: (mood: string) => Song[];
+    isAiSearchConfigured: () => boolean;
+    isSupabaseSearchEnabled: () => boolean;
 }
 
 export function useSearch(
@@ -91,6 +101,26 @@ export function useSearch(
         return allResults;
     }, [searchSongs, searchMembers, searchAlbums, searchAwards, searchConcerts]);
 
+    const searchAllAsync = useCallback(async (query: string, limit = 15): Promise<SearchResult[]> => {
+        if (!query.trim()) return [];
+        if (isAiSearchConfigured()) {
+            try {
+                return await searchWithAi(query, limit);
+            } catch {
+                return searchAll(query, limit);
+            }
+        }
+        if (isSupabaseConfigured()) {
+            try {
+                const supabaseResults = await searchWithSupabase(query, limit);
+                if (supabaseResults.length > 0) return supabaseResults;
+            } catch {
+                // fall through to local
+            }
+        }
+        return Promise.resolve(searchAll(query, limit));
+    }, [searchAll]);
+
     const getSuggestions = useCallback((query: string, limit = 5): string[] => {
         if (!query.trim() || query.length < 2) return [];
 
@@ -122,8 +152,11 @@ export function useSearch(
         searchAwards,
         searchConcerts,
         searchAll,
+        searchAllAsync,
         getSuggestions,
         searchByMood,
+        isAiSearchConfigured,
+        isSupabaseSearchEnabled: isSupabaseConfigured,
     };
 }
 
