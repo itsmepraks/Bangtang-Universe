@@ -1689,6 +1689,19 @@ select option {
   50%       { opacity: 0.9; }
 }
 
+/* Concert spotlight sweep - dramatic beam intensity */
+@keyframes spotlight-sweep {
+  0%, 100% { opacity: 0.7; filter: blur(2px); }
+  50%      { opacity: 1; filter: blur(1px); }
+}
+
+/* Stage floor LED strip shimmer */
+@keyframes stage-led-shimmer {
+  0%   { opacity: 0.6; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
 @keyframes truss-glow {
   0%, 100% { opacity: 0.25; }
   50%       { opacity: 0.55; }

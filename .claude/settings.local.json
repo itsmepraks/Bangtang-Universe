@@ -26,7 +26,18 @@
       "Bash(git checkout:*)",
       "Bash(git log:*)",
       "Bash(git branch:*)",
-      "Bash(npm run scrape:all:*)"
+      "Bash(npm run scrape:all:*)",
+      "Bash(wc:*)",
+      "Bash(ls:*)",
+      "Bash(cd:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(git push:*)",
+      "Bash(git:*)",
+      "Bash(python:*)",
+      "Bash(awk NR>=287 && NR<=295:*)",
+      "Bash(awk NR>=455 && NR<=475:*)"
     ],
     "additionalDirectories": [
       "c:\\Development\\BTS universe"
