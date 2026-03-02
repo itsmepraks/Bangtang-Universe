@@ -102,7 +102,8 @@
     "scrape:concerts": "npx tsx scripts/scrape-13-concerts.ts",
     "scrape:collaborations": "npx tsx scripts/scrape-14-collaborations.ts",
     "scrape:member-events": "npx tsx scripts/scrape-15-member-events.ts",
-    "scrape:all": "npm run scrape:musicbrainz && npm run scrape:wiki && npm run scrape:genius && npm run scrape:albums && npm run scrape:songs && npm run scrape:lyrics && npm run scrape:verify && npm run scrape:expand-discography && npm run scrape:cover-art && npm run scrape:lyrics-translations && npm run scrape:awards && npm run scrape:chart-entries && npm run scrape:concerts && npm run scrape:collaborations && npm run scrape:member-events"
+    "scrape:setlistfm": "npx tsx scripts/scrape-16-setlistfm.ts",
+    "scrape:all": "npm run scrape:musicbrainz && npm run scrape:wiki && npm run scrape:genius && npm run scrape:albums && npm run scrape:songs && npm run scrape:lyrics && npm run scrape:verify && npm run scrape:expand-discography && npm run scrape:cover-art && npm run scrape:lyrics-translations && npm run scrape:awards && npm run scrape:chart-entries && npm run scrape:concerts && npm run scrape:collaborations && npm run scrape:member-events && npm run scrape:setlistfm"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.93.3",

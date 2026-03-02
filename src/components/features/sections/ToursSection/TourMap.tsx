@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps';
 import { MapPin, Plus, Minus, RotateCcw } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
@@ -32,6 +32,18 @@ export default function TourMap({ concerts }: TourMapProps) {
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([10, 10]);
 
+  const dateRange = useMemo(() => {
+    if (concerts.length === 0) return { min: 0, max: 0 };
+    const times = concerts.map(c => new Date(c.date).getTime());
+    return { min: Math.min(...times), max: Math.max(...times) };
+  }, [concerts]);
+
+  const [sliderValue, setSliderValue] = useState<number>(dateRange.max);
+
+  useEffect(() => {
+    if (dateRange.max > 0) setSliderValue(dateRange.max);
+  }, [dateRange.max]);
+
   const years = useMemo(() => {
     const yearSet = new Set<number>();
     concerts.forEach((c) => yearSet.add(new Date(c.date).getFullYear()));
@@ -39,9 +51,24 @@ export default function TourMap({ concerts }: TourMapProps) {
   }, [concerts]);
 
   const filtered = useMemo(() => {
-    if (selectedYear === null) return concerts;
-    return concerts.filter((c) => new Date(c.date).getFullYear() === selectedYear);
-  }, [concerts, selectedYear]);
+    if (selectedYear !== null) {
+      return concerts.filter((c) => new Date(c.date).getFullYear() === selectedYear);
+    }
+    // Timeline slider: show all concerts up to the slider date (cumulative)
+    return concerts.filter((c) => new Date(c.date).getTime() <= sliderValue);
+  }, [concerts, selectedYear, sliderValue]);
+
+  const currentTour = useMemo(() => {
+    const atDate = concerts
+      .filter((c) => new Date(c.date).getTime() <= sliderValue)
+      .sort((a, b) => b.date.localeCompare(a.date));
+    return atDate[0]?.tour_name || '';
+  }, [concerts, sliderValue]);
+
+  const sliderDateLabel = useMemo(() => {
+    const d = new Date(sliderValue);
+    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  }, [sliderValue]);
 
   const pins = useMemo((): CityPin[] => {
     const map = new Map<string, CityPin>();
@@ -165,7 +192,15 @@ export default function TourMap({ concerts }: TourMapProps) {
         {[null, ...years].map((year) => (
           <button
             key={year ?? 'all'}
-            onClick={() => setSelectedYear(year === selectedYear ? null : year)}
+            onClick={() => {
+              if (year === selectedYear) {
+                setSelectedYear(null);
+                setSliderValue(dateRange.max);
+              } else {
+                setSelectedYear(year);
+                setSliderValue(new Date(`${year}-12-31`).getTime());
+              }
+            }}
             className={`px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm transition-all duration-150 ${
               selectedYear === year
                 ? 'bg-purple-500/20 border-purple-400/40 text-white shadow-[0_0_12px_rgba(168,85,247,0.3)]'
@@ -178,7 +213,7 @@ export default function TourMap({ concerts }: TourMapProps) {
       </div>
 
       {/* ── Stats overlay — bottom-left ── */}
-      <div className="absolute bottom-4 left-4 z-10 flex items-center gap-3">
+      <div className="absolute bottom-20 left-4 z-10 flex items-center gap-3">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.08] backdrop-blur-sm">
           <span className="text-purple-400 font-semibold text-sm tabular-nums">{pins.length}</span>
           <span className="text-white/40 text-xs">{pins.length === 1 ? 'city' : 'cities'}</span>
@@ -215,6 +250,43 @@ export default function TourMap({ concerts }: TourMapProps) {
           <RotateCcw className="w-3 h-3" />
         </button>
       </div>
+
+      {/* ── Timeline Slider — bottom center ── */}
+      {dateRange.min > 0 && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-[min(90%,600px)]">
+          <div className="bg-black/50 backdrop-blur-md border border-white/[0.08] rounded-xl px-5 py-3">
+            <input
+              type="range"
+              min={dateRange.min}
+              max={dateRange.max}
+              value={sliderValue}
+              onChange={(e) => {
+                setSliderValue(Number(e.target.value));
+                setSelectedYear(null);
+              }}
+              className="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer
+                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4
+                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-400
+                [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(168,85,247,0.5)]
+                [&::-webkit-slider-thumb]:cursor-pointer"
+            />
+            <div className="flex justify-between items-center mt-1.5">
+              <span className="text-[10px] text-white/30">
+                {new Date(dateRange.min).getFullYear()}
+              </span>
+              <div className="text-center">
+                <span className="text-xs font-medium text-purple-300">{sliderDateLabel}</span>
+                {currentTour && (
+                  <div className="text-[10px] text-white/40 truncate max-w-[250px]">{currentTour}</div>
+                )}
+              </div>
+              <span className="text-[10px] text-white/30">
+                {new Date(dateRange.max).getFullYear()}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Hover tooltip ── */}
       {tooltip && (
