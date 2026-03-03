@@ -67,7 +67,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
       <div
         className="absolute pointer-events-none"
         style={{
-          bottom: 'calc(32% + 68px)',
+          bottom: 'calc(32% + clamp(48px, 8vh, 68px))',
           left: '50%',
           transform: 'translateX(-50%)',
           width: 'min(860px, 96%)',
@@ -98,7 +98,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         style={{
           bottom: '32%',
           width: 'min(860px, 96%)',
-          height: '68px',
+          height: 'clamp(48px, 8vh, 68px)',
           clipPath: 'polygon(12% 0%, 88% 0%, 100% 100%, 0% 100%)',
           zIndex: 5,
         }}
@@ -142,9 +142,9 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
-          gap: 'clamp(8px, 2.5vw, 40px)',
-          width: 'min(720px, 82%)',
-          height: '480px',
+          gap: 'clamp(4px, 2.5vw, 40px)',
+          width: 'min(720px, 90%)',
+          height: 'clamp(280px, 55vh, 480px)',
           zIndex: 6,
         }}
       >
@@ -155,7 +155,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           return (
           <div
             key={i}
-            style={{ position: 'relative', flexShrink: 0, width: '52px', height: '480px' }}
+            style={{ position: 'relative', flexShrink: 0, width: 'clamp(32px, 7vw, 52px)', height: '100%' }}
           >
             {/* Atmospheric cone — flows into stage */}
             <div style={{
@@ -163,8 +163,8 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               bottom: '20px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: '120px',
-              height: '458px',
+              width: 'clamp(70px, 15vw, 120px)',
+              height: 'calc(100% - 22px)',
               background: `linear-gradient(to top,
                 ${m.color}55 0%,
                 ${m.color}44 25%,
@@ -185,8 +185,8 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               bottom: '20px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: isFocused ? '48px' : '40px',
-              height: '458px',
+              width: isFocused ? 'clamp(28px, 6vw, 48px)' : 'clamp(24px, 5vw, 40px)',
+              height: 'calc(100% - 22px)',
               background: `linear-gradient(to right,
                 ${m.color}88 0%,
                 ${m.color}66 18%,
@@ -207,8 +207,8 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               bottom: '8px',
               left: '50%',
               transform: 'translateX(-50%)',
-              width: isFocused ? '130px' : '110px',
-              height: isFocused ? '56px' : '48px',
+              width: isFocused ? 'clamp(70px, 16vw, 130px)' : 'clamp(60px, 14vw, 110px)',
+              height: isFocused ? 'clamp(32px, 7vh, 56px)' : 'clamp(28px, 6vh, 48px)',
               background: `radial-gradient(ellipse 50% 40% at 50% 60%,
                 ${m.color}44 0%,
                 ${m.color}55 25%,

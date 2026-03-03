@@ -25,6 +25,7 @@ const SearchSection = lazy(() => import('./components/features/sections/SearchSe
 const AwardsSection = lazy(() => import('./components/features/sections/AwardsSection'));
 const ToursSection = lazy(() => import('./components/features/sections/ToursSection'));
 const MediaSection = lazy(() => import('./components/features/sections/MediaSection'));
+const OnboardingFlow = lazy(() => import('./components/features/OnboardingFlow'));
 
 // Loading fallback for lazy components
 const LoadingFallback = () => (
@@ -53,6 +54,7 @@ import {
   Film,
   Menu,
   X,
+  Info,
 } from 'lucide-react';
 
 const SECTION_TITLES: Record<DashboardSection, string> = {
@@ -79,7 +81,7 @@ const NAV_ITEMS: { id: DashboardSection; icon: React.ElementType; label: string 
 
 // --- MAIN APPLICATION ---
 export default function App() {
-  const [mode, setMode] = useState<'landing' | 'warp' | 'dashboard'>('landing');
+  const [mode, setMode] = useState<'landing' | 'warp' | 'onboarding' | 'dashboard'>('landing');
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -110,7 +112,13 @@ export default function App() {
   const dataLoading = songsLoading || albumsLoading || membersLoading || awardsLoading || concertsLoading || mediaLoading;
 
   const handleSync = () => {
-    setMode('dashboard');
+    try {
+      if (localStorage.getItem('bts-onboarded') === '1') {
+        setMode('dashboard');
+        return;
+      }
+    } catch { /* noop */ }
+    setMode('onboarding');
   };
 
   // Cross-section navigation
@@ -170,8 +178,8 @@ export default function App() {
   return (
     <div className="relative w-screen h-screen bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white">
 
-      {/* 1. UNIVERSE LAYER - Only shown during landing */}
-      {mode !== 'dashboard' && (
+      {/* 1. UNIVERSE LAYER - Only shown during landing/warp */}
+      {(mode === 'landing' || mode === 'warp') && (
         <Suspense fallback={<LoadingFallback />}>
           <Universe3D mode={mode} />
         </Suspense>
@@ -182,7 +190,14 @@ export default function App() {
         {mode === 'landing' && <LandingRitual onSync={handleSync} />}
       </Suspense>
 
-      {/* 3. DASHBOARD */}
+      {/* 3. ONBOARDING */}
+      {mode === 'onboarding' && (
+        <Suspense fallback={<LoadingFallback />}>
+          <OnboardingFlow onComplete={() => setMode('dashboard')} />
+        </Suspense>
+      )}
+
+      {/* 4. DASHBOARD */}
       {mode === 'dashboard' && !activeMemberId && (
         <div className="absolute inset-0 z-10 flex animate-in fade-in zoom-in-95 duration-1000">
 
@@ -227,6 +242,16 @@ export default function App() {
                 </button>
               ))}
             </nav>
+
+            <div className="pt-4 border-t border-white/[0.06] mb-3 px-2">
+              <button
+                onClick={() => setMode('onboarding')}
+                className="flex items-center gap-2 text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer"
+              >
+                <Info size={14} />
+                <span>About this project</span>
+              </button>
+            </div>
 
             <div className="pt-4 border-t border-white/[0.06] space-y-1.5 px-2 mb-4">
               {dataLoading ? (
@@ -354,7 +379,7 @@ export default function App() {
         </div>
       )}
 
-      {/* 4. MEMBER DETAIL OVERLAY (FULL SCREEN) */}
+      {/* 5. MEMBER DETAIL OVERLAY (FULL SCREEN) */}
       <Suspense fallback={<LoadingFallback />}>
         {activeMemberId && (
           <MemberDNA memberId={activeMemberId} onClose={() => setActiveMemberId(null)} />
