@@ -14,6 +14,7 @@ import {
 import type { Song, Album } from '../../../../types/database';
 import { computeAudioHistograms, computeRankings } from '../../../../services/analyticsService';
 import { getSentimentColor, CHART_STYLES } from '../../../../constants/colors';
+import GlossaryTip from '../../../ui/GlossaryTip';
 
 // ==================== TYPES ====================
 
@@ -75,11 +76,34 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
     return rankings.find((r) => r.category === selectedRankingCategory) ?? null;
   }, [rankings, selectedRankingCategory]);
 
+  // Summary insight
+  const moodSummary = useMemo(() => {
+    if (scatterData.length === 0) return null;
+    const avgValence = scatterData.reduce((s, d) => s + d.valence, 0) / scatterData.length;
+    const avgEnergy = scatterData.reduce((s, d) => s + d.energy, 0) / scatterData.length;
+    const highEnergy = scatterData.filter(d => d.energy > 0.7).length;
+    const highValence = scatterData.filter(d => d.valence > 0.6).length;
+    const quadrant =
+      avgEnergy > 0.5 && avgValence > 0.5 ? 'energetic and uplifting' :
+      avgEnergy > 0.5 && avgValence <= 0.5 ? 'intense and moody' :
+      avgEnergy <= 0.5 && avgValence > 0.5 ? 'relaxed and happy' :
+      'calm and introspective';
+    return { avgValence: avgValence.toFixed(2), avgEnergy: avgEnergy.toFixed(2), highEnergy, highValence, quadrant, total: scatterData.length };
+  }, [scatterData]);
+
   return (
     <div className="space-y-6">
       {/* ==================== MOOD QUADRANT ==================== */}
       <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
-        <h3 className="text-sm font-semibold text-white/70 mb-4">Mood Quadrant</h3>
+        <h3 className="text-sm font-semibold text-white/70 mb-2">Mood Quadrant</h3>
+        {moodSummary && (
+          <p className="text-xs text-white/40 leading-relaxed mb-4 max-w-2xl">
+            Mapping {moodSummary.total} songs by <GlossaryTip term="valence" /> (happiness) and{' '}
+            <GlossaryTip term="energy" /> (intensity). BTS's sound center is{' '}
+            <span className="text-white/60 font-medium">{moodSummary.quadrant}</span> (avg valence {moodSummary.avgValence}, energy {moodSummary.avgEnergy}).{' '}
+            {moodSummary.highEnergy} songs are high-energy and {moodSummary.highValence} lean happy.
+          </p>
+        )}
 
         <div className="relative">
           {/* Quadrant axis labels */}

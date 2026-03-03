@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { ArrowUpDown } from 'lucide-react';
 import type { Album, Award, Concert, MemberEvent } from '../../../../types/database';
 
 // ==================== TYPES ====================
@@ -37,7 +38,12 @@ const CATEGORY_LABELS: Record<TimelineEntry['category'], string> = {
 // ==================== COMPONENT ====================
 
 export default function CareerTimeline({ albums, awards, concerts, memberEvents }: CareerTimelineProps) {
-  const milestones = useMemo(() => {
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [activeCategories, setActiveCategories] = useState<Set<TimelineEntry['category']>>(
+    () => new Set(['album', 'award', 'tour', 'event']),
+  );
+
+  const allEntries = useMemo(() => {
     const entries: TimelineEntry[] = [];
 
     // Album releases
@@ -54,7 +60,6 @@ export default function CareerTimeline({ albums, awards, concerts, memberEvents 
 
     // Award wins (significant ones)
     const wonAwards = awards.filter((a) => a.result === 'won');
-    // Deduplicate by ceremony+year, keeping first occurrence
     const seenCeremonyYear = new Set<string>();
     for (const award of wonAwards) {
       const key = `${award.ceremony}-${award.year}`;
@@ -98,14 +103,42 @@ export default function CareerTimeline({ albums, awards, concerts, memberEvents 
       });
     }
 
-    // Sort chronologically
+    // Sort chronologically ascending (base order)
     entries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     return entries;
   }, [albums, awards, concerts, memberEvents]);
 
+  // Apply category filter + sort order
+  const milestones = useMemo(() => {
+    const filtered = allEntries.filter(e => activeCategories.has(e.category));
+    return sortOrder === 'desc' ? [...filtered].reverse() : filtered;
+  }, [allEntries, activeCategories, sortOrder]);
+
+  const toggleCategory = (cat: TimelineEntry['category']) => {
+    setActiveCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(cat)) {
+        // Don't allow deselecting all
+        if (next.size > 1) next.delete(cat);
+      } else {
+        next.add(cat);
+      }
+      return next;
+    });
+  };
+
+  // Category counts for filter pills
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const entry of allEntries) {
+      counts[entry.category] = (counts[entry.category] ?? 0) + 1;
+    }
+    return counts;
+  }, [allEntries]);
+
   // Empty state
-  if (milestones.length === 0) {
+  if (allEntries.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <p className="text-sm text-white/40">No timeline data available yet.</p>
@@ -125,21 +158,50 @@ export default function CareerTimeline({ albums, awards, concerts, memberEvents 
 
   const years = Object.keys(yearGroups)
     .map(Number)
-    .sort((a, b) => a - b);
+    .sort((a, b) => sortOrder === 'desc' ? b - a : a - b);
 
   return (
     <div className="space-y-6">
-      {/* Legend */}
-      <div className="flex flex-wrap gap-4">
-        {(Object.keys(CATEGORY_COLORS) as TimelineEntry['category'][]).map((cat) => (
-          <div key={cat} className="flex items-center gap-2 text-xs text-white/50">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: CATEGORY_COLORS[cat] }}
-            />
-            {CATEGORY_LABELS[cat]}
-          </div>
-        ))}
+      {/* Controls: filters + sort */}
+      <div className="flex flex-wrap items-center gap-3">
+        {/* Category filter pills */}
+        {(Object.keys(CATEGORY_COLORS) as TimelineEntry['category'][]).map((cat) => {
+          const isActive = activeCategories.has(cat);
+          const color = CATEGORY_COLORS[cat];
+          return (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => toggleCategory(cat)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200"
+              style={{
+                color: isActive ? color : 'rgba(255,255,255,0.3)',
+                borderColor: isActive ? `${color}40` : 'rgba(255,255,255,0.08)',
+                backgroundColor: isActive ? `${color}12` : 'transparent',
+              }}
+            >
+              <span
+                className="w-2 h-2 rounded-full transition-opacity"
+                style={{
+                  backgroundColor: color,
+                  opacity: isActive ? 1 : 0.3,
+                }}
+              />
+              {CATEGORY_LABELS[cat]}
+              <span className="text-[10px] opacity-60">({categoryCounts[cat] ?? 0})</span>
+            </button>
+          );
+        })}
+
+        {/* Sort toggle */}
+        <button
+          type="button"
+          onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white/50 border border-white/[0.08] hover:text-white/70 hover:border-white/[0.15] transition-colors"
+        >
+          <ArrowUpDown className="w-3 h-3" />
+          {sortOrder === 'asc' ? 'Oldest first' : 'Newest first'}
+        </button>
       </div>
 
       {/* Timeline */}
@@ -154,6 +216,7 @@ export default function CareerTimeline({ albums, awards, concerts, memberEvents 
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-4 h-4 rounded-full bg-purple-500/20 border-2 border-purple-500/50 relative z-10" />
                 <span className="text-sm font-semibold text-white/80">{year}</span>
+                <span className="text-[10px] text-white/30">{yearGroups[year].length} events</span>
               </div>
 
               {/* Entries for this year */}

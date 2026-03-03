@@ -16,6 +16,7 @@ import {
   computeMemberContributions,
 } from '../../../../services/analyticsService';
 import { CHART_STYLES } from '../../../../constants/colors';
+import GlossaryTip from '../../../ui/GlossaryTip';
 
 interface WritingNetworkProps {
   songs: Song[];
@@ -66,13 +67,35 @@ export default function WritingNetwork({ songs, members }: WritingNetworkProps) 
     );
   }
 
+  // Summary insight
+  const writingSummary = useMemo(() => {
+    if (contributions.length === 0) return null;
+    const topMember = contributions[0];
+    const topWriter = topWriters[0];
+    const topPair = topCollaborators[0];
+    return { topMember, topWriter, topPair, totalWriters: writers.length };
+  }, [contributions, topWriters, topCollaborators, writers.length]);
+
   return (
     <div className="space-y-8">
       {/* 1. Member Contributions (Grouped Bar Chart) */}
       <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-6">
-        <h3 className="text-sm font-semibold text-white/70 mb-4">
+        <h3 className="text-sm font-semibold text-white/70 mb-2">
           Member Contributions
         </h3>
+        {writingSummary && (
+          <p className="text-xs text-white/40 leading-relaxed mb-4 max-w-2xl">
+            {writingSummary.totalWriters} unique writers have contributed to BTS's discography.{' '}
+            <span className="text-white/60 font-medium">{writingSummary.topMember.stageName}</span> leads
+            with {writingSummary.topMember.komcaCredits} <GlossaryTip term="KOMCA" /> credits.
+            {writingSummary.topWriter && (
+              <> The most prolific writer overall is <span className="text-white/60 font-medium">{writingSummary.topWriter.name}</span> ({writingSummary.topWriter.songCount} songs).</>
+            )}
+            {writingSummary.topPair && (
+              <> Top writing duo: {writingSummary.topPair.writerA} & {writingSummary.topPair.writerB} ({writingSummary.topPair.coOccurrences} co-writes).</>
+            )}
+          </p>
+        )}
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={barChartData}>
             <CartesianGrid {...CHART_STYLES.GRID} />

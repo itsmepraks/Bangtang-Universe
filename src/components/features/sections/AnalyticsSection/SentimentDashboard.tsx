@@ -17,6 +17,8 @@ import {
 } from '../../../../services/analyticsService';
 import { getSentimentColor, CHART_STYLES } from '../../../../constants/colors';
 
+const POSITIVE_SENTIMENTS = new Set(['Joy', 'Gratitude', 'Comfort', 'Celebration', 'Confidence', 'Determination']);
+
 interface SentimentDashboardProps {
   songs: Song[];
   albums: Album[];
@@ -26,6 +28,44 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
   const distribution = useMemo(() => computeSentimentDistribution(songs), [songs]);
 
   const sentimentByEra = useMemo(() => computeSentimentByEra(songs, albums), [songs, albums]);
+
+  // Map sentiment → example songs (prefer title tracks, max 3)
+  const sentimentExamples = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const song of songs) {
+      if (!song.sentiment) continue;
+      if (!map.has(song.sentiment)) map.set(song.sentiment, []);
+      const arr = map.get(song.sentiment)!;
+      // title tracks first
+      if (song.is_title_track && arr.length < 3) {
+        arr.unshift(song.title);
+        if (arr.length > 3) arr.pop();
+      } else if (arr.length < 3) {
+        arr.push(song.title);
+      }
+    }
+    return map;
+  }, [songs]);
+
+  // Summary stats
+  const summaryStats = useMemo(() => {
+    const total = distribution.reduce((s, d) => s + d.count, 0);
+    const positiveCount = distribution
+      .filter(d => POSITIVE_SENTIMENTS.has(d.sentiment))
+      .reduce((s, d) => s + d.count, 0);
+    const reflectiveCount = total - positiveCount;
+    const top = distribution[0];
+    const runner = distribution[1];
+    return {
+      total,
+      positiveCount,
+      reflectiveCount,
+      positivePct: total > 0 ? Math.round((positiveCount / total) * 100) : 0,
+      top,
+      runner,
+      uniqueCount: distribution.length,
+    };
+  }, [distribution]);
 
   // Collect every unique sentiment across all eras for stacked bars
   const allSentiments = useMemo(() => {
@@ -61,9 +101,48 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
     <div className="space-y-8">
       {/* ===== Overall Sentiment Distribution ===== */}
       <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
-        <h3 className="text-lg font-semibold text-white/90 mb-4">
+        <h3 className="text-lg font-semibold text-white/90 mb-2">
           Sentiment Distribution
         </h3>
+
+        {/* Summary insight */}
+        {summaryStats.top && (
+          <p className="text-xs text-white/40 leading-relaxed mb-5 max-w-2xl">
+            Across {summaryStats.total} songs with {summaryStats.uniqueCount} distinct emotions,{' '}
+            <span className="text-white/60 font-medium">{summaryStats.top.sentiment}</span> is the
+            dominant mood ({summaryStats.top.count} songs, {summaryStats.top.percentage}%)
+            {summaryStats.runner && (
+              <>, followed by <span className="text-white/60 font-medium">{summaryStats.runner.sentiment}</span> ({summaryStats.runner.count})</>
+            )}
+            . Positive sentiments make up{' '}
+            <span className="text-white/60 font-medium">{summaryStats.positivePct}%</span> of the
+            catalog, with {summaryStats.reflectiveCount} songs exploring deeper, reflective themes.
+          </p>
+        )}
+
+        {/* Positive vs Reflective split bar */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-400/70" />
+              <span className="text-[10px] text-white/40 uppercase tracking-wide">Positive {summaryStats.positivePct}%</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm bg-blue-400/70" />
+              <span className="text-[10px] text-white/40 uppercase tracking-wide">Reflective {100 - summaryStats.positivePct}%</span>
+            </div>
+          </div>
+          <div className="h-2 bg-white/[0.06] rounded-full overflow-hidden flex">
+            <div
+              className="h-full bg-emerald-400/50 transition-all duration-500"
+              style={{ width: `${summaryStats.positivePct}%` }}
+            />
+            <div
+              className="h-full bg-blue-400/40 transition-all duration-500"
+              style={{ width: `${100 - summaryStats.positivePct}%` }}
+            />
+          </div>
+        </div>
 
         {/* Badge row */}
         <div className="flex flex-wrap gap-2 mb-6">
@@ -101,12 +180,41 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
               width={110}
             />
             <Tooltip
-              contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
-              labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
               cursor={CHART_STYLES.TOOLTIP.cursor}
-              formatter={(value, _name, props) => {
-                const pct = (props as { payload?: { percentage?: number } })?.payload?.percentage ?? 0;
-                return [`${value} songs (${pct}%)`, 'Count'];
+              content={({ active, payload }) => {
+                if (!active || !payload?.length) return null;
+                const data = payload[0]?.payload as { sentiment: string; count: number; percentage: number } | undefined;
+                if (!data) return null;
+                const color = getSentimentColor(data.sentiment);
+                const examples = sentimentExamples.get(data.sentiment) || [];
+                return (
+                  <div style={CHART_STYLES.TOOLTIP.contentStyle}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <span style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: color, flexShrink: 0 }} />
+                      <span style={{ ...CHART_STYLES.TOOLTIP.labelStyle }}>{data.sentiment}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 16, marginBottom: examples.length > 0 ? 8 : 0 }}>
+                      <div>
+                        <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, fontWeight: 600 }}>{data.count}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, marginLeft: 4 }}>songs</span>
+                      </div>
+                      <div>
+                        <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, fontWeight: 600 }}>{data.percentage}%</span>
+                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, marginLeft: 4 }}>of catalog</span>
+                      </div>
+                    </div>
+                    {examples.length > 0 && (
+                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 6 }}>
+                        <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Example songs</span>
+                        {examples.map(title => (
+                          <div key={title} style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 2 }}>
+                            {title}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
               }}
             />
             <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={20} activeBar={CHART_STYLES.BAR_ACTIVE}>

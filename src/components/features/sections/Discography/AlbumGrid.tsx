@@ -4,6 +4,8 @@ import type { Song, Album } from '../../../../types/database';
 import FilterBar from '../../../ui/FilterBar';
 import Badge from '../../../ui/Badge';
 import BtsLogo from '../../../ui/BtsLogo';
+import SectionIntro from '../../../ui/SectionIntro';
+import GlossaryTip from '../../../ui/GlossaryTip';
 
 type Category = 'all' | 'group' | 'solo' | 'collab';
 
@@ -109,6 +111,16 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
 
   return (
     <div className="space-y-6">
+      <SectionIntro
+        description={
+          <>
+            The complete BTS discography — group albums, solo projects, and collaborations.
+            Each album belongs to an <GlossaryTip term="era" /> that defines its thematic universe.
+            Click any album to explore tracks and audio details.
+          </>
+        }
+      />
+
       {/* Category Filter */}
       <div className="space-y-4">
         <FilterBar

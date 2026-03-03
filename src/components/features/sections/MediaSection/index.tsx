@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy } from 'react';
 import { Film, Tv, User, LayoutGrid } from 'lucide-react';
 import type { Media, Member } from '../../../../types/database';
+import SectionIntro from '../../../ui/SectionIntro';
 
 const MediaGrid = lazy(() => import('./MediaGrid'));
 const MediaTimeline = lazy(() => import('./MediaTimeline'));
@@ -38,6 +39,8 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
 
     return (
         <div className="space-y-6">
+            <SectionIntro description="Documentaries, concert films, variety shows, and solo projects — the visual story of BTS beyond music." />
+
             <div className="overflow-x-auto scrollbar-hide">
                 <div className="flex items-center gap-2" role="tablist" aria-label="Media views">
                     {TABS.map((tab) => {

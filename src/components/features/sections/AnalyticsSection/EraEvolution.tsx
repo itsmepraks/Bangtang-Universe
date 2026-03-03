@@ -14,6 +14,7 @@ import {
 import type { Song, Album } from '../../../../types/database';
 import { computeEraEvolution } from '../../../../services/analyticsService';
 import { CHART_STYLES } from '../../../../constants/colors';
+import GlossaryTip from '../../../ui/GlossaryTip';
 
 interface EraEvolutionProps {
   songs: Song[];
@@ -53,13 +54,34 @@ export default function EraEvolution({ songs, albums }: EraEvolutionProps) {
     );
   }
 
+  // Summary insight
+  const eraSummary = useMemo(() => {
+    if (eraStats.length < 2) return null;
+    const first = eraStats[0];
+    const last = eraStats[eraStats.length - 1];
+    const mostEnergetic = [...eraStats].sort((a, b) => b.avgEnergy - a.avgEnergy)[0];
+    const mostDanceable = [...eraStats].sort((a, b) => b.avgDanceability - a.avgDanceability)[0];
+    const totalSongs = eraStats.reduce((s, e) => s + e.songCount, 0);
+    const bpmTrend = last.avgBpm > first.avgBpm ? 'increased' : 'decreased';
+    return { first, last, mostEnergetic, mostDanceable, totalSongs, bpmTrend };
+  }, [eraStats]);
+
   return (
     <div className="space-y-8">
       {/* 1. Era Audio Evolution (Line Chart) */}
       <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
-        <h3 className="text-sm font-semibold text-white/70 mb-4">
+        <h3 className="text-sm font-semibold text-white/70 mb-2">
           Sound Evolution Across Eras
         </h3>
+        {eraSummary && (
+          <p className="text-xs text-white/40 leading-relaxed mb-4 max-w-2xl">
+            Tracking how BTS's sound evolved across {eraStats.length} <GlossaryTip term="era">eras</GlossaryTip> and{' '}
+            {eraSummary.totalSongs} songs. Average <GlossaryTip term="BPM" /> has {eraSummary.bpmTrend} from{' '}
+            {eraSummary.first.avgBpm} ({eraSummary.first.era}) to {eraSummary.last.avgBpm} ({eraSummary.last.era}).{' '}
+            <span className="text-white/60 font-medium">{eraSummary.mostEnergetic.era}</span> is the most energetic era
+            and <span className="text-white/60 font-medium">{eraSummary.mostDanceable.era}</span> the most danceable.
+          </p>
+        )}
         <ResponsiveContainer width="100%" height={320}>
           <LineChart data={lineChartData}>
             <CartesianGrid {...CHART_STYLES.GRID} />

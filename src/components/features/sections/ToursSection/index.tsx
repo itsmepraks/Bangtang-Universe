@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy } from 'react';
 import { MapPin, BarChart3, Globe } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
+import SectionIntro from '../../../ui/SectionIntro';
 
 const TourList = lazy(() => import('./TourList'));
 const TourStats = lazy(() => import('./TourStats'));
@@ -36,6 +37,8 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
 
   return (
     <div className="space-y-6">
+      <SectionIntro description="Every BTS concert mapped worldwide — from early Korean showcases to sold-out stadium tours across six continents." />
+
       <div className="overflow-x-auto scrollbar-hide">
         <div className="flex items-center gap-2" role="tablist" aria-label="Tours views">
           {TABS.map((tab) => {
