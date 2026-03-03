@@ -104,6 +104,8 @@
     "scrape:member-events": "npx tsx scripts/scrape-15-member-events.ts",
     "scrape:setlistfm": "npx tsx scripts/scrape-16-setlistfm.ts",
     "scrape:solo-awards": "npx tsx scripts/scrape-17-solo-awards.ts",
+    "seed:member-events": "npx tsx scripts/seed-member-events.ts",
+    "fix:member-data": "npx tsx scripts/fix-member-data.ts",
     "scrape:all": "npm run scrape:musicbrainz && npm run scrape:wiki && npm run scrape:genius && npm run scrape:albums && npm run scrape:songs && npm run scrape:lyrics && npm run scrape:verify && npm run scrape:expand-discography && npm run scrape:cover-art && npm run scrape:lyrics-translations && npm run scrape:awards && npm run scrape:chart-entries && npm run scrape:concerts && npm run scrape:collaborations && npm run scrape:member-events && npm run scrape:setlistfm"
   },
   "dependencies": {

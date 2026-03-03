@@ -42,7 +42,7 @@ const MEMBERS: {
     { name: 'Jin', member_id: 'jin', url: 'https://en.wikipedia.org/wiki/Jin_(singer)' },
     { name: 'Suga', member_id: 'suga', url: 'https://en.wikipedia.org/wiki/Suga_(rapper)' },
     { name: 'J-Hope', member_id: 'jh', url: 'https://en.wikipedia.org/wiki/J-Hope' },
-    { name: 'Jimin', member_id: 'jm', url: 'https://en.wikipedia.org/wiki/Jimin_(singer)' },
+    { name: 'Jimin', member_id: 'jm', url: 'https://en.wikipedia.org/wiki/Jimin' },
     { name: 'V', member_id: 'v', url: 'https://en.wikipedia.org/wiki/V_(singer)' },
     { name: 'Jungkook', member_id: 'jk', url: 'https://en.wikipedia.org/wiki/Jungkook' },
 ];
