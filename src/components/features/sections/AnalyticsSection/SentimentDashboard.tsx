@@ -145,9 +145,29 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
                 width={110}
               />
               <Tooltip
-                contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
-                labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
                 cursor={CHART_STYLES.TOOLTIP.cursor}
+                content={({ active, payload, label }) => {
+                  if (!active || !payload?.length) return null;
+                  const nonZero = payload.filter(p => (p.value as number) > 0);
+                  if (nonZero.length === 0) return null;
+                  const total = nonZero.reduce((sum, p) => sum + (p.value as number), 0);
+                  return (
+                    <div style={CHART_STYLES.TOOLTIP.contentStyle}>
+                      <p style={{ ...CHART_STYLES.TOOLTIP.labelStyle, marginBottom: 8 }}>{label}</p>
+                      {nonZero.map(p => (
+                        <div key={p.dataKey as string} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: 2, backgroundColor: p.color, flexShrink: 0 }} />
+                          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, flex: 1 }}>{p.dataKey as string}</span>
+                          <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: 500 }}>{p.value as number}</span>
+                        </div>
+                      ))}
+                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: 6, paddingTop: 6, display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
+                        <span style={{ color: 'rgba(255,255,255,0.4)' }}>Total</span>
+                        <span style={{ color: 'rgba(255,255,255,0.7)', fontWeight: 600 }}>{total}</span>
+                      </div>
+                    </div>
+                  );
+                }}
               />
               <Legend
                 wrapperStyle={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}
