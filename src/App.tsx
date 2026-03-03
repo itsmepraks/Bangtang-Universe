@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 
 // Import data and hooks
-import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useMemberEvents } from './hooks';
+import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useMemberEvents, useMedia } from './hooks';
 import type { DashboardSection, DiscographyState } from './types/index';
 
 // Lightweight components - imported directly
@@ -24,6 +24,7 @@ const AnalyticsSection = lazy(() => import('./components/features/sections/Analy
 const SearchSection = lazy(() => import('./components/features/sections/SearchSection'));
 const AwardsSection = lazy(() => import('./components/features/sections/AwardsSection'));
 const ToursSection = lazy(() => import('./components/features/sections/ToursSection'));
+const MediaSection = lazy(() => import('./components/features/sections/MediaSection'));
 
 // Loading fallback for lazy components
 const LoadingFallback = () => (
@@ -49,6 +50,7 @@ import {
   Users,
   Trophy,
   MapPin,
+  Film,
   Menu,
   X,
 } from 'lucide-react';
@@ -60,6 +62,7 @@ const SECTION_TITLES: Record<DashboardSection, string> = {
   analytics: 'Analytics',
   awards: 'Awards',
   tours: 'Tours',
+  media: 'Media',
   search: 'Search',
 };
 
@@ -70,6 +73,7 @@ const NAV_ITEMS: { id: DashboardSection; icon: React.ElementType; label: string 
   { id: 'analytics', icon: BarChart3, label: 'Analytics' },
   { id: 'awards', icon: Trophy, label: 'Awards' },
   { id: 'tours', icon: MapPin, label: 'Tours' },
+  { id: 'media', icon: Film, label: 'Media' },
   { id: 'search', icon: Search, label: 'Search' },
 ];
 
@@ -101,8 +105,9 @@ export default function App() {
   const { chartEntries } = useChartEntries();
   const { concerts, loading: concertsLoading } = useConcerts();
   const { memberEvents } = useMemberEvents();
+  const { media, loading: mediaLoading } = useMedia();
 
-  const dataLoading = songsLoading || albumsLoading || membersLoading || awardsLoading || concertsLoading;
+  const dataLoading = songsLoading || albumsLoading || membersLoading || awardsLoading || concertsLoading || mediaLoading;
 
   const handleSync = () => {
     setMode('dashboard');
@@ -237,6 +242,7 @@ export default function App() {
                   <div className="text-xs text-white/40">{members.length} members</div>
                   <div className="text-xs text-white/40">{awards.length} awards</div>
                   <div className="text-xs text-white/40">{concerts.length} concerts</div>
+                  <div className="text-xs text-white/40">{media.length} media</div>
                 </>
               )}
             </div>
@@ -315,6 +321,10 @@ export default function App() {
 
                   {activeSection === 'tours' && (
                     <ToursSection concerts={concerts} />
+                  )}
+
+                  {activeSection === 'media' && (
+                    <MediaSection media={media} members={members} />
                   )}
 
                   {activeSection === 'search' && (

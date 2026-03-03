@@ -15,3 +15,4 @@ export { useChartEntries, useChartEntriesBySong, useChartEntriesByChart } from '
 export { useConcerts, useConcertsByTour, useConcertsByCountry } from './useConcerts';
 export { useCollaborations, useCollaborationsByMember, useCollaborationsByArtist } from './useCollaborations';
 export { useMemberEvents, useMemberEventsByMember, useMemberEventsByType } from './useMemberEvents';
+export { useMedia, useMediaByType, useMediaByMember } from './useMedia';

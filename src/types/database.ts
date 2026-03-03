@@ -169,6 +169,20 @@ export interface MemberEvent {
     created_at: string;
 }
 
+export interface Media {
+    id: number;
+    title: string;
+    type: 'documentary' | 'concert_film' | 'variety' | 'docu_series' | 'reality';
+    release_date: string | null;
+    platform: string | null;
+    seasons: number;
+    episodes: number | null;
+    scope: 'group' | 'solo' | 'unit';
+    member_ids: string[] | null;
+    description: string | null;
+    created_at: string;
+}
+
 // ==================== DATABASE SCHEMA TYPE ====================
 
 export interface Database {
@@ -224,6 +238,11 @@ export interface Database {
                 Insert: Omit<MemberEvent, 'id' | 'created_at'>;
                 Update: Partial<Omit<MemberEvent, 'id' | 'created_at'>>;
             };
+            media: {
+                Row: Media;
+                Insert: Omit<Media, 'id' | 'created_at'>;
+                Update: Partial<Omit<Media, 'id' | 'created_at'>>;
+            };
         };
     };
 }
@@ -239,6 +258,7 @@ export type ChartEntryInsert = Database['public']['Tables']['chart_entries']['In
 export type ConcertInsert = Database['public']['Tables']['concerts']['Insert'];
 export type CollaborationInsert = Database['public']['Tables']['collaborations']['Insert'];
 export type MemberEventInsert = Database['public']['Tables']['member_events']['Insert'];
+export type MediaInsert = Database['public']['Tables']['media']['Insert'];
 
 // Song with joined album data
 export interface SongWithAlbum extends Song {
