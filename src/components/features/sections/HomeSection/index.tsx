@@ -209,7 +209,7 @@ export default function HomeSection({
                 axisLine={false}
               />
               <YAxis domain={[0, 1]} tick={false} axisLine={false} tickLine={false} />
-              <Tooltip {...CHART_STYLES.TOOLTIP} />
+              <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ stroke: 'rgba(255,255,255,0.06)' }} />
               <Area
                 type="monotone"
                 dataKey="energy"
@@ -385,7 +385,7 @@ export default function HomeSection({
                 axisLine={false}
                 allowDecimals={false}
               />
-              <Tooltip {...CHART_STYLES.TOOLTIP} />
+              <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
               <Bar
                 dataKey="count"
                 fill="#A855F7"
@@ -393,6 +393,7 @@ export default function HomeSection({
                 radius={[3, 3, 0, 0]}
                 isAnimationActive={false}
                 name="Wins"
+                activeBar={{ fillOpacity: 0.95 }}
               />
             </BarChart>
           </ResponsiveContainer>

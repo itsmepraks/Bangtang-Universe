@@ -102,7 +102,10 @@ export const CHART_STYLES = {
       color: 'rgba(255,255,255,0.8)',
     },
     labelStyle: { color: 'rgba(255,255,255,0.95)', fontWeight: 600 },
+    cursor: { fill: 'rgba(255,255,255,0.03)' },
   },
+  /** Subtle hover for Bar charts — prevents the bright default Recharts highlight */
+  BAR_ACTIVE: { fillOpacity: 0.95 },
 } as const;
 
 /**

@@ -201,8 +201,8 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
                 axisLine={false}
                 allowDecimals={false}
               />
-              <Tooltip {...CHART_STYLES.TOOLTIP} />
-              <Bar dataKey="count" fill="#A855F7" fillOpacity={0.7} radius={[4, 4, 0, 0]} />
+              <Tooltip {...CHART_STYLES.TOOLTIP} cursor={CHART_STYLES.TOOLTIP.cursor} />
+              <Bar dataKey="count" fill="#A855F7" fillOpacity={0.7} radius={[4, 4, 0, 0]} activeBar={CHART_STYLES.BAR_ACTIVE} />
             </BarChart>
           </ResponsiveContainer>
         )}

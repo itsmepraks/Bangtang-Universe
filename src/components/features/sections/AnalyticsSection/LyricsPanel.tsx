@@ -136,9 +136,10 @@ export default function LyricsPanel({ lyrics, songs, albums }: LyricsPanelProps)
                 <Tooltip
                   contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
                   labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
+                  cursor={CHART_STYLES.TOOLTIP.cursor}
                   formatter={(value) => [`${value} occurrences`, 'Count']}
                 />
-                <Bar dataKey="count" fill="#A855F7" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="count" fill="#A855F7" radius={[0, 4, 4, 0]} activeBar={CHART_STYLES.BAR_ACTIVE} />
               </BarChart>
             </ResponsiveContainer>
           ) : (

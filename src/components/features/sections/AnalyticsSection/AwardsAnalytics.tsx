@@ -147,8 +147,9 @@ export default function AwardsAnalytics({ awards, chartEntries, songs }: AwardsA
                 <Tooltip
                   contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
                   labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
+                  cursor={CHART_STYLES.TOOLTIP.cursor}
                 />
-                <Bar dataKey="wins" fill={BORAHAE_COLORS.INDIGO} radius={[0, 4, 4, 0]} name="Wins" />
+                <Bar dataKey="wins" fill={BORAHAE_COLORS.INDIGO} radius={[0, 4, 4, 0]} name="Wins" activeBar={CHART_STYLES.BAR_ACTIVE} />
               </BarChart>
             </ResponsiveContainer>
           </div>

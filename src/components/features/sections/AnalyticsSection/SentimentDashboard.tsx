@@ -103,12 +103,13 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
             <Tooltip
               contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
               labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
+              cursor={CHART_STYLES.TOOLTIP.cursor}
               formatter={(value, _name, props) => {
                 const pct = (props as { payload?: { percentage?: number } })?.payload?.percentage ?? 0;
                 return [`${value} songs (${pct}%)`, 'Count'];
               }}
             />
-            <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={20}>
+            <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={20} activeBar={CHART_STYLES.BAR_ACTIVE}>
               {distribution.map((entry) => (
                 <Cell
                   key={entry.sentiment}
@@ -146,6 +147,7 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
               <Tooltip
                 contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
                 labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
+                cursor={CHART_STYLES.TOOLTIP.cursor}
               />
               <Legend
                 wrapperStyle={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}
@@ -157,6 +159,7 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
                   stackId="sentiment"
                   fill={getSentimentColor(sentiment)}
                   barSize={22}
+                  activeBar={CHART_STYLES.BAR_ACTIVE}
                 />
               ))}
             </BarChart>

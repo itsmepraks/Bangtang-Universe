@@ -127,14 +127,16 @@ export default function AwardStats({ awards }: AwardStatsProps) {
               <Tooltip
                 contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
                 labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
+                cursor={CHART_STYLES.TOOLTIP.cursor}
               />
-              <Bar dataKey="won" stackId="awards" fill="#FBBF24" radius={[0, 0, 0, 0]} name="Won" />
+              <Bar dataKey="won" stackId="awards" fill="#FBBF24" radius={[0, 0, 0, 0]} name="Won" activeBar={CHART_STYLES.BAR_ACTIVE} />
               <Bar
                 dataKey="nominated"
                 stackId="awards"
                 fill="#A855F7"
                 radius={[4, 4, 0, 0]}
                 name="Nominated"
+                activeBar={CHART_STYLES.BAR_ACTIVE}
               />
             </BarChart>
           </ResponsiveContainer>
@@ -160,9 +162,10 @@ export default function AwardStats({ awards }: AwardStatsProps) {
               <Tooltip
                 contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
                 labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
+                cursor={CHART_STYLES.TOOLTIP.cursor}
               />
-              <Bar dataKey="won" fill="#FBBF24" radius={[0, 4, 4, 0]} name="Won" />
-              <Bar dataKey="total" fill="rgba(168, 85, 247, 0.3)" radius={[0, 4, 4, 0]} name="Total" />
+              <Bar dataKey="won" fill="#FBBF24" radius={[0, 4, 4, 0]} name="Won" activeBar={CHART_STYLES.BAR_ACTIVE} />
+              <Bar dataKey="total" fill="rgba(168, 85, 247, 0.3)" radius={[0, 4, 4, 0]} name="Total" activeBar={CHART_STYLES.BAR_ACTIVE} />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -139,12 +139,14 @@ export default function EraEvolution({ songs, albums }: EraEvolutionProps) {
             <Tooltip
               contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
               labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
+              cursor={CHART_STYLES.TOOLTIP.cursor}
             />
             <Bar
               dataKey="songCount"
               fill="#A855F7"
               radius={[4, 4, 0, 0]}
               name="Songs"
+              activeBar={CHART_STYLES.BAR_ACTIVE}
             />
           </BarChart>
         </ResponsiveContainer>

@@ -145,7 +145,7 @@ export default function TourStats({ concerts }: TourStatsProps) {
                   labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
                   cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                 />
-                <Bar dataKey="count" name="Concerts" fill={BORAHAE_COLORS.PRIMARY} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" name="Concerts" fill={BORAHAE_COLORS.PRIMARY} radius={[4, 4, 0, 0]} activeBar={CHART_STYLES.BAR_ACTIVE} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -183,7 +183,7 @@ export default function TourStats({ concerts }: TourStatsProps) {
                   labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
                   cursor={{ fill: 'rgba(255,255,255,0.03)' }}
                 />
-                <Bar dataKey="count" name="Concerts" fill={BORAHAE_COLORS.INDIGO} radius={[0, 4, 4, 0]} />
+                <Bar dataKey="count" name="Concerts" fill={BORAHAE_COLORS.INDIGO} radius={[0, 4, 4, 0]} activeBar={CHART_STYLES.BAR_ACTIVE} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -245,6 +245,7 @@ export default function TourStats({ concerts }: TourStatsProps) {
                   name="Attendance"
                   fill={BORAHAE_COLORS.VIOLET}
                   radius={[0, 4, 4, 0]}
+                  activeBar={CHART_STYLES.BAR_ACTIVE}
                 />
               </BarChart>
             </ResponsiveContainer>

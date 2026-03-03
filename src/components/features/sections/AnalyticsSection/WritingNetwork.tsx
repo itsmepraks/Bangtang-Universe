@@ -91,17 +91,18 @@ export default function WritingNetwork({ songs, members }: WritingNetworkProps) 
             <Tooltip
               contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
               labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
+              cursor={CHART_STYLES.TOOLTIP.cursor}
             />
             <Legend
               wrapperStyle={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}
             />
-            <Bar dataKey="KOMCA" name="KOMCA" fill="#A855F7" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="KOMCA" name="KOMCA" fill="#A855F7" radius={[4, 4, 0, 0]} activeBar={CHART_STYLES.BAR_ACTIVE}>
               {barChartData.map((entry, index) => (
                 <Cell key={`komca-${index}`} fill={entry.color || '#A855F7'} />
               ))}
             </Bar>
-            <Bar dataKey="Writer" name="Writer" fill="#818CF8" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Producer" name="Producer" fill="#10B981" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="Writer" name="Writer" fill="#818CF8" radius={[4, 4, 0, 0]} activeBar={CHART_STYLES.BAR_ACTIVE} />
+            <Bar dataKey="Producer" name="Producer" fill="#10B981" radius={[4, 4, 0, 0]} activeBar={CHART_STYLES.BAR_ACTIVE} />
           </BarChart>
         </ResponsiveContainer>
       </div>
