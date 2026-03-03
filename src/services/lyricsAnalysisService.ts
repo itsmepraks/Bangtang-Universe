@@ -65,6 +65,56 @@ const STOP_WORDS = new Set<string>([
 
 const MIN_WORD_LENGTH = 3;
 
+/** Theme dictionary — maps theme labels to keyword/phrase patterns */
+const THEME_KEYWORDS: Record<string, string[]> = {
+  'Love': ['love', 'heart', 'kiss', 'darling', 'baby', 'sweetheart', 'romance', 'loved', 'loving', 'lover', 'adore'],
+  'Self-Love': ['myself', 'self', 'own way', 'who i am', 'love myself', 'my own', 'worth', 'enough', 'accept'],
+  'Youth': ['young', 'youth', 'teenage', 'school', 'grow', 'growing', 'young forever', 'adolescent', 'twenties'],
+  'Dreams': ['dream', 'dreams', 'dreaming', 'ambition', 'goal', 'wish', 'aspire', 'achieve', 'success', 'make it'],
+  'Hardship': ['hard', 'pain', 'struggle', 'suffer', 'difficult', 'tough', 'burden', 'weight', 'pressure', 'stress', 'exhausted', 'tired'],
+  'Hope': ['hope', 'hopeful', 'tomorrow', 'future', 'bright', 'light', 'believe', 'faith', 'forward', 'someday'],
+  'Loneliness': ['alone', 'lonely', 'loneliness', 'empty', 'isolated', 'solitude', 'nobody', 'by myself', 'without you'],
+  'Anger': ['angry', 'anger', 'mad', 'rage', 'hate', 'fire', 'burn', 'furious', 'fight', 'war', 'destroy'],
+  'Freedom': ['free', 'freedom', 'fly', 'flying', 'wings', 'escape', 'break free', 'let go', 'liberate', 'run'],
+  'Loss': ['lost', 'lose', 'gone', 'miss', 'missing', 'farewell', 'goodbye', 'left', 'apart', 'separation', 'away'],
+  'Friendship': ['friend', 'friends', 'together', 'us', 'bond', 'brothers', 'side by side', 'crew', 'family'],
+  'Identity': ['who am i', 'identity', 'name', 'face', 'mask', 'real', 'fake', 'persona', 'true self', 'mirror'],
+  'Night': ['night', 'midnight', 'dark', 'darkness', 'moon', 'moonlight', 'stars', 'shadow', 'dawn'],
+  'Resilience': ['strong', 'strength', 'overcome', 'rise', 'stand up', 'keep going', 'never give up', 'survive', 'endure', 'persist'],
+  'Happiness': ['happy', 'happiness', 'joy', 'smile', 'laugh', 'fun', 'paradise', 'heaven', 'euphoria', 'bliss'],
+  'Nostalgia': ['remember', 'memory', 'memories', 'past', 'old days', 'used to', 'back then', 'childhood', 'those days'],
+  'Heartbreak': ['break', 'broken', 'cry', 'crying', 'tears', 'hurt', 'wound', 'scar', 'shatter', 'torn'],
+  'Desire': ['want', 'need', 'desire', 'crave', 'hunger', 'thirst', 'temptation', 'obsess', 'addicted'],
+  'Society': ['society', 'world', 'system', 'money', 'rich', 'poor', 'class', 'judge', 'standard', 'generation'],
+  'Time': ['time', 'moment', 'forever', 'eternal', 'clock', 'season', 'year', 'day', 'hour', 'wait', 'passing'],
+};
+
+/** Positive/negative word lists for basic sentiment scoring */
+const POSITIVE_WORDS = new Set([
+  'love', 'happy', 'happiness', 'joy', 'beautiful', 'smile', 'laugh', 'hope',
+  'dream', 'light', 'bright', 'shine', 'wonderful', 'amazing', 'paradise',
+  'heaven', 'free', 'freedom', 'fly', 'wings', 'together', 'forever',
+  'warm', 'sweet', 'magic', 'star', 'sun', 'sunrise', 'golden',
+  'celebrate', 'dance', 'party', 'fun', 'best', 'perfect', 'blessing',
+  'trust', 'faith', 'believe', 'peace', 'calm', 'gentle', 'kind',
+  'strong', 'brave', 'courage', 'inspire', 'alive', 'good', 'great',
+  'thank', 'grateful', 'proud', 'rise', 'bloom', 'blossom', 'spring',
+  'euphoria', 'bliss', 'treasure', 'precious', 'dear', 'adore',
+]);
+
+const NEGATIVE_WORDS = new Set([
+  'hate', 'pain', 'hurt', 'cry', 'tears', 'sad', 'lonely', 'alone',
+  'dark', 'darkness', 'shadow', 'lost', 'lose', 'broken', 'break',
+  'angry', 'anger', 'rage', 'fear', 'scared', 'afraid', 'die', 'death',
+  'kill', 'destroy', 'war', 'fight', 'blood', 'wound', 'scar',
+  'empty', 'nothing', 'never', 'gone', 'goodbye', 'farewell', 'end',
+  'fall', 'falling', 'drown', 'suffocate', 'trapped', 'prison', 'cage',
+  'cold', 'frozen', 'burn', 'fire', 'hell', 'devil', 'fake', 'lie',
+  'betray', 'abandon', 'forget', 'blame', 'guilt', 'regret', 'sorry',
+  'exhausted', 'tired', 'weak', 'helpless', 'hopeless', 'desperate',
+  'nightmare', 'suffer', 'misery', 'cruel', 'bitter', 'toxic', 'sick',
+]);
+
 // ==================== Helpers ====================
 
 /**
@@ -78,6 +128,41 @@ function tokenize(text: string): string[] {
     .split(/\s+/)
     .map((w) => w.replace(/^['-]+|['-]+$/g, ''))
     .filter((w) => w.length >= MIN_WORD_LENGTH && !STOP_WORDS.has(w));
+}
+
+/**
+ * Extract themes from lyrics text using keyword matching.
+ * Returns array of matched theme names for a single song.
+ */
+export function extractThemes(text: string): string[] {
+  const lower = text.toLowerCase();
+  const matched: string[] = [];
+  for (const [theme, keywords] of Object.entries(THEME_KEYWORDS)) {
+    for (const kw of keywords) {
+      if (lower.includes(kw)) {
+        matched.push(theme);
+        break;
+      }
+    }
+  }
+  return matched;
+}
+
+/**
+ * Compute a simple sentiment score from English lyrics text.
+ * Returns a value roughly in [-1, 1] range.
+ */
+function computeSentiment(text: string): number {
+  const words = text.toLowerCase().replace(/[^a-z'\s-]/g, ' ').split(/\s+/);
+  let positive = 0;
+  let negative = 0;
+  for (const w of words) {
+    if (POSITIVE_WORDS.has(w)) positive++;
+    if (NEGATIVE_WORDS.has(w)) negative++;
+  }
+  const total = positive + negative;
+  if (total === 0) return 0;
+  return (positive - negative) / total;
 }
 
 // ==================== Implementation ====================
@@ -94,11 +179,20 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
     let total = 0;
 
     for (const entry of lyrics) {
-      if (!entry.themes) continue;
-      for (const theme of entry.themes) {
-        const normalized = theme.trim().toLowerCase();
+      // Use DB themes if available, otherwise extract from lyrics text
+      const themes = entry.themes && entry.themes.length > 0
+        ? entry.themes
+        : entry.lyrics_english
+          ? extractThemes(entry.lyrics_english)
+          : null;
+
+      if (!themes) continue;
+      for (const theme of themes) {
+        const normalized = theme.trim();
         if (normalized.length === 0) continue;
-        counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
+        // Capitalize first letter for display consistency
+        const display = normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase();
+        counts.set(display, (counts.get(display) ?? 0) + 1);
         total += 1;
       }
     }
@@ -169,7 +263,11 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
     const points: (SentimentArcPoint & { releaseDate: string })[] = [];
 
     for (const entry of lyrics) {
-      if (entry.sentiment_score == null) continue;
+      // Use DB score if available, otherwise compute from lyrics text
+      const score = entry.sentiment_score ?? (
+        entry.lyrics_english ? computeSentiment(entry.lyrics_english) : null
+      );
+      if (score == null) continue;
 
       const song = songMap.get(entry.song_id);
       if (!song || song.album_id == null) continue;
@@ -180,7 +278,7 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
       points.push({
         songTitle: song.title,
         songId: song.id,
-        sentimentScore: entry.sentiment_score,
+        sentimentScore: score,
         albumTitle: album.title,
         era: album.era ?? 'Unknown',
         releaseDate: album.release_date,

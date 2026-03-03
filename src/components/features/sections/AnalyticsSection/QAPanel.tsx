@@ -126,8 +126,23 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
             );
           })()}
 
+          {/* Suggestion Buttons (low confidence / fallback) */}
+          {answer.confidence < 0.2 && answer.data && answer.data.length > 0 && 'suggestion' in answer.data[0] && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {answer.data.map((row, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSuggestionClick(String(row.suggestion))}
+                  className="px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-full text-xs text-purple-400 hover:text-purple-300 hover:bg-white/[0.06] cursor-pointer transition-all"
+                >
+                  {String(row.suggestion)}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Ranking / List Table */}
-          {(answer.type === 'ranking' || answer.type === 'list') && answer.data && answer.data.length > 0 && (
+          {(answer.type === 'ranking' || answer.type === 'list') && answer.confidence >= 0.2 && answer.data && answer.data.length > 0 && (
             <div className="overflow-x-auto mt-4">
               <table className="w-full text-sm text-left">
                 <thead>

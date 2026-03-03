@@ -39,29 +39,71 @@ export interface QAProvider {
 // ==================== HELPERS ====================
 
 /**
- * Finds a member whose stage_name contains the given query
- * (case-insensitive partial match).
+ * Finds a member by stage_name or full_name.
+ * Checks exact match, then word-boundary partial match.
  */
 function findMember(query: string, members: Member[]): Member | undefined {
   const q = query.toLowerCase().trim();
-  // Prefer exact match first, then partial
-  return (
-    members.find((m) => m.stage_name.toLowerCase() === q) ??
-    members.find((m) => m.stage_name.toLowerCase().includes(q))
-  );
+
+  // 1. Exact stage_name match
+  const exact = members.find((m) => m.stage_name.toLowerCase() === q);
+  if (exact) return exact;
+
+  // 2. Exact full_name match
+  const exactFull = members.find((m) => m.full_name?.toLowerCase() === q);
+  if (exactFull) return exactFull;
+
+  // 3. Stage name contained in query (word boundary: "who is rm" contains "rm")
+  const stageInQuery = members.find((m) => {
+    const name = m.stage_name.toLowerCase();
+    const regex = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    return regex.test(q);
+  });
+  if (stageInQuery) return stageInQuery;
+
+  // 4. Full name contained in query ("who is kim namjoon" contains "kim namjoon")
+  const fullInQuery = members.find((m) => {
+    if (!m.full_name) return false;
+    return q.includes(m.full_name.toLowerCase());
+  });
+  if (fullInQuery) return fullInQuery;
+
+  // 5. Partial full_name match (first or last name)
+  const partialFull = members.find((m) => {
+    if (!m.full_name) return false;
+    const parts = m.full_name.toLowerCase().split(/\s+/);
+    return parts.some((part) => part.length >= 3 && q.includes(part));
+  });
+  if (partialFull) return partialFull;
+
+  return undefined;
 }
 
 /**
- * Finds a song whose title contains the given query
- * (case-insensitive partial / fuzzy match).
+ * Finds a song whose title matches the query.
+ * Avoids false positives from very short titles (e.g. "ON") matching inside words.
  */
 function findSong(query: string, songs: Song[]): Song | undefined {
   const q = query.toLowerCase().trim();
-  return (
-    songs.find((s) => s.title.toLowerCase() === q) ??
-    songs.find((s) => s.title.toLowerCase().includes(q)) ??
-    songs.find((s) => q.includes(s.title.toLowerCase()))
-  );
+
+  // 1. Exact title match
+  const exact = songs.find((s) => s.title.toLowerCase() === q);
+  if (exact) return exact;
+
+  // 2. Title contains query
+  const titleContains = songs.find((s) => s.title.toLowerCase().includes(q));
+  if (titleContains) return titleContains;
+
+  // 3. Query contains title — but only if the title is 4+ chars or matches as a whole word
+  const queryContains = songs.find((s) => {
+    const title = s.title.toLowerCase();
+    if (!q.includes(title)) return false;
+    if (title.length >= 4) return true;
+    // For short titles (1-3 chars), require word boundary match
+    const regex = new RegExp(`\\b${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+    return regex.test(q);
+  });
+  return queryContains;
 }
 
 /**
@@ -78,6 +120,20 @@ function albumForSong(song: Song, albums: Album[]): Album | undefined {
 function fmt(value: number | null, digits = 2): string {
   if (value === null) return 'N/A';
   return value.toFixed(digits);
+}
+
+/**
+ * Computes age from a birth date string (YYYY-MM-DD).
+ */
+function getAge(birthDate: string): number {
+  const birth = new Date(birthDate);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
 }
 
 // ==================== RULE-BASED QA ====================
@@ -163,10 +219,17 @@ class RuleBasedQA implements QAProvider {
       return this.handleAlbumCount(albums);
     }
 
-    // ---- 15. About [member] / tell me about ----
-    if (/(?:about|tell me about)\s+(.+)/i.test(q)) {
-      const match = q.match(/(?:about|tell me about)\s+(.+)/i)!;
-      return this.handleAboutMember(match[1].trim(), members);
+    // ---- 15. Who is / about [member] / tell me about ----
+    if (/(?:who(?:'s| is)|about|tell me about)\s+(.+)/i.test(q)) {
+      const match = q.match(/(?:who(?:'s| is)|about|tell me about)\s+(.+)/i)!;
+      const member = findMember(match[1].trim(), members);
+      if (member) return this.handleAboutMember(member.stage_name, members);
+    }
+
+    // ---- 15b. When was [member] born / how old is [member] / [member] birthday ----
+    if (/(?:when was|how old|birthday|birth date|born)\b/i.test(q)) {
+      const member = findMember(q, members);
+      if (member) return this.handleMemberBirthday(member);
     }
 
     // ---- 16. How many awards / total awards ----
@@ -225,6 +288,44 @@ class RuleBasedQA implements QAProvider {
     // ---- 25. Enlistment / military / service ----
     if (/enlist|military|service/i.test(q)) {
       return this.handleEnlistment(context);
+    }
+
+    // ---- Keyword-based fallback: match single words / short queries to relevant topics ----
+    if (/\bconcert|perform|tour|show|live\b/i.test(q)) {
+      return this.handleConcertCount(context);
+    }
+    if (/\baward|prize|win|won|trophy|grammy|billboard music|ama|mama\b/i.test(q)) {
+      return this.handleAwardCount(context);
+    }
+    if (/\bchart|billboard|hot\s?100|ranking|peak\b/i.test(q)) {
+      return this.handleChartEntries(context);
+    }
+    if (/\bsong|track|music|discograph/i.test(q)) {
+      return this.handleSongCount(context.songs);
+    }
+    if (/\balbum/i.test(q)) {
+      return this.handleAlbumCount(context.albums);
+    }
+    if (/\bmember|lineup|group|bangtan/i.test(q)) {
+      return this.handleMemberOverview(context.members);
+    }
+    if (/\bcollab/i.test(q)) {
+      return this.handleCollaborations(context);
+    }
+    if (/\benlist|military|army|service|discharge/i.test(q)) {
+      return this.handleEnlistment(context);
+    }
+
+    // Check if query contains a member name
+    const memberMatch = findMember(q, context.members);
+    if (memberMatch) {
+      return this.handleAboutMember(memberMatch.stage_name, context.members);
+    }
+
+    // Check if query contains a song title
+    const songMatch = findSong(q, context.songs);
+    if (songMatch) {
+      return this.handleSongInfo(songMatch, context.songs, context.albums);
     }
 
     // ---- Fallback ----
@@ -561,23 +662,44 @@ class RuleBasedQA implements QAProvider {
       };
     }
 
+    const bio = member.bio ? ` ${member.bio}` : '';
+    const age = member.birth_date ? ` (${getAge(member.birth_date)} years old)` : '';
+
     return {
-      text: `${member.stage_name}${member.full_name ? ` (${member.full_name})` : ''}`,
+      text: `${member.stage_name}${member.full_name ? ` (${member.full_name})` : ''} — ${member.role ?? 'Member'}.${age}${bio}`,
       data: [
-        {
-          stageName: member.stage_name,
-          fullName: member.full_name ?? 'N/A',
-          role: member.role ?? 'N/A',
-          komcaCredits: member.komca_credits,
-          writerCredits: member.writer_credits,
-          producerCredits: member.producer_credits,
-          birthDate: member.birth_date ?? 'N/A',
-          birthPlace: member.birth_place ?? 'N/A',
-          mbti: member.mbti ?? 'N/A',
-          zodiac: member.zodiac ?? 'N/A',
-        },
+        { stat: 'Role', value: member.role ?? 'N/A' },
+        { stat: 'Birth Date', value: member.birth_date ?? 'N/A' },
+        { stat: 'Birth Place', value: member.birth_place ?? 'N/A' },
+        { stat: 'MBTI', value: member.mbti ?? 'N/A' },
+        { stat: 'KOMCA Credits', value: member.komca_credits },
+        { stat: 'Writer Credits', value: member.writer_credits },
+        { stat: 'Producer Credits', value: member.producer_credits },
+        { stat: 'Zodiac', value: member.zodiac ?? 'N/A' },
       ],
-      type: 'text',
+      type: 'stat',
+      confidence: 0.95,
+    };
+  }
+
+  private handleMemberBirthday(member: Member): QAResponse {
+    if (!member.birth_date) {
+      return {
+        text: `Birth date not available for ${member.stage_name}.`,
+        type: 'text',
+        confidence: 0.5,
+      };
+    }
+    const age = getAge(member.birth_date);
+    return {
+      text: `${member.stage_name} was born on ${member.birth_date}${member.birth_place ? ` in ${member.birth_place}` : ''}. He is currently ${age} years old.`,
+      data: [
+        { stat: 'Birth Date', value: member.birth_date },
+        { stat: 'Age', value: age },
+        { stat: 'Birth Place', value: member.birth_place ?? 'N/A' },
+        { stat: 'Zodiac', value: member.zodiac ?? 'N/A' },
+      ],
+      type: 'stat',
       confidence: 0.95,
     };
   }
@@ -865,6 +987,39 @@ class RuleBasedQA implements QAProvider {
       }),
       type: 'list',
       confidence: 0.9,
+    };
+  }
+
+  private handleMemberOverview(members: Member[]): QAResponse {
+    if (members.length === 0) {
+      return { text: 'No member data available.', type: 'text', confidence: 0.5 };
+    }
+    return {
+      text: `BTS has ${members.length} members:`,
+      data: members.map((m) => ({
+        name: m.stage_name,
+        role: m.role ?? 'N/A',
+        writerCredits: m.writer_credits,
+        komcaCredits: m.komca_credits,
+      })),
+      type: 'list',
+      confidence: 0.85,
+    };
+  }
+
+  private handleSongInfo(song: Song, _songs: Song[], albums: Album[]): QAResponse {
+    const album = albumForSong(song, albums);
+    return {
+      text: `"${song.title}" ${album ? `from ${album.title} (${album.era ?? 'Unknown'} era)` : ''}`,
+      data: [
+        { stat: 'Energy', value: fmt(song.energy) },
+        { stat: 'Valence', value: fmt(song.valence) },
+        { stat: 'Danceability', value: fmt(song.danceability) },
+        { stat: 'BPM', value: fmt(song.bpm, 0) },
+        { stat: 'Title Track', value: song.is_title_track ? 'Yes' : 'No' },
+      ],
+      type: 'stat',
+      confidence: 0.8,
     };
   }
 
