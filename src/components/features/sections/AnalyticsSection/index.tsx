@@ -1,5 +1,5 @@
-import { useState, Suspense, lazy } from 'react';
-import { BarChart3, TrendingUp, Network, Heart, Sparkles, MessageSquare, BookOpen, Trophy, Calendar } from 'lucide-react';
+import { useState, Suspense, lazy, useMemo } from 'react';
+import { BarChart3, TrendingUp, Network, Heart, Sparkles, MessageSquare, BookOpen, Trophy, Calendar, Beaker, Users, Compass } from 'lucide-react';
 import type { Song, Album, Member, Lyrics, Award, ChartEntry, Concert, MemberEvent } from '../../../../types/database';
 import SectionIntro from '../../../ui/SectionIntro';
 import GlossaryTip from '../../../ui/GlossaryTip';
@@ -25,12 +25,20 @@ interface AnalyticsSectionProps {
   memberEvents?: MemberEvent[];
 }
 
+type GroupId = 'music' | 'career' | 'explore';
+
 interface TabDef {
   id: string;
   label: string;
   icon: React.ElementType;
-  group: 'music' | 'career' | 'explore';
+  group: GroupId;
 }
+
+const GROUPS: { id: GroupId; label: string; icon: React.ElementType; description: string }[] = [
+  { id: 'music', label: 'Music Science', icon: Beaker, description: 'Audio features, eras & emotional analysis' },
+  { id: 'career', label: 'Credits & Career', icon: Users, description: 'Writing credits, awards & milestones' },
+  { id: 'explore', label: 'Explore', icon: Compass, description: 'Recommendations, Q&A & lyrics search' },
+];
 
 const TABS: TabDef[] = [
   { id: 'audio', label: 'Audio Features', icon: BarChart3, group: 'music' },
@@ -44,14 +52,18 @@ const TABS: TabDef[] = [
   { id: 'lyrics', label: 'Lyrics', icon: BookOpen, group: 'explore' },
 ];
 
-const GROUP_LABELS: Record<string, string> = {
-  music: 'Music Science',
-  career: 'Credits & Career',
-  explore: 'Explore',
-};
-
 export default function AnalyticsSection({ songs, albums, members, lyrics, awards, chartEntries, concerts, memberEvents }: AnalyticsSectionProps) {
+  const [activeGroup, setActiveGroup] = useState<GroupId>('music');
   const [activeTab, setActiveTab] = useState<string>('audio');
+
+  const groupTabs = useMemo(() => TABS.filter(t => t.group === activeGroup), [activeGroup]);
+
+  const handleGroupChange = (group: GroupId) => {
+    setActiveGroup(group);
+    // Switch to first tab of the new group
+    const firstTab = TABS.find(t => t.group === group);
+    if (firstTab) setActiveTab(firstTab.id);
+  };
 
   const renderPanel = () => {
     switch (activeTab) {
@@ -78,47 +90,8 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
     }
   };
 
-  // Build grouped tab bar with dividers
-  let lastGroup = '';
-  const tabElements: React.ReactNode[] = [];
-  for (const tab of TABS) {
-    if (tab.group !== lastGroup) {
-      if (lastGroup !== '') {
-        tabElements.push(
-          <span key={`div-${tab.group}`} className="w-px h-5 bg-white/[0.08] mx-1 shrink-0" />,
-        );
-      }
-      tabElements.push(
-        <span key={`lbl-${tab.group}`} className="text-[9px] text-white/25 uppercase tracking-widest font-medium px-1 shrink-0 hidden md:inline">
-          {GROUP_LABELS[tab.group]}
-        </span>,
-      );
-      lastGroup = tab.group;
-    }
-    const Icon = tab.icon;
-    const isActive = activeTab === tab.id;
-    tabElements.push(
-      <button
-        key={tab.id}
-        id={`analytics-tab-${tab.id}`}
-        role="tab"
-        aria-selected={isActive}
-        aria-controls="analytics-tabpanel"
-        onClick={() => setActiveTab(tab.id)}
-        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 shrink-0 ${
-          isActive
-            ? 'bg-purple-500/10 text-white border border-purple-500/30'
-            : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
-        }`}
-      >
-        <Icon className="w-4 h-4" aria-hidden="true" />
-        <span className="whitespace-nowrap">{tab.label}</span>
-      </button>,
-    );
-  }
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <SectionIntro
         description={
           <>
@@ -130,12 +103,63 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
         }
       />
 
-      <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex items-center gap-2" role="tablist" aria-label="Analytics views">
-          {tabElements}
-        </div>
+      {/* Row 1: Group selector */}
+      <div className="grid grid-cols-3 gap-2">
+        {GROUPS.map((group) => {
+          const Icon = group.icon;
+          const isActive = activeGroup === group.id;
+          return (
+            <button
+              key={group.id}
+              type="button"
+              onClick={() => handleGroupChange(group.id)}
+              className={`flex flex-col items-start gap-1 px-4 py-3 rounded-xl text-left transition-all duration-200 border ${
+                isActive
+                  ? 'bg-purple-500/8 border-purple-500/25 shadow-[inset_0_1px_0_0_rgba(168,85,247,0.1)]'
+                  : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.10]'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-purple-400' : 'text-white/35'}`} />
+                <span className={`text-xs font-semibold tracking-wide ${isActive ? 'text-white/90' : 'text-white/50'}`}>
+                  {group.label}
+                </span>
+              </div>
+              <span className="text-[10px] text-white/30 leading-tight hidden sm:block">
+                {group.description}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
+      {/* Row 2: Sub-tabs for active group */}
+      <div className="flex items-center gap-1.5" role="tablist" aria-label="Analytics views">
+        {groupTabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              id={`analytics-tab-${tab.id}`}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls="analytics-tabpanel"
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                isActive
+                  ? 'bg-purple-500/10 text-white border border-purple-500/30'
+                  : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
+              }`}
+            >
+              <Icon className="w-4 h-4" aria-hidden="true" />
+              <span className="whitespace-nowrap">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Panel */}
       <div
         id="analytics-tabpanel"
         role="tabpanel"
