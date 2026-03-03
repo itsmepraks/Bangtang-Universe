@@ -93,17 +93,17 @@ export default function MediaTimeline({ media, members }: MediaTimelineProps) {
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2 mb-1.5">
                                                         <Icon size={14} className={config.color} />
-                                                        <span className={`text-[11px] font-medium ${config.color} opacity-80`}>{config.label}</span>
+                                                        <span className={`text-xs font-medium ${config.color} opacity-80`}>{config.label}</span>
                                                         {item.platform && (
                                                             <>
                                                                 <span className="text-white/15">·</span>
-                                                                <span className="text-[11px] text-white/30">{item.platform}</span>
+                                                                <span className="text-xs text-white/30">{item.platform}</span>
                                                             </>
                                                         )}
                                                     </div>
-                                                    <h3 className="text-sm font-semibold text-white leading-snug">{item.title}</h3>
+                                                    <h3 className="text-sm font-semibold text-white mb-1 leading-snug">{item.title}</h3>
                                                     {item.description && (
-                                                        <p className="text-xs text-white/35 mt-1 line-clamp-1">{item.description}</p>
+                                                        <p className="text-xs text-white/40 mt-1 line-clamp-1">{item.description}</p>
                                                     )}
                                                 </div>
 
@@ -111,15 +111,15 @@ export default function MediaTimeline({ media, members }: MediaTimelineProps) {
                                                     {month && (
                                                         <span className="text-[11px] text-white/40 font-mono">{month}</span>
                                                     )}
-                                                    <div className="flex items-center gap-1.5 text-[10px] text-white/25">
-                                                        {item.seasons > 1 && <span>{item.seasons}S</span>}
-                                                        {item.episodes && <span>{item.episodes}ep</span>}
+                                                    <div className="flex items-center gap-1.5 text-[10px] text-white/30">
+                                                        {item.seasons > 1 && <span>{item.seasons} seasons</span>}
+                                                        {item.episodes && <span>{item.episodes} eps</span>}
                                                     </div>
                                                 </div>
                                             </div>
 
                                             {memberNames && memberNames.length > 0 && (
-                                                <div className="flex items-center gap-1.5 mt-2.5">
+                                                <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-white/[0.04]">
                                                     {memberNames.map(member => member && (
                                                         <span
                                                             key={member.id}

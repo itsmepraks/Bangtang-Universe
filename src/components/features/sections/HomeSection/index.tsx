@@ -246,30 +246,28 @@ export default function HomeSection({
           ]}
           onExplore={() => onNavigate('members')}
         >
-          <ResponsiveContainer width="100%" height={196}>
-            <BarChart
-              data={memberChartData}
-              layout="vertical"
-              margin={{ top: 0, right: 8, bottom: 0, left: 8 }}
-            >
-              <XAxis type="number" tick={false} axisLine={false} tickLine={false} />
-              <YAxis
-                type="category"
-                dataKey="name"
-                tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.5)' }}
-                tickLine={false}
-                axisLine={false}
-                width={50}
-                interval={0}
-              />
-              <Tooltip {...CHART_STYLES.TOOLTIP} />
-              <Bar dataKey="value" radius={[0, 3, 3, 0]} isAnimationActive={false} name="KOMCA">
-                {memberChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.85} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="space-y-2.5">
+            {memberChartData.map((member) => (
+              <div key={member.name} className="flex items-center gap-2.5">
+                <span className="text-[10px] text-white/50 w-[46px] text-right shrink-0 font-medium">
+                  {member.name}
+                </span>
+                <div className="flex-1 h-2 bg-white/[0.06] rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${(member.value / (memberChartData[0]?.value || 1)) * 100}%`,
+                      backgroundColor: member.color,
+                      opacity: 0.8,
+                    }}
+                  />
+                </div>
+                <span className="text-[10px] text-white/30 w-7 text-right tabular-nums shrink-0">
+                  {member.value}
+                </span>
+              </div>
+            ))}
+          </div>
         </BentoCard>
 
         {/* MOOD QUADRANT — col 3, rows 1+2 (tall) */}

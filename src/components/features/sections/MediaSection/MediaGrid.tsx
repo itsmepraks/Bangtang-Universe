@@ -69,7 +69,7 @@ export default function MediaGrid({ media, members }: MediaGridProps) {
                         )}
 
                         <div className="flex items-center justify-between text-xs text-white/30">
-                            <span>{item.platform}</span>
+                            {item.platform && <span>{item.platform}</span>}
                             <div className="flex items-center gap-2">
                                 {item.seasons > 1 && <span>{item.seasons} seasons</span>}
                                 {item.episodes && <span>{item.episodes} eps</span>}
