@@ -88,6 +88,36 @@ export const CITY_COORDS: Record<string, [number, number]> = {
   "Buenos Aires, Argentina": [-58.382, -34.604],
   "Mexico City, Mexico": [-99.133, 19.433],
   "Bogotá, Colombia": [-74.072, 4.711],
+
+  // Japan (auto-generated)
+  "Kobe, Japan": [135.114, 34.412],
+  "Chiba, Japan": [140.622, 35.362],
+  "Yokohama, Japan": [139.65, 35.45],
+  "Choufu, Japan": [139.322, 35.392],
+  "Hiroshima, Japan": [132.45, 34.4],
+  "Sapporo, Japan": [141.211, 43.343],
+  "Fukuroi, Japan": [137.917, 34.75],
+
+  // Hong Kong SAR China (auto-generated)
+  "Islands District, Hong Kong SAR China": [114.067, 22.45],
+
+  // Philippines (auto-generated)
+  "Pasay City, Philippines": [121, 14.55],
+
+  // South Korea (auto-generated)
+  "Gangneung, South Korea": [128.872, 37.753],
+  "Goyang-si, South Korea": [126.835, 37.656],
+  "Incheon, South Korea": [126.732, 37.454],
+
+  // United States (auto-generated)
+  "Grand Prairie, United States": [-96.998, 32.746],
+  "Rosemont, United States": [-87.885, 41.995],
+
+  // Indonesia (auto-generated)
+  "Tangerang, Indonesia": [106.63, -6.178],
+
+  // France (auto-generated)
+  "Saint-Denis, France": [2.367, 48.933],
 };
 
 /**
@@ -122,6 +152,9 @@ export const COUNTRY_CENTROIDS: Record<string, [number, number]> = {
   "Argentina": [-63.617, -38.416],
   "Mexico": [-102.553, 23.634],
   "Colombia": [-74.297, 4.571],
+
+  // Auto-generated
+  "Hong Kong SAR China": [114.067, 22.45],
 };
 
 /**

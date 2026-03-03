@@ -366,7 +366,7 @@ async function upsertConcerts(concerts: MergedConcert[]): Promise<void> {
         // Check for existing entry by (date, venue)
         const { data: existing } = await supabase
             .from('concerts')
-            .select('id, setlist, attendance, lat, lng')
+            .select('id, setlist, attendance')
             .eq('date', concert.date)
             .eq('venue', concert.venue)
             .limit(1);
@@ -382,13 +382,6 @@ async function upsertConcerts(concerts: MergedConcert[]): Promise<void> {
             // Add attendance if the existing row doesn't have one
             if (row.attendance == null && concert.attendance != null) {
                 updates.attendance = concert.attendance;
-            }
-            // Add coordinates if the existing row doesn't have them
-            if (row.lat == null && concert.lat != null) {
-                updates.lat = concert.lat;
-            }
-            if (row.lng == null && concert.lng != null) {
-                updates.lng = concert.lng;
             }
 
             if (Object.keys(updates).length > 0) {
@@ -409,7 +402,7 @@ async function upsertConcerts(concerts: MergedConcert[]): Promise<void> {
             continue;
         }
 
-        // Insert new concert
+        // Insert new concert (lat/lng stored in local cache only, not in DB)
         const { error } = await supabase.from('concerts').insert({
             tour_name: concert.tour_name,
             venue: concert.venue,
@@ -419,8 +412,6 @@ async function upsertConcerts(concerts: MergedConcert[]): Promise<void> {
             attendance: concert.attendance,
             setlist: concert.setlist,
             notes: concert.notes,
-            lat: concert.lat,
-            lng: concert.lng,
         });
 
         if (error) {

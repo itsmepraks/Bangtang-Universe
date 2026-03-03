@@ -12,9 +12,12 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 // ==================== PATHS ====================
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '..');
 const CACHE_DIR = path.join(ROOT, 'scripts', 'cache');
 const CITY_COORDS_PATH = path.join(ROOT, 'src', 'data', 'cityCoords.ts');
