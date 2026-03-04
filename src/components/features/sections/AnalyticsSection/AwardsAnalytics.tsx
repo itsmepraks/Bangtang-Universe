@@ -139,10 +139,13 @@ export default function AwardsAnalytics({ awards, chartEntries, songs }: AwardsA
                 <CartesianGrid {...CHART_STYLES.GRID} />
                 <XAxis type="number" tick={CHART_STYLES.AXIS} allowDecimals={false} />
                 <YAxis
-                  type="category"
                   dataKey="ceremony"
-                  tick={CHART_STYLES.AXIS}
-                  width={160}
+                  type="category"
+                  width={130}
+                  tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.5)' }}
+                  tickFormatter={(val: string) => val.length > 20 ? val.slice(0, 20) + '\u2026' : val}
+                  tickLine={false}
+                  axisLine={false}
                 />
                 <Tooltip
                   contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
@@ -185,13 +188,13 @@ export default function AwardsAnalytics({ awards, chartEntries, songs }: AwardsA
         <div>
           <h3 className="text-sm font-semibold text-white/70 mb-4">Top Chart Positions</h3>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
+            <table className="w-full min-w-[480px] text-sm text-left">
               <thead>
                 <tr className="border-b border-white/[0.06]">
-                  <th className="py-2 px-3 text-xs font-medium text-white/40 uppercase tracking-wider">Peak</th>
-                  <th className="py-2 px-3 text-xs font-medium text-white/40 uppercase tracking-wider">Song</th>
-                  <th className="py-2 px-3 text-xs font-medium text-white/40 uppercase tracking-wider">Chart</th>
-                  <th className="py-2 px-3 text-xs font-medium text-white/40 uppercase tracking-wider">Weeks</th>
+                  <th className="py-2 px-3 w-10 text-xs font-medium text-white/40 uppercase tracking-wider">Peak</th>
+                  <th className="py-2 px-3 min-w-[140px] text-xs font-medium text-white/40 uppercase tracking-wider">Song</th>
+                  <th className="py-2 px-3 min-w-[100px] text-xs font-medium text-white/40 uppercase tracking-wider">Chart</th>
+                  <th className="py-2 px-3 w-14 text-xs font-medium text-white/40 uppercase tracking-wider">Weeks</th>
                   <th className="py-2 px-3 text-xs font-medium text-white/40 uppercase tracking-wider">Cert.</th>
                 </tr>
               </thead>
