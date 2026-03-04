@@ -92,12 +92,12 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
       </div>
 
       {/* Suggested Questions */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
         {SUGGESTED_QUESTIONS.map((sq) => (
           <button
             key={sq}
             onClick={() => handleSuggestionClick(sq)}
-            className="px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-full text-xs text-white/50 hover:text-white/70 hover:bg-white/[0.06] cursor-pointer transition-all"
+            className="flex-shrink-0 whitespace-nowrap px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-full text-xs text-white/50 hover:text-white/70 hover:bg-white/[0.06] cursor-pointer transition-all"
           >
             <Sparkles className="w-3 h-3 inline-block mr-1 opacity-50" />
             {sq}
@@ -128,12 +128,12 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
 
           {/* Suggestion Buttons (low confidence / fallback) */}
           {answer.confidence < 0.2 && answer.data && answer.data.length > 0 && 'suggestion' in answer.data[0] && (
-            <div className="flex flex-wrap gap-2 mt-3">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 mt-3">
               {answer.data.map((row, i) => (
                 <button
                   key={i}
                   onClick={() => handleSuggestionClick(String(row.suggestion))}
-                  className="px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-full text-xs text-purple-400 hover:text-purple-300 hover:bg-white/[0.06] cursor-pointer transition-all"
+                  className="flex-shrink-0 whitespace-nowrap px-3 py-1.5 bg-white/[0.03] border border-white/[0.06] rounded-full text-xs text-purple-400 hover:text-purple-300 hover:bg-white/[0.06] cursor-pointer transition-all"
                 >
                   {String(row.suggestion)}
                 </button>
@@ -143,8 +143,8 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
 
           {/* Ranking / List Table */}
           {(answer.type === 'ranking' || answer.type === 'list') && answer.confidence >= 0.2 && answer.data && answer.data.length > 0 && (
-            <div className="overflow-x-auto mt-4">
-              <table className="w-full text-sm text-left">
+            <div className="overflow-x-auto rounded-xl border border-white/[0.06] mt-4">
+              <table className="min-w-[360px] w-full text-sm text-left">
                 <thead>
                   <tr className="border-b border-white/[0.06]">
                     {Object.keys(answer.data[0]).map((key) => (
@@ -174,7 +174,7 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
 
           {/* Stat Display */}
           {answer.type === 'stat' && answer.data && answer.data.length > 0 && (
-            <div className="flex flex-wrap gap-4 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
               {answer.data.map((item, i) => (
                 <div
                   key={i}
