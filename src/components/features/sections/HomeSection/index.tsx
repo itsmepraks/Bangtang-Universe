@@ -281,7 +281,7 @@ export default function HomeSection({
           className="lg:row-span-2 lg:col-span-1"
         >
           {/* Quadrant axis labels overlaid on the chart */}
-          <div className="relative h-full">
+          <div className="relative h-full min-h-[280px]">
             <span className="absolute top-0 inset-x-0 text-center text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
               Energetic ↑
             </span>
