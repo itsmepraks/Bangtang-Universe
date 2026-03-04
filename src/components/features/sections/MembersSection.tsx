@@ -196,7 +196,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
       </div>
 
       {/* ── Tab Navigation ── */}
-      <div className="flex gap-1 mb-6 p-1 rounded-xl bg-white/[0.02] border border-white/[0.06] w-fit">
+      <div className="flex gap-1 mb-6 p-1 rounded-xl bg-white/[0.02] border border-white/[0.06] overflow-x-auto scrollbar-hide w-full sm:w-fit">
         {TABS.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -204,7 +204,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 flex-shrink-0 ${
                 isActive
                   ? 'bg-white/[0.08] text-white shadow-sm'
                   : 'text-white/40 hover:text-white/70 hover:bg-white/[0.03]'

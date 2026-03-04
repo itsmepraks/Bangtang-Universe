@@ -62,7 +62,7 @@ export default function LyricsViewer({ song }: LyricsViewerProps) {
         if (lyricsKo) tabs.push({ value: 'korean', label: 'Korean' });
         if (lyricsEn) tabs.push({ value: 'english', label: 'English' });
         if (lyricsRom) tabs.push({ value: 'romanized', label: 'Romanized' });
-        if (lyricsKo && lyricsEn) tabs.push({ value: 'side-by-side', label: 'Side by Side' });
+        if (lyricsKo && lyricsEn) tabs.push({ value: 'side-by-side', label: 'Split' });
         return tabs;
     }, [lyricsKo, lyricsEn, lyricsRom]);
 
@@ -101,20 +101,22 @@ export default function LyricsViewer({ song }: LyricsViewerProps) {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <TabBar
-                    tabs={availableTabs}
-                    active={activeMode}
-                    onChange={(v) => setMode(v as LyricsMode)}
-                />
+            <div className="flex items-center justify-between gap-3 min-w-0">
+                <div className="overflow-x-auto scrollbar-hide flex-1 min-w-0">
+                  <TabBar
+                      tabs={availableTabs}
+                      active={activeMode}
+                      onChange={(v) => setMode(v as LyricsMode)}
+                  />
+                </div>
                 {lyrics?.genius_url && (
                     <a
                         href={lyrics.genius_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-purple-400/60 hover:text-purple-300 tracking-wide transition-colors"
+                        className="text-xs text-purple-400/60 hover:text-purple-300 tracking-wide transition-colors shrink-0"
                     >
-                        View on Genius
+                        Genius ↗
                     </a>
                 )}
             </div>

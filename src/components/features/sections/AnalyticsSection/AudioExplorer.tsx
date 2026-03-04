@@ -182,14 +182,14 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
         <h3 className="text-sm font-semibold text-white/70 mb-4">Audio Feature Distributions</h3>
 
         {/* Feature filter pills */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-0.5">
           {HISTOGRAM_FEATURES.map((feature) => {
             const isActive = feature === selectedFeature;
             return (
               <button
                 key={feature}
                 onClick={() => setSelectedFeature(feature)}
-                className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                className={`px-3 py-1.5 text-xs rounded-full border transition-colors flex-shrink-0 ${
                   isActive
                     ? 'bg-purple-500/15 text-white border-purple-500/30'
                     : 'bg-white/[0.03] text-white/50 border-white/[0.06] hover:text-white/70'
@@ -237,14 +237,14 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
         <h3 className="text-sm font-semibold text-white/70 mb-4">Song Rankings</h3>
 
         {/* Ranking category pills */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-0.5">
           {rankingCategories.map((category) => {
             const isActive = category === selectedRankingCategory;
             return (
               <button
                 key={category}
                 onClick={() => setSelectedRankingCategory(category)}
-                className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                className={`px-3 py-1.5 text-xs rounded-full border transition-colors flex-shrink-0 ${
                   isActive
                     ? 'bg-purple-500/15 text-white border-purple-500/30'
                     : 'bg-white/[0.03] text-white/50 border-white/[0.06] hover:text-white/70'

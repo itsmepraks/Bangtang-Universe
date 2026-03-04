@@ -34,10 +34,10 @@ interface TabDef {
   group: GroupId;
 }
 
-const GROUPS: { id: GroupId; label: string; icon: React.ElementType; description: string }[] = [
-  { id: 'music', label: 'Music Science', icon: Beaker, description: 'Audio features, eras & emotional analysis' },
-  { id: 'career', label: 'Credits & Career', icon: Users, description: 'Writing credits, awards & milestones' },
-  { id: 'explore', label: 'Explore', icon: Compass, description: 'Recommendations, Q&A & lyrics search' },
+const GROUPS: { id: GroupId; label: string; shortLabel: string; icon: React.ElementType; description: string }[] = [
+  { id: 'music', label: 'Music Science', shortLabel: 'Music', icon: Beaker, description: 'Audio features, eras & emotional analysis' },
+  { id: 'career', label: 'Credits & Career', shortLabel: 'Career', icon: Users, description: 'Writing credits, awards & milestones' },
+  { id: 'explore', label: 'Explore', shortLabel: 'Explore', icon: Compass, description: 'Recommendations, Q&A & lyrics search' },
 ];
 
 const TABS: TabDef[] = [
@@ -113,16 +113,17 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
               key={group.id}
               type="button"
               onClick={() => handleGroupChange(group.id)}
-              className={`flex flex-col items-start gap-1 px-4 py-3 rounded-xl text-left transition-all duration-200 border ${
+              className={`flex flex-col items-start gap-1 px-3 sm:px-4 py-3 rounded-xl text-left transition-all duration-200 border ${
                 isActive
                   ? 'bg-purple-500/8 border-purple-500/25 shadow-[inset_0_1px_0_0_rgba(168,85,247,0.1)]'
                   : 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.10]'
               }`}
             >
-              <div className="flex items-center gap-2">
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-purple-400' : 'text-white/35'}`} />
-                <span className={`text-xs font-semibold tracking-wide ${isActive ? 'text-white/90' : 'text-white/50'}`}>
-                  {group.label}
+              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-purple-400' : 'text-white/35'}`} />
+                <span className={`text-xs font-semibold tracking-wide truncate ${isActive ? 'text-white/90' : 'text-white/50'}`}>
+                  <span className="sm:hidden">{group.shortLabel}</span>
+                  <span className="hidden sm:inline">{group.label}</span>
                 </span>
               </div>
               <span className="text-[10px] text-white/30 leading-tight hidden sm:block">
