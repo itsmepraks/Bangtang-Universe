@@ -79,11 +79,17 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
             const val = e.target.value;
             setSelectedSongId(val ? Number(val) : null);
           }}
-          className="bg-[#111118] border border-white/[0.06] rounded-xl text-white text-sm p-3 w-full [&>option]:text-black"
+          className="w-full bg-[#0c0c12] border border-white/[0.10] rounded-xl text-sm text-white/80 px-4 py-3 cursor-pointer focus:outline-none focus:border-purple-500/40 appearance-none"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 14px center',
+            paddingRight: '36px',
+          }}
         >
-          <option value="">Select a song...</option>
+          <option value="" style={{ background: '#0c0c12' }}>Select a song...</option>
           {songs.map((song) => (
-            <option key={song.id} value={song.id}>
+            <option key={song.id} value={song.id} style={{ background: '#0c0c12' }}>
               {song.title}
             </option>
           ))}
@@ -113,11 +119,11 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
                 {Math.round(rec.similarity * 100)}% similar
               </p>
               {rec.reasons.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-3">
+                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide mt-2 pb-0.5">
                   {rec.reasons.map((reason, idx) => (
                     <span
                       key={idx}
-                      className="text-xs text-white/50 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06]"
+                      className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300/70 border border-purple-500/15 flex-shrink-0 whitespace-nowrap"
                     >
                       {reason}
                     </span>
@@ -141,7 +147,8 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
             <span className="text-indigo-400">{topRecommendation.song.title}</span>
           </p>
 
-          <ResponsiveContainer width="100%" height={300}>
+          <div className="min-h-[260px]">
+          <ResponsiveContainer width="100%" height={280}>
             <RadarChart data={radarData}>
               <PolarGrid stroke="rgba(255,255,255,0.08)" />
               <PolarAngleAxis
@@ -164,6 +171,7 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
               />
             </RadarChart>
           </ResponsiveContainer>
+          </div>
         </div>
       )}
     </div>
