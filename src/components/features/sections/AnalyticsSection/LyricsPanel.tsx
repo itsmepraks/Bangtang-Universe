@@ -159,7 +159,9 @@ export default function LyricsPanel({ lyrics, songs, albums }: LyricsPanelProps)
         <p className="text-[10px] text-white/30 mb-4">How BTS's lyrical themes shifted over time — darker cells = more songs with that theme</p>
         <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-4 md:p-6">
           {themeHeatmap.themes.length > 0 ? (
-            <div className="overflow-x-auto">
+            <div className="relative">
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#111118] to-transparent pointer-events-none z-10" />
+              <div className="overflow-x-auto scrollbar-hide">
               <div
                 className="grid gap-px min-w-[600px]"
                 style={{
@@ -228,6 +230,7 @@ export default function LyricsPanel({ lyrics, songs, albums }: LyricsPanelProps)
                 ))}
               </div>
             </div>
+            </div>
           ) : (
             <p className="text-xs text-white/40 text-center py-8">
               No theme data found in lyrics.
@@ -267,7 +270,7 @@ export default function LyricsPanel({ lyrics, songs, albums }: LyricsPanelProps)
         <p className="text-[10px] text-white/30 mb-4">Average emotional tone per album — positive (above line) vs negative (below line)</p>
         <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-6">
           {sentimentArc.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={280}>
               <AreaChart
                 data={sentimentArc}
                 margin={{ top: 10, right: 20, bottom: 20, left: 10 }}
@@ -285,12 +288,13 @@ export default function LyricsPanel({ lyrics, songs, albums }: LyricsPanelProps)
                 />
                 <XAxis
                   dataKey="album"
-                  tick={CHART_STYLES.AXIS}
                   axisLine={false}
                   tickLine={false}
-                  angle={-30}
+                  angle={-35}
                   textAnchor="end"
-                  height={60}
+                  height={50}
+                  tick={{ fontSize: 10, fill: 'rgba(255,255,255,0.4)' }}
+                  interval="preserveStartEnd"
                 />
                 <YAxis
                   tick={CHART_STYLES.AXIS}
