@@ -95,7 +95,8 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
     <div className="space-y-6">
       {/* ==================== MOOD QUADRANT ==================== */}
       <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
-        <h3 className="text-sm font-semibold text-white/70 mb-2">Mood Quadrant</h3>
+        <h3 className="text-sm font-semibold text-white/70 mb-1">Mood Quadrant</h3>
+        <p className="text-xs text-white/35 mb-3">Each dot is a song — tap to see title, sentiment, and audio values.</p>
         {moodSummary && (
           <p className="text-xs text-white/40 leading-relaxed mb-4 max-w-2xl">
             Mapping {moodSummary.total} songs by <GlossaryTip term="valence" /> (happiness) and{' '}
@@ -155,7 +156,8 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
 
       {/* ==================== AUDIO FEATURE DISTRIBUTIONS ==================== */}
       <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
-        <h3 className="text-sm font-semibold text-white/70 mb-4">Audio Feature Distributions</h3>
+        <h3 className="text-sm font-semibold text-white/70 mb-1">Audio Feature Distributions</h3>
+        <p className="text-xs text-white/35 mb-3">How songs are distributed across each audio dimension.</p>
 
         {/* Feature filter pills */}
         <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-0.5">
@@ -211,27 +213,24 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
 
       {/* ==================== SONG RANKINGS ==================== */}
       <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
-        <h3 className="text-sm font-semibold text-white/70 mb-4">Song Rankings</h3>
-
-        {/* Ranking category pills */}
-        <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-0.5">
-          {rankingCategories.map((category) => {
-            const isActive = category === selectedRankingCategory;
-            return (
-              <button
-                key={category}
-                onClick={() => setSelectedRankingCategory(category)}
-                className={`px-3 py-1.5 text-xs rounded-full border transition-colors flex-shrink-0 ${
-                  isActive
-                    ? 'bg-purple-500/15 text-white border-purple-500/30'
-                    : 'bg-white/[0.03] text-white/50 border-white/[0.06] hover:text-white/70'
-                }`}
-              >
-                {category}
-              </button>
-            );
-          })}
+        <div className="flex items-center justify-between mb-2 gap-3">
+          <h3 className="text-sm font-semibold text-white/70">Song Rankings</h3>
+          <select
+            value={selectedRankingCategory}
+            onChange={(e) => setSelectedRankingCategory(e.target.value)}
+            className="bg-[#111118] border border-white/[0.10] rounded-lg text-xs text-white/70 px-2.5 py-1.5 cursor-pointer focus:outline-none focus:border-purple-500/40 appearance-none pr-6 shrink-0"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 8px center',
+            }}
+          >
+            {rankingCategories.map((cat) => (
+              <option key={cat} value={cat} style={{ background: '#111118' }}>{cat}</option>
+            ))}
+          </select>
         </div>
+        <p className="text-xs text-white/35 mb-3">Top songs sorted by the selected audio characteristic.</p>
 
         {/* Rankings list */}
         {selectedRanking && (
