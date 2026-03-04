@@ -106,72 +106,48 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
         )}
 
         <div className="relative">
-          {/* Quadrant axis labels */}
-          <div className="flex justify-between text-xs text-white/30 mb-1 px-1">
+          {/* X-axis label row */}
+          <div className="flex justify-between text-[10px] text-white/25 mb-1">
             <span>← Sad</span>
-            <span className="text-center">Valence</span>
             <span>Happy →</span>
           </div>
 
-          <div className="flex gap-2">
-            {/* Y-axis label */}
-            <div className="flex flex-col justify-between text-xs text-white/30 py-1 shrink-0 w-14 text-right">
-              <span>Intense ↑</span>
-              <span>Energy</span>
-              <span>↓ Calm</span>
-            </div>
-
-            <div className="flex-1">
-              <ResponsiveContainer width="100%" height={340}>
-                <ScatterChart margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-                  <CartesianGrid {...CHART_STYLES.GRID} />
-                  <XAxis
-                    type="number"
-                    dataKey="valence"
-                    domain={[0, 1]}
-                    name="Valence"
-                    tick={false}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    type="number"
-                    dataKey="energy"
-                    domain={[0, 1]}
-                    name="Energy"
-                    tick={false}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-              <Tooltip
-                {...CHART_STYLES.TOOLTIP}
-                content={({ payload }) => {
-                  if (!payload || payload.length === 0) return null;
-                  const data = payload[0].payload as (typeof scatterData)[number];
-                  return (
-                    <div
-                      style={{
-                        ...CHART_STYLES.TOOLTIP.contentStyle,
-                      }}
-                    >
-                      <p style={CHART_STYLES.TOOLTIP.labelStyle}>{data.title}</p>
-                      <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: 4 }}>
-                        Sentiment: {data.sentiment}
-                      </p>
-                      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', marginTop: 2 }}>
-                        Valence: {data.valence.toFixed(2)} / Energy: {data.energy.toFixed(2)}
-                      </p>
-                    </div>
-                  );
-                }}
-              />
-              <Scatter data={scatterData} isAnimationActive={false}>
-                {scatterData.map((entry, index) => (
-                  <Cell key={`scatter-${index}`} fill={entry.color} fillOpacity={0.75} r={5} />
-                ))}
-              </Scatter>
-                </ScatterChart>
-              </ResponsiveContainer>
+          {/* Chart full-width with overlaid Y-axis labels */}
+          <div className="relative">
+            <ResponsiveContainer width="100%" height={300}>
+              <ScatterChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+                <CartesianGrid {...CHART_STYLES.GRID} />
+                <XAxis type="number" dataKey="valence" domain={[0, 1]} name="Valence" tick={false} tickLine={false} axisLine={false} />
+                <YAxis type="number" dataKey="energy" domain={[0, 1]} name="Energy" tick={false} tickLine={false} axisLine={false} width={0} />
+                <Tooltip
+                  {...CHART_STYLES.TOOLTIP}
+                  content={({ payload }) => {
+                    if (!payload || payload.length === 0) return null;
+                    const data = payload[0].payload as (typeof scatterData)[number];
+                    return (
+                      <div style={{ ...CHART_STYLES.TOOLTIP.contentStyle }}>
+                        <p style={CHART_STYLES.TOOLTIP.labelStyle}>{data.title}</p>
+                        <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', marginTop: 3 }}>
+                          {data.sentiment}
+                        </p>
+                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', marginTop: 2 }}>
+                          Valence {data.valence.toFixed(2)} · Energy {data.energy.toFixed(2)}
+                        </p>
+                      </div>
+                    );
+                  }}
+                />
+                <Scatter data={scatterData} isAnimationActive={false}>
+                  {scatterData.map((entry, index) => (
+                    <Cell key={`scatter-${index}`} fill={entry.color} fillOpacity={0.8} r={5} />
+                  ))}
+                </Scatter>
+              </ScatterChart>
+            </ResponsiveContainer>
+            {/* Overlaid Y-axis labels */}
+            <div className="absolute left-1 top-2 flex flex-col justify-between h-[288px] pointer-events-none">
+              <span className="text-[10px] text-white/25">Intense ↑</span>
+              <span className="text-[10px] text-white/25">↓ Calm</span>
             </div>
           </div>
         </div>
@@ -203,27 +179,28 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
 
         {/* Histogram bar chart */}
         {selectedHistogram && (
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={260}>
             <BarChart
               data={selectedHistogram.buckets}
-              margin={{ top: 10, right: 20, bottom: 10, left: 10 }}
+              margin={{ top: 8, right: 8, bottom: 36, left: 0 }}
             >
               <CartesianGrid {...CHART_STYLES.GRID} />
               <XAxis
                 dataKey="range"
-                tick={CHART_STYLES.AXIS}
+                tick={{ ...CHART_STYLES.AXIS, fontSize: 10 }}
                 tickLine={false}
                 axisLine={false}
-                interval={0}
-                angle={-30}
+                interval={1}
+                angle={-40}
                 textAnchor="end"
-                height={50}
+                height={40}
               />
               <YAxis
                 tick={CHART_STYLES.AXIS}
                 tickLine={false}
                 axisLine={false}
                 allowDecimals={false}
+                width={28}
               />
               <Tooltip {...CHART_STYLES.TOOLTIP} cursor={CHART_STYLES.TOOLTIP.cursor} />
               <Bar dataKey="count" fill="#A855F7" fillOpacity={0.7} radius={[4, 4, 0, 0]} activeBar={CHART_STYLES.BAR_ACTIVE} />
@@ -262,16 +239,14 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
             {selectedRanking.songs.map((song, index) => (
               <div
                 key={song.id}
-                className="flex items-center justify-between p-3 border-b border-white/[0.04]"
+                className="flex items-center gap-3 py-2.5 px-1 border-b border-white/[0.04] last:border-0"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-white/40 w-5 text-right">{index + 1}</span>
-                  <div>
-                    <p className="text-sm text-white/80">{song.title}</p>
-                    {song.album && <p className="text-xs text-white/40">{song.album}</p>}
-                  </div>
+                <span className="text-xs text-white/30 w-4 text-right shrink-0">{index + 1}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white/80 truncate">{song.title}</p>
+                  {song.album && <p className="text-[11px] text-white/35 truncate">{song.album}</p>}
                 </div>
-                <span className="text-sm text-white/60 font-mono">{song.value}</span>
+                <span className="text-sm text-white/55 font-mono shrink-0">{song.value}</span>
               </div>
             ))}
           </div>
