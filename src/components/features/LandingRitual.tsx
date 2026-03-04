@@ -9,13 +9,13 @@ export interface LandingRitualProps {
 // 7 BTS members — signature concert color, pulse delay, stage name
 // Colors tuned for concert spotlight visibility and member identity
 const MEMBERS = [
-  { color: '#3B82F6', glow: '#60A5FA', delay: 0.00, name: 'RM'     },  // blue
-  { color: '#F472B6', glow: '#FB7185', delay: 0.30, name: 'JIN'    },  // pink
-  { color: '#CBD5E1', glow: '#E2E8F0', delay: 0.55, name: 'SUGA'   },  // silver
-  { color: '#F8FAFC', glow: '#FFFFFF', delay: 0.15, name: 'J-HOPE' },  // white
-  { color: '#FBBF24', glow: '#FCD34D', delay: 0.45, name: 'JIMIN'  },  // amber
-  { color: '#34D399', glow: '#6EE7B7', delay: 0.70, name: 'V'      },  // green
-  { color: '#A78BFA', glow: '#C4B5FD', delay: 0.25, name: 'JK'     },  // purple
+  { color: '#3B82F6', glow: '#60A5FA', delay: 0.00, name: 'RM',     short: 'RM'  },  // blue
+  { color: '#F472B6', glow: '#FB7185', delay: 0.30, name: 'JIN',    short: 'JIN' },  // pink
+  { color: '#CBD5E1', glow: '#E2E8F0', delay: 0.55, name: 'SUGA',   short: 'SG'  },  // silver
+  { color: '#F8FAFC', glow: '#FFFFFF', delay: 0.15, name: 'J-HOPE', short: 'JH'  },  // white
+  { color: '#FBBF24', glow: '#FCD34D', delay: 0.45, name: 'JIMIN',  short: 'JM'  },  // amber
+  { color: '#34D399', glow: '#6EE7B7', delay: 0.70, name: 'V',      short: 'V'   },  // green
+  { color: '#A78BFA', glow: '#C4B5FD', delay: 0.25, name: 'JK',     short: 'JK'  },  // purple
 ] as const;
 
 // Foreground army bomb orbs — purple ocean glow (you're in the crowd)
@@ -142,7 +142,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'center',
-          gap: 'clamp(4px, 2.5vw, 40px)',
+          gap: 'clamp(3px, 2vw, 40px)',
           width: 'min(720px, 90%)',
           height: 'clamp(280px, 55vh, 480px)',
           zIndex: 6,
@@ -225,7 +225,12 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               onClick={() => setFocusedMember(isFocused ? null : m.name)}
               className="absolute left-1/2 -translate-x-1/2 cursor-pointer outline-none focus:outline-none select-none transition-all duration-300 hover:opacity-90"
               style={{
-                bottom: '12px',
+                bottom: '0px',
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                minHeight: '44px',
+                paddingBottom: '4px',
                 fontSize: 'clamp(11px, 2.4vw, 13px)',
                 fontWeight: '700',
                 letterSpacing: '0.12em',
@@ -235,11 +240,12 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 fontFamily: 'ui-monospace, SFMono-Regular, monospace',
                 background: 'none',
                 border: 'none',
-                padding: 0,
+                padding: '0 0 4px 0',
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              {m.name}
+              <span className="sm:hidden">{m.short}</span>
+              <span className="hidden sm:inline">{m.name}</span>
             </button>
           </div>
         );
