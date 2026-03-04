@@ -231,7 +231,7 @@ export default function App() {
                   key={item.id}
                   onClick={() => setActiveSection(item.id)}
                   aria-current={activeSection === item.id ? 'page' : undefined}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 w-full text-left ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-left ${
                     activeSection === item.id
                       ? 'bg-purple-500/10 text-white shadow-[inset_3px_0_0_0_#A855F7]'
                       : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
