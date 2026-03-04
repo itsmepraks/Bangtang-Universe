@@ -1,6 +1,5 @@
-import { useState, Suspense, lazy, useMemo } from 'react';
-// GroupId kept for TABS type alignment
-import { BarChart3, TrendingUp, Network, Heart, Sparkles, MessageSquare, BookOpen, Trophy, Calendar, Beaker, Users, Compass } from 'lucide-react';
+import { useState, Suspense, lazy } from 'react';
+import { BarChart3, TrendingUp, Network, Heart, Sparkles, MessageSquare, BookOpen, Trophy, Calendar } from 'lucide-react';
 import type { Song, Album, Member, Lyrics, Award, ChartEntry, Concert, MemberEvent } from '../../../../types/database';
 import SectionIntro from '../../../ui/SectionIntro';
 import GlossaryTip from '../../../ui/GlossaryTip';
@@ -26,20 +25,12 @@ interface AnalyticsSectionProps {
   memberEvents?: MemberEvent[];
 }
 
-type GroupId = 'music' | 'career' | 'explore';
-
 interface TabDef {
   id: string;
   label: string;
   icon: React.ElementType;
-  group: GroupId;
+  group: 'music' | 'career' | 'explore';
 }
-
-const GROUPS: { id: GroupId; label: string; shortLabel: string; icon: React.ElementType; description: string }[] = [
-  { id: 'music', label: 'Music Science', shortLabel: 'Music', icon: Beaker, description: 'Audio features, eras & emotional analysis' },
-  { id: 'career', label: 'Credits & Career', shortLabel: 'Career', icon: Users, description: 'Writing credits, awards & milestones' },
-  { id: 'explore', label: 'Explore', shortLabel: 'Explore', icon: Compass, description: 'Recommendations, Q&A & lyrics search' },
-];
 
 const TABS: TabDef[] = [
   { id: 'audio', label: 'Audio Features', icon: BarChart3, group: 'music' },
@@ -55,8 +46,6 @@ const TABS: TabDef[] = [
 
 export default function AnalyticsSection({ songs, albums, members, lyrics, awards, chartEntries, concerts, memberEvents }: AnalyticsSectionProps) {
   const [activeTab, setActiveTab] = useState<string>('audio');
-
-  const activeGroup = useMemo(() => TABS.find(t => t.id === activeTab)?.group ?? 'music', [activeTab]);
 
   const renderPanel = () => {
     switch (activeTab) {
@@ -86,59 +75,40 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
         }
       />
 
-      {/* Single-row navigation: group pills + all tabs */}
-      <div className="space-y-2">
-        {/* Group pills — compact segmented control */}
-        <div className="flex gap-1 p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl w-fit">
-          {GROUPS.map((group) => {
-            const Icon = group.icon;
-            const isActive = activeGroup === group.id;
+      {/* Flat single-row tab strip */}
+      <div className="relative">
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0a0a0f] to-transparent pointer-events-none z-10" />
+        <div
+          className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide border-b border-white/[0.06]"
+          role="tablist"
+          aria-label="Analytics views"
+        >
+          {TABS.map((tab, index) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            const prevTab = TABS[index - 1];
+            const showDivider = index > 0 && prevTab?.group !== tab.group;
             return (
-              <button
-                key={group.id}
-                type="button"
-                onClick={() => {
-                  const firstTab = TABS.find(t => t.group === group.id);
-                  if (firstTab) setActiveTab(firstTab.id);
-                }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
-                  isActive
-                    ? 'bg-purple-500/15 text-purple-300 border border-purple-500/25'
-                    : 'text-white/40 hover:text-white/70 border border-transparent'
-                }`}
-              >
-                <Icon className="w-3 h-3 shrink-0" />
-                <span>{group.shortLabel}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Sub-tabs for active group */}
-        <div className="relative">
-          <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-[#0a0a0f] to-transparent pointer-events-none z-10" />
-          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Analytics views">
-            {TABS.filter(t => t.group === activeGroup).map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
+              <div key={tab.id} className="flex items-center flex-shrink-0">
+                {showDivider && (
+                  <span className="w-px h-4 bg-white/[0.10] mx-2 flex-shrink-0" aria-hidden="true" />
+                )}
                 <button
-                  key={tab.id}
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex-shrink-0 whitespace-nowrap ${
+                  className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 whitespace-nowrap border-b-2 -mb-px ${
                     isActive
-                      ? 'bg-white/[0.08] text-white'
-                      : 'text-white/45 hover:text-white/70 hover:bg-white/[0.03]'
+                      ? 'text-white border-purple-500'
+                      : 'text-white/40 border-transparent hover:text-white/70 hover:border-white/20'
                   }`}
                 >
-                  <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                  <Icon className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
                   {tab.label}
                 </button>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
