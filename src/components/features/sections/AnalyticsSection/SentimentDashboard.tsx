@@ -94,8 +94,8 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
     });
   }, [sentimentByEra, allSentiments]);
 
-  const distributionChartHeight = Math.max(280, distribution.length * 36);
-  const eraChartHeight = Math.max(300, eraStackedData.length * 48);
+  const distributionChartHeight = Math.min(360, Math.max(220, distribution.length * 36));
+  const eraChartHeight = Math.min(380, Math.max(240, eraStackedData.length * 48));
 
   return (
     <div className="space-y-8">
@@ -145,13 +145,13 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
         </div>
 
         {/* Badge row */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5 mb-6">
           {distribution.map((entry) => {
             const color = getSentimentColor(entry.sentiment);
             return (
               <span
                 key={entry.sentiment}
-                className="px-3 py-1.5 rounded-full text-xs font-medium border"
+                className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border"
                 style={{
                   color,
                   borderColor: color,
