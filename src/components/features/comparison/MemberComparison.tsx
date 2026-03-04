@@ -100,21 +100,21 @@ export default function MemberComparison({ members, songs }: MemberComparisonPro
           </div>
 
           {/* Comparison Table */}
-          <div className="p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl">
-            <table className="w-full">
+          <div className="p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-x-auto">
+            <table className="w-full min-w-[360px]">
               <thead>
                 <tr className="border-b border-white/[0.06]">
-                  <th className="text-left text-xs font-medium text-white/50 uppercase tracking-wide py-3 px-4">Stat</th>
-                  <th className="text-center text-xs font-medium uppercase tracking-wide py-3 px-4" style={{ color: memberA.color || '#A855F7' }}>{memberA.stage_name}</th>
-                  <th className="text-center text-xs font-medium uppercase tracking-wide py-3 px-4" style={{ color: memberB.color || '#818CF8' }}>{memberB.stage_name}</th>
+                  <th className="text-left text-xs font-medium text-white/50 uppercase tracking-wide py-3 px-3 sm:px-4">Stat</th>
+                  <th className="text-center text-xs font-medium uppercase tracking-wide py-3 px-3 sm:px-4" style={{ color: memberA.color || '#A855F7' }}>{memberA.stage_name}</th>
+                  <th className="text-center text-xs font-medium uppercase tracking-wide py-3 px-3 sm:px-4" style={{ color: memberB.color || '#818CF8' }}>{memberB.stage_name}</th>
                 </tr>
               </thead>
               <tbody>
                 {tableRows.map(row => (
                   <tr key={row.label} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
-                    <td className="text-sm text-white/50 py-3 px-4">{row.label}</td>
-                    <td className="text-sm text-white/70 text-center py-3 px-4">{row.a}</td>
-                    <td className="text-sm text-white/70 text-center py-3 px-4">{row.b}</td>
+                    <td className="text-sm text-white/50 py-3 px-3 sm:px-4">{row.label}</td>
+                    <td className="text-sm text-white/70 text-center py-3 px-3 sm:px-4">{row.a}</td>
+                    <td className="text-sm text-white/70 text-center py-3 px-3 sm:px-4">{row.b}</td>
                   </tr>
                 ))}
               </tbody>
