@@ -36,7 +36,7 @@ const FOREGROUND_BOMBS = [
 ] as const;
 
 export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
-    const [focusedMember, setFocusedMember] = useState<string | null>(null);
+    const [focusedMember, setFocusedMember] = useState<typeof MEMBERS[number]['name'] | null>(null);
 
     return (
         <div className="absolute inset-0 z-50 flex flex-col overflow-hidden select-none bg-[#020008]">
@@ -148,13 +148,14 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
           zIndex: 6,
         }}
       >
-        {MEMBERS.map((m, i) => {
+        {MEMBERS.map((m) => {
           const isFocused = focusedMember === m.name;
           const dimmed = focusedMember !== null && !isFocused;
           const opacity = dimmed ? 0.25 : (isFocused ? 1 : 0.9);
+          const animDur = `${3.2 + m.delay * 0.5}s`;
           return (
           <div
-            key={i}
+            key={m.name}
             style={{ position: 'relative', flexShrink: 0, width: 'clamp(32px, 7vw, 52px)', height: '100%' }}
           >
             {/* Atmospheric cone — flows into stage */}
@@ -176,8 +177,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               filter: 'blur(20px)',
               opacity,
               transition: 'opacity 0.4s ease',
-              animation: dimmed ? 'none' : `led-pulse ${3.2 + m.delay * 0.5}s ease-in-out infinite`,
-              animationDelay: `${m.delay}s`,
+              animation: dimmed ? 'none' : `led-pulse ${animDur} ease-in-out ${m.delay}s infinite`,
             }} />
             {/* Core beam — extends into floor */}
             <div style={{
@@ -198,8 +198,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               filter: 'blur(5px)',
               opacity,
               transition: 'opacity 0.4s ease, width 0.4s ease',
-              animation: dimmed ? 'none' : `spotlight-sweep ${3.2 + m.delay * 0.5}s ease-in-out infinite`,
-              animationDelay: `${m.delay}s`,
+              animation: dimmed ? 'none' : `spotlight-sweep ${animDur} ease-in-out ${m.delay}s infinite`,
             }} />
             {/* Floor pool — blends into stage, no hard edge */}
             <div style={{
@@ -218,8 +217,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               filter: 'blur(20px)',
               opacity,
               transition: 'opacity 0.4s ease',
-              animation: dimmed ? 'none' : `led-pulse ${3.2 + m.delay * 0.5}s ease-in-out infinite`,
-              animationDelay: `${m.delay}s`,
+              animation: dimmed ? 'none' : `led-pulse ${animDur} ease-in-out ${m.delay}s infinite`,
             }} />
             {/* Member name — clickable */}
             <button
@@ -255,9 +253,9 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         className="absolute inset-x-0 bottom-0 pointer-events-none"
         style={{ height: '24%', zIndex: 7 }}
       >
-        {FOREGROUND_BOMBS.map((b, i) => (
+        {FOREGROUND_BOMBS.map((b) => (
           <div
-            key={i}
+            key={b.x}
             style={{
               position: 'absolute',
               left: `${b.x}%`,
@@ -268,8 +266,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
               filter: `blur(${b.blur}px)`,
               opacity: b.opacity,
               borderRadius: '50%',
-              animation: `foreground-twinkle ${b.dur}s ease-in-out infinite`,
-              animationDelay: `${b.delay}s`,
+              animation: `foreground-twinkle ${b.dur}s ease-in-out ${b.delay}s infinite`,
             }}
           />
         ))}
