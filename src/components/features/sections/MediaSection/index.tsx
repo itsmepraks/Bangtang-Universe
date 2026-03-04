@@ -71,7 +71,7 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
                 </div>
             </div>
 
-            <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-6" role="tabpanel">
+            <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-4 sm:p-6" role="tabpanel">
                 <Suspense
                     fallback={
                         <div className="flex items-center justify-center h-64">

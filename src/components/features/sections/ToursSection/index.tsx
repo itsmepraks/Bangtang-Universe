@@ -66,7 +66,7 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
       </div>
 
       <div
-        className={`bg-[#111118] rounded-2xl border border-white/[0.06] ${activeTab === 'map' ? 'p-0 overflow-hidden' : 'p-6'}`}
+        className={`bg-[#111118] rounded-2xl border border-white/[0.06] ${activeTab === 'map' ? 'p-0 overflow-hidden' : 'p-4 sm:p-6'}`}
         role="tabpanel"
       >
         <Suspense
