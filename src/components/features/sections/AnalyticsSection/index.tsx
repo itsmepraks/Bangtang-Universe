@@ -134,29 +134,33 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
       </div>
 
       {/* Row 2: Sub-tabs for active group */}
-      <div className="flex items-center gap-1.5" role="tablist" aria-label="Analytics views">
-        {groupTabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              id={`analytics-tab-${tab.id}`}
-              role="tab"
-              aria-selected={isActive}
-              aria-controls="analytics-tabpanel"
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-purple-500/10 text-white border border-purple-500/30'
-                  : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
-              }`}
-            >
-              <Icon className="w-4 h-4" aria-hidden="true" />
-              <span className="whitespace-nowrap">{tab.label}</span>
-            </button>
-          );
-        })}
+      <div className="relative">
+        {/* Scroll fade hint */}
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0a0a0f] to-transparent pointer-events-none z-10" />
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide" role="tablist" aria-label="Analytics views">
+          {groupTabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                id={`analytics-tab-${tab.id}`}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls="analytics-tabpanel"
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex-shrink-0 ${
+                  isActive
+                    ? 'bg-purple-500/10 text-white border border-purple-500/30'
+                    : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
+                }`}
+              >
+                <Icon className="w-4 h-4" aria-hidden="true" />
+                <span className="whitespace-nowrap">{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Panel */}
