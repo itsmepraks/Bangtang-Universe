@@ -25,14 +25,7 @@ interface AnalyticsSectionProps {
   memberEvents?: MemberEvent[];
 }
 
-interface TabDef {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  group: 'music' | 'career' | 'explore';
-}
-
-const TABS: TabDef[] = [
+const TABS = [
   { id: 'audio', label: 'Audio Features', icon: BarChart3, group: 'music' },
   { id: 'era', label: 'Era Evolution', icon: TrendingUp, group: 'music' },
   { id: 'sentiment', label: 'Sentiment', icon: Heart, group: 'music' },
@@ -42,10 +35,12 @@ const TABS: TabDef[] = [
   { id: 'recommendations', label: 'Recommendations', icon: Sparkles, group: 'explore' },
   { id: 'qa', label: 'Q&A', icon: MessageSquare, group: 'explore' },
   { id: 'lyrics', label: 'Lyrics', icon: BookOpen, group: 'explore' },
-];
+] as const;
+
+type TabId = (typeof TABS)[number]['id'];
 
 export default function AnalyticsSection({ songs, albums, members, lyrics, awards, chartEntries, concerts, memberEvents }: AnalyticsSectionProps) {
-  const [activeTab, setActiveTab] = useState<string>('audio');
+  const [activeTab, setActiveTab] = useState<TabId>('audio');
 
   const renderPanel = () => {
     switch (activeTab) {
@@ -96,6 +91,7 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
                 <button
                   role="tab"
                   aria-selected={isActive}
+                  aria-controls="analytics-panel"
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 whitespace-nowrap border-b-2 -mb-px ${
                     isActive
@@ -115,6 +111,7 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
       {/* Panel */}
       <div
         role="tabpanel"
+        id="analytics-panel"
         className="bg-[#111118] rounded-2xl border border-white/[0.06] p-3 md:p-5"
       >
         <Suspense
