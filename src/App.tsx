@@ -8,7 +8,7 @@ import type { DashboardSection, DiscographyState } from './types/index';
 import {
   BTSLogo,
 } from './components';
-import { Breadcrumb } from './components/ui';
+import { Breadcrumb, DataStatusBanner } from './components/ui';
 
 // Heavy components - lazy loaded for code-splitting
 const Universe3D = lazy(() => import('./components/features/Universe3D'));
@@ -26,6 +26,7 @@ const AwardsSection = lazy(() => import('./components/features/sections/AwardsSe
 const ToursSection = lazy(() => import('./components/features/sections/ToursSection'));
 const MediaSection = lazy(() => import('./components/features/sections/MediaSection'));
 const OnboardingFlow = lazy(() => import('./components/features/OnboardingFlow'));
+const CommandPalette = lazy(() => import('./components/features/CommandPalette'));
 
 // Loading fallback for lazy components
 const LoadingFallback = () => (
@@ -85,6 +86,76 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // ── URL hash sync (deep-linkable top-level state) ─────────────
+  // Format: #/<section>[/<arg1>[/<arg2>]]
+  // discography: #/discography, #/discography/album/42, #/discography/song/42/137
+  // members:     #/members, #/members/rm
+  // analytics:   #/analytics, #/analytics/recommendations
+  const [analyticsTabFromHash, setAnalyticsTabFromHash] = useState<string | null>(null);
+
+  // Read hash on mount + on hashchange
+  useEffect(() => {
+    const applyHash = () => {
+      const raw = window.location.hash.replace(/^#\/?/, '');
+      if (!raw) return;
+      const parts = raw.split('/').filter(Boolean);
+      const section = parts[0] as DashboardSection | undefined;
+      const validSections: DashboardSection[] = ['overview', 'discography', 'members', 'analytics', 'awards', 'tours', 'media', 'search'];
+      if (!section || !validSections.includes(section)) return;
+      setActiveSection(section);
+      if (section === 'discography') {
+        if (parts[1] === 'album' && parts[2]) {
+          setDiscographyState({ selectedAlbumId: Number(parts[2]), selectedSongId: null, view: 'album' });
+        } else if (parts[1] === 'song' && parts[2] && parts[3]) {
+          setDiscographyState({ selectedAlbumId: Number(parts[2]), selectedSongId: Number(parts[3]), view: 'song' });
+        } else {
+          setDiscographyState({ selectedAlbumId: null, selectedSongId: null, view: 'grid' });
+        }
+      } else if (section === 'members') {
+        setMemberSectionId(parts[1] ?? null);
+      } else if (section === 'analytics' && parts[1]) {
+        setAnalyticsTabFromHash(parts[1]);
+      }
+    };
+    applyHash();
+    window.addEventListener('hashchange', applyHash);
+    return () => window.removeEventListener('hashchange', applyHash);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Write hash on state changes
+  useEffect(() => {
+    if (mode !== 'dashboard') return;
+    let hash = `#/${activeSection}`;
+    if (activeSection === 'discography') {
+      if (discographyState.view === 'song' && discographyState.selectedAlbumId && discographyState.selectedSongId) {
+        hash = `#/discography/song/${discographyState.selectedAlbumId}/${discographyState.selectedSongId}`;
+      } else if (discographyState.view === 'album' && discographyState.selectedAlbumId) {
+        hash = `#/discography/album/${discographyState.selectedAlbumId}`;
+      }
+    } else if (activeSection === 'members' && memberSectionId) {
+      hash = `#/members/${memberSectionId}`;
+    } else if (activeSection === 'analytics' && analyticsTabFromHash) {
+      hash = `#/analytics/${analyticsTabFromHash}`;
+    }
+    if (window.location.hash !== hash) {
+      window.history.replaceState(null, '', hash);
+    }
+  }, [mode, activeSection, discographyState, memberSectionId, analyticsTabFromHash]);
+
+  // ⌘K / Ctrl+K toggles command palette
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   // Close sidebar on navigation (mobile)
   useEffect(() => {
@@ -99,17 +170,34 @@ export default function App() {
   const [eraFilter, setEraFilter] = useState<string | null>(null);
 
   // Database hooks
-  const { songs, loading: songsLoading } = useSongs();
-  const { albums, loading: albumsLoading } = useAlbums();
-  const { members, loading: membersLoading } = useMembers();
-  const { lyrics } = useLyrics();
-  const { awards, loading: awardsLoading } = useAwards();
-  const { chartEntries } = useChartEntries();
-  const { concerts, loading: concertsLoading } = useConcerts();
-  const { memberEvents } = useMemberEvents();
-  const { media, loading: mediaLoading } = useMedia();
+  const { songs, loading: songsLoading, error: songsError, refetch: refetchSongs } = useSongs();
+  const { albums, loading: albumsLoading, error: albumsError, refetch: refetchAlbums } = useAlbums();
+  const { members, loading: membersLoading, error: membersError, refetch: refetchMembers } = useMembers();
+  const { lyrics, error: lyricsError, refetch: refetchLyrics } = useLyrics();
+  const { awards, loading: awardsLoading, error: awardsError, refetch: refetchAwards } = useAwards();
+  const { chartEntries, error: chartEntriesError, refetch: refetchChartEntries } = useChartEntries();
+  const { concerts, loading: concertsLoading, error: concertsError, refetch: refetchConcerts } = useConcerts();
+  const { memberEvents, error: memberEventsError, refetch: refetchMemberEvents } = useMemberEvents();
+  const { media, loading: mediaLoading, error: mediaError, refetch: refetchMedia } = useMedia();
 
   const dataLoading = songsLoading || albumsLoading || membersLoading || awardsLoading || concertsLoading || mediaLoading;
+  const hasDataError = Boolean(
+    songsError || albumsError || membersError || lyricsError || awardsError ||
+    chartEntriesError || concertsError || memberEventsError || mediaError
+  );
+  const [retrying, setRetrying] = useState(false);
+  const handleRetryData = async () => {
+    setRetrying(true);
+    try {
+      await Promise.allSettled([
+        refetchSongs(), refetchAlbums(), refetchMembers(), refetchLyrics(),
+        refetchAwards(), refetchChartEntries(), refetchConcerts(),
+        refetchMemberEvents(), refetchMedia(),
+      ]);
+    } finally {
+      setRetrying(false);
+    }
+  };
 
   const handleSync = () => {
     try {
@@ -200,6 +288,13 @@ export default function App() {
       {/* 4. DASHBOARD */}
       {mode === 'dashboard' && !activeMemberId && (
         <div className="absolute inset-0 z-10 flex animate-in fade-in zoom-in-95 duration-1000">
+          {/* Skip to content (visible only on keyboard focus) */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-purple-500 focus:text-white focus:text-sm focus:font-medium focus:shadow-lg"
+          >
+            Skip to main content
+          </a>
 
           {/* Dashboard Background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -278,21 +373,41 @@ export default function App() {
           <div className="flex-1 flex flex-col min-w-0 relative z-10">
 
             {/* Header */}
-            <header className="h-14 flex items-center justify-between px-4 md:px-8 bg-[#0c0c12]/50 border-b border-white/[0.06]">
-              <div className="flex items-center">
+            <header className="flex flex-col bg-[#0c0c12]/50 border-b border-white/[0.06]">
+              <div className="h-14 flex items-center justify-between px-4 md:px-8">
+                <div className="flex items-center">
+                  <button
+                    onClick={() => setSidebarOpen(prev => !prev)}
+                    className="md:hidden p-2 -ml-2 mr-2 text-white/60 hover:text-white"
+                    aria-label="Toggle navigation"
+                  >
+                    {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                  </button>
+                  <Breadcrumb items={breadcrumbs} />
+                </div>
                 <button
-                  onClick={() => setSidebarOpen(prev => !prev)}
-                  className="md:hidden p-2 -ml-2 mr-2 text-white/60 hover:text-white"
-                  aria-label="Toggle navigation"
+                  onClick={() => setPaletteOpen(true)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-colors text-xs"
+                  aria-label="Open command palette"
                 >
-                  {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                  <Search size={14} aria-hidden="true" />
+                  <span className="hidden sm:inline">Search…</span>
+                  <kbd className="hidden sm:inline-block text-[10px] px-1 rounded bg-white/[0.06] border border-white/[0.08] font-mono">⌘K</kbd>
                 </button>
-                <Breadcrumb items={breadcrumbs} />
               </div>
+              <DataStatusBanner
+                hasError={hasDataError}
+                onRetry={handleRetryData}
+                retrying={retrying}
+              />
             </header>
 
             {/* Main Views */}
-            <main className="flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar">
+            <main
+              id="main-content"
+              tabIndex={-1}
+              className="flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar focus:outline-none"
+            >
               <Suspense fallback={<SectionSpinner />}>
                 <SectionTransition sectionKey={activeSection}>
 
@@ -337,6 +452,8 @@ export default function App() {
                       chartEntries={chartEntries}
                       concerts={concerts}
                       memberEvents={memberEvents}
+                      initialTab={analyticsTabFromHash}
+                      onTabChange={setAnalyticsTabFromHash}
                     />
                   )}
 
@@ -377,6 +494,29 @@ export default function App() {
             </main>
           </div>
         </div>
+      )}
+
+      {/* COMMAND PALETTE (⌘K) */}
+      {mode === 'dashboard' && (
+        <Suspense fallback={null}>
+          <CommandPalette
+            open={paletteOpen}
+            onClose={() => setPaletteOpen(false)}
+            songs={songs}
+            albums={albums}
+            members={members}
+            onNavigate={navigateTo}
+            onSelectSong={(song) => {
+              const album = albums.find((a) => a.id === song.album_id);
+              setDiscographyState({
+                selectedAlbumId: album?.id ?? null,
+                selectedSongId: song.id,
+                view: 'song',
+              });
+              setActiveSection('discography');
+            }}
+          />
+        </Suspense>
       )}
 
       {/* 5. MEMBER DETAIL OVERLAY (FULL SCREEN) */}

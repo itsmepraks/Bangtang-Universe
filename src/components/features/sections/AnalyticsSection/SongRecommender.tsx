@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Sparkles } from 'lucide-react';
 import {
   RadarChart,
   Radar,
@@ -9,6 +10,7 @@ import {
 import type { Song, Album } from '../../../../types/database';
 import { getRecommendations } from '../../../../services/recommendationService';
 import { CHART_STYLES } from '../../../../constants/colors';
+import EmptyState from '../../../ui/EmptyState';
 
 interface SongRecommenderProps {
   songs: Song[];
@@ -98,9 +100,20 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
 
       {/* ===== Placeholder when nothing selected ===== */}
       {!selectedSong && (
-        <p className="text-white/40 text-sm text-center py-12">
-          Select a song to see recommendations based on audio similarity.
-        </p>
+        <EmptyState
+          icon={Sparkles}
+          title="Pick a song to start"
+          description="We'll suggest 8 tracks with similar energy, mood, danceability, and acoustic character — and show a side-by-side radar of the closest match."
+        />
+      )}
+
+      {/* ===== No recommendations found ===== */}
+      {selectedSong && recommendations.length === 0 && (
+        <EmptyState
+          icon={Sparkles}
+          title="No similar songs found"
+          description="This track's audio profile is unusual in the catalog. Try another song."
+        />
       )}
 
       {/* ===== Recommendations Grid ===== */}
@@ -119,7 +132,7 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
                 {Math.round(rec.similarity * 100)}% similar
               </p>
               {rec.reasons.length > 0 && (
-                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide mt-2 pb-0.5">
+                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide scroll-fade-x mt-2 pb-0.5">
                   {rec.reasons.map((reason, idx) => (
                     <span
                       key={idx}

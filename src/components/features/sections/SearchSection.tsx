@@ -7,6 +7,7 @@ import type { Song, Member, Album, Award, Concert } from '../../../types/databas
 import type { DashboardSection } from '../../../types/index';
 import Badge from '../../ui/Badge';
 import ProgressBar from '../../ui/ProgressBar';
+import EmptyState from '../../ui/EmptyState';
 
 interface SearchSectionProps {
   songs: Song[];
@@ -257,13 +258,15 @@ export default function SearchSection({ songs, members, albums, awards, concerts
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Network size={40} className="text-white/20 mb-4" />
-          <p className="text-sm text-white/40">
-            {query || activeMood ? 'No results found' : 'Search the archive'}
-          </p>
-          <p className="text-xs text-white/40 mt-2">Try searching for a song, album, or member</p>
-        </div>
+        <EmptyState
+          icon={query || activeMood ? Network : Search}
+          title={query || activeMood ? 'No results found' : 'Search the archive'}
+          description={
+            query || activeMood
+              ? 'Try a different spelling, a mood pill above, or a broader term.'
+              : 'Search songs, albums, members, awards, concerts — or pick a mood to explore by vibe.'
+          }
+        />
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Music, Disc, Users, PenTool, Trophy, MapPin } from 'lucide-react';
+import { Music, Disc, Users, PenTool, Trophy, MapPin, Sparkles, MessageSquare, Search as SearchIcon, ArrowRight } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -174,6 +174,45 @@ export default function HomeSection({
         <StatCard label="KOMCA Credits" value={totalKomca} icon={PenTool} accent="#D8B4FE" subtitle="total production" />
         <StatCard label="Awards Won" value={awardsWon} icon={Trophy} accent="#FBBF24" subtitle={`${awards.length} nominations`} />
         <StatCard label="Concerts" value={concerts.length} icon={MapPin} accent="#10B981" subtitle={`${uniqueTours} tours`} />
+      </div>
+
+      {/* ── Try this: quick entry cards (Nielsen #6, #7 — surface hidden features) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          {
+            icon: SearchIcon,
+            label: 'Search by mood',
+            hint: 'Happy, sad, energetic…',
+            onClick: () => onNavigate('search'),
+          },
+          {
+            icon: Sparkles,
+            label: 'Find songs like…',
+            hint: 'Audio-similar recommendations',
+            onClick: () => onNavigate('analytics'),
+          },
+          {
+            icon: MessageSquare,
+            label: 'Ask about BTS',
+            hint: '"Who has the most credits?"',
+            onClick: () => onNavigate('analytics'),
+          },
+        ].map(({ icon: Icon, label, hint, onClick }) => (
+          <button
+            key={label}
+            onClick={onClick}
+            className="group flex items-center gap-3 text-left bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3 hover:bg-white/[0.05] hover:border-purple-500/20 transition-all"
+          >
+            <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center flex-shrink-0">
+              <Icon className="w-4 h-4 text-purple-300/80" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">{label}</div>
+              <div className="text-[11px] text-white/40 truncate">{hint}</div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-purple-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" aria-hidden="true" />
+          </button>
+        ))}
       </div>
 
       {/* ── Bento grid ──────────────────────────────────────────── */}

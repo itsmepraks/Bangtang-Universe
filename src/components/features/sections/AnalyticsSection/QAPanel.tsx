@@ -3,6 +3,7 @@ import { MessageSquare, Send, Sparkles } from 'lucide-react';
 import { qaService, SUGGESTED_QUESTIONS } from '../../../../services/qaService';
 import type { QAResponse } from '../../../../services/qaService';
 import type { Song, Album, Member, Award, ChartEntry, Concert, Collaboration, MemberEvent } from '../../../../types/database';
+import EmptyState from '../../../ui/EmptyState';
 
 interface QAPanelProps {
   songs: Song[];
@@ -92,7 +93,7 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
       </div>
 
       {/* Suggested Questions */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide scroll-fade-x pb-1">
         {SUGGESTED_QUESTIONS.map((sq) => (
           <button
             key={sq}
@@ -104,6 +105,20 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
           </button>
         ))}
       </div>
+
+      {/* Empty state — before first question */}
+      {!answer && (
+        <EmptyState
+          icon={MessageSquare}
+          title="Ask anything about BTS"
+          description={
+            <>
+              Try natural questions like <em>"Who has the most KOMCA credits?"</em> or
+              {' '}<em>"What were their Grammy nominations?"</em> — or tap a suggestion above.
+            </>
+          }
+        />
+      )}
 
       {/* Answer Display */}
       {answer && (
@@ -119,9 +134,17 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
           {/* Confidence Badge — only shown when confidence is meaningful */}
           {answer.confidence >= 0.5 && (() => {
             const { label, color } = getConfidenceLabel(answer.confidence);
+            const explain =
+              label === 'High'
+                ? 'Strong match in the dataset — safe to trust.'
+                : 'Partial match — the answer may be incomplete or approximate.';
             return (
-              <span className={`text-xs ${color}`}>
-                Confidence: {label} ({(answer.confidence * 100).toFixed(0)}%)
+              <span
+                className={`text-xs ${color} inline-flex items-center gap-1.5`}
+                title={explain}
+              >
+                <span className={`w-1.5 h-1.5 rounded-full ${label === 'High' ? 'bg-green-400' : 'bg-yellow-400'}`} />
+                {label === 'High' ? 'Confident answer' : 'Partial match'}
               </span>
             );
           })()}

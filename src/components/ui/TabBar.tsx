@@ -12,7 +12,7 @@ interface TabBarProps {
 
 export default function TabBar({ tabs, active, onChange, className = '' }: TabBarProps) {
   return (
-    <div className={`flex gap-2 overflow-x-auto scrollbar-hide ${className}`}>
+    <div className={`flex gap-2 overflow-x-auto scrollbar-hide scroll-fade-x ${className}`}>
       {tabs.map(tab => (
         <button
           key={tab.value}

@@ -184,6 +184,17 @@
 }
 
 /**
+ * Horizontal scroll affordance.
+ * Applies a right-edge mask fade so users know there's more content off-screen.
+ * Used on filter pill strips, tab rows, and suggestion chips that scroll horizontally.
+ * (Krug's Trunk Test — make navigation discoverable.)
+ */
+.scroll-fade-x {
+  -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%);
+  mask-image: linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%);
+}
+
+/**
  * Usage Example:
  * 
  * <div className="overflow-y-auto pretty-scrollbar max-h-96">
