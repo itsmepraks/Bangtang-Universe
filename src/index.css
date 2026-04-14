@@ -1070,8 +1070,8 @@ body,
   /* Deep space black with slight purple tint */
   color: white;
   /* Default text color */
-  font-family: 'Inter', system-ui, sans-serif;
-  /* Modern, readable font */
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  letter-spacing: -0.01em;
   color-scheme: dark;
   /* Render form controls (select, input, scrollbar) in dark mode */
   -webkit-touch-callout: none;
