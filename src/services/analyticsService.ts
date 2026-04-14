@@ -11,7 +11,7 @@ import type { Song, Album, Member, Award, Concert } from '../types/database';
 
 // ==================== CONSTANTS ====================
 
-const ERA_ORDER: string[] = [
+const LEGACY_ERA_ORDER: string[] = [
   'School Trilogy',
   'HYYH',
   'Wings',
@@ -22,6 +22,23 @@ const ERA_ORDER: string[] = [
   'Proof',
   'Chapter 2',
 ];
+
+/**
+ * Build era ordering from actual album data, sorted by earliest release date.
+ */
+export function buildEraOrder(albums: Album[]): string[] {
+  const eraFirstDate = new Map<string, string>();
+  for (const album of albums) {
+    if (!album.era) continue;
+    const existing = eraFirstDate.get(album.era);
+    if (!existing || (album.release_date && album.release_date < existing)) {
+      eraFirstDate.set(album.era, album.release_date ?? '9999');
+    }
+  }
+  return [...eraFirstDate.entries()]
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .map(([era]) => era);
+}
 
 // ==================== EXPORTED TYPES ====================
 
@@ -143,7 +160,7 @@ function pairKey(a: string, b: string): string {
 
 /**
  * Group songs by their album's era and compute average audio features per era.
- * Results are sorted chronologically according to ERA_ORDER.
+ * Results are sorted chronologically by earliest album release date per era.
  */
 export function computeEraEvolution(songs: Song[], albums: Album[]): EraStats[] {
   const albumMap = buildAlbumMap(albums);
@@ -157,7 +174,7 @@ export function computeEraEvolution(songs: Song[], albums: Album[]): EraStats[] 
   for (const song of songs) {
     if (song.album_id === null) continue;
     const album = albumMap.get(song.album_id);
-    if (!album || !album.era || !ERA_ORDER.includes(album.era)) continue;
+    if (!album || !album.era) continue;
 
     const era = album.era;
     if (!eraMap.has(era)) {
@@ -168,29 +185,14 @@ export function computeEraEvolution(songs: Song[], albums: Album[]): EraStats[] 
     entry.albumTitles.add(album.title);
   }
 
-  // Build stats and sort by ERA_ORDER
+  // Build stats sorted by earliest release date per era
+  const eraOrder = buildEraOrder(albums);
   const results: EraStats[] = [];
 
-  for (const era of ERA_ORDER) {
+  for (const era of eraOrder) {
     const entry = eraMap.get(era);
     if (!entry) continue;
 
-    const eraSongs = entry.songs;
-    results.push({
-      era,
-      songCount: eraSongs.length,
-      avgBpm: round(mean(extractNumeric(eraSongs, 'bpm'))),
-      avgEnergy: round(mean(extractNumeric(eraSongs, 'energy'))),
-      avgValence: round(mean(extractNumeric(eraSongs, 'valence'))),
-      avgDanceability: round(mean(extractNumeric(eraSongs, 'danceability'))),
-      avgAcousticness: round(mean(extractNumeric(eraSongs, 'acousticness'))),
-      albums: Array.from(entry.albumTitles),
-    });
-  }
-
-  // Append any eras not in ERA_ORDER (future-proofing)
-  for (const [era, entry] of eraMap.entries()) {
-    if (ERA_ORDER.includes(era)) continue;
     const eraSongs = entry.songs;
     results.push({
       era,
@@ -332,7 +334,7 @@ export function computeSentimentByEra(
   for (const song of songs) {
     if (song.album_id === null) continue;
     const album = albumMap.get(song.album_id);
-    if (!album || !album.era || !ERA_ORDER.includes(album.era)) continue;
+    if (!album || !album.era) continue;
     if (!eraSongs.has(album.era)) {
       eraSongs.set(album.era, []);
     }
@@ -341,16 +343,11 @@ export function computeSentimentByEra(
 
   const result: Record<string, SentimentDistribution[]> = {};
 
-  // Iterate in ERA_ORDER for consistent key ordering
-  for (const era of ERA_ORDER) {
+  // Iterate in chronological era order
+  const eraOrder = buildEraOrder(albums);
+  for (const era of eraOrder) {
     const songs = eraSongs.get(era);
     if (!songs) continue;
-    result[era] = computeSentimentDistribution(songs);
-  }
-
-  // Append eras not in ERA_ORDER
-  for (const [era, songs] of eraSongs.entries()) {
-    if (ERA_ORDER.includes(era)) continue;
     result[era] = computeSentimentDistribution(songs);
   }
 
