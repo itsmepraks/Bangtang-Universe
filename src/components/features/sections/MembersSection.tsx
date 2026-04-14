@@ -6,6 +6,7 @@ import { useSoloAlbumsByMember, useAwardsByMember, useCollaborationsByMember, us
 import MemberTimeline from './Members/MemberTimeline';
 import Badge from '../../ui/Badge';
 import MemberComparison from '../comparison/MemberComparison';
+import { getMemberColor } from '../../../constants/colors';
 
 
 interface MembersSectionProps {
@@ -23,7 +24,20 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
         <button
           key={m.id}
           onClick={() => onSelect(m.id)}
-          className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:border-white/[0.12] hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
+          className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] flex flex-col"
+          style={{
+            '--member-color': getMemberColor(m.id),
+          } as React.CSSProperties}
+          onMouseEnter={(e) => {
+            const el = e.currentTarget;
+            el.style.borderColor = `${getMemberColor(m.id)}40`;
+            el.style.boxShadow = `0 0 20px ${getMemberColor(m.id)}15, 0 0 40px ${getMemberColor(m.id)}08`;
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget;
+            el.style.borderColor = '';
+            el.style.boxShadow = '';
+          }}
         >
           {/* Photo */}
           <div className="aspect-[3/4] relative overflow-hidden rounded-t-2xl">
@@ -57,6 +71,11 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
               />
             </div>
           </div>
+          {/* Signature color accent bar */}
+          <div
+            className="h-0.5 mt-auto rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 mx-4 mb-3"
+            style={{ backgroundColor: getMemberColor(m.id) }}
+          />
         </button>
       ))}
     </div>
