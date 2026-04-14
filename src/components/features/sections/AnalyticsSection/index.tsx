@@ -100,6 +100,7 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
                 <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
                 <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '150ms' }} />
                 <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '300ms' }} />
+              </div>
             </div>
           }
         >
