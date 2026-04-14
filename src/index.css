@@ -1747,6 +1747,23 @@ select option {
   animation: concert-glow 42s ease-in-out infinite;
 }
 
+.concert-intense {
+  animation: concert-glow-intense 8s ease-in-out infinite;
+}
+
+@keyframes concert-glow-intense {
+  0%, 100% { background-color: rgba(168, 85, 247, 0.12); }
+  10% { background-color: rgba(37, 99, 235, 0.10); }
+  20% { background-color: rgba(236, 72, 153, 0.14); }
+  30% { background-color: rgba(16, 185, 129, 0.10); }
+  40% { background-color: rgba(239, 68, 68, 0.12); }
+  50% { background-color: rgba(245, 158, 11, 0.14); }
+  60% { background-color: rgba(139, 92, 246, 0.12); }
+  70% { background-color: rgba(236, 72, 153, 0.10); }
+  80% { background-color: rgba(37, 99, 235, 0.14); }
+  90% { background-color: rgba(16, 185, 129, 0.12); }
+}
+
 /**
  * Subtle noise texture — breaks the flat digital feel.
  * Applied to the app root for an organic, printed quality.

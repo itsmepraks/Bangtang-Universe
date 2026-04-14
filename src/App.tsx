@@ -93,6 +93,7 @@ export default function App() {
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [concertMode, setConcertMode] = useState(false);
 
   // State for expanded sections (must be declared before useEffects that reference them)
   const [discographyState, setDiscographyState] = useState<DiscographyState>({
@@ -304,9 +305,9 @@ export default function App() {
 
           {/* Dashboard Background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-[15%] right-[5%] w-[35%] h-[35%] rounded-full opacity-[0.03]"
+            <div className={`absolute top-[15%] right-[5%] w-[35%] h-[35%] rounded-full ${concertMode ? 'opacity-[0.12]' : 'opacity-[0.03]'}`}
               style={{ background: 'radial-gradient(circle, #EC4899 0%, transparent 70%)', filter: 'blur(80px)' }} />
-            <div className="absolute bottom-[20%] left-[10%] w-[30%] h-[30%] rounded-full opacity-[0.03]"
+            <div className={`absolute bottom-[20%] left-[10%] w-[30%] h-[30%] rounded-full ${concertMode ? 'opacity-[0.12]' : 'opacity-[0.03]'}`}
               style={{ background: 'radial-gradient(circle, #2563EB 0%, transparent 70%)', filter: 'blur(80px)' }} />
           </div>
 
@@ -350,7 +351,18 @@ export default function App() {
               ))}
             </nav>
 
-            <div className="pt-4 border-t border-white/[0.06] mb-3 px-2">
+            <div className="pt-4 border-t border-white/[0.06] mb-3 px-2 space-y-2">
+              <button
+                onClick={() => setConcertMode(c => !c)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all w-full text-left ${
+                  concertMode
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30'
+                    : 'text-white/40 hover:text-white/60 hover:bg-white/[0.03]'
+                }`}
+              >
+                <span className="text-base">{concertMode ? '🔥' : '🎆'}</span>
+                <span>{concertMode ? 'Concert mode ON' : 'Concert mode'}</span>
+              </button>
               <button
                 onClick={() => setMode('onboarding')}
                 className="flex items-center gap-2 text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer"
@@ -418,7 +430,7 @@ export default function App() {
             <main
               id="main-content"
               tabIndex={-1}
-              className="flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar focus:outline-none concert-bg"
+              className={`flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar focus:outline-none ${concertMode ? 'concert-intense' : 'concert-bg'}`}
             >
               <Suspense fallback={<SectionSpinner />}>
                 <SectionTransition sectionKey={activeSection}>
