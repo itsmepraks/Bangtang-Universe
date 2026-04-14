@@ -77,6 +77,60 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   return dotProduct / (magnitudeA * magnitudeB);
 }
 
+/** Count how many of the 5 audio features are non-null for a song. */
+function featureCoverage(song: Song): number {
+  let count = 0;
+  if (song.energy != null) count++;
+  if (song.valence != null) count++;
+  if (song.danceability != null) count++;
+  if (song.acousticness != null) count++;
+  if (song.bpm != null) count++;
+  return count;
+}
+
+/**
+ * Text-based similarity when audio features are missing.
+ * Uses sentiment match, era match, and shared writer overlap.
+ */
+function textSimilarity(
+  target: Song,
+  candidate: Song,
+  targetEra: string | null,
+  candidateEra: string | null,
+): number {
+  let score = 0;
+
+  // Sentiment match (worth 0.35)
+  if (target.sentiment && candidate.sentiment && target.sentiment === candidate.sentiment) {
+    score += 0.35;
+  }
+
+  // Era match (worth 0.25)
+  if (targetEra && candidateEra && targetEra === candidateEra) {
+    score += 0.25;
+  }
+
+  // Shared writers (worth up to 0.25)
+  const tw = new Set((target.writers ?? []).map(w => w.toLowerCase()));
+  const cw = new Set((candidate.writers ?? []).map(w => w.toLowerCase()));
+  if (tw.size > 0 && cw.size > 0) {
+    let shared = 0;
+    for (const w of tw) { if (cw.has(w)) shared++; }
+    score += (shared / Math.max(tw.size, cw.size)) * 0.25;
+  }
+
+  // Same member credits (worth 0.15)
+  const tm = new Set((target.member_credits ?? []).map(m => m.toLowerCase()));
+  const cm = new Set((candidate.member_credits ?? []).map(m => m.toLowerCase()));
+  if (tm.size > 0 && cm.size > 0) {
+    let shared = 0;
+    for (const m of tm) { if (cm.has(m)) shared++; }
+    score += (shared / Math.max(tm.size, cm.size)) * 0.15;
+  }
+
+  return score;
+}
+
 // ==================== HELPERS ====================
 
 /**
@@ -151,6 +205,17 @@ function generateReasons(target: Song, candidate: Song, targetEra: string | null
     reasons.push('Similar danceability');
   }
 
+  // Shared writers
+  const targetWriters = new Set((target.writers ?? []).map(w => w.toLowerCase()));
+  const sharedWriters = (candidate.writers ?? []).filter(w => targetWriters.has(w.toLowerCase()));
+  if (sharedWriters.length > 0) {
+    reasons.push(`Shared writer: ${sharedWriters[0]}`);
+  }
+
+  if (reasons.length === 0) {
+    reasons.push('Similar profile');
+  }
+
   return reasons;
 }
 
@@ -182,37 +247,32 @@ export function getRecommendations(
 
   const scored: SongRecommendation[] = [];
 
+  const targetFeatures = featureCoverage(targetSong);
+  const useAudio = targetFeatures >= 3;
+
   for (const candidate of allSongs) {
-    // Exclude the target song itself
     if (candidate.id === targetSong.id) continue;
 
-    const candidateVector = buildFeatureVector(candidate);
-
-    // Base similarity from cosine distance
-    let similarity = cosineSimilarity(targetVector, candidateVector);
-
-    // Sentiment bonus
     const candidateEra = getEra(candidate.album_id, albums);
-    if (
-      targetSong.sentiment !== null &&
-      candidate.sentiment !== null &&
-      targetSong.sentiment === candidate.sentiment
-    ) {
-      similarity += 0.05;
+    let similarity: number;
+
+    if (useAudio && featureCoverage(candidate) >= 3) {
+      // Both have enough audio — use cosine similarity
+      const candidateVector = buildFeatureVector(candidate);
+      similarity = cosineSimilarity(targetVector, candidateVector);
+      // Bonuses
+      if (targetSong.sentiment && candidate.sentiment && targetSong.sentiment === candidate.sentiment) {
+        similarity += 0.05;
+      }
+      if (targetEra && candidateEra && targetEra === candidateEra) {
+        similarity += 0.03;
+      }
+    } else {
+      // Fallback: text-based similarity
+      similarity = textSimilarity(targetSong, candidate, targetEra, candidateEra);
     }
 
-    // Era bonus
-    if (
-      targetEra !== null &&
-      candidateEra !== null &&
-      targetEra === candidateEra
-    ) {
-      similarity += 0.03;
-    }
-
-    // Cap at 1.0
     similarity = Math.min(similarity, 1.0);
-
     const reasons = generateReasons(targetSong, candidate, targetEra, candidateEra);
     const albumTitle = getAlbumTitle(candidate.album_id, albums);
 
