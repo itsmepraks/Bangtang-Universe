@@ -92,7 +92,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
   }, [scatterData]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* ==================== MOOD QUADRANT ==================== */}
       <div className="bg-[#0c0c14] rounded-2xl p-4 md:p-6">
         <h3 className="text-base font-bold text-white/85 mb-1">Mood Quadrant</h3>

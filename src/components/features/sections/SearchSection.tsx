@@ -124,7 +124,7 @@ export default function SearchSection({ songs, members, albums, awards, concerts
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Search Bar */}
       <div className="relative">
         <div className="flex items-center gap-4 bg-[#111118] border border-white/[0.06] rounded-2xl px-6 py-4 focus-within:border-purple-500/30 transition-colors">

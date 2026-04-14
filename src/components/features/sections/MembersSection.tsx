@@ -454,6 +454,7 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
   return (
     <div className="space-y-8">
       <MemberGrid members={members} onSelect={onSelectMember} />
+      <div className="border-t border-white/[0.04] my-2" />
       <GlassHUD title="Compare Members" icon={GitCompare}>
         <MemberComparison members={members} songs={songs} />
       </GlassHUD>

@@ -86,7 +86,7 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
       <div
         role="tabpanel"
         id="analytics-panel"
-        className="bg-[#111118] rounded-2xl border border-white/[0.06] p-3 md:p-5"
+        className="bg-[#111118] rounded-2xl border border-white/[0.06] p-2 md:p-4"
       >
         <Suspense
           fallback={

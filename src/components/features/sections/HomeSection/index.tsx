@@ -132,7 +132,7 @@ export default function HomeSection({
   }, [concerts]);
 
   return (
-    <main className="space-y-6">
+    <main className="space-y-8">
       {/* ── Page title + tagline ─────────────────────────────────── */}
       <div className="pt-1">
         <h1 className="text-xs font-semibold text-white/40 uppercase tracking-widest">
