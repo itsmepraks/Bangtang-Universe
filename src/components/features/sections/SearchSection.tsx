@@ -263,8 +263,8 @@ export default function SearchSection({ songs, members, albums, awards, concerts
           title={query || activeMood ? 'No results found' : 'Search the archive'}
           description={
             query || activeMood
-              ? 'Try a different spelling, a mood pill above, or a broader term.'
-              : 'Search songs, albums, members, awards, concerts — or pick a mood to explore by vibe.'
+              ? 'Try different words or pick a mood above.'
+              : 'Songs, albums, members, moods.'
           }
         />
       )}

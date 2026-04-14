@@ -111,12 +111,7 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
         <EmptyState
           icon={MessageSquare}
           title="Ask anything about BTS"
-          description={
-            <>
-              Try natural questions like <em>"Who has the most KOMCA credits?"</em> or
-              {' '}<em>"What were their Grammy nominations?"</em> — or tap a suggestion above.
-            </>
-          }
+          description="Type a question or tap a suggestion."
         />
       )}
 

@@ -103,7 +103,7 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
         <EmptyState
           icon={Sparkles}
           title="Pick a song to start"
-          description="We'll suggest 8 tracks with similar energy, mood, danceability, and acoustic character — and show a side-by-side radar of the closest match."
+          description="Pick a song. We'll find 8 that sound like it."
         />
       )}
 
@@ -112,7 +112,7 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
         <EmptyState
           icon={Sparkles}
           title="No similar songs found"
-          description="This track's audio profile is unusual in the catalog. Try another song."
+          description="Nothing close. Try a different track."
         />
       )}
 
