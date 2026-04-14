@@ -66,7 +66,7 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
       <div>
         <div className="flex items-center gap-2 mb-1">
           <MessageSquare className="w-4 h-4 text-purple-400" />
-          <h3 className="text-sm font-semibold text-white/70">Ask About BTS</h3>
+          <h3 className="text-base font-bold text-white/85">Ask About BTS</h3>
         </div>
         <p className="text-xs text-white/40">
           Ask questions about the discography, members, and more
@@ -117,7 +117,7 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
 
       {/* Answer Display */}
       {answer && (
-        <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-6 space-y-4">
+        <div className="bg-gradient-to-br from-[#111118] to-[#0e0e18] border border-white/[0.05] rounded-xl p-5 space-y-4">
           {/* Current Question */}
           <p className="text-sm text-white/50 mb-2">
             &ldquo;{currentQuestion}&rdquo;
@@ -261,7 +261,7 @@ export default function QAPanel({ songs, albums, members, awards, chartEntries, 
                   setCurrentQuestion(entry.question);
                   setAnswer(entry.response);
                 }}
-                className="w-full text-left bg-white/[0.02] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.04] transition-colors"
+                className="w-full text-left bg-[#0c0c14] border border-white/[0.03] rounded-lg p-3 hover:bg-white/[0.04] transition-colors"
               >
                 <p className="text-xs text-white/40 truncate">
                   {entry.question}

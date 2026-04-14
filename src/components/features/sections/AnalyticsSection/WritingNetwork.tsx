@@ -80,7 +80,7 @@ export default function WritingNetwork({ songs, members }: WritingNetworkProps) 
     <div className="space-y-8">
       {/* 1. Member Contributions (Grouped Bar Chart) */}
       <div className="bg-[#111118] border border-dashed border-white/[0.08] rounded-xl p-4 md:p-5">
-        <h3 className="text-sm font-semibold text-white/70 mb-2">
+        <h3 className="text-base font-bold text-white/85 mb-2">
           Member Contributions
         </h3>
         {writingSummary && (
@@ -132,7 +132,7 @@ export default function WritingNetwork({ songs, members }: WritingNetworkProps) 
 
       {/* 2. Top Writers (Table) */}
       <div className="bg-[#111118] border border-dashed border-white/[0.08] rounded-xl p-4 md:p-5">
-        <h3 className="text-sm font-semibold text-white/70 mb-4">Top Songwriters</h3>
+        <h3 className="text-base font-bold text-white/85 mb-4">Top Songwriters</h3>
         <div className="space-y-1.5">
           {topWriters.map((writer, index) => (
             <div
@@ -163,7 +163,7 @@ export default function WritingNetwork({ songs, members }: WritingNetworkProps) 
 
       {/* 3. Top Writing Pairs (Table) */}
       <div className="bg-[#111118] border border-dashed border-white/[0.08] rounded-xl p-4 md:p-5">
-        <h3 className="text-sm font-semibold text-white/70 mb-4">
+        <h3 className="text-base font-bold text-white/85 mb-4">
           Frequent Collaborators
         </h3>
         <div className="space-y-1.5">

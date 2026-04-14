@@ -95,7 +95,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
     <div className="space-y-6">
       {/* ==================== MOOD QUADRANT ==================== */}
       <div className="bg-[#0c0c14] rounded-2xl p-4 md:p-6">
-        <h3 className="text-sm font-semibold text-white/70 mb-1">Mood Quadrant</h3>
+        <h3 className="text-base font-bold text-white/85 mb-1">Mood Quadrant</h3>
 
 
         <div className="relative">
@@ -148,7 +148,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
 
       {/* ==================== AUDIO FEATURE DISTRIBUTIONS ==================== */}
       <div className="bg-[#111118]/80 border border-white/[0.04] rounded-xl p-3 md:p-5">
-        <h3 className="text-sm font-semibold text-white/70 mb-1">Audio Feature Distributions</h3>
+        <h3 className="text-base font-bold text-white/85 mb-1">Audio Feature Distributions</h3>
         <p className="text-xs text-white/35 mb-3">How songs are distributed across each audio dimension.</p>
 
         {/* Feature filter pills */}
@@ -206,7 +206,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
       {/* ==================== SONG RANKINGS ==================== */}
       <div className="bg-[#111118]/80 border border-white/[0.04] rounded-xl p-3 md:p-5">
         <div className="flex items-center justify-between mb-2 gap-3">
-          <h3 className="text-sm font-semibold text-white/70">Song Rankings</h3>
+          <h3 className="text-base font-bold text-white/85">Song Rankings</h3>
           <select
             value={selectedRankingCategory}
             onChange={(e) => setSelectedRankingCategory(e.target.value)}

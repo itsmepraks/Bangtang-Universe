@@ -72,7 +72,7 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
     <div className="space-y-8">
       {/* ===== Song Selector ===== */}
       <div>
-        <h3 className="text-lg font-semibold text-white/90 mb-4">
+        <h3 className="text-lg font-bold text-white mb-4">
           Song Recommendations
         </h3>
         <select
@@ -122,7 +122,7 @@ export default function SongRecommender({ songs, albums }: SongRecommenderProps)
           {recommendations.map((rec) => (
             <div
               key={rec.song.id}
-              className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5 hover:border-white/[0.12] transition-all"
+              className="bg-[#0e0e16] border border-white/[0.04] rounded-xl p-4 hover:bg-[#131320] transition-colors"
             >
               <p className="text-base font-semibold text-white/90">
                 {rec.song.title}
