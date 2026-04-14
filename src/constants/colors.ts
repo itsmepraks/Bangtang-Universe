@@ -125,6 +125,21 @@ export const SENTIMENT_COLORS = {
 } as const;
 
 /**
+ * Section-specific accent colors — each section has its own concert spotlight.
+ * Purple remains the brand color; these are section highlights only.
+ */
+export const SECTION_ACCENTS = {
+  overview: '#A855F7',     // purple — brand home
+  discography: '#818CF8',  // indigo — musical
+  members: '#EC4899',      // pink — personality
+  analytics: '#06B6D4',    // cyan — data/tech
+  awards: '#FBBF24',       // gold — trophies
+  tours: '#10B981',        // emerald — global/travel
+  media: '#F97316',        // orange — visual/creative
+  search: '#A855F7',       // purple — brand
+} as const;
+
+/**
  * Retrieves the signature color for a BTS member by their ID
  * 
  * @param memberId - The member's ID (case-insensitive): 'rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'
@@ -206,6 +221,7 @@ export const COLORS = {
   UNIVERSE: UNIVERSE_COLORS,
   UI: UI_COLORS,
   SENTIMENT: SENTIMENT_COLORS,
+  SECTION_ACCENTS,
 } as const;
 
 export default COLORS;

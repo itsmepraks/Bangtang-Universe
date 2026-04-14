@@ -78,9 +78,9 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
                 aria-controls="tours-panel"
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
                   isActive
-                    ? 'bg-purple-500/10 text-white border border-purple-500/30'
+                    ? 'bg-emerald-500/10 text-white border border-emerald-500/30'
                     : 'text-white/60 hover:text-white/85 hover:bg-white/[0.03] border border-transparent'
                 }`}
               >

@@ -56,7 +56,7 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-purple-500/10 text-white border border-purple-500/30'
+                    ? 'bg-amber-500/15 text-white border border-amber-500/30'
                     : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
                 }`}
               >
