@@ -152,7 +152,7 @@ export function extractThemes(text: string): string[] {
  * Compute a simple sentiment score from English lyrics text.
  * Returns a value roughly in [-1, 1] range.
  */
-function computeSentiment(text: string): number {
+export function computeSentiment(text: string): number {
   const words = text.toLowerCase().replace(/[^a-z'\s-]/g, ' ').split(/\s+/);
   let positive = 0;
   let negative = 0;

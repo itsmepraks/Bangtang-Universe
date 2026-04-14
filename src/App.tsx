@@ -88,6 +88,13 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
+  // State for expanded sections (must be declared before useEffects that reference them)
+  const [discographyState, setDiscographyState] = useState<DiscographyState>({
+    selectedAlbumId: null, selectedSongId: null, view: 'grid',
+  });
+  const [memberSectionId, setMemberSectionId] = useState<string | null>(null);
+  const [eraFilter, setEraFilter] = useState<string | null>(null);
+
   // ── URL hash sync (deep-linkable top-level state) ─────────────
   // Format: #/<section>[/<arg1>[/<arg2>]]
   // discography: #/discography, #/discography/album/42, #/discography/song/42/137
@@ -161,13 +168,6 @@ export default function App() {
   useEffect(() => {
     setSidebarOpen(false);
   }, [activeSection]);
-
-  // New state for expanded sections
-  const [discographyState, setDiscographyState] = useState<DiscographyState>({
-    selectedAlbumId: null, selectedSongId: null, view: 'grid',
-  });
-  const [memberSectionId, setMemberSectionId] = useState<string | null>(null);
-  const [eraFilter, setEraFilter] = useState<string | null>(null);
 
   // Database hooks
   const { songs, loading: songsLoading, error: songsError, refetch: refetchSongs } = useSongs();

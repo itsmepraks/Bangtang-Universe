@@ -161,8 +161,7 @@ export default function HomeSection({
           Bangtan Universe
         </h1>
         <p className="text-sm text-white/35 mt-1">
-          A complete data archive of BTS — music, members, awards, concerts, and deep audio
-          analytics across every era.
+          11 years. 7 members. The numbers behind the music.
         </p>
       </div>
 

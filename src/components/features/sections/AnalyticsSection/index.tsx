@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { BarChart3, TrendingUp, Network, Heart, Sparkles, MessageSquare, BookOpen, Trophy, Calendar } from 'lucide-react';
 import type { Song, Album, Member, Lyrics, Award, ChartEntry, Concert, MemberEvent } from '../../../../types/database';
-import SectionIntro from '../../../ui/SectionIntro';
-import GlossaryTip from '../../../ui/GlossaryTip';
+
 
 const AudioExplorer = lazy(() => import('./AudioExplorer'));
 const EraEvolution = lazy(() => import('./EraEvolution'));
@@ -76,17 +75,6 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
 
   return (
     <div className="space-y-4">
-      <SectionIntro
-        description={
-          <>
-            Deep-dive into BTS's music through data. Explore audio features like{' '}
-            <GlossaryTip term="energy" />, <GlossaryTip term="valence" />, and{' '}
-            <GlossaryTip term="BPM" /> across <GlossaryTip term="era">eras</GlossaryTip>,
-            trace the writing network, or discover songs by mood.
-          </>
-        }
-      />
-
       {/* Flat single-row tab strip — keyboard-navigable via arrow keys */}
       <AnalyticsTabStrip
         tabs={TABS}

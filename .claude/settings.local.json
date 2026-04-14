@@ -38,7 +38,19 @@
       "Bash(python:*)",
       "Bash(awk NR>=287 && NR<=295:*)",
       "Bash(awk NR>=455 && NR<=475:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(npx -- tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(gh pr create --title 'ux: heuristic audit pass — discoverability, error recovery, a11y' --body ':*)",
+      "Bash(grep -r \"Concert\\\\|concerts\\\\|tour\" /Users/praks/Development/BTS-universe/scripts/scrape-13* --include=\"*.ts\")",
+      "Read(//tmp/**)",
+      "Bash(npm list:*)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(python3 /Users/praks/.claude/skills/ui-ux-pro-max/scripts/search.py \"music entertainment dashboard data visualization dark mode immersive\" --design-system -p \"BTS Universe\")",
+      "Bash(python3 /Users/praks/.claude/skills/ui-ux-pro-max/scripts/search.py \"AI generated feel human organic natural\" --domain ux)",
+      "Bash(grep -n \"Each \\\\|Click \\\\|Tap \\\\|Mapping \" /Users/praks/Development/BTS-universe/src/components/features/sections/AnalyticsSection/*.tsx)",
+      "Bash(grep -A 3 \"SectionIntro description=\" /Users/praks/Development/BTS-universe/src/components/features/sections/**/*.tsx)"
     ],
     "additionalDirectories": [
       "c:\\Development\\BTS universe"

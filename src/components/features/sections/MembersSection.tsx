@@ -6,8 +6,7 @@ import { useSoloAlbumsByMember, useAwardsByMember, useCollaborationsByMember, us
 import MemberTimeline from './Members/MemberTimeline';
 import Badge from '../../ui/Badge';
 import MemberComparison from '../comparison/MemberComparison';
-import SectionIntro from '../../ui/SectionIntro';
-import GlossaryTip from '../../ui/GlossaryTip';
+
 
 interface MembersSectionProps {
   members: Member[];
@@ -435,14 +434,6 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
 
   return (
     <div className="space-y-8">
-      <SectionIntro
-        description={
-          <>
-            The seven members of BTS — their profiles, solo careers, and <GlossaryTip term="KOMCA" /> songwriting credits.
-            Click a member to explore their full profile, discography, and awards.
-          </>
-        }
-      />
       <MemberGrid members={members} onSelect={onSelectMember} />
       <GlassHUD title="Compare Members" icon={GitCompare}>
         <MemberComparison members={members} songs={songs} />
