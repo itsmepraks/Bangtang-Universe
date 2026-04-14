@@ -96,15 +96,7 @@ export default function AudioExplorer({ songs, albums }: AudioExplorerProps) {
       {/* ==================== MOOD QUADRANT ==================== */}
       <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
         <h3 className="text-sm font-semibold text-white/70 mb-1">Mood Quadrant</h3>
-        <p className="text-xs text-white/35 mb-3">Each dot is a song — tap to see title, sentiment, and audio values.</p>
-        {moodSummary && (
-          <p className="text-xs text-white/40 leading-relaxed mb-4 max-w-2xl">
-            Mapping {moodSummary.total} songs by <GlossaryTip term="valence" /> (happiness) and{' '}
-            <GlossaryTip term="energy" /> (intensity). BTS's sound center is{' '}
-            <span className="text-white/60 font-medium">{moodSummary.quadrant}</span> (avg valence {moodSummary.avgValence}, energy {moodSummary.avgEnergy}).{' '}
-            {moodSummary.highEnergy} songs are high-energy and {moodSummary.highValence} lean happy.
-          </p>
-        )}
+
 
         <div className="relative">
           {/* X-axis label row */}

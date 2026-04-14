@@ -5,13 +5,9 @@ import {
   Area,
   BarChart,
   Bar,
-  ScatterChart,
-  Scatter,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
-  Cell,
   ResponsiveContainer,
 } from 'recharts';
 import type { Song, Album, Member, Award, Concert } from '../../../../types/database';
@@ -22,7 +18,7 @@ import {
   computeEraEvolution,
   computeMemberContributions,
 } from '../../../../services/analyticsService';
-import { getSentimentColor, CHART_STYLES } from '../../../../constants/colors';
+import { CHART_STYLES } from '../../../../constants/colors';
 
 interface HomeSectionProps {
   songs: Song[];
@@ -66,6 +62,10 @@ export default function HomeSection({
     [members],
   );
   const awardsWon = useMemo(() => awards.filter((a) => a.result === 'won').length, [awards]);
+  const latestAlbum = useMemo(
+    () => [...albums].sort((a, b) => (b.release_date ?? '').localeCompare(a.release_date ?? ''))[0] ?? null,
+    [albums],
+  );
   const uniqueTours = useMemo(
     () => new Set(concerts.map((c) => c.tour_name)).size,
     [concerts],
@@ -97,28 +97,6 @@ export default function HomeSection({
     [contributions],
   );
   const topContributor = contributions[0]?.stageName ?? '—';
-
-  // ── MOOD card ─────────────────────────────────────────────────
-  const scatterData = useMemo(
-    () =>
-      songs
-        .filter((s) => s.valence != null && s.energy != null)
-        .map((s) => ({
-          valence: s.valence as number,
-          energy: s.energy as number,
-          sentiment: s.sentiment ?? 'Unknown',
-          color: getSentimentColor(s.sentiment ?? ''),
-          title: s.title,
-        })),
-    [songs],
-  );
-  const topSentiment = useMemo(() => {
-    const counts: Record<string, number> = {};
-    songs.forEach((s) => {
-      if (s.sentiment) counts[s.sentiment] = (counts[s.sentiment] || 0) + 1;
-    });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
-  }, [songs]);
 
   // ── AWARDS card ───────────────────────────────────────────────
   const uniqueCeremonies = useMemo(
@@ -308,94 +286,39 @@ export default function HomeSection({
           </div>
         </BentoCard>
 
-        {/* MOOD QUADRANT — col 3, rows 1+2 (tall) */}
+        {/* LATEST RELEASE — col 3, rows 1+2 (tall) */}
         <BentoCard
-          title="Mood Quadrant"
+          title="Latest Release"
           metrics={[
-            { value: scatterData.length, label: 'songs plotted' },
-            { value: topSentiment, label: 'top sentiment' },
+            { value: latestAlbum?.title ?? '—', label: 'album' },
+            { value: latestAlbum?.release_date?.slice(0, 4) ?? '—', label: 'year' },
           ]}
-          onExplore={() => onNavigate('analytics')}
+          onExplore={() => latestAlbum && onNavigate('discography', latestAlbum.id)}
           className="lg:row-span-2 lg:col-span-1"
         >
-          {/* Quadrant axis labels overlaid on the chart */}
-          <div className="relative h-full min-h-[280px]">
-            <span className="absolute top-0 inset-x-0 text-center text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
-              Energetic ↑
-            </span>
-            <span className="absolute bottom-1 inset-x-0 text-center text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
-              ↓ Calm
-            </span>
-            <span className="absolute top-1/2 left-0 -translate-y-1/2 text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
-              Sad
-            </span>
-            <span className="absolute top-1/2 right-0 -translate-y-1/2 text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
-              Happy
-            </span>
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 18, right: 28, bottom: 18, left: 24 }}>
-                <CartesianGrid {...CHART_STYLES.GRID} />
-                <XAxis
-                  type="number"
-                  dataKey="valence"
-                  domain={[0, 1]}
-                  name="Valence"
-                  tick={false}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  type="number"
-                  dataKey="energy"
-                  domain={[0, 1]}
-                  name="Energy"
-                  tick={false}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  content={({ payload }) => {
-                    if (!payload?.length) return null;
-                    const d = payload[0].payload as (typeof scatterData)[number];
-                    const valPct = Math.round(d.valence * 100);
-                    const engPct = Math.round(d.energy * 100);
-                    return (
-                      <div style={{ ...CHART_STYLES.TOOLTIP.contentStyle, minWidth: 160 }}>
-                        <p style={CHART_STYLES.TOOLTIP.labelStyle}>{d.title}</p>
-                        <p style={{ color: d.color, fontSize: 11, marginTop: 3, marginBottom: 8 }}>
-                          {d.sentiment}
-                        </p>
-                        {/* Valence bar */}
-                        <div style={{ marginBottom: 6 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>Valence</span>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>{valPct}%</span>
-                          </div>
-                          <div style={{ height: 3, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
-                            <div style={{ height: '100%', width: `${valPct}%`, background: '#C084FC', borderRadius: 2 }} />
-                          </div>
-                        </div>
-                        {/* Energy bar */}
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>Energy</span>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>{engPct}%</span>
-                          </div>
-                          <div style={{ height: 3, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
-                            <div style={{ height: '100%', width: `${engPct}%`, background: '#A855F7', borderRadius: 2 }} />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }}
-                />
-                <Scatter data={scatterData} isAnimationActive={false}>
-                  {scatterData.map((entry, i) => (
-                    <Cell key={`scatter-${i}`} fill={entry.color} fillOpacity={0.75} />
-                  ))}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
+          <div className="relative h-full min-h-[280px] rounded-xl overflow-hidden">
+            {latestAlbum?.cover_art_url ? (
+              <img
+                src={latestAlbum.cover_art_url}
+                alt={latestAlbum.title}
+                className="w-full h-full object-cover opacity-80"
+                loading="lazy"
+              />
+            ) : (
+              <div
+                className="w-full h-full"
+                style={{
+                  background: `linear-gradient(135deg, ${latestAlbum?.cover_color || '#A855F7'}60, ${latestAlbum?.cover_color || '#A855F7'}10)`,
+                }}
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4">
+              <p className="text-lg font-bold text-white">{latestAlbum?.title}</p>
+              {latestAlbum?.era && (
+                <p className="text-xs text-white/60 mt-1">{latestAlbum.era} era</p>
+              )}
+            </div>
           </div>
         </BentoCard>
 
