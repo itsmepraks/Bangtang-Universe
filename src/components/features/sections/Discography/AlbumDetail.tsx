@@ -4,7 +4,7 @@ import type { Song, Album } from '../../../../types/database';
 import Badge from '../../../ui/Badge';
 import DataTable from '../../../ui/DataTable';
 import BtsLogo from '../../../ui/BtsLogo';
-import { getSentimentColor } from '../../../../constants/colors';
+import { getSentimentColor, BORAHAE_COLORS } from '../../../../constants/colors';
 
 interface AlbumDetailProps {
   album: Album;
@@ -72,7 +72,7 @@ export default function AlbumDetail({ album, songs, onSelectSong, onBack }: Albu
       <div className="flex flex-col md:flex-row gap-4 md:gap-8">
         <div
           className="w-32 h-32 md:w-48 md:h-48 rounded-2xl flex-shrink-0 overflow-hidden"
-          style={{ background: `linear-gradient(135deg, ${album.cover_color || '#A855F7'}60, ${album.cover_color || '#A855F7'}15)` }}
+          style={{ background: `linear-gradient(135deg, ${album.cover_color || BORAHAE_COLORS.PRIMARY}60, ${album.cover_color || BORAHAE_COLORS.PRIMARY}15)` }}
         >
           {album.cover_art_url ? (
             <img

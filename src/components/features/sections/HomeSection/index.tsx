@@ -18,7 +18,7 @@ import {
   computeEraEvolution,
   computeMemberContributions,
 } from '../../../../services/analyticsService';
-import { CHART_STYLES } from '../../../../constants/colors';
+import { CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
 
 interface HomeSectionProps {
   songs: Song[];
@@ -208,7 +208,7 @@ export default function HomeSection({
           {/* Legend */}
           <div className="flex items-center gap-3 mb-2">
             <span className="flex items-center gap-1.5 text-[10px] text-white/35">
-              <span className="w-3 h-0.5 rounded bg-[#A855F7] inline-block" />
+              <span className="w-3 h-0.5 rounded inline-block" style={{ backgroundColor: BORAHAE_COLORS.PRIMARY }} />
               Energy
             </span>
             <span className="flex items-center gap-1.5 text-[10px] text-white/35">
@@ -229,8 +229,8 @@ export default function HomeSection({
               <Area
                 type="monotone"
                 dataKey="energy"
-                stroke="#A855F7"
-                fill="#A855F7"
+                stroke={BORAHAE_COLORS.PRIMARY}
+                fill={BORAHAE_COLORS.PRIMARY}
                 fillOpacity={0.15}
                 strokeWidth={2}
                 dot={false}
@@ -308,7 +308,7 @@ export default function HomeSection({
               <div
                 className="w-full h-full"
                 style={{
-                  background: `linear-gradient(135deg, ${latestAlbum?.cover_color || '#A855F7'}60, ${latestAlbum?.cover_color || '#A855F7'}10)`,
+                  background: `linear-gradient(135deg, ${latestAlbum?.cover_color || BORAHAE_COLORS.PRIMARY}60, ${latestAlbum?.cover_color || BORAHAE_COLORS.PRIMARY}10)`,
                 }}
               />
             )}
@@ -357,7 +357,7 @@ export default function HomeSection({
               <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
               <Bar
                 dataKey="count"
-                fill="#A855F7"
+                fill={BORAHAE_COLORS.PRIMARY}
                 fillOpacity={0.8}
                 radius={[3, 3, 0, 0]}
                 isAnimationActive={false}

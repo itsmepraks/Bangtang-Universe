@@ -6,7 +6,7 @@ import { useSoloAlbumsByMember, useAwardsByMember, useCollaborationsByMember, us
 import MemberTimeline from './Members/MemberTimeline';
 import Badge from '../../ui/Badge';
 import MemberComparison from '../comparison/MemberComparison';
-import { getMemberColor } from '../../../constants/colors';
+import { getMemberColor, BORAHAE_COLORS } from '../../../constants/colors';
 
 
 interface MembersSectionProps {
@@ -44,7 +44,7 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
             {m.image_url ? (
               <img src={m.image_url} alt={m.stage_name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${m.color || '#A855F7'}30, transparent)` }}>
+              <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${m.color || BORAHAE_COLORS.PRIMARY}30, transparent)` }}>
                 <User size={48} className="text-white/20" />
               </div>
             )}
@@ -65,7 +65,7 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
               <div
                 className="w-3 h-3 rounded-full transition-shadow duration-300 group-hover:shadow-[0_0_12px_var(--glow)]"
                 style={{
-                  backgroundColor: m.color || '#A855F7',
+                  backgroundColor: m.color || BORAHAE_COLORS.PRIMARY,
                   '--glow': `${m.color}80`,
                 } as React.CSSProperties}
               />
@@ -170,7 +170,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
               </h2>
               <div
                 className="w-3 h-3 rounded-full shadow-lg"
-                style={{ backgroundColor: member.color || '#A855F7', boxShadow: `0 0 12px ${member.color}60` }}
+                style={{ backgroundColor: member.color || BORAHAE_COLORS.PRIMARY, boxShadow: `0 0 12px ${member.color}60` }}
               />
             </div>
             {member.full_name && <p className="text-sm text-white/50 mb-3">{member.full_name}</p>}
@@ -203,7 +203,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
                 <div key={stat.label} className="flex flex-col">
                   <span
                     className="text-xl md:text-2xl font-semibold tabular-nums"
-                    style={{ color: stat.accent ? (member.color || '#A855F7') : 'rgba(255,255,255,0.85)' }}
+                    style={{ color: stat.accent ? (member.color || BORAHAE_COLORS.PRIMARY) : 'rgba(255,255,255,0.85)' }}
                   >
                     {stat.value}
                   </span>
@@ -287,7 +287,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
                       className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                       style={{ backgroundColor: `${member.color}15`, border: `1px solid ${member.color}25` }}
                     >
-                      <Award size={11} style={{ color: member.color || '#A855F7' }} />
+                      <Award size={11} style={{ color: member.color || BORAHAE_COLORS.PRIMARY }} />
                     </div>
                     <span className="group-hover:text-white/80 transition-colors">{a}</span>
                   </div>
@@ -400,7 +400,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
               {/* Awards summary bar */}
               <div className="flex items-center gap-4 px-5 py-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
                 <div className="flex items-center gap-2">
-                  <Trophy size={14} style={{ color: member.color || '#A855F7' }} />
+                  <Trophy size={14} style={{ color: member.color || BORAHAE_COLORS.PRIMARY }} />
                   <span className="text-sm font-semibold text-white/80">{memberAwards.length}</span>
                   <span className="text-xs text-white/40">total</span>
                 </div>

@@ -18,7 +18,8 @@ import {
   buildEraOrder,
 } from '../../../../services/analyticsService';
 import { lyricsAnalyzer, extractThemes } from '../../../../services/lyricsAnalysisService';
-import { getSentimentColor, CHART_STYLES } from '../../../../constants/colors';
+import { getSentimentColor, CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
+import ChartSection from '../../../ui/ChartSection';
 
 const POSITIVE_SENTIMENTS = new Set([
   'Joy', 'Gratitude', 'Comfort', 'Celebration', 'Confidence', 'Determination',
@@ -183,11 +184,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
       </div>
 
       {/* ===== 2. Sentiment Distribution ===== */}
-      <div className="bg-gradient-to-br from-[#111118] to-[#0f0f18] border border-white/[0.05] rounded-2xl p-4 md:p-6">
-        <h3 className="text-base font-bold text-white/85 mb-4">
-          Sentiment Distribution
-        </h3>
-
+      <ChartSection title="Sentiment Distribution" variant="gradient">
         {/* Positive vs Reflective split bar */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-2">
@@ -306,7 +303,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </ChartSection>
 
       {/* ===== 3. Theme x Era Heatmap ===== */}
       <div className="bg-[#0c0c14] rounded-2xl p-4 md:p-6">
@@ -406,8 +403,8 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
             >
               <defs>
                 <linearGradient id="moodArcFillPos" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#A855F7" stopOpacity={0.5} />
-                  <stop offset="50%" stopColor="#A855F7" stopOpacity={0.15} />
+                  <stop offset="0%" stopColor={BORAHAE_COLORS.PRIMARY} stopOpacity={0.5} />
+                  <stop offset="50%" stopColor={BORAHAE_COLORS.PRIMARY} stopOpacity={0.15} />
                   <stop offset="100%" stopColor="#6366F1" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
@@ -457,10 +454,10 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
               <Area
                 type="monotone"
                 dataKey="sentiment"
-                stroke="#A855F7"
+                stroke={BORAHAE_COLORS.PRIMARY}
                 strokeWidth={2}
                 fill="url(#moodArcFillPos)"
-                dot={{ fill: '#A855F7', r: 4, strokeWidth: 0 }}
+                dot={{ fill: BORAHAE_COLORS.PRIMARY, r: 4, strokeWidth: 0 }}
                 activeDot={{ r: 6, fill: '#C084FC', strokeWidth: 0 }}
               />
             </AreaChart>
@@ -473,9 +470,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
       </div>
 
       {/* ===== 5. Word Cloud ===== */}
-      <div className="bg-[#111118]/80 border border-white/[0.04] rounded-xl p-3 md:p-5">
-        <h3 className="text-base font-bold text-white/85 mb-4">Most Used Words</h3>
-
+      <ChartSection title="Most Used Words" variant="subtle">
         {wordCloudItems.length > 0 ? (
           <div className="flex flex-wrap gap-x-3 gap-y-2 justify-center items-baseline">
             {wordCloudItems.map((item) => (
@@ -494,7 +489,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
             No word frequency data available.
           </p>
         )}
-      </div>
+      </ChartSection>
     </div>
   );
 }

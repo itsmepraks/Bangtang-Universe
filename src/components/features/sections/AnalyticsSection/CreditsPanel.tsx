@@ -15,8 +15,9 @@ import {
   computeWritingNetwork,
   computeMemberContributions,
 } from '../../../../services/analyticsService';
-import { CHART_STYLES } from '../../../../constants/colors';
+import { CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
 import GlossaryTip from '../../../ui/GlossaryTip';
+import ChartSection from '../../../ui/ChartSection';
 
 interface CreditsPanelProps {
   songs: Song[];
@@ -85,10 +86,7 @@ export default function CreditsPanel({ songs, members }: CreditsPanelProps) {
   return (
     <div className="space-y-8">
       {/* 1. Member Contributions (Grouped Bar Chart) */}
-      <div className="bg-[#0c0c14] rounded-2xl p-4 md:p-6">
-        <h3 className="text-base font-bold text-white/85 mb-2">
-          Member Contributions
-        </h3>
+      <ChartSection title="Member Contributions" variant="immersive">
         {writingSummary && (
           <p className="text-xs text-white/40 leading-relaxed mb-4 max-w-2xl">
             {writingSummary.totalWriters} unique writers have contributed to BTS&apos;s discography.{' '}
@@ -146,12 +144,12 @@ export default function CreditsPanel({ songs, members }: CreditsPanelProps) {
             <Bar
               dataKey="KOMCA"
               name="KOMCA"
-              fill="#A855F7"
+              fill={BORAHAE_COLORS.PRIMARY}
               radius={[4, 4, 0, 0]}
               activeBar={CHART_STYLES.BAR_ACTIVE}
             >
               {barChartData.map((entry, index) => (
-                <Cell key={`komca-${index}`} fill={entry.color || '#A855F7'} />
+                <Cell key={`komca-${index}`} fill={entry.color || BORAHAE_COLORS.PRIMARY} />
               ))}
             </Bar>
             <Bar
@@ -170,13 +168,10 @@ export default function CreditsPanel({ songs, members }: CreditsPanelProps) {
             />
           </BarChart>
         </ResponsiveContainer>
-      </div>
+      </ChartSection>
 
       {/* 2. Top Songwriters (Ranked Table) */}
-      <div className="bg-gradient-to-br from-[#111118] to-[#0f0f18] border border-white/[0.05] rounded-2xl p-4 md:p-6">
-        <h3 className="text-base font-bold text-white/85 mb-4">
-          Top Songwriters
-        </h3>
+      <ChartSection title="Top Songwriters" variant="gradient">
         <div className="space-y-1.5">
           {topWriters.map((writer, index) => {
             const isMember = memberStageNames.has(writer.name);
@@ -212,13 +207,10 @@ export default function CreditsPanel({ songs, members }: CreditsPanelProps) {
             );
           })}
         </div>
-      </div>
+      </ChartSection>
 
       {/* 3. Co-Writer Pairs (Table with Count Badges) */}
-      <div className="bg-[#111118]/80 border border-dashed border-white/[0.08] rounded-xl p-4 md:p-5">
-        <h3 className="text-base font-bold text-white/85 mb-4">
-          Co-Writer Pairs
-        </h3>
+      <ChartSection title="Co-Writer Pairs" variant="dashed">
         <div className="space-y-1.5">
           {topCollaborators.map((pair, index) => (
             <div
@@ -239,7 +231,7 @@ export default function CreditsPanel({ songs, members }: CreditsPanelProps) {
             </div>
           ))}
         </div>
-      </div>
+      </ChartSection>
     </div>
   );
 }

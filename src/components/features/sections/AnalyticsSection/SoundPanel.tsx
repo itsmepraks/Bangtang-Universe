@@ -20,7 +20,8 @@ import {
   computeAudioHistograms,
   computeRankings,
 } from '../../../../services/analyticsService';
-import { getSentimentColor, CHART_STYLES } from '../../../../constants/colors';
+import { getSentimentColor, CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
+import ChartSection from '../../../ui/ChartSection';
 
 // ==================== TYPES ====================
 
@@ -143,10 +144,7 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
       </div>
 
       {/* ==================== MOOD QUADRANT ==================== */}
-      <div className="bg-[#0c0c14] rounded-2xl p-4 md:p-6">
-        <h3 className="text-base font-bold text-white/85 mb-1">Mood Quadrant</h3>
-        <p className="text-xs text-white/40 mb-3">Valence vs Energy for each song, colored by sentiment.</p>
-
+      <ChartSection title="Mood Quadrant" subtitle="Valence vs Energy for each song, colored by sentiment." variant="immersive">
         <div className="relative">
           {/* X-axis label row */}
           <div className="flex justify-between text-[10px] text-white/25 mb-1">
@@ -228,17 +226,11 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
             </div>
           </div>
         </div>
-      </div>
+      </ChartSection>
 
       {/* ==================== ERA EVOLUTION LINE CHART ==================== */}
       {eraStats.length > 0 && (
-        <div className="bg-[#0e0e16] border-l-2 border-l-purple-500/20 border border-white/[0.04] rounded-xl p-4 md:p-6">
-          <h3 className="text-base font-bold text-white/85 mb-1">
-            Sound Evolution Across Eras
-          </h3>
-          <p className="text-xs text-white/40 mb-4">
-            Energy, valence, and danceability averaged per era.
-          </p>
+        <ChartSection title="Sound Evolution Across Eras" subtitle="Energy, valence, and danceability averaged per era." variant="timeline">
           <ResponsiveContainer width="100%" height={320}>
             <LineChart data={lineChartData}>
               <CartesianGrid {...CHART_STYLES.GRID} />
@@ -264,9 +256,9 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
               <Line
                 type="monotone"
                 dataKey="Energy"
-                stroke="#A855F7"
+                stroke={BORAHAE_COLORS.PRIMARY}
                 strokeWidth={2}
-                dot={{ r: 3, fill: '#A855F7' }}
+                dot={{ r: 3, fill: BORAHAE_COLORS.PRIMARY }}
                 activeDot={{ r: 5 }}
               />
               <Line
@@ -287,13 +279,12 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
               />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </ChartSection>
       )}
 
       {/* ==================== SONGS PER ERA BAR CHART ==================== */}
       {eraStats.length > 0 && (
-        <div className="bg-[#0e0e16] border-l-2 border-l-purple-500/20 border border-white/[0.04] rounded-xl p-4 md:p-6">
-          <h3 className="text-base font-bold text-white/85 mb-4">Songs Per Era</h3>
+        <ChartSection title="Songs Per Era" variant="timeline">
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={barChartData}>
               <CartesianGrid {...CHART_STYLES.GRID} />
@@ -323,19 +314,12 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
               />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </ChartSection>
       )}
 
       {/* ==================== AUDIO FEATURE HISTOGRAMS ==================== */}
       {withAudio >= 20 ? (
-        <div className="bg-[#111118]/80 border border-white/[0.04] rounded-xl p-3 md:p-5">
-          <h3 className="text-base font-bold text-white/85 mb-1">
-            Audio Feature Distributions
-          </h3>
-          <p className="text-xs text-white/40 mb-3">
-            How songs are distributed across each audio dimension.
-          </p>
-
+        <ChartSection title="Audio Feature Distributions" subtitle="How songs are distributed across each audio dimension." variant="subtle">
           {/* Feature filter pills */}
           <div className="flex gap-2 mb-4 overflow-x-auto scrollbar-hide pb-0.5">
             {HISTOGRAM_FEATURES.map((feature) => {
@@ -392,7 +376,7 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
               </BarChart>
             </ResponsiveContainer>
           )}
-        </div>
+        </ChartSection>
       ) : (
         <div className="bg-[#111118]/80 border border-white/[0.04] rounded-xl p-3 md:p-5">
           <p className="text-sm text-white/30">
@@ -453,8 +437,7 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
 
       {/* ==================== ERA DETAIL TABLE ==================== */}
       {eraStats.length > 0 && (
-        <div className="bg-[#0e0e16] border-l-2 border-l-purple-500/20 border border-white/[0.04] rounded-xl p-4 md:p-6">
-          <h3 className="text-base font-bold text-white/85 mb-4">Era Details</h3>
+        <ChartSection title="Era Details" variant="timeline">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -481,7 +464,7 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
               </tbody>
             </table>
           </div>
-        </div>
+        </ChartSection>
       )}
     </div>
   );

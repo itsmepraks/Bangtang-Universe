@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Calendar, Star, Shield, Music, Award } from 'lucide-react';
 import type { MemberEvent } from '../../../../types/database';
+import { BORAHAE_COLORS } from '../../../../constants/colors';
 
 interface MemberTimelineProps {
     events: MemberEvent[];
@@ -10,7 +11,7 @@ interface MemberTimelineProps {
 const EVENT_STYLES: Record<string, { color: string; icon: typeof Star }> = {
     enlistment_start: { color: '#6B7280', icon: Shield },
     enlistment_end: { color: '#10B981', icon: Shield },
-    solo_debut: { color: '#A855F7', icon: Music },
+    solo_debut: { color: BORAHAE_COLORS.PRIMARY, icon: Music },
     milestone: { color: '#FBBF24', icon: Star },
     variety_show: { color: '#3B82F6', icon: Star },
     ambassador: { color: '#EC4899', icon: Award },
@@ -34,7 +35,7 @@ export default function MemberTimeline({ events }: MemberTimelineProps) {
     return (
         <div className="space-y-0">
             {sorted.map((event, i) => {
-                const style = EVENT_STYLES[event.event_type] || { color: '#A855F7', icon: Star };
+                const style = EVENT_STYLES[event.event_type] || { color: BORAHAE_COLORS.PRIMARY, icon: Star };
                 const Icon = style.icon;
                 const dateStr = new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 

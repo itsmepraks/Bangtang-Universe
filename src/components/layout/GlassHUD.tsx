@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { BORAHAE_COLORS } from '../../constants/colors';
 
 export interface GlassHUDProps {
     title: string;
@@ -18,7 +19,7 @@ export const GlassHUD: React.FC<GlassHUDProps> = ({
     className = "",
     onClose,
     headerAction,
-    accentColor = "#A855F7"
+    accentColor = BORAHAE_COLORS.PRIMARY
 }) => (
     <div className={`relative rounded-2xl flex flex-col overflow-hidden border border-white/[0.06] bg-[#111118] ${className}`}>
         <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">

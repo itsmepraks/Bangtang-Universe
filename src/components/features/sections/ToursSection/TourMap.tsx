@@ -3,6 +3,7 @@ import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 're
 import { MapPin, Plus, Minus, RotateCcw } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
 import { resolveCoords } from '../../../../data/cityCoords';
+import { BORAHAE_COLORS } from '../../../../constants/colors';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore – world-atlas ships plain JSON with no type declarations
 import worldData from 'world-atlas/countries-50m.json';
@@ -167,7 +168,7 @@ export default function TourMap({ concerts }: TourMapProps) {
                 {/* Core dot */}
                 <circle
                   r={r}
-                  fill="#A855F7"
+                  fill={BORAHAE_COLORS.PRIMARY}
                   fillOpacity={0.92}
                   stroke="#C084FC"
                   strokeWidth={0.8 / zoom}

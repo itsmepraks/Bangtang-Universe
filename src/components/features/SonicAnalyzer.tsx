@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Play, Pause, ChevronDown } from 'lucide-react';
 import type { Song } from '../../types/database';
+import { BORAHAE_COLORS } from '../../constants/colors';
 
 export interface SonicAnalyzerProps {
     playing: boolean;
@@ -17,7 +18,7 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
     togglePlay,
     song,
     onSelectSong,
-    accentColor = "#A855F7",
+    accentColor = BORAHAE_COLORS.PRIMARY,
     songs = [],
     getAlbumTitle
 }) => {

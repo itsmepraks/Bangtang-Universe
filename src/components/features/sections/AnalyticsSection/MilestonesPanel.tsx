@@ -11,6 +11,7 @@ import {
 import { ArrowUpDown } from 'lucide-react';
 import type { Album, Award, ChartEntry, Song, Concert, MemberEvent } from '../../../../types/database';
 import { CHART_STYLES } from '../../../../constants/colors';
+import ChartSection from '../../../ui/ChartSection';
 
 // ==================== TYPES ====================
 
@@ -224,8 +225,7 @@ export default function MilestonesPanel({
 
       {/* ===== 2. Awards Per Year (Line Chart) ===== */}
       {awardsPerYear.length > 0 && (
-        <div className="bg-gradient-to-br from-[#111118] to-[#0f0f18] border border-white/[0.05] rounded-2xl p-4 md:p-6">
-          <h3 className="text-base font-bold text-white/85 mb-4">Awards Won Per Year</h3>
+        <ChartSection title="Awards Won Per Year" variant="gradient">
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={awardsPerYear}>
@@ -248,7 +248,7 @@ export default function MilestonesPanel({
               </LineChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </ChartSection>
       )}
 
       {/* ===== 3. Career Timeline ===== */}
@@ -363,8 +363,7 @@ export default function MilestonesPanel({
 
       {/* ===== 4. Chart Positions Table ===== */}
       {topChartSongs.length > 0 && (
-        <div className="bg-[#111118]/80 border border-dashed border-white/[0.08] rounded-xl p-4 md:p-5">
-          <h3 className="text-base font-bold text-white/85 mb-4">Top Chart Positions</h3>
+        <ChartSection title="Top Chart Positions" variant="dashed">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[520px] text-sm text-left">
               <thead>
@@ -409,7 +408,7 @@ export default function MilestonesPanel({
               </tbody>
             </table>
           </div>
-        </div>
+        </ChartSection>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import type { Song, Album } from '../../../../types/database';
 import FilterBar from '../../../ui/FilterBar';
 import Badge from '../../../ui/Badge';
 import BtsLogo from '../../../ui/BtsLogo';
+import { BORAHAE_COLORS } from '../../../../constants/colors';
 
 
 type Category = 'all' | 'group' | 'solo' | 'collab';
@@ -190,7 +191,7 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
               >
                 <div
                   className="h-32 w-full relative overflow-hidden"
-                  style={{ background: `linear-gradient(135deg, ${album.cover_color || '#A855F7'}40, ${album.cover_color || '#A855F7'}10)` }}
+                  style={{ background: `linear-gradient(135deg, ${album.cover_color || BORAHAE_COLORS.PRIMARY}40, ${album.cover_color || BORAHAE_COLORS.PRIMARY}10)` }}
                 >
                   {album.cover_art_url ? (
                     <img
