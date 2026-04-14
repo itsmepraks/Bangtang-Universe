@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 // Import data and hooks
 import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useMemberEvents, useMedia } from './hooks';
 import type { DashboardSection, DiscographyState } from './types/index';
+import { SECTION_ACCENTS } from './constants/colors';
 
 // Lightweight components - imported directly
 import {
@@ -330,9 +331,13 @@ export default function App() {
                   aria-current={activeSection === item.id ? 'page' : undefined}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-left ${
                     activeSection === item.id
-                      ? 'bg-purple-500/10 text-white shadow-[inset_3px_0_0_0_#A855F7]'
+                      ? 'text-white'
                       : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
                   }`}
+                  style={activeSection === item.id ? {
+                    backgroundColor: `${SECTION_ACCENTS[item.id]}15`,
+                    boxShadow: `inset 3px 0 0 0 ${SECTION_ACCENTS[item.id]}`,
+                  } : undefined}
                 >
                   <item.icon size={18} aria-hidden="true" />
                   <span className="text-sm font-medium">{item.label}</span>
