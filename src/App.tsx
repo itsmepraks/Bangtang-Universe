@@ -29,19 +29,24 @@ const MediaSection = lazy(() => import('./components/features/sections/MediaSect
 const OnboardingFlow = lazy(() => import('./components/features/OnboardingFlow'));
 const CommandPalette = lazy(() => import('./components/features/CommandPalette'));
 
-// Loading fallback for lazy components
+// Loading fallback — three pulsing dots instead of generic spinner
 const LoadingFallback = () => (
   <div className="absolute inset-0 bg-[#0a0a0f] flex items-center justify-center">
-    <div className="flex flex-col items-center gap-4">
-      <div className="w-12 h-12 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-      <span className="text-xs text-white/50 tracking-wider uppercase font-mono">Loading...</span>
+    <div className="flex items-center gap-1.5">
+      <div className="w-2 h-2 rounded-full bg-purple-400/60 animate-pulse" />
+      <div className="w-2 h-2 rounded-full bg-pink-400/60 animate-pulse" style={{ animationDelay: '150ms' }} />
+      <div className="w-2 h-2 rounded-full bg-blue-400/60 animate-pulse" style={{ animationDelay: '300ms' }} />
     </div>
   </div>
 );
 
 const SectionSpinner = () => (
-  <div className="flex items-center justify-center h-full">
-    <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+  <div className="flex items-center justify-center h-full py-20">
+    <div className="flex items-center gap-1.5">
+      <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
+      <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '150ms' }} />
+      <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '300ms' }} />
+    </div>
   </div>
 );
 
