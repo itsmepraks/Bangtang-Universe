@@ -165,14 +165,14 @@ export default function HomeSection({
           {
             icon: Sparkles,
             label: 'Find songs like…',
-            hint: 'Audio-similar recommendations',
-            onClick: () => onNavigate('analytics'),
+            hint: 'Recommendations by mood & era',
+            onClick: () => { window.location.hash = '#/analytics/discover'; },
           },
           {
             icon: MessageSquare,
             label: 'Ask about BTS',
             hint: '"Who has the most credits?"',
-            onClick: () => onNavigate('analytics'),
+            onClick: () => { window.location.hash = '#/analytics/discover'; },
           },
         ].map(({ icon: Icon, label, hint, onClick }) => (
           <button
