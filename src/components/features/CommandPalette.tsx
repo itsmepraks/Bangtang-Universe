@@ -249,7 +249,7 @@ export default function CommandPalette({
                       <div className="text-[11px] text-white/40 truncate">{item.sublabel}</div>
                     )}
                   </div>
-                  <span className="text-[10px] text-white/30 uppercase tracking-wide flex-shrink-0">
+                  <span className="text-[10px] text-white/30 flex-shrink-0">
                     {item.type}
                   </span>
                 </button>

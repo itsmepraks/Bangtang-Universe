@@ -35,7 +35,7 @@ export default function StatCard({ label, value, icon: Icon, accent = '#A855F7',
       <div className="flex items-start justify-between">
         <div>
           <span className="text-2xl sm:text-3xl font-semibold text-white/95 tabular-nums">{displayed.toLocaleString()}</span>
-          <div className="text-xs font-medium text-white/50 uppercase tracking-wide mt-1">{label}</div>
+          <div className="text-xs font-medium text-white/50 mt-1">{label}</div>
           {subtitle && <div className="text-xs text-white/40 mt-0.5">{subtitle}</div>}
         </div>
         <Icon size={20} className="text-white/20 group-hover:text-purple-400/60 transition-colors duration-500" />

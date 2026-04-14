@@ -18,7 +18,7 @@ export default function MetricCard({ label, value, icon: Icon, accent, subtitle,
       <div className="flex items-start justify-between">
         <div>
           <div className={`${valueSize[size]} font-semibold text-white/95 tabular-nums`}>{value}</div>
-          <div className="text-xs font-medium text-white/50 uppercase tracking-wide mt-1">{label}</div>
+          <div className="text-xs font-medium text-white/50 mt-1">{label}</div>
           {subtitle && <div className="text-xs text-white/40 mt-0.5">{subtitle}</div>}
         </div>
         {Icon && <Icon size={size === 'sm' ? 16 : 20} className="text-white/20" />}

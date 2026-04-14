@@ -30,7 +30,7 @@ export default function BentoCard({
       <div className="flex items-center justify-between">
         <h2
           id={`bento-${title.toLowerCase().replace(/\s+/g, '-')}`}
-          className="text-[10px] font-semibold text-white/50 uppercase tracking-widest"
+          className="text-xs font-semibold text-white/50 tracking-wide"
         >
           {title}
         </h2>
@@ -54,7 +54,7 @@ export default function BentoCard({
               <p className="text-2xl font-bold text-white/95 tabular-nums leading-none">
                 {typeof m.value === 'number' ? m.value.toLocaleString() : m.value}
               </p>
-              <p className="text-[10px] text-white/40 uppercase tracking-wide mt-0.5">
+              <p className="text-[10px] text-white/40 mt-0.5">
                 {m.label}
               </p>
             </div>

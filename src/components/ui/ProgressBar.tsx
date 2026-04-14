@@ -14,7 +14,7 @@ export default function ProgressBar({ value, label, showPercent = false, color, 
     <div>
       {(label || showPercent) && (
         <div className="flex justify-between mb-1.5">
-          {label && <span className="text-xs font-medium text-white/50 uppercase tracking-wide">{label}</span>}
+          {label && <span className="text-xs font-medium text-white/50">{label}</span>}
           {showPercent && <span className="text-xs text-white/60 font-mono">{pct}%</span>}
         </div>
       )}

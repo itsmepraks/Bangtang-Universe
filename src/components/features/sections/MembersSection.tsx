@@ -56,7 +56,7 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
           </div>
           {/* Info */}
           <div className="p-5 space-y-3">
-            <p className="text-xs font-medium text-white/50 uppercase tracking-wide">{m.role}</p>
+            <p className="text-xs font-medium text-white/50">{m.role}</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <PenTool size={12} className="text-white/40" />
