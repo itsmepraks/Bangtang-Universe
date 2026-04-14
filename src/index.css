@@ -1728,3 +1728,21 @@ select option {
   0%, 100% { transform: scale(1) translateY(0px); }
   50%       { transform: scale(1.12) translateY(-5px); }
 }
+
+/**
+ * Concert spotlight — cycles through member colors as a soft ambient glow.
+ * Like ARMY bombs shifting color in unison during a concert.
+ */
+@keyframes concert-glow {
+  0%, 100% { background-color: rgba(168, 85, 247, 0.04); }
+  14% { background-color: rgba(37, 99, 235, 0.04); }
+  28% { background-color: rgba(236, 72, 153, 0.04); }
+  42% { background-color: rgba(16, 185, 129, 0.04); }
+  56% { background-color: rgba(239, 68, 68, 0.04); }
+  70% { background-color: rgba(245, 158, 11, 0.04); }
+  84% { background-color: rgba(139, 92, 246, 0.04); }
+}
+
+.concert-bg {
+  animation: concert-glow 42s ease-in-out infinite;
+}

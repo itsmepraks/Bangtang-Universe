@@ -298,8 +298,10 @@ export default function App() {
 
           {/* Dashboard Background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full opacity-[0.05]"
-              style={{ background: 'radial-gradient(circle, #A855F7 0%, transparent 70%)', filter: 'blur(100px)' }} />
+            <div className="absolute top-[15%] right-[5%] w-[35%] h-[35%] rounded-full opacity-[0.03]"
+              style={{ background: 'radial-gradient(circle, #EC4899 0%, transparent 70%)', filter: 'blur(80px)' }} />
+            <div className="absolute bottom-[20%] left-[10%] w-[30%] h-[30%] rounded-full opacity-[0.03]"
+              style={{ background: 'radial-gradient(circle, #2563EB 0%, transparent 70%)', filter: 'blur(80px)' }} />
           </div>
 
           {/* Mobile sidebar backdrop */}
@@ -406,7 +408,7 @@ export default function App() {
             <main
               id="main-content"
               tabIndex={-1}
-              className="flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar focus:outline-none"
+              className="flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar focus:outline-none concert-bg"
             >
               <Suspense fallback={<SectionSpinner />}>
                 <SectionTransition sectionKey={activeSection}>
