@@ -312,12 +312,20 @@ export default function HomeSection({
                 }}
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent" />
+            <div className="absolute top-3 left-3">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-[#0a0a0f] tracking-wide">NEW</span>
+            </div>
             <div className="absolute bottom-4 left-4 right-4">
               <p className="text-lg font-bold text-white">{latestAlbum?.title}</p>
-              {latestAlbum?.era && (
-                <p className="text-xs text-white/60 mt-1">{latestAlbum.era} era</p>
-              )}
+              <div className="flex items-center gap-2 mt-1">
+                {latestAlbum?.era && (
+                  <span className="text-xs text-white/60">{latestAlbum.era}</span>
+                )}
+                {latestAlbum?.track_count && (
+                  <span className="text-xs text-white/40">{latestAlbum.track_count} tracks</span>
+                )}
+              </div>
             </div>
           </div>
         </BentoCard>

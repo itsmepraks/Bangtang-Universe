@@ -129,7 +129,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white text-xs tracking-wide uppercase transition-colors">
           <ChevronLeft size={16} /> All Members
         </button>
-        <button onClick={onOpenFullProfile} className="text-xs text-purple-400/60 hover:text-purple-300 tracking-wide uppercase transition-colors">
+        <button onClick={onOpenFullProfile} className="text-xs tracking-wide uppercase transition-colors" style={{ color: `${getMemberColor(member.id)}90` }}>
           Full Profile View
         </button>
       </div>

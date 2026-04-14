@@ -52,7 +52,13 @@
       "Bash(grep -n \"Each \\\\|Click \\\\|Tap \\\\|Mapping \" /Users/praks/Development/BTS-universe/src/components/features/sections/AnalyticsSection/*.tsx)",
       "Bash(grep -A 3 \"SectionIntro description=\" /Users/praks/Development/BTS-universe/src/components/features/sections/**/*.tsx)",
       "Bash(grep -n \"tailwind\\\\|@config\\\\|theme:\" /Users/praks/Development/BTS-universe/tailwind.config.*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(gh pr:*)",
+      "Bash(curl -s --max-time 10 \"https://api.getsongbpm.com/search/?api_key=free&type=song&lookup=BTS+Dynamite\")",
+      "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/track/search?q=BTS+Dynamite\")",
+      "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/track/search/BTS%20Dynamite\")",
+      "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/\")",
+      "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/track?name=Dynamite&artist=BTS\")"
     ],
     "additionalDirectories": [
       "c:\\Development\\BTS universe"
