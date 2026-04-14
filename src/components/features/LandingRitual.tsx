@@ -237,7 +237,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 color: m.glow,
                 textShadow: `0 0 12px ${m.color}, 0 0 20px ${m.color}88, 0 1px 4px rgba(0,0,0,0.9)`,
                 whiteSpace: 'nowrap',
-                fontFamily: 'ui-monospace, SFMono-Regular, monospace',
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                 background: 'none',
                 border: 'none',
                 padding: '0 0 4px 0',
@@ -284,12 +284,18 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 <h1
                     className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white/85 tracking-[0.12em] uppercase animate-in fade-in slide-in-from-top-8 duration-1000"
                     style={{
-                        fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-                        textShadow: '0 0 16px rgba(168,85,247,0.3), 0 2px 8px rgba(0,0,0,0.5)'
+                        fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                        textShadow: '0 0 16px rgba(236,72,153,0.3), 0 0 32px rgba(139,92,246,0.2), 0 2px 8px rgba(0,0,0,0.5)'
                     }}
                 >
                     Bangtan Universe
                 </h1>
+                <p
+                    className="text-xs sm:text-sm text-white/45 tracking-[0.25em] uppercase text-center mt-2 animate-in fade-in duration-1000 delay-300"
+                    style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
+                >
+                    The music. The moments. The data.
+                </p>
             </div>
 
             {/* ENTER THE UNIVERSE — CTA */}
@@ -299,7 +305,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                     className="relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-all duration-500 cursor-pointer outline-none focus:outline-none select-none hover:scale-105 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
-                    <div className="absolute inset-0 rounded-full bg-purple-500/20 blur-[16px] group-hover:bg-purple-400/35 transition-all duration-400" />
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500/20 to-pink-500/20 blur-[16px] group-hover:from-purple-400/35 group-hover:to-pink-400/35 transition-all duration-400" />
                     <div className="relative z-10 group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] transition-all duration-400">
                         <BTSLogo className="w-9 h-9 sm:w-10 sm:h-10 text-white" />
                     </div>
@@ -310,11 +316,12 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                 >
                     <span
                         className="text-xs sm:text-sm text-white/60 tracking-[0.3em] font-medium uppercase group-hover:text-white/90 transition-all duration-400"
+                        style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
                     >
                         Enter The Universe
                     </span>
                 </button>
-                <ChevronRight size={12} className="text-purple-400/40 animate-pulse rotate-90" />
+                <ChevronRight size={12} className="text-pink-400/40 animate-pulse rotate-90" />
             </div>
 
             {/* Bottom vignette */}

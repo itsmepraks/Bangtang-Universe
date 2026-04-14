@@ -136,6 +136,8 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
 
       {/* ── Hero Header ── */}
       <div className="relative rounded-2xl overflow-hidden border border-white/[0.06] mb-6">
+        {/* Signature color accent bar */}
+        <div className="h-1 w-full rounded-full" style={{ background: `linear-gradient(to right, ${getMemberColor(member.id)}, ${getMemberColor(member.id)}40)` }} />
         {/* Background gradient with member color */}
         <div
           className="absolute inset-0"
@@ -224,9 +226,14 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 flex-shrink-0 ${
                 isActive
-                  ? 'bg-white/[0.08] text-white shadow-sm'
+                  ? 'text-white shadow-sm'
                   : 'text-white/40 hover:text-white/70 hover:bg-white/[0.03]'
               }`}
+              style={isActive ? {
+                backgroundColor: `${getMemberColor(member.id)}18`,
+                boxShadow: `0 0 12px ${getMemberColor(member.id)}10`,
+                borderBottom: `2px solid ${getMemberColor(member.id)}`,
+              } : undefined}
             >
               <Icon size={14} />
               {tab.label}

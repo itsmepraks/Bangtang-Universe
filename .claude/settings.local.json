@@ -51,7 +51,8 @@
       "Bash(python3 /Users/praks/.claude/skills/ui-ux-pro-max/scripts/search.py \"AI generated feel human organic natural\" --domain ux)",
       "Bash(grep -n \"Each \\\\|Click \\\\|Tap \\\\|Mapping \" /Users/praks/Development/BTS-universe/src/components/features/sections/AnalyticsSection/*.tsx)",
       "Bash(grep -A 3 \"SectionIntro description=\" /Users/praks/Development/BTS-universe/src/components/features/sections/**/*.tsx)",
-      "Bash(grep -n \"tailwind\\\\|@config\\\\|theme:\" /Users/praks/Development/BTS-universe/tailwind.config.*)"
+      "Bash(grep -n \"tailwind\\\\|@config\\\\|theme:\" /Users/praks/Development/BTS-universe/tailwind.config.*)",
+      "Bash(grep:*)"
     ],
     "additionalDirectories": [
       "c:\\Development\\BTS universe"
