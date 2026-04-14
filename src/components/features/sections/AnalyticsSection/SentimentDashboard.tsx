@@ -100,7 +100,7 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
   return (
     <div className="space-y-8">
       {/* ===== Overall Sentiment Distribution ===== */}
-      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
+      <div className="bg-gradient-to-br from-[#111118] to-[#0f0f18] border border-white/[0.05] rounded-2xl p-4 md:p-6">
         <h3 className="text-lg font-semibold text-white/90 mb-2">
           Sentiment Distribution
         </h3>
@@ -230,7 +230,7 @@ export default function SentimentDashboard({ songs, albums }: SentimentDashboard
       </div>
 
       {/* ===== Sentiment by Era ===== */}
-      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
+      <div className="bg-gradient-to-br from-[#111118] to-[#0f0f18] border border-white/[0.05] rounded-2xl p-4 md:p-6">
         <h3 className="text-lg font-semibold text-white/90 mb-4">
           Sentiment Across Eras
         </h3>

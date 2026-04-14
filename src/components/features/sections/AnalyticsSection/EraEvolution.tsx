@@ -69,7 +69,7 @@ export default function EraEvolution({ songs, albums }: EraEvolutionProps) {
   return (
     <div className="space-y-8">
       {/* 1. Era Audio Evolution (Line Chart) */}
-      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
+      <div className="bg-[#0e0e16] border-l-2 border-l-purple-500/20 border border-white/[0.04] rounded-xl p-4 md:p-6">
         <h3 className="text-sm font-semibold text-white/70 mb-2">
           Sound Evolution Across Eras
         </h3>
@@ -141,7 +141,7 @@ export default function EraEvolution({ songs, albums }: EraEvolutionProps) {
       </div>
 
       {/* 2. Songs Per Era (Bar Chart) */}
-      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
+      <div className="bg-[#0e0e16] border-l-2 border-l-purple-500/20 border border-white/[0.04] rounded-xl p-4 md:p-6">
         <h3 className="text-sm font-semibold text-white/70 mb-4">Songs Per Era</h3>
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={barChartData}>
@@ -175,7 +175,7 @@ export default function EraEvolution({ songs, albums }: EraEvolutionProps) {
       </div>
 
       {/* 3. Era Stats Table */}
-      <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-3 md:p-6">
+      <div className="bg-[#0e0e16] border-l-2 border-l-purple-500/20 border border-white/[0.04] rounded-xl p-4 md:p-6">
         <h3 className="text-sm font-semibold text-white/70 mb-4">Era Details</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
