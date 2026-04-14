@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
 const GLOSSARY: Record<string, string> = {
-  era: 'A musical period defined by a thematic concept — e.g., "Love Yourself" explored self-love across multiple albums.',
-  komca: 'Korea Music Copyright Association — official songwriting credits registered in South Korea.',
-  valence: 'Musical positivity on a 0–1 scale. High valence = happy, cheerful. Low valence = sad, melancholic.',
-  energy: 'Perceived intensity and activity on a 0–1 scale. High energy = fast, loud, noisy.',
-  danceability: 'How suitable a song is for dancing, based on tempo, rhythm stability, and beat strength (0–1).',
-  acousticness: 'Confidence that a track is acoustic (0–1). Higher = more likely acoustic instruments.',
-  sentiment: 'The dominant emotional theme of a song, classified from its lyrics — e.g., Joy, Longing, Determination.',
-  bpm: 'Beats per minute — the tempo of a song. Higher BPM = faster pace.',
-  'title track': 'The main promotional song of an album, typically with a music video and live performances.',
+  era: 'Album era (e.g. Love Yourself, Wings)',
+  komca: 'Official Korean songwriting credits',
+  valence: 'How happy a song sounds (0-1)',
+  energy: 'How intense a song feels (0-1)',
+  danceability: 'How danceable (0-1)',
+  acousticness: 'How acoustic vs. electronic (0-1)',
+  sentiment: 'Dominant emotion (Joy, Pain, Hope, etc.)',
+  bpm: 'Tempo in beats per minute',
+  'title track': 'Lead single with music video',
 };
 
 interface GlossaryTipProps {
