@@ -1,17 +1,12 @@
 import { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { BarChart3, TrendingUp, Network, Heart, Sparkles, MessageSquare, BookOpen, Trophy, Calendar } from 'lucide-react';
+import { BarChart3, Heart, Network, Sparkles, Trophy } from 'lucide-react';
 import type { Song, Album, Member, Lyrics, Award, ChartEntry, Concert, MemberEvent } from '../../../../types/database';
 
-
-const AudioExplorer = lazy(() => import('./AudioExplorer'));
-const EraEvolution = lazy(() => import('./EraEvolution'));
-const WritingNetwork = lazy(() => import('./WritingNetwork'));
-const SentimentDashboard = lazy(() => import('./SentimentDashboard'));
-const SongRecommender = lazy(() => import('./SongRecommender'));
-const QAPanel = lazy(() => import('./QAPanel'));
-const LyricsPanel = lazy(() => import('./LyricsPanel'));
-const AwardsAnalytics = lazy(() => import('./AwardsAnalytics'));
-const CareerTimeline = lazy(() => import('./CareerTimeline'));
+const SoundPanel = lazy(() => import('./SoundPanel'));
+const MoodPanel = lazy(() => import('./MoodPanel'));
+const CreditsPanel = lazy(() => import('./CreditsPanel'));
+const DiscoverPanel = lazy(() => import('./DiscoverPanel'));
+const MilestonesPanel = lazy(() => import('./MilestonesPanel'));
 
 interface AnalyticsSectionProps {
   songs: Song[];
@@ -27,15 +22,11 @@ interface AnalyticsSectionProps {
 }
 
 const TABS = [
-  { id: 'audio', label: 'Explore audio features', icon: BarChart3, group: 'music' },
-  { id: 'era', label: 'How sound changed by era', icon: TrendingUp, group: 'music' },
-  { id: 'sentiment', label: 'Mood over time', icon: Heart, group: 'music' },
-  { id: 'writing', label: 'Who wrote with whom', icon: Network, group: 'career' },
-  { id: 'awards-charts', label: 'Awards & chart history', icon: Trophy, group: 'career' },
-  { id: 'career', label: 'Career timeline', icon: Calendar, group: 'career' },
-  { id: 'recommendations', label: 'Find songs like…', icon: Sparkles, group: 'explore' },
-  { id: 'qa', label: 'Ask about BTS', icon: MessageSquare, group: 'explore' },
-  { id: 'lyrics', label: 'Lyric themes by era', icon: BookOpen, group: 'explore' },
+  { id: 'sound', label: 'The sound', icon: BarChart3, group: 'music' },
+  { id: 'mood', label: 'Mood & lyrics', icon: Heart, group: 'music' },
+  { id: 'credits', label: 'Who writes', icon: Network, group: 'career' },
+  { id: 'discover', label: 'Discover', icon: Sparkles, group: 'explore' },
+  { id: 'milestones', label: 'Milestones', icon: Trophy, group: 'career' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -44,7 +35,7 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
   const isValidTabId = (v: string | null | undefined): v is TabId =>
     !!v && TABS.some((t) => t.id === v);
   const [activeTab, setActiveTab] = useState<TabId>(
-    isValidTabId(initialTab) ? initialTab : 'audio',
+    isValidTabId(initialTab) ? initialTab : 'sound',
   );
   // Re-sync when hash-driven initialTab changes from outside
   useEffect(() => {
@@ -60,16 +51,30 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
 
   const renderPanel = () => {
     switch (activeTab) {
-      case 'audio':        return <AudioExplorer songs={songs} albums={albums} />;
-      case 'era':          return <EraEvolution songs={songs} albums={albums} />;
-      case 'writing':      return <WritingNetwork songs={songs} members={members} />;
-      case 'sentiment':    return <SentimentDashboard songs={songs} albums={albums} />;
-      case 'recommendations': return <SongRecommender songs={songs} albums={albums} />;
-      case 'awards-charts':   return <AwardsAnalytics awards={awards || []} chartEntries={chartEntries || []} songs={songs} />;
-      case 'career':       return <CareerTimeline albums={albums} awards={awards || []} concerts={concerts || []} memberEvents={memberEvents || []} />;
-      case 'qa':           return <QAPanel songs={songs} albums={albums} members={members} awards={awards} chartEntries={chartEntries} concerts={concerts} memberEvents={memberEvents} />;
-      case 'lyrics':       return <LyricsPanel lyrics={lyrics} songs={songs} albums={albums} />;
-      default:             return null;
+      case 'sound':
+        return <SoundPanel songs={songs} albums={albums} />;
+      case 'mood':
+        return <MoodPanel songs={songs} albums={albums} lyrics={lyrics} />;
+      case 'credits':
+        return <CreditsPanel songs={songs} members={members} />;
+      case 'discover':
+        return (
+          <DiscoverPanel
+            songs={songs} albums={albums} members={members}
+            awards={awards} chartEntries={chartEntries}
+            concerts={concerts} memberEvents={memberEvents}
+          />
+        );
+      case 'milestones':
+        return (
+          <MilestonesPanel
+            albums={albums} awards={awards || []}
+            chartEntries={chartEntries || []} songs={songs}
+            concerts={concerts || []} memberEvents={memberEvents || []}
+          />
+        );
+      default:
+        return null;
     }
   };
 
@@ -91,7 +96,10 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
         <Suspense
           fallback={
             <div className="flex items-center justify-center h-64">
-              <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '150ms' }} />
+                <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '300ms' }} />
             </div>
           }
         >
@@ -159,9 +167,9 @@ function AnalyticsTabStrip({
                 aria-controls="analytics-panel"
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => onChange(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 whitespace-nowrap border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-0 rounded-sm ${
+                className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 whitespace-nowrap border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0 rounded-sm ${
                   isActive
-                    ? 'text-white border-purple-500'
+                    ? 'text-white border-cyan-500'
                     : 'text-white/55 border-transparent hover:text-white/80 hover:border-white/20'
                 }`}
               >
