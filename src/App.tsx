@@ -265,7 +265,7 @@ export default function App() {
   }, [activeSection, selectedAlbum, selectedSong, selectedMember]);
 
   return (
-    <div className="relative w-screen h-screen bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white">
+    <div className="relative w-screen h-screen bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white noise-texture">
 
       {/* 1. UNIVERSE LAYER - Only shown during landing/warp */}
       {(mode === 'landing' || mode === 'warp') && (
