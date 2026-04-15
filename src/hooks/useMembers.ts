@@ -9,6 +9,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Member } from '../types/database';
 import { MEMBER_DATA } from '../data/members';
+import { BORAHAE_COLORS } from '../constants/colors';
 
 interface UseMembersResult {
     members: Member[];
@@ -102,7 +103,7 @@ export function useMemberById(id: string) {
 // Get member color
 export function useMemberColor(id: string): string {
     const { member } = useMemberById(id);
-    return member?.color || '#A855F7'; // Default purple
+    return member?.color || BORAHAE_COLORS.PRIMARY; // Default purple
 }
 
 // Get members sorted by KOMCA credits

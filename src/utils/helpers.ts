@@ -20,6 +20,7 @@
  */
 
 import type { Position3D, Star, BokehBubble, FloatingParticle } from '../types/index';
+import { BORAHAE_COLORS, UNIVERSE_COLORS } from '../constants/colors';
 
 // ============================================================================
 // ANIMATION HELPERS
@@ -251,7 +252,7 @@ export const generateStars = (
   count: number,
   minRadius: number = 300,
   maxRadius: number = 1300,
-  colors: string[] = ['#ffffff', '#A855F7', '#D8B4FE', '#818CF8', '#C084FC']
+  colors: string[] = [...UNIVERSE_COLORS.STARS]
 ): Star[] => {
   return Array.from({ length: count }, (_, i) => ({
     theta: Math.random() * 2 * Math.PI,

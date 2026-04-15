@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Search, Network, RefreshCw, Music, Disc, User, Sparkles, Trophy, MapPin } from 'lucide-react';
 import { useSearch, type SearchResult } from '../../../hooks';
 import { MOOD_MAP } from '../../../services/searchService';
-import { getSentimentColor } from '../../../constants/colors';
+import { getSentimentColor, BORAHAE_COLORS } from '../../../constants/colors';
 import type { Song, Member, Album, Award, Concert } from '../../../types/database';
 import type { DashboardSection } from '../../../types/index';
 import Badge from '../../ui/Badge';
@@ -310,7 +310,7 @@ function PreviewPanel({ result }: { result: SearchResult }) {
       <div className="space-y-4">
         <div
           className="h-20 rounded-xl"
-          style={{ background: `linear-gradient(135deg, ${album.cover_color || '#A855F7'}40, ${album.cover_color || '#A855F7'}10)` }}
+          style={{ background: `linear-gradient(135deg, ${album.cover_color || BORAHAE_COLORS.PRIMARY}40, ${album.cover_color || BORAHAE_COLORS.PRIMARY}10)` }}
         />
         <div>
           <h4 className="text-sm font-semibold text-white/90">{album.title}</h4>

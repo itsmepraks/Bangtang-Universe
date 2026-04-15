@@ -6,6 +6,7 @@
  */
 
 import type { Member } from '../types/index';
+import { BORAHAE_COLORS } from '../constants/colors';
 
 // Extended member interface with additional fields
 export interface ExtendedMember extends Member {
@@ -360,7 +361,7 @@ export const getMemberById = (id: string): ExtendedMember | undefined => {
 // Helper function to get member color
 export const getMemberColor = (id: string): string => {
     const member = getMemberById(id);
-    return member?.color || '#A855F7';
+    return member?.color || BORAHAE_COLORS.PRIMARY;
 };
 
 // Get total KOMCA credits across all members

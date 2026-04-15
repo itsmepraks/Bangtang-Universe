@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { ArrowUpDown } from 'lucide-react';
 import type { Album, Award, ChartEntry, Song, Concert, MemberEvent } from '../../../../types/database';
-import { CHART_STYLES } from '../../../../constants/colors';
+import { CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
 import ChartSection from '../../../ui/ChartSection';
 
 // ==================== TYPES ====================
@@ -35,7 +35,7 @@ interface TimelineEntry {
 // ==================== CONSTANTS ====================
 
 const CATEGORY_COLORS: Record<TimelineEntry['category'], string> = {
-  album: '#A855F7',   // purple
+  album: BORAHAE_COLORS.PRIMARY,   // purple
   award: '#EAB308',   // gold
   tour: '#22C55E',    // green
   event: '#3B82F6',   // blue

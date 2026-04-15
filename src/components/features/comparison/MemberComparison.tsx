@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 import type { Member, Song } from '../../../types/database';
-import { CHART_STYLES } from '../../../constants/colors';
+import { CHART_STYLES, BORAHAE_COLORS } from '../../../constants/colors';
 
 interface MemberComparisonProps {
   members: Member[];
@@ -93,7 +93,7 @@ export default function MemberComparison({ members, songs }: MemberComparisonPro
                   labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
                 />
                 <Legend wrapperStyle={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }} />
-                <Bar dataKey={memberA.stage_name} fill={memberA.color || '#A855F7'} fillOpacity={0.7} radius={[4, 4, 0, 0]} />
+                <Bar dataKey={memberA.stage_name} fill={memberA.color || BORAHAE_COLORS.PRIMARY} fillOpacity={0.7} radius={[4, 4, 0, 0]} />
                 <Bar dataKey={memberB.stage_name} fill={memberB.color || '#818CF8'} fillOpacity={0.7} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -105,7 +105,7 @@ export default function MemberComparison({ members, songs }: MemberComparisonPro
               <thead>
                 <tr className="border-b border-white/[0.06]">
                   <th className="text-left text-xs font-medium text-white/50 uppercase tracking-wide py-3 px-3 sm:px-4">Stat</th>
-                  <th className="text-center text-xs font-medium uppercase tracking-wide py-3 px-3 sm:px-4" style={{ color: memberA.color || '#A855F7' }}>{memberA.stage_name}</th>
+                  <th className="text-center text-xs font-medium uppercase tracking-wide py-3 px-3 sm:px-4" style={{ color: memberA.color || BORAHAE_COLORS.PRIMARY }}>{memberA.stage_name}</th>
                   <th className="text-center text-xs font-medium uppercase tracking-wide py-3 px-3 sm:px-4" style={{ color: memberB.color || '#818CF8' }}>{memberB.stage_name}</th>
                 </tr>
               </thead>

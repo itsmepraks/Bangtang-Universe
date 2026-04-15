@@ -19,7 +19,7 @@ import type {
 import { getRecommendations } from '../../../../services/recommendationService';
 import { qaService, SUGGESTED_QUESTIONS } from '../../../../services/qaService';
 import type { QAResponse } from '../../../../services/qaService';
-import { CHART_STYLES } from '../../../../constants/colors';
+import { CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
 import EmptyState from '../../../ui/EmptyState';
 
 // ==================== TYPES ====================
@@ -255,8 +255,8 @@ export default function DiscoverPanel({
                     <Radar
                       name={selectedSong.title}
                       dataKey="selected"
-                      stroke="#A855F7"
-                      fill="#A855F7"
+                      stroke={BORAHAE_COLORS.PRIMARY}
+                      fill={BORAHAE_COLORS.PRIMARY}
                       fillOpacity={0.2}
                     />
                     <Radar

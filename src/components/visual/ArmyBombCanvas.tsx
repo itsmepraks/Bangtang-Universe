@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useMemo } from 'react';
+import { BORAHAE_COLORS } from '../../constants/colors';
 
 interface Bomb {
     x: number;
@@ -17,7 +18,7 @@ export const ArmyBombCanvas: React.FC = () => {
         const result: Omit<Bomb, 'twinkleSpeed'>[] = [];
 
         const colors = [
-            '#A855F7', '#9333EA', '#7C3AED', '#8B5CF6', '#C084FC', '#B47EE5',
+            BORAHAE_COLORS.PRIMARY, '#9333EA', '#7C3AED', '#8B5CF6', '#C084FC', '#B47EE5',
             '#D8B4FE', '#E9D5FF', '#F3E8FF',
             '#FFFFFF', '#F5F3FF',
         ];

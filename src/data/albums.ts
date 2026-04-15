@@ -5,6 +5,8 @@
  * compilations, and major single releases.
  */
 
+import { BORAHAE_COLORS } from '../constants/colors';
+
 export interface Album {
     id: number;
     title: string;
@@ -184,7 +186,7 @@ export const ALBUMS: Album[] = [
         trackCount: 1,
         description: 'Digital single released for BTS\'s 10th anniversary FESTA, expressing gratitude to ARMY.',
         era: 'Chapter 2',
-        coverColor: '#A855F7',
+        coverColor: BORAHAE_COLORS.PRIMARY,
         coverArtUrl: 'http://coverartarchive.org/release/47915090-9b99-4cfe-9326-92b40332c345/35879173466-500.jpg',
     }
 ];

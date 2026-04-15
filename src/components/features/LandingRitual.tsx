@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { BTSLogo, ArmyBombCanvas } from '../visual';
+import { BORAHAE_COLORS } from '../../constants/colors';
 
 export interface LandingRitualProps {
     onSync: () => void;
@@ -20,16 +21,16 @@ const MEMBERS = [
 
 // Foreground army bomb orbs — purple ocean glow (you're in the crowd)
 const FOREGROUND_BOMBS = [
-  { x:  3, y:  2, size: 62, color: '#A855F7', blur: 20, opacity: 0.52, dur: 3.2, delay: 0.0 },
+  { x:  3, y:  2, size: 62, color: BORAHAE_COLORS.PRIMARY, blur: 20, opacity: 0.52, dur: 3.2, delay: 0.0 },
   { x:  9, y: 12, size: 50, color: '#8B5CF6', blur: 16, opacity: 0.42, dur: 2.8, delay: 0.8 },
   { x: 16, y:  3, size: 78, color: '#C084FC', blur: 24, opacity: 0.58, dur: 3.6, delay: 1.2 },
   { x: 23, y: 14, size: 44, color: '#9333EA', blur: 14, opacity: 0.38, dur: 2.4, delay: 0.4 },
-  { x: 31, y:  6, size: 58, color: '#A855F7', blur: 18, opacity: 0.48, dur: 3.0, delay: 1.6 },
+  { x: 31, y:  6, size: 58, color: BORAHAE_COLORS.PRIMARY, blur: 18, opacity: 0.48, dur: 3.0, delay: 1.6 },
   { x: 40, y:  1, size: 85, color: '#D8B4FE', blur: 28, opacity: 0.35, dur: 4.0, delay: 2.0 },
   { x: 49, y:  9, size: 52, color: '#8B5CF6', blur: 17, opacity: 0.45, dur: 2.6, delay: 0.6 },
   { x: 58, y:  4, size: 70, color: '#C084FC', blur: 22, opacity: 0.52, dur: 3.4, delay: 1.0 },
   { x: 66, y: 13, size: 46, color: '#9333EA', blur: 15, opacity: 0.42, dur: 2.9, delay: 1.8 },
-  { x: 74, y:  5, size: 64, color: '#A855F7', blur: 19, opacity: 0.48, dur: 3.1, delay: 0.3 },
+  { x: 74, y:  5, size: 64, color: BORAHAE_COLORS.PRIMARY, blur: 19, opacity: 0.48, dur: 3.1, delay: 0.3 },
   { x: 82, y:  1, size: 80, color: '#B47EE5', blur: 24, opacity: 0.55, dur: 3.7, delay: 1.4 },
   { x: 90, y: 10, size: 54, color: '#8B5CF6', blur: 18, opacity: 0.44, dur: 2.7, delay: 2.2 },
   { x: 96, y:  4, size: 66, color: '#C084FC', blur: 21, opacity: 0.50, dur: 3.3, delay: 0.9 },

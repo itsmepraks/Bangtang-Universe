@@ -307,7 +307,7 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
               />
               <Bar
                 dataKey="songCount"
-                fill="#A855F7"
+                fill={BORAHAE_COLORS.PRIMARY}
                 radius={[4, 4, 0, 0]}
                 name="Songs"
                 activeBar={CHART_STYLES.BAR_ACTIVE}
@@ -368,7 +368,7 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
                 <Tooltip {...CHART_STYLES.TOOLTIP} cursor={CHART_STYLES.TOOLTIP.cursor} />
                 <Bar
                   dataKey="count"
-                  fill="#A855F7"
+                  fill={BORAHAE_COLORS.PRIMARY}
                   fillOpacity={0.7}
                   radius={[4, 4, 0, 0]}
                   activeBar={CHART_STYLES.BAR_ACTIVE}

@@ -3,7 +3,7 @@ import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, Lege
 import type { Song } from '../../../types/database';
 import MetricCard from '../../ui/MetricCard';
 import Badge from '../../ui/Badge';
-import { getSentimentColor, CHART_STYLES } from '../../../constants/colors';
+import { getSentimentColor, CHART_STYLES, BORAHAE_COLORS } from '../../../constants/colors';
 
 interface SongComparisonProps {
   songs: Song[];
@@ -92,7 +92,7 @@ export default function SongComparison({ songs, initialSongA, initialSongB }: So
               <RadarChart data={radarData}>
                 <PolarGrid stroke="rgba(255,255,255,0.06)" />
                 <PolarAngleAxis dataKey="feature" tick={{ ...CHART_STYLES.AXIS }} />
-                {songA && <Radar name={songA.title} dataKey="a" stroke="#A855F7" fill="#A855F7" fillOpacity={0.2} strokeWidth={2} />}
+                {songA && <Radar name={songA.title} dataKey="a" stroke={BORAHAE_COLORS.PRIMARY} fill={BORAHAE_COLORS.PRIMARY} fillOpacity={0.2} strokeWidth={2} />}
                 {songB && <Radar name={songB.title} dataKey="b" stroke="#818CF8" fill="#818CF8" fillOpacity={0.2} strokeWidth={2} />}
                 <Legend wrapperStyle={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }} />
               </RadarChart>
@@ -105,7 +105,7 @@ export default function SongComparison({ songs, initialSongA, initialSongB }: So
               <div className="space-y-3">
                 <h4 className="text-sm font-semibold text-purple-300">{songA.title}</h4>
                 <div className="grid grid-cols-2 gap-3">
-                  <MetricCard label="BPM" value={songA.bpm || '—'} size="sm" accent="#A855F7" />
+                  <MetricCard label="BPM" value={songA.bpm || '—'} size="sm" accent={BORAHAE_COLORS.PRIMARY} />
                   <MetricCard label="Duration" value={songA.duration_seconds ? `${Math.floor(songA.duration_seconds / 60)}:${(songA.duration_seconds % 60).toString().padStart(2, '0')}` : '—'} size="sm" />
                 </div>
                 {songA.sentiment && (
