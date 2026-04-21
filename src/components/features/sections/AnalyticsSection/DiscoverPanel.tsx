@@ -195,8 +195,8 @@ export default function DiscoverPanel({
           {selectedSong && recommendations.length === 0 && (
             <EmptyState
               icon={Sparkles}
-              title="No similar songs found"
-              description="Nothing close. Try a different track."
+              title="No close matches"
+              description="This track's profile is unusual. Try a different song."
             />
           )}
 
@@ -295,7 +295,7 @@ export default function DiscoverPanel({
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a question..."
+              placeholder='e.g. "Who wrote Dynamite?"'
               className="bg-white/[0.03] border border-white/[0.06] rounded-xl text-white text-sm p-3 pr-12 w-full placeholder:text-white/40 focus:outline-none focus:border-purple-500/30"
             />
             <button
@@ -346,8 +346,8 @@ export default function DiscoverPanel({
                 const { label, color } = getConfidenceLabel(answer.confidence);
                 const explain =
                   label === 'High'
-                    ? 'Strong match in the dataset — safe to trust.'
-                    : 'Partial match — the answer may be incomplete or approximate.';
+                    ? 'High confidence. This answer is solid.'
+                    : 'Partial match. The answer may be incomplete.';
                 return (
                   <span
                     className={`text-xs ${color} inline-flex items-center gap-1.5`}

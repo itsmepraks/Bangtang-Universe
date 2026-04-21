@@ -380,7 +380,7 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
       ) : (
         <div className="bg-[#111118]/80 border border-white/[0.04] rounded-xl p-3 md:p-5">
           <p className="text-sm text-white/30">
-            Not enough audio data for detailed distributions.
+            Only a handful of songs have audio details. Distributions need more to show a pattern.
           </p>
         </div>
       )}

@@ -205,7 +205,7 @@ export default function MilestonesPanel({
   if (awards.length === 0 && chartEntries.length === 0 && allEntries.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <p className="text-sm text-white/40">No milestone data available yet.</p>
+        <p className="text-sm text-white/60">Nothing to show yet.</p>
         <p className="text-xs text-white/40 mt-2">
           Awards, chart entries, and timeline events will appear here once data is loaded.
         </p>

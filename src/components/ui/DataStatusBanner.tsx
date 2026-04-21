@@ -28,8 +28,8 @@ export default function DataStatusBanner({ hasError, onRetry, retrying = false }
     >
       <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" aria-hidden="true" />
       <div className="flex-1 min-w-0 text-xs">
-        <span className="font-medium">Live data unavailable.</span>{' '}
-        <span className="text-amber-100/60">Showing cached archive — newest additions may be missing.</span>
+        <span className="font-medium">Can't reach the server.</span>{' '}
+        <span className="text-amber-100/60">Showing saved data. Newest releases may not be here yet.</span>
       </div>
       <button
         onClick={onRetry}

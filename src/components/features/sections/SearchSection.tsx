@@ -147,7 +147,7 @@ export default function SearchSection({ songs, members, albums, awards, concerts
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             onFocus={() => setShowSuggestions(true)}
             placeholder="Search songs, albums, members..."
-            aria-label="Search the archive"
+            aria-label="Search BTS"
             className="flex-1 bg-transparent text-base text-white/80 outline-none placeholder:text-white/40"
           />
           <button
@@ -260,7 +260,7 @@ export default function SearchSection({ songs, members, albums, awards, concerts
       ) : (
         <EmptyState
           icon={query || activeMood ? Network : Search}
-          title={query || activeMood ? 'No results found' : 'Search the archive'}
+          title={query || activeMood ? 'No results found' : 'Search BTS'}
           description={
             query || activeMood
               ? 'Try different words or pick a mood above.'

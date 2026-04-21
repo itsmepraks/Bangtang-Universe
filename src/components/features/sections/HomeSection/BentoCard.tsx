@@ -38,7 +38,7 @@ export default function BentoCard({
           <button
             type="button"
             onClick={onExplore}
-            aria-label={`Explore ${title}`}
+            aria-label={`See all ${title.toLowerCase()}`}
             className="text-white/40 hover:text-purple-400/70 transition-colors duration-200 text-sm leading-none p-3 -mr-1"
           >
             {'\u2192'}
