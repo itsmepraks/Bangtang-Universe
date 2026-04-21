@@ -335,7 +335,7 @@ export default function App() {
                   key={item.id}
                   onClick={() => setActiveSection(item.id)}
                   aria-current={activeSection === item.id ? 'page' : undefined}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-left ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-[color,background-color,box-shadow] duration-200 w-full text-left ${
                     activeSection === item.id
                       ? 'text-white'
                       : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
@@ -354,7 +354,7 @@ export default function App() {
             <div className="pt-4 border-t border-white/[0.06] mb-3 px-2 space-y-2">
               <button
                 onClick={() => setConcertMode(c => !c)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-all w-full text-left ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-[color,background-color,border-color] duration-200 w-full text-left ${
                   concertMode
                     ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30'
                     : 'text-white/40 hover:text-white/60 hover:bg-white/[0.03]'

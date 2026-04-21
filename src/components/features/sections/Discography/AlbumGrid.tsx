@@ -197,7 +197,7 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
                     <img
                       src={album.cover_art_url}
                       alt={album.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover img-outline group-hover:scale-105 transition-transform duration-700"
                       loading="lazy"
                     />
                   ) : (

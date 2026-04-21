@@ -330,7 +330,7 @@ function PreviewPanel({ result }: { result: SearchResult }) {
     return (
       <div className="space-y-4">
         {member.image_url && (
-          <img src={member.image_url} alt={member.stage_name} className="w-full h-32 object-cover rounded-xl" />
+          <img src={member.image_url} alt={member.stage_name} className="w-full h-32 object-cover rounded-xl img-outline" />
         )}
         <div>
           <h4 className="text-sm font-semibold text-white/90">{member.stage_name}</h4>

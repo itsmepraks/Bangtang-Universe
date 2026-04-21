@@ -178,7 +178,7 @@ export default function HomeSection({
           <button
             key={label}
             onClick={onClick}
-            className="group flex items-center gap-3 text-left bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3 hover:bg-white/[0.05] hover:border-purple-500/20 transition-all"
+            className="group flex items-center gap-3 text-left bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3 hover:bg-white/[0.05] hover:border-purple-500/20 active:scale-[0.96] transition-[background-color,border-color,transform] duration-200"
           >
             <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center flex-shrink-0">
               <Icon className="w-4 h-4 text-purple-300/80" aria-hidden="true" />
@@ -187,7 +187,7 @@ export default function HomeSection({
               <div className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">{label}</div>
               <div className="text-[11px] text-white/40 truncate">{hint}</div>
             </div>
-            <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-purple-300 group-hover:translate-x-0.5 transition-all flex-shrink-0" aria-hidden="true" />
+            <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-purple-300 group-hover:translate-x-0.5 transition-[color,transform] flex-shrink-0" aria-hidden="true" />
           </button>
         ))}
       </div>
@@ -301,7 +301,7 @@ export default function HomeSection({
               <img
                 src={latestAlbum.cover_art_url}
                 alt={latestAlbum.title}
-                className="w-full h-full object-cover opacity-80"
+                className="w-full h-full object-cover img-outline opacity-80"
                 loading="lazy"
               />
             ) : (
