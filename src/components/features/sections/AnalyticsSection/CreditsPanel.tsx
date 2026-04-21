@@ -43,11 +43,6 @@ export default function CreditsPanel({ songs, members }: CreditsPanelProps) {
     [topWriters],
   );
 
-  const maxPairCount = useMemo(
-    () => (topCollaborators.length > 0 ? topCollaborators[0].coOccurrences : 1),
-    [topCollaborators],
-  );
-
   const memberStageNames = useMemo(
     () => new Set(members.map((m) => m.stage_name)),
     [members],

@@ -11,18 +11,6 @@ import type { Song, Album, Member, Award, Concert } from '../types/database';
 
 // ==================== CONSTANTS ====================
 
-const LEGACY_ERA_ORDER: string[] = [
-  'School Trilogy',
-  'HYYH',
-  'Wings',
-  'Love Yourself',
-  'Map of the Soul',
-  'BE',
-  'Butter',
-  'Proof',
-  'Chapter 2',
-];
-
 /**
  * Build era ordering from actual album data, sorted by earliest release date.
  */

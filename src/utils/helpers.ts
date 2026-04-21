@@ -20,7 +20,7 @@
  */
 
 import type { Position3D, Star, BokehBubble, FloatingParticle } from '../types/index';
-import { BORAHAE_COLORS, UNIVERSE_COLORS } from '../constants/colors';
+import { UNIVERSE_COLORS } from '../constants/colors';
 
 // ============================================================================
 // ANIMATION HELPERS
