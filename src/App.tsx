@@ -28,6 +28,7 @@ const ToursSection = lazy(() => import('./components/features/sections/ToursSect
 const MediaSection = lazy(() => import('./components/features/sections/MediaSection'));
 const OnboardingFlow = lazy(() => import('./components/features/OnboardingFlow'));
 const CommandPalette = lazy(() => import('./components/features/CommandPalette'));
+const DelightLayer = lazy(() => import('./components/features/DelightLayer'));
 
 // Loading fallback — three pulsing dots instead of generic spinner
 const LoadingFallback = () => (
@@ -63,6 +64,19 @@ import {
   X,
   Info,
 } from 'lucide-react';
+
+/**
+ * Time-of-day greeting for the sidebar. Rotates across 4 buckets so returning
+ * users see different personality at different hours.
+ */
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 5) return 'Burning midnight oil, ARMY';
+  if (h < 12) return 'Good morning, ARMY';
+  if (h < 17) return 'Good afternoon, ARMY';
+  if (h < 22) return 'Good evening, ARMY';
+  return 'Night owl, ARMY';
+}
 
 const SECTION_TITLES: Record<DashboardSection, string> = {
   overview: 'Overview',
@@ -326,7 +340,10 @@ export default function App() {
               className="flex items-center gap-3 px-2 mb-8 group cursor-pointer"
             >
               <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300" />
-              <span className="text-sm font-semibold text-white/80">Bangtan Universe</span>
+              <div className="min-w-0">
+                <span className="block text-sm font-semibold text-white/80 leading-tight">Bangtan Universe</span>
+                <span className="block text-[10px] text-white/30 leading-tight">{getGreeting()}</span>
+              </div>
             </div>
 
             <nav aria-label="Main navigation" className="flex flex-col gap-1 flex-1">
@@ -550,6 +567,10 @@ export default function App() {
         )}
       </Suspense>
 
+      {/* Hidden delights — Konami code + console greeting */}
+      <Suspense fallback={null}>
+        <DelightLayer />
+      </Suspense>
 
     </div>
   );

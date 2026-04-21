@@ -11,6 +11,7 @@ interface StatCardProps {
 
 export default function StatCard({ label, value, icon: Icon, accent = BORAHAE_COLORS.PRIMARY, subtitle }: StatCardProps) {
   const [displayed, setDisplayed] = useState(0);
+  const [pulseKey, setPulseKey] = useState(0);
 
   useEffect(() => {
     if (value === 0) return;
@@ -22,6 +23,7 @@ export default function StatCard({ label, value, icon: Icon, accent = BORAHAE_CO
       current += increment;
       if (current >= value) {
         setDisplayed(value);
+        setPulseKey((k) => k + 1); // trigger completion pulse
         clearInterval(timer);
       } else {
         setDisplayed(Math.floor(current));
@@ -35,7 +37,12 @@ export default function StatCard({ label, value, icon: Icon, accent = BORAHAE_CO
       <div className="h-0.5 w-10 rounded-full mb-4" style={{ backgroundColor: accent }} />
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-2xl sm:text-3xl font-semibold text-white/95 tabular-nums">{displayed.toLocaleString()}</span>
+          <span
+            key={pulseKey}
+            className={`inline-block text-2xl sm:text-3xl font-semibold text-white/95 tabular-nums ${pulseKey > 0 ? 'stat-complete-pulse' : ''}`}
+          >
+            {displayed.toLocaleString()}
+          </span>
           <div className="text-xs font-medium text-white/50 mt-1">{label}</div>
           {subtitle && <div className="text-xs text-white/40 mt-0.5">{subtitle}</div>}
         </div>
