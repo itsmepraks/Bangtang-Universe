@@ -28,6 +28,7 @@ import {
     logError,
     logWarning,
     logDone,
+    errorMessage,
 } from './scrape-utils.js';
 
 const USER_AGENT = 'BangtanUniverse/1.0 (https://github.com/itsmepraks/BTS-universe)';
@@ -352,8 +353,8 @@ async function scrapeMember(member: typeof MEMBERS[0]): Promise<MemberInfo> {
             timeout: 30000,
         });
         html = resp.data;
-    } catch (err: any) {
-        logWarning(`Failed to fetch ${member.name}'s page: ${err.message}`);
+    } catch (err: unknown) {
+        logWarning(`Failed to fetch ${member.name}'s page: ${errorMessage(err)}`);
         return {
             member_id: member.member_id,
             birth_name_ko: null,

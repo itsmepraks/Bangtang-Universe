@@ -16,7 +16,7 @@ interface SearchSectionProps {
   awards: Award[];
   concerts: Concert[];
   onSelectSong: (s: Song) => void;
-  onNavigate: (section: DashboardSection, payload?: unknown) => void;
+  onNavigate: (section: DashboardSection, payload?: string | number) => void;
 }
 
 const MOOD_LABELS: Record<string, string> = {

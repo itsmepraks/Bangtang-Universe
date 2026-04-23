@@ -9,7 +9,7 @@ interface CommandPaletteProps {
   songs: Song[];
   albums: Album[];
   members: Member[];
-  onNavigate: (section: DashboardSection, payload?: unknown) => void;
+  onNavigate: (section: DashboardSection, payload?: string | number) => void;
   onSelectSong: (song: Song) => void;
 }
 

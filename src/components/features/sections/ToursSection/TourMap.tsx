@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps';
+import type { Geography as GeographyShape } from 'react-simple-maps';
 import { MapPin, Plus, Minus, RotateCcw } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
 import { resolveCoords } from '../../../../data/cityCoords';
@@ -129,8 +130,8 @@ export default function TourMap({ concerts }: TourMapProps) {
           }}
         >
           <Geographies geography={worldData}>
-            {({ geographies }: { geographies: { rsmKey: string; [key: string]: unknown }[] }) =>
-              geographies.map((geo: { rsmKey: string; [key: string]: unknown }) => (
+            {({ geographies }: { geographies: GeographyShape[] }) =>
+              geographies.map((geo) => (
                 <Geography
                   key={geo.rsmKey}
                   geography={geo}

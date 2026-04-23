@@ -227,7 +227,7 @@ export default function App() {
     setMode('onboarding');
   };
 
-  const navigateTo = (section: DashboardSection, payload?: unknown) => {
+  const navigateTo = (section: DashboardSection, payload?: string | number) => {
     setActiveSection(section);
     if (section === 'discography') {
       if (typeof payload === 'number') {

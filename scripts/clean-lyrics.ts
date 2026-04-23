@@ -156,7 +156,7 @@ async function main() {
 
             if (cleaned === null && original) {
                 // Was junk → null it out
-                updates[field] = null as any;
+                updates[field] = null;
                 changed = true;
                 lyricsNulled++;
                 console.log(`   ✗ [${row.id}] "${songTitle}" ${field} → NULL (was ${original.length} chars)`);
@@ -209,13 +209,13 @@ async function main() {
             ['lyrics_en', 'lyrics_en'],
             ['lyrics_romanized', 'lyrics_romanized'],
         ] as const) {
-            const original = (row as any)[field];
+            const original = (row as Record<string, string | null>)[field];
             if (!original) continue;
 
             const cleaned = cleanField(original);
 
             if (cleaned === null && original) {
-                updates[dbField] = null as any;
+                updates[dbField] = null;
                 changed = true;
                 songsNulled++;
                 console.log(`   ✗ [${row.id}] "${row.title}" ${dbField} → NULL (was ${original.length} chars)`);

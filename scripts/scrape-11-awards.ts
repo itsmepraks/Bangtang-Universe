@@ -11,7 +11,7 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { createSupabaseAdmin, delay, saveCache, loadCache, logStart, logSuccess, logError, logWarning, logDone } from './scrape-utils.js';
+import { createSupabaseAdmin, delay, saveCache, loadCache, logStart, logSuccess, logError, logWarning, logDone, errorMessage } from './scrape-utils.js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const UPSERT = process.argv.includes('--upsert');
@@ -230,8 +230,8 @@ async function main() {
             timeout: 30000,
         });
         html = response.data;
-    } catch (err: any) {
-        logError(`Failed to fetch Wikipedia page: ${err.message}`);
+    } catch (err: unknown) {
+        logError(`Failed to fetch Wikipedia page: ${errorMessage(err)}`);
         process.exit(1);
     }
 

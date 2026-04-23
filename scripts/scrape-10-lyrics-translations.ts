@@ -11,7 +11,7 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { createSupabaseAdmin, delay, saveCache, loadCache, logStart, logProgress, logSuccess, logError, logWarning, logDone } from './scrape-utils.js';
+import { createSupabaseAdmin, delay, saveCache, loadCache, logStart, logProgress, logSuccess, logError, logWarning, logDone, errorMessage } from './scrape-utils.js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const UPSERT = process.argv.includes('--upsert');
@@ -74,12 +74,13 @@ async function searchSong(title: string): Promise<string | null> {
         }
 
         return songPageUrl;
-    } catch (err: any) {
-        if (err.response?.status === 403 || err.response?.status === 429) {
-            logWarning(`Search blocked (${err.response.status}) - may need to wait`);
+    } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } }).response?.status;
+        if (status === 403 || status === 429) {
+            logWarning(`Search blocked (${status}) - may need to wait`);
             return null;
         }
-        logWarning(`Search failed for "${title}": ${err.message}`);
+        logWarning(`Search failed for "${title}": ${errorMessage(err)}`);
         return null;
     }
 }
@@ -190,12 +191,13 @@ async function scrapeLyricsPage(url: string): Promise<{ ko: string | null; en: s
             en: englishLines.length > 0 ? englishLines.join('\n\n') : null,
             romanized: romanizedLines.length > 0 ? romanizedLines.join('\n\n') : null,
         };
-    } catch (err: any) {
-        if (err.response?.status === 403 || err.response?.status === 429) {
-            logWarning(`Page blocked (${err.response.status}): ${url}`);
+    } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } }).response?.status;
+        if (status === 403 || status === 429) {
+            logWarning(`Page blocked (${status}): ${url}`);
             return { ko: null, en: null, romanized: null };
         }
-        logWarning(`Failed to scrape lyrics page ${url}: ${err.message}`);
+        logWarning(`Failed to scrape lyrics page ${url}: ${errorMessage(err)}`);
         return { ko: null, en: null, romanized: null };
     }
 }
@@ -382,8 +384,8 @@ async function main() {
                 logWarning(`Page found but no lyrics extracted`);
                 notFound++;
             }
-        } catch (err: any) {
-            logWarning(`Error processing "${song.title}": ${err.message}`);
+        } catch (err: unknown) {
+            logWarning(`Error processing "${song.title}": ${errorMessage(err)}`);
             results.push({
                 song_id: song.id,
                 song_title: song.title,

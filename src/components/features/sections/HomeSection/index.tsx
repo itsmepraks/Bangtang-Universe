@@ -26,7 +26,7 @@ interface HomeSectionProps {
   members: Member[];
   awards: Award[];
   concerts: Concert[];
-  onNavigate: (section: DashboardSection, payload?: unknown) => void;
+  onNavigate: (section: DashboardSection, payload?: string | number) => void;
 }
 
 // "Love Yourself: Her" → "LY:Her"; "WINGS" → "WINGS"; "Dark & Wild" → "D&W"

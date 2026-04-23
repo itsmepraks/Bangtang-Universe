@@ -121,7 +121,7 @@ async function main() {
 
         if (existing) {
             // UPDATE existing album with enriched data
-            const updates: Record<string, any> = {};
+            const updates: Record<string, unknown> = {};
 
             // Only update fields where we have better data
             if (wiki?.title_korean && !existing.title_korean) {

@@ -8,7 +8,7 @@
  */
 
 import axios from 'axios';
-import { delay, saveCache, loadCache, logStart, logProgress, logSuccess, logWarning, logDone } from './scrape-utils.js';
+import { delay, saveCache, loadCache, logStart, logProgress, logSuccess, logWarning, logDone, errorMessage } from './scrape-utils.js';
 
 const WIKI_API = 'https://en.wikipedia.org/w/api.php';
 
@@ -131,8 +131,8 @@ async function fetchWikitext(pageTitle: string): Promise<string | null> {
             timeout: 15000,
         });
         return data?.parse?.wikitext?.['*'] || null;
-    } catch (err: any) {
-        logWarning(`Failed to fetch Wikipedia page "${pageTitle}": ${err.message}`);
+    } catch (err: unknown) {
+        logWarning(`Failed to fetch Wikipedia page "${pageTitle}": ${errorMessage(err)}`);
         return null;
     }
 }
