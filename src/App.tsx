@@ -65,6 +65,7 @@ import {
   Info,
   PanelLeftClose,
   PanelLeftOpen,
+  Music,
 } from 'lucide-react';
 
 /**
@@ -434,22 +435,30 @@ export default function App() {
             </div>
 
             {!sidebarCollapsed && (
-              <div className="pt-4 border-t border-white/[0.06] space-y-1.5 px-2 mb-4">
+              <div className="pt-4 border-t border-white/[0.06] mb-2">
                 {dataLoading ? (
-                  <>
-                    {[1,2,3,4,5].map(i => (
-                      <div key={i} className="h-4 w-20 rounded bg-white/[0.04] animate-pulse" />
+                  <div className="grid grid-cols-2 gap-1.5 px-2">
+                    {[1,2,3,4,5,6].map(i => (
+                      <div key={i} className="h-8 rounded-md bg-white/[0.02] animate-pulse" />
                     ))}
-                  </>
+                  </div>
                 ) : (
-                  <>
-                    <div className="text-xs text-white/40">{songs.length} songs</div>
-                    <div className="text-xs text-white/40">{albums.length} albums</div>
-                    <div className="text-xs text-white/40">{members.length} members</div>
-                    <div className="text-xs text-white/40">{awards.length} awards</div>
-                    <div className="text-xs text-white/40">{concerts.length} concerts</div>
-                    <div className="text-xs text-white/40">{media.length} media</div>
-                  </>
+                  <div className="grid grid-cols-2 gap-x-2 gap-y-1 px-2">
+                    {[
+                      { icon: Music, label: 'songs', value: songs.length, color: SECTION_ACCENTS.discography },
+                      { icon: Disc, label: 'albums', value: albums.length, color: SECTION_ACCENTS.discography },
+                      { icon: Users, label: 'members', value: members.length, color: SECTION_ACCENTS.members },
+                      { icon: Trophy, label: 'awards', value: awards.length, color: SECTION_ACCENTS.awards },
+                      { icon: MapPin, label: 'shows', value: concerts.length, color: SECTION_ACCENTS.tours },
+                      { icon: Film, label: 'media', value: media.length, color: SECTION_ACCENTS.media },
+                    ].map(({ icon: Icon, label, value, color }) => (
+                      <div key={label} className="flex items-center gap-1.5 py-1">
+                        <Icon size={11} style={{ color: `${color}cc` }} className="flex-shrink-0" aria-hidden="true" />
+                        <span className="text-xs font-semibold text-white/70 tabular-nums">{value.toLocaleString()}</span>
+                        <span className="text-[10px] text-white/30">{label}</span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}
