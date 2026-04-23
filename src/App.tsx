@@ -348,19 +348,44 @@ export default function App() {
           )}
 
           {/* Sidebar */}
-          <div className={`fixed inset-y-0 left-0 ${sidebarCollapsed ? 'w-16' : 'w-56'} bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-6 ${sidebarCollapsed ? 'px-2' : 'px-4'} z-50 transform transition-[transform,width,padding] duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
-            <div
-              onClick={() => setMode('landing')}
-              className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3 px-2'} mb-8 group cursor-pointer`}
-            >
-              <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300 flex-shrink-0" />
+          <div className={`fixed inset-y-0 left-0 ${sidebarCollapsed ? 'w-[72px]' : 'w-56'} bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-4 ${sidebarCollapsed ? 'px-3' : 'px-4'} z-50 transform transition-[transform,width,padding] duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
+            {/* Top row: logo + collapse toggle (typical sidebar affordance) */}
+            <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} mb-6`}>
+              <div
+                onClick={() => setMode('landing')}
+                className={`flex items-center ${sidebarCollapsed ? '' : 'gap-3'} group cursor-pointer min-w-0`}
+              >
+                <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300 flex-shrink-0" />
+                {!sidebarCollapsed && (
+                  <div className="min-w-0">
+                    <span className="block text-sm font-semibold text-white/80 leading-tight truncate">Bangtan Universe</span>
+                    <span className="block text-[10px] text-white/30 leading-tight truncate">{getGreeting()}</span>
+                  </div>
+                )}
+              </div>
               {!sidebarCollapsed && (
-                <div className="min-w-0">
-                  <span className="block text-sm font-semibold text-white/80 leading-tight">Bangtan Universe</span>
-                  <span className="block text-[10px] text-white/30 leading-tight">{getGreeting()}</span>
-                </div>
+                <button
+                  onClick={() => setSidebarCollapsed(true)}
+                  className="hidden md:flex items-center justify-center w-7 h-7 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/[0.04] transition-colors flex-shrink-0"
+                  aria-label="Collapse sidebar"
+                  title="Collapse sidebar"
+                >
+                  <PanelLeftClose size={16} />
+                </button>
               )}
             </div>
+
+            {/* Expand button — shows when collapsed, positioned below the logo */}
+            {sidebarCollapsed && (
+              <button
+                onClick={() => setSidebarCollapsed(false)}
+                className="hidden md:flex items-center justify-center w-full h-9 mb-3 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/[0.04] transition-colors"
+                aria-label="Expand sidebar"
+                title="Expand sidebar"
+              >
+                <PanelLeftOpen size={16} />
+              </button>
+            )}
 
             <nav aria-label="Main navigation" className="flex flex-col gap-1 flex-1">
               {NAV_ITEMS.map(item => (
@@ -369,14 +394,14 @@ export default function App() {
                   onClick={() => setActiveSection(item.id)}
                   aria-current={activeSection === item.id ? 'page' : undefined}
                   title={sidebarCollapsed ? item.label : undefined}
-                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 rounded-xl transition-[color,background-color,box-shadow] duration-200 w-full text-left ${
+                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-xl transition-[color,background-color,box-shadow] duration-200 w-full text-left ${
                     activeSection === item.id
                       ? 'text-white'
                       : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
                   }`}
                   style={activeSection === item.id ? {
                     backgroundColor: `${SECTION_ACCENTS[item.id]}15`,
-                    boxShadow: `inset 3px 0 0 0 ${SECTION_ACCENTS[item.id]}`,
+                    boxShadow: sidebarCollapsed ? undefined : `inset 3px 0 0 0 ${SECTION_ACCENTS[item.id]}`,
                   } : undefined}
                 >
                   <item.icon size={18} aria-hidden="true" className="flex-shrink-0" />
@@ -389,7 +414,7 @@ export default function App() {
               <button
                 onClick={() => setConcertMode(c => !c)}
                 title={sidebarCollapsed ? (concertMode ? 'Concert mode ON' : 'Concert mode') : undefined}
-                className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-2 px-4'} py-2.5 rounded-xl text-xs font-medium transition-[color,background-color,border-color] duration-200 w-full text-left ${
+                className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'gap-2 px-4'} py-2.5 rounded-xl text-xs font-medium transition-[color,background-color,border-color] duration-200 w-full text-left ${
                   concertMode
                     ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30'
                     : 'text-white/40 hover:text-white/60 hover:bg-white/[0.03]'
@@ -405,15 +430,6 @@ export default function App() {
               >
                 <Info size={14} />
                 {!sidebarCollapsed && <span>About this project</span>}
-              </button>
-              <button
-                onClick={() => setSidebarCollapsed(c => !c)}
-                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                className={`hidden md:flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2'} text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer`}
-              >
-                {sidebarCollapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
-                {!sidebarCollapsed && <span>Collapse sidebar</span>}
               </button>
             </div>
 
