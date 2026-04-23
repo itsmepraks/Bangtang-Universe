@@ -63,6 +63,8 @@ import {
   Menu,
   X,
   Info,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 
 /**
@@ -106,7 +108,19 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('bts-sidebar-collapsed') === '1';
+    } catch { return false; }
+  });
   const [paletteOpen, setPaletteOpen] = useState(false);
+
+  // Persist sidebar collapse state
+  useEffect(() => {
+    try {
+      localStorage.setItem('bts-sidebar-collapsed', sidebarCollapsed ? '1' : '0');
+    } catch { /* noop */ }
+  }, [sidebarCollapsed]);
   const [concertMode, setConcertMode] = useState(false);
 
   // State for expanded sections (must be declared before useEffects that reference them)
@@ -334,16 +348,18 @@ export default function App() {
           )}
 
           {/* Sidebar */}
-          <div className={`fixed inset-y-0 left-0 w-56 bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-6 px-4 z-50 transform transition-transform duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:transition-none`}>
+          <div className={`fixed inset-y-0 left-0 ${sidebarCollapsed ? 'w-16' : 'w-56'} bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-6 ${sidebarCollapsed ? 'px-2' : 'px-4'} z-50 transform transition-[transform,width,padding] duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
             <div
               onClick={() => setMode('landing')}
-              className="flex items-center gap-3 px-2 mb-8 group cursor-pointer"
+              className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'gap-3 px-2'} mb-8 group cursor-pointer`}
             >
-              <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300" />
-              <div className="min-w-0">
-                <span className="block text-sm font-semibold text-white/80 leading-tight">Bangtan Universe</span>
-                <span className="block text-[10px] text-white/30 leading-tight">{getGreeting()}</span>
-              </div>
+              <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300 flex-shrink-0" />
+              {!sidebarCollapsed && (
+                <div className="min-w-0">
+                  <span className="block text-sm font-semibold text-white/80 leading-tight">Bangtan Universe</span>
+                  <span className="block text-[10px] text-white/30 leading-tight">{getGreeting()}</span>
+                </div>
+              )}
             </div>
 
             <nav aria-label="Main navigation" className="flex flex-col gap-1 flex-1">
@@ -352,7 +368,8 @@ export default function App() {
                   key={item.id}
                   onClick={() => setActiveSection(item.id)}
                   aria-current={activeSection === item.id ? 'page' : undefined}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-[color,background-color,box-shadow] duration-200 w-full text-left ${
+                  title={sidebarCollapsed ? item.label : undefined}
+                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-3 px-4'} py-3 rounded-xl transition-[color,background-color,box-shadow] duration-200 w-full text-left ${
                     activeSection === item.id
                       ? 'text-white'
                       : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
@@ -362,51 +379,64 @@ export default function App() {
                     boxShadow: `inset 3px 0 0 0 ${SECTION_ACCENTS[item.id]}`,
                   } : undefined}
                 >
-                  <item.icon size={18} aria-hidden="true" />
-                  <span className="text-sm font-medium">{item.label}</span>
+                  <item.icon size={18} aria-hidden="true" className="flex-shrink-0" />
+                  {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
                 </button>
               ))}
             </nav>
 
-            <div className="pt-4 border-t border-white/[0.06] mb-3 px-2 space-y-2">
+            <div className={`pt-4 border-t border-white/[0.06] mb-3 ${sidebarCollapsed ? 'px-0' : 'px-2'} space-y-2`}>
               <button
                 onClick={() => setConcertMode(c => !c)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-medium transition-[color,background-color,border-color] duration-200 w-full text-left ${
+                title={sidebarCollapsed ? (concertMode ? 'Concert mode ON' : 'Concert mode') : undefined}
+                className={`flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'gap-2 px-4'} py-2.5 rounded-xl text-xs font-medium transition-[color,background-color,border-color] duration-200 w-full text-left ${
                   concertMode
                     ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30'
                     : 'text-white/40 hover:text-white/60 hover:bg-white/[0.03]'
                 }`}
               >
                 <span className="text-base">{concertMode ? '🔥' : '🎆'}</span>
-                <span>{concertMode ? 'Concert mode ON' : 'Concert mode'}</span>
+                {!sidebarCollapsed && <span>{concertMode ? 'Concert mode ON' : 'Concert mode'}</span>}
               </button>
               <button
                 onClick={() => setMode('onboarding')}
-                className="flex items-center gap-2 text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer"
+                title={sidebarCollapsed ? 'About this project' : undefined}
+                className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2'} text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer`}
               >
                 <Info size={14} />
-                <span>About this project</span>
+                {!sidebarCollapsed && <span>About this project</span>}
+              </button>
+              <button
+                onClick={() => setSidebarCollapsed(c => !c)}
+                title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                className={`hidden md:flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2'} text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer`}
+              >
+                {sidebarCollapsed ? <PanelLeftOpen size={14} /> : <PanelLeftClose size={14} />}
+                {!sidebarCollapsed && <span>Collapse sidebar</span>}
               </button>
             </div>
 
-            <div className="pt-4 border-t border-white/[0.06] space-y-1.5 px-2 mb-4">
-              {dataLoading ? (
-                <>
-                  {[1,2,3,4,5].map(i => (
-                    <div key={i} className="h-4 w-20 rounded bg-white/[0.04] animate-pulse" />
-                  ))}
-                </>
-              ) : (
-                <>
-                  <div className="text-xs text-white/40">{songs.length} songs</div>
-                  <div className="text-xs text-white/40">{albums.length} albums</div>
-                  <div className="text-xs text-white/40">{members.length} members</div>
-                  <div className="text-xs text-white/40">{awards.length} awards</div>
-                  <div className="text-xs text-white/40">{concerts.length} concerts</div>
-                  <div className="text-xs text-white/40">{media.length} media</div>
-                </>
-              )}
-            </div>
+            {!sidebarCollapsed && (
+              <div className="pt-4 border-t border-white/[0.06] space-y-1.5 px-2 mb-4">
+                {dataLoading ? (
+                  <>
+                    {[1,2,3,4,5].map(i => (
+                      <div key={i} className="h-4 w-20 rounded bg-white/[0.04] animate-pulse" />
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <div className="text-xs text-white/40">{songs.length} songs</div>
+                    <div className="text-xs text-white/40">{albums.length} albums</div>
+                    <div className="text-xs text-white/40">{members.length} members</div>
+                    <div className="text-xs text-white/40">{awards.length} awards</div>
+                    <div className="text-xs text-white/40">{concerts.length} concerts</div>
+                    <div className="text-xs text-white/40">{media.length} media</div>
+                  </>
+                )}
+              </div>
+            )}
 
           </div>
 
