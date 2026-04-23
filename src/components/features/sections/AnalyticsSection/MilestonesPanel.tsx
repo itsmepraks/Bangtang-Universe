@@ -13,8 +13,6 @@ import type { Album, Award, ChartEntry, Song, Concert, MemberEvent } from '../..
 import { CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
 import ChartSection from '../../../ui/ChartSection';
 
-// ==================== TYPES ====================
-
 interface MilestonesPanelProps {
   albums: Album[];
   awards: Award[];
@@ -32,13 +30,11 @@ interface TimelineEntry {
   category: 'album' | 'award' | 'tour' | 'event';
 }
 
-// ==================== CONSTANTS ====================
-
 const CATEGORY_COLORS: Record<TimelineEntry['category'], string> = {
-  album: BORAHAE_COLORS.PRIMARY,   // purple
-  award: '#EAB308',   // gold
-  tour: '#22C55E',    // green
-  event: '#3B82F6',   // blue
+  album: BORAHAE_COLORS.PRIMARY,
+  award: '#EAB308',
+  tour: '#22C55E',
+  event: '#3B82F6',
 };
 
 const CATEGORY_LABELS: Record<TimelineEntry['category'], string> = {
@@ -47,8 +43,6 @@ const CATEGORY_LABELS: Record<TimelineEntry['category'], string> = {
   tour: 'Tour',
   event: 'Member Event',
 };
-
-// ==================== COMPONENT ====================
 
 export default function MilestonesPanel({
   albums,

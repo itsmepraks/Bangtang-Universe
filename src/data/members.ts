@@ -1,14 +1,6 @@
-/**
- * BTS Member Data - Complete & Accurate Profiles
- * 
- * Data sources: KOMCA, Wikipedia, Official BTS/HYBE releases
- * Last updated: January 2026
- */
-
 import type { Member } from '../types/index';
 import { BORAHAE_COLORS } from '../constants/colors';
 
-// Extended member interface with additional fields
 export interface ExtendedMember extends Member {
     birthDate: string;
     birthPlace: string;
@@ -22,7 +14,7 @@ export interface ExtendedMember extends Member {
     featuredTracks: string[];
     producerCredits: number;
     writerCredits: number;
-    image: string; // Path to member image
+    image: string;
 }
 
 export interface SoloAlbum {
@@ -37,10 +29,10 @@ export const MEMBER_DATA: ExtendedMember[] = [
         id: 'rm',
         name: 'RM',
         full: 'Kim Namjoon',
-        color: '#2563EB', // Blue
+        color: '#2563EB',
         role: 'Leader / Main Rapper / Producer',
         mic: 'Blue',
-        komca: 227, // As of 2024
+        komca: 227,
         image: '/assets/members/rm.jpg',
         bio: 'The philosophical leader and main rapper of BTS. A self-taught English speaker with an IQ of 148, RM is the primary songwriter of the group and has been credited on over 200 songs. His solo work explores themes of nature, identity, and the human condition.',
         soloTracks: ['Wild Flower', 'Still Life', 'Yun', 'All Day', 'Lonely', 'Change pt.2', 'Closer', 'Domodachi', 'Come back to me'],
@@ -93,7 +85,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         id: 'jin',
         name: 'JIN',
         full: 'Kim Seokjin',
-        color: '#EC4899', // Pink
+        color: '#EC4899',
         role: 'Sub Vocalist / Visual',
         mic: 'Pink',
         komca: 35,
@@ -131,7 +123,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         id: 'suga',
         name: 'SUGA',
         full: 'Min Yoongi',
-        color: '#64748B', // Slate gray
+        color: '#64748B',
         role: 'Lead Rapper / Producer',
         mic: 'Black',
         komca: 177,
@@ -182,7 +174,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         id: 'jh',
         name: 'J-HOPE',
         full: 'Jung Hoseok',
-        color: '#EF4444', // Red (representing his energy)
+        color: '#EF4444',
         role: 'Main Dancer / Sub Rapper',
         mic: 'Silver',
         komca: 150,
@@ -232,7 +224,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         id: 'jm',
         name: 'JIMIN',
         full: 'Park Jimin',
-        color: '#F59E0B', // Amber/Gold
+        color: '#F59E0B',
         role: 'Lead Vocalist / Main Dancer',
         mic: 'Gold',
         komca: 27,
@@ -277,7 +269,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         id: 'v',
         name: 'V',
         full: 'Kim Taehyung',
-        color: '#22C55E', // Green
+        color: '#22C55E',
         role: 'Sub Vocalist / Visual',
         mic: 'Green',
         komca: 25,
@@ -316,7 +308,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         id: 'jk',
         name: 'JK',
         full: 'Jeon Jungkook',
-        color: '#8B5CF6', // Purple
+        color: '#8B5CF6',
         role: 'Main Vocalist / Lead Dancer / Center / Maknae',
         mic: 'Purple',
         komca: 30,
@@ -353,23 +345,19 @@ export const MEMBER_DATA: ExtendedMember[] = [
     }
 ];
 
-// Helper function to get member by ID
 export const getMemberById = (id: string): ExtendedMember | undefined => {
     return MEMBER_DATA.find(m => m.id === id);
 };
 
-// Helper function to get member color
 export const getMemberColor = (id: string): string => {
     const member = getMemberById(id);
     return member?.color || BORAHAE_COLORS.PRIMARY;
 };
 
-// Get total KOMCA credits across all members
 export const getTotalKOMCACredits = (): number => {
     return MEMBER_DATA.reduce((sum, m) => sum + m.komca, 0);
 };
 
-// Get members sorted by KOMCA credits
 export const getMembersByCredits = (): ExtendedMember[] => {
     return [...MEMBER_DATA].sort((a, b) => b.komca - a.komca);
 };

@@ -1,14 +1,5 @@
-/**
- * Export Service
- *
- * Provides client-side export functionality for data in JSON and CSV formats.
- * All functions accept data as parameters (from hooks).
- */
-
 import { saveAs } from 'file-saver';
 import type { Song, Member, Album } from '../types/database';
-
-// ============ CSV CONVERSION ============
 
 const toCSV = <T extends object>(data: T[], columns?: (keyof T)[]): string => {
     if (data.length === 0) return '';
@@ -38,8 +29,6 @@ const toCSV = <T extends object>(data: T[], columns?: (keyof T)[]): string => {
 
     return [header, ...rows].join('\n');
 };
-
-// ============ EXPORT FUNCTIONS ============
 
 export const exportSongsJSON = (songs: Song[]): void => {
     const json = JSON.stringify(songs, null, 2);

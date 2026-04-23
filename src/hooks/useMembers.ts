@@ -1,10 +1,3 @@
-/**
- * useMembers Hook
- * 
- * Fetches member data from Supabase database
- * Falls back to local data if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Member } from '../types/database';
@@ -18,7 +11,6 @@ interface UseMembersResult {
     refetch: () => Promise<void>;
 }
 
-// Convert local member format to database format
 function convertLocalMember(m: typeof MEMBER_DATA[0]): Member {
     return {
         id: m.id,
@@ -90,7 +82,6 @@ export function useMembers(): UseMembersResult {
     return { members, loading, error, refetch: fetchMembers };
 }
 
-// Get member by ID
 export function useMemberById(id: string) {
     const { members, loading, error } = useMembers();
     return {
@@ -100,13 +91,11 @@ export function useMemberById(id: string) {
     };
 }
 
-// Get member color
 export function useMemberColor(id: string): string {
     const { member } = useMemberById(id);
-    return member?.color || BORAHAE_COLORS.PRIMARY; // Default purple
+    return member?.color || BORAHAE_COLORS.PRIMARY;
 }
 
-// Get members sorted by KOMCA credits
 export function useMembersByCredits() {
     const { members, loading, error } = useMembers();
     const sortedMembers = useMemo(
@@ -116,7 +105,6 @@ export function useMembersByCredits() {
     return { members: sortedMembers, loading, error };
 }
 
-// Get total KOMCA credits
 export function useTotalKOMCACredits(): number {
     const { members } = useMembers();
     return members.reduce((sum, m) => sum + m.komca_credits, 0);

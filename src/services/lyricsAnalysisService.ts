@@ -1,16 +1,4 @@
-/**
- * Lyrics Analysis Engine
- *
- * Pure TypeScript service for analyzing BTS lyrics data:
- * theme frequency, word frequency, and sentiment arcs.
- *
- * Implements the LyricsAnalysisProvider interface so the local
- * implementation can be swapped for an AI-backed provider later.
- */
-
 import type { Lyrics, Song, Album } from '../types/database';
-
-// ==================== Public Types ====================
 
 export interface ThemeFrequency {
   theme: string;
@@ -31,7 +19,7 @@ export interface SentimentArcPoint {
   era: string;
 }
 
-/** Interface for future AI swap */
+// Abstraction so the local analyzer can be swapped for an AI-backed provider.
 export interface LyricsAnalysisProvider {
   analyzeThemes(lyrics: Lyrics[]): ThemeFrequency[];
   getWordFrequency(lyrics: Lyrics[], topN?: number): WordFrequency[];
@@ -41,8 +29,6 @@ export interface LyricsAnalysisProvider {
     albums: Album[],
   ): SentimentArcPoint[];
 }
-
-// ==================== Constants ====================
 
 const STOP_WORDS = new Set<string>([
   'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
@@ -65,7 +51,6 @@ const STOP_WORDS = new Set<string>([
 
 const MIN_WORD_LENGTH = 3;
 
-/** Theme dictionary — maps theme labels to keyword/phrase patterns */
 const THEME_KEYWORDS: Record<string, string[]> = {
   'Love': ['love', 'heart', 'kiss', 'darling', 'baby', 'sweetheart', 'romance', 'loved', 'loving', 'lover', 'adore'],
   'Self-Love': ['myself', 'self', 'own way', 'who i am', 'love myself', 'my own', 'worth', 'enough', 'accept'],
@@ -89,7 +74,6 @@ const THEME_KEYWORDS: Record<string, string[]> = {
   'Time': ['time', 'moment', 'forever', 'eternal', 'clock', 'season', 'year', 'day', 'hour', 'wait', 'passing'],
 };
 
-/** Positive/negative word lists for basic sentiment scoring */
 const POSITIVE_WORDS = new Set([
   'love', 'happy', 'happiness', 'joy', 'beautiful', 'smile', 'laugh', 'hope',
   'dream', 'light', 'bright', 'shine', 'wonderful', 'amazing', 'paradise',
@@ -115,12 +99,6 @@ const NEGATIVE_WORDS = new Set([
   'nightmare', 'suffer', 'misery', 'cruel', 'bitter', 'toxic', 'sick',
 ]);
 
-// ==================== Helpers ====================
-
-/**
- * Tokenize a block of English text into lowercase words
- * with punctuation stripped.
- */
 function tokenize(text: string): string[] {
   return text
     .toLowerCase()
@@ -130,10 +108,6 @@ function tokenize(text: string): string[] {
     .filter((w) => w.length >= MIN_WORD_LENGTH && !STOP_WORDS.has(w));
 }
 
-/**
- * Extract themes from lyrics text using keyword matching.
- * Returns array of matched theme names for a single song.
- */
 export function extractThemes(text: string): string[] {
   const lower = text.toLowerCase();
   const matched: string[] = [];
@@ -148,10 +122,7 @@ export function extractThemes(text: string): string[] {
   return matched;
 }
 
-/**
- * Compute a simple sentiment score from English lyrics text.
- * Returns a value roughly in [-1, 1] range.
- */
+// Returns a value roughly in [-1, 1].
 export function computeSentiment(text: string): number {
   const words = text.toLowerCase().replace(/[^a-z'\s-]/g, ' ').split(/\s+/);
   let positive = 0;
@@ -165,21 +136,12 @@ export function computeSentiment(text: string): number {
   return (positive - negative) / total;
 }
 
-// ==================== Implementation ====================
-
 export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
-  /**
-   * Aggregate every `themes` array across all lyrics entries,
-   * count occurrences of each theme, and compute the percentage
-   * share of total theme mentions. Results are sorted by count
-   * descending.
-   */
   analyzeThemes(lyrics: Lyrics[]): ThemeFrequency[] {
     const counts = new Map<string, number>();
     let total = 0;
 
     for (const entry of lyrics) {
-      // Use DB themes if available, otherwise extract from lyrics text
       const themes = entry.themes && entry.themes.length > 0
         ? entry.themes
         : entry.lyrics_english
@@ -190,7 +152,6 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
       for (const theme of themes) {
         const normalized = theme.trim();
         if (normalized.length === 0) continue;
-        // Capitalize first letter for display consistency
         const display = normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase();
         counts.set(display, (counts.get(display) ?? 0) + 1);
         total += 1;
@@ -208,15 +169,6 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
       .sort((a, b) => b.count - a.count);
   }
 
-  /**
-   * Build a word-frequency list from English lyrics text.
-   *
-   * Processing pipeline:
-   *   1. Split into words, lowercase, strip punctuation.
-   *   2. Remove stop words.
-   *   3. Remove words shorter than 3 characters.
-   *   4. Count, sort descending, return top N.
-   */
   getWordFrequency(lyrics: Lyrics[], topN: number = 100): WordFrequency[] {
     const counts = new Map<string, number>();
 
@@ -234,17 +186,8 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
       .slice(0, topN);
   }
 
-  /**
-   * Build a sentiment arc across the discography.
-   *
-   * For every lyric entry that has a `sentiment_score`, look up the
-   * matching song and its album. The returned points are ordered by
-   * album `release_date` (chronological), giving a timeline of
-   * emotional tone across eras.
-   *
-   * Entries whose song or album cannot be resolved are silently
-   * skipped so the arc remains clean.
-   */
+  // Points are ordered by album release_date, so the arc is chronological.
+  // Entries without a resolvable song or album are skipped.
   analyzeSentimentArc(
     lyrics: Lyrics[],
     songs: Song[],
@@ -263,7 +206,6 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
     const points: (SentimentArcPoint & { releaseDate: string })[] = [];
 
     for (const entry of lyrics) {
-      // Use DB score if available, otherwise compute from lyrics text
       const score = entry.sentiment_score ?? (
         entry.lyrics_english ? computeSentiment(entry.lyrics_english) : null
       );
@@ -285,14 +227,10 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
       });
     }
 
-    // Sort chronologically by album release date
     points.sort((a, b) => a.releaseDate.localeCompare(b.releaseDate));
 
-    // Strip the internal releaseDate field before returning
     return points.map(({ releaseDate: _, ...point }) => point);
   }
 }
-
-// ==================== Singleton Export ====================
 
 export const lyricsAnalyzer = new LocalLyricsAnalyzer();

@@ -9,31 +9,21 @@ interface LyricsViewerProps {
     song: Song;
 }
 
-/**
- * Clean lyrics text stored from Genius scraping.
- *
- * Two types of bad data can appear:
- * 1. Genius page navigation prepended before actual lyrics:
- *    "15 ContributorsTranslationsRomanizationEnglish... [가사] [Intro: RM]..."
- *    → strip everything before the first '[' when no newline precedes it.
- *
- * 2. Album tracklist/metadata stored instead of lyrics (scraper error):
- *    "Tracklist:01. Song Name02. ..." or content with "Release Date:"
- *    → return '' so the caller can treat it as no lyrics available.
- *
- * Works for both English ([Intro:]) and Korean ([가사], [인트로:]) section markers.
- */
+// Strips two kinds of bad scraped data:
+//  1. Genius page nav prepended before lyrics (e.g. "15 Contributors..."). We
+//     detect this by finding a '[' with no newline before it and dropping the
+//     prefix. Works for English ([Intro:]) and Korean ([가사], [인트로:]) markers.
+//  2. Tracklist/metadata stored by the scraper instead of lyrics — we return
+//     '' so the caller treats it as "no lyrics".
 function cleanLyrics(raw: string): string {
     const trimmed = raw.trim();
 
-    // Reject album metadata / tracklist content stored instead of actual lyrics
     if (/^Tracklist:/i.test(trimmed) || /^Release Date:/i.test(trimmed)) {
         return '';
     }
 
     const firstBracket = trimmed.indexOf('[');
     if (firstBracket <= 0) return trimmed;
-    // Genius navigation is a run-on block with no newlines before the first bracket.
     const textBeforeBracket = trimmed.slice(0, firstBracket);
     if (!textBeforeBracket.includes('\n')) {
         return trimmed.slice(firstBracket).trim();
@@ -46,7 +36,6 @@ type LyricsMode = 'english' | 'korean' | 'romanized' | 'side-by-side';
 export default function LyricsViewer({ song }: LyricsViewerProps) {
     const { lyric: lyrics } = useLyricsBySongId(song.id);
 
-    // Get lyrics from either the lyrics table or the song's direct fields, stripped of Genius navigation
     const rawKo = lyrics?.lyrics_korean || song.lyrics_ko || null;
     const rawEn = lyrics?.lyrics_english || song.lyrics_en || null;
     const rawRom = lyrics?.lyrics_romanized || song.lyrics_romanized || null;
@@ -56,7 +45,6 @@ export default function LyricsViewer({ song }: LyricsViewerProps) {
 
     const hasAnyLyrics = lyricsKo || lyricsEn || lyricsRom;
 
-    // Build available mode tabs based on which lyrics exist
     const availableTabs = useMemo(() => {
         const tabs: { value: LyricsMode; label: string }[] = [];
         if (lyricsKo) tabs.push({ value: 'korean', label: 'Korean' });

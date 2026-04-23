@@ -1,25 +1,14 @@
-/**
- * Supabase Full-Text Search Service
- *
- * Uses Postgres ilike for server-side search across songs, albums, members,
- * awards, and concerts. No extra API keys needed — uses your existing Supabase.
- */
-
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Song, Member, Album, Award, Concert } from '../types/database';
 import type { SearchResult } from './searchService';
 import { mapSongResult, mapAlbumResult, mapMemberResult, mapAwardResult, mapConcertResult } from './searchService';
 import type { FuseResult } from 'fuse.js';
 
-/** Build ilike pattern for partial match (PostgREST uses * as % alias) */
+// PostgREST uses * as the % alias in ilike patterns.
 function ilikePattern(term: string): string {
   return `*${term.trim()}*`;
 }
 
-/**
- * Search all tables in Supabase using ilike.
- * Returns combined, ranked results in SearchResult format.
- */
 export async function searchWithSupabase(query: string, limit = 15): Promise<SearchResult[]> {
   if (!isSupabaseConfigured() || !query.trim()) return [];
 

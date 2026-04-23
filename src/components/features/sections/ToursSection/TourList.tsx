@@ -27,7 +27,6 @@ export default function TourList({ concerts }: TourListProps) {
   const [countryFilter, setCountryFilter] = useState('');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
-  // Derive unique tour names and countries for filters
   const { tourNames, countries } = useMemo(() => {
     const tourSet = new Set<string>();
     const countrySet = new Set<string>();
@@ -41,7 +40,6 @@ export default function TourList({ concerts }: TourListProps) {
     };
   }, [concerts]);
 
-  // Group concerts by tour_name and apply filters
   const tourGroups = useMemo(() => {
     let filtered = concerts;
 

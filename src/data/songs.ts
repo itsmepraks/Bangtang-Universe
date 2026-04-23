@@ -1,11 +1,4 @@
-/**
- * BTS Song Database - Complete Discography
- * 
- * Contains all major BTS songs with audio features and metadata.
- * Audio features (BPM, energy, valence) researched from public sources.
- * 
- * Data sources: Wikipedia, Spotify public data, SongBPM.com, Tunebat.com
- */
+// Audio features sourced from Wikipedia, Spotify, SongBPM, Tunebat.
 
 export interface Song {
     id: number;
@@ -24,9 +17,9 @@ export interface Song {
     keywords: string[];
     writers: string[];
     producers: string[];
-    memberCredits: string[]; // member IDs who wrote/produced
-    isTitle: boolean; // title track
-    hasMV: boolean; // has music video
+    memberCredits: string[];
+    isTitle: boolean;
+    hasMV: boolean;
 }
 
 export type SongSentiment =
@@ -46,7 +39,6 @@ export type SongSentiment =
     | 'Melancholy'
     | 'Empowerment';
 
-// Full BTS discography
 export const SONGS: Song[] = [
     // ============ DARK & WILD (2014) ============
     {
@@ -1230,44 +1222,34 @@ export const SONGS: Song[] = [
     }
 ];
 
-// ============ HELPER FUNCTIONS ============
-
-// Get song by ID
 export const getSongById = (id: number): Song | undefined => {
     return SONGS.find(s => s.id === id);
 };
 
-// Get songs by album
 export const getSongsByAlbum = (albumId: number): Song[] => {
     return SONGS.filter(s => s.albumId === albumId);
 };
 
-// Get songs by member credit
 export const getSongsByMember = (memberId: string): Song[] => {
     return SONGS.filter(s => s.memberCredits.includes(memberId));
 };
 
-// Get songs by sentiment
 export const getSongsBySentiment = (sentiment: SongSentiment): Song[] => {
     return SONGS.filter(s => s.sentiment === sentiment);
 };
 
-// Get title tracks only
 export const getTitleTracks = (): Song[] => {
     return SONGS.filter(s => s.isTitle);
 };
 
-// Get songs sorted by energy
 export const getSongsByEnergy = (ascending = false): Song[] => {
     return [...SONGS].sort((a, b) => ascending ? a.energy - b.energy : b.energy - a.energy);
 };
 
-// Get songs sorted by BPM
 export const getSongsByBPM = (ascending = false): Song[] => {
     return [...SONGS].sort((a, b) => ascending ? a.bpm - b.bpm : b.bpm - a.bpm);
 };
 
-// Search songs by keyword
 export const searchSongsByKeyword = (keyword: string): Song[] => {
     const lower = keyword.toLowerCase();
     return SONGS.filter(s =>
@@ -1277,15 +1259,12 @@ export const searchSongsByKeyword = (keyword: string): Song[] => {
     );
 };
 
-// Get total song count
 export const getTotalSongCount = (): number => SONGS.length;
 
-// Get average BPM
 export const getAverageBPM = (): number => {
     return Math.round(SONGS.reduce((sum, s) => sum + s.bpm, 0) / SONGS.length);
 };
 
-// Get sentiment distribution
 export const getSentimentDistribution = (): Record<SongSentiment, number> => {
     const dist: Partial<Record<SongSentiment, number>> = {};
     SONGS.forEach(s => {

@@ -1,10 +1,3 @@
-/**
- * useAwards Hook
- *
- * Fetches award data from Supabase database
- * Falls back to empty array if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Award } from '../types/database';
@@ -54,7 +47,6 @@ export function useAwards(): UseAwardsResult {
     return { awards, loading, error, refetch: fetchAwards };
 }
 
-// Get awards by member
 export function useAwardsByMember(memberId: string) {
     const { awards, loading, error } = useAwards();
     const filtered = useMemo(
@@ -64,7 +56,6 @@ export function useAwardsByMember(memberId: string) {
     return { awards: filtered, loading, error };
 }
 
-// Get awards by ceremony
 export function useAwardsByCeremony(ceremony: string) {
     const { awards, loading, error } = useAwards();
     const filtered = useMemo(

@@ -29,9 +29,7 @@ interface HomeSectionProps {
   onNavigate: (section: DashboardSection, payload?: unknown) => void;
 }
 
-/** Produce a short but unique era label for the Music area chart x-axis.
- *  "Love Yourself: Her" → "LY:Her"  |  "WINGS" → "WINGS"  |  "Dark & Wild" → "D&W"
- */
+// "Love Yourself: Her" → "LY:Her"; "WINGS" → "WINGS"; "Dark & Wild" → "D&W"
 function abbreviateEra(era: string): string {
   if (era.includes(':')) {
     const [main, sub] = era.split(':').map((s) => s.trim());

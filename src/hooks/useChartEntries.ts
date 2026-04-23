@@ -1,10 +1,3 @@
-/**
- * useChartEntries Hook
- *
- * Fetches chart entry data from Supabase database
- * Falls back to empty array if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { ChartEntry } from '../types/database';
@@ -54,7 +47,6 @@ export function useChartEntries(): UseChartEntriesResult {
     return { chartEntries, loading, error, refetch: fetchChartEntries };
 }
 
-// Get chart entries by song
 export function useChartEntriesBySong(songId: number) {
     const { chartEntries, loading, error } = useChartEntries();
     const filtered = useMemo(
@@ -64,7 +56,6 @@ export function useChartEntriesBySong(songId: number) {
     return { chartEntries: filtered, loading, error };
 }
 
-// Get chart entries by chart name
 export function useChartEntriesByChart(chartName: string) {
     const { chartEntries, loading, error } = useChartEntries();
     const filtered = useMemo(

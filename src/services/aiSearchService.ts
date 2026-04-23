@@ -1,10 +1,5 @@
-/**
- * AI Search Service
- *
- * When VITE_ENABLE_AI_SEARCH=true and VITE_AI_SEARCH_API_URL is set,
- * this service calls the RAG/semantic search API for natural-language queries.
- * Falls back to Fuse.js when not configured.
- */
+// RAG/semantic search endpoint. Enabled when VITE_ENABLE_AI_SEARCH=true and
+// VITE_AI_SEARCH_API_URL is set; callers fall back to Fuse.js otherwise.
 
 import type { SearchResult } from './searchService';
 
@@ -15,7 +10,6 @@ export function isAiSearchConfigured(): boolean {
   return Boolean(AI_SEARCH_ENABLED && AI_SEARCH_API_URL?.trim());
 }
 
-/** Expected API response shape from RAG/semantic search endpoint */
 export interface AiSearchApiResult {
   id: number | string;
   type: 'song' | 'member' | 'album' | 'award' | 'concert' | 'collaboration';
@@ -31,10 +25,6 @@ export interface AiSearchApiResponse {
   query?: string;
 }
 
-/**
- * Call the AI search API. Returns results in SearchResult format.
- * Throws on network/parse errors.
- */
 export async function searchWithAi(query: string, limit = 15): Promise<SearchResult[]> {
   if (!isAiSearchConfigured()) {
     return [];

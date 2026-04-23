@@ -42,7 +42,6 @@ export default function TourStats({ concerts }: TourStatsProps) {
       .sort((a, b) => parseInt(a.year) - parseInt(b.year));
   }, [concerts]);
 
-  // Top countries by concert count
   const topCountries = useMemo(() => {
     const countryMap = new Map<string, number>();
     concerts.forEach((c) => {
@@ -54,7 +53,6 @@ export default function TourStats({ concerts }: TourStatsProps) {
       .slice(0, 15);
   }, [concerts]);
 
-  // Total attendance per tour
   const attendancePerTour = useMemo(() => {
     const tourMap = new Map<string, number>();
     concerts.forEach((c) => {

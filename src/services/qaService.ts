@@ -1,17 +1,5 @@
-/**
- * Rule-Based Q&A Engine
- *
- * Pattern-matches user questions against a set of known intents
- * and returns structured answers from the song/album/member data.
- *
- * Implements the QAProvider interface so it can later be swapped
- * for an AI-backed provider without changing call sites.
- */
-
 import type { Song, Album, Member, Award, ChartEntry, Concert, Collaboration, MemberEvent } from '../types/database';
 import { getRecommendations } from './recommendationService';
-
-// ==================== TYPES ====================
 
 export interface QAContext {
   songs: Song[];
@@ -31,29 +19,21 @@ export interface QAResponse {
   confidence: number; // 0-1
 }
 
-/** Interface for future AI swap */
+// Abstraction so rule-based QA can be swapped for an AI-backed provider.
 export interface QAProvider {
   answer(question: string, context: QAContext): QAResponse;
 }
 
-// ==================== HELPERS ====================
-
-/**
- * Finds a member by stage_name or full_name.
- * Checks exact match, then word-boundary partial match.
- */
 function findMember(query: string, members: Member[]): Member | undefined {
   const q = query.toLowerCase().trim();
 
-  // 1. Exact stage_name match
   const exact = members.find((m) => m.stage_name.toLowerCase() === q);
   if (exact) return exact;
 
-  // 2. Exact full_name match
   const exactFull = members.find((m) => m.full_name?.toLowerCase() === q);
   if (exactFull) return exactFull;
 
-  // 3. Stage name contained in query (word boundary: "who is rm" contains "rm")
+  // Word-boundary stage-name match (so "who is rm" finds RM).
   const stageInQuery = members.find((m) => {
     const name = m.stage_name.toLowerCase();
     const regex = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
@@ -61,14 +41,13 @@ function findMember(query: string, members: Member[]): Member | undefined {
   });
   if (stageInQuery) return stageInQuery;
 
-  // 4. Full name contained in query ("who is kim namjoon" contains "kim namjoon")
   const fullInQuery = members.find((m) => {
     if (!m.full_name) return false;
     return q.includes(m.full_name.toLowerCase());
   });
   if (fullInQuery) return fullInQuery;
 
-  // 5. Partial full_name match (first or last name)
+  // Partial full-name match on first/last name (min length 3 to avoid noise).
   const partialFull = members.find((m) => {
     if (!m.full_name) return false;
     const parts = m.full_name.toLowerCase().split(/\s+/);
@@ -79,52 +58,37 @@ function findMember(query: string, members: Member[]): Member | undefined {
   return undefined;
 }
 
-/**
- * Finds a song whose title matches the query.
- * Avoids false positives from very short titles (e.g. "ON") matching inside words.
- */
+// Word-boundary match for short titles (≤3 chars) to avoid matching "ON"
+// inside "on the way".
 function findSong(query: string, songs: Song[]): Song | undefined {
   const q = query.toLowerCase().trim();
 
-  // 1. Exact title match
   const exact = songs.find((s) => s.title.toLowerCase() === q);
   if (exact) return exact;
 
-  // 2. Title contains query
   const titleContains = songs.find((s) => s.title.toLowerCase().includes(q));
   if (titleContains) return titleContains;
 
-  // 3. Query contains title — but only if the title is 4+ chars or matches as a whole word
   const queryContains = songs.find((s) => {
     const title = s.title.toLowerCase();
     if (!q.includes(title)) return false;
     if (title.length >= 4) return true;
-    // For short titles (1-3 chars), require word boundary match
     const regex = new RegExp(`\\b${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
     return regex.test(q);
   });
   return queryContains;
 }
 
-/**
- * Returns the album for a given song, or undefined.
- */
 function albumForSong(song: Song, albums: Album[]): Album | undefined {
   if (song.album_id === null) return undefined;
   return albums.find((a) => a.id === song.album_id);
 }
 
-/**
- * Formats a number as a fixed-point string, falling back to "N/A".
- */
 function fmt(value: number | null, digits = 2): string {
   if (value === null) return 'N/A';
   return value.toFixed(digits);
 }
 
-/**
- * Computes age from a birth date string (YYYY-MM-DD).
- */
 function getAge(birthDate: string): number {
   const birth = new Date(birthDate);
   const today = new Date();
@@ -136,108 +100,89 @@ function getAge(birthDate: string): number {
   return age;
 }
 
-// ==================== RULE-BASED QA ====================
-
 class RuleBasedQA implements QAProvider {
   answer(question: string, context: QAContext): QAResponse {
     const q = question.toLowerCase().trim();
     const { songs, albums, members } = context;
 
-    // ---- 1. Who wrote the most songs / top writer / most prolific ----
     if (
       /who wrote the most|top writer|most prolific/i.test(q)
     ) {
       return this.handleTopWriter(members);
     }
 
-    // ---- 8. Compare X and Y (checked early so "compare" doesn't collide) ----
+    // "compare" checked early so it doesn't collide with other handlers.
     if (/compare\s+(.+?)\s+and\s+(.+)/i.test(q)) {
       const match = q.match(/compare\s+(.+?)\s+and\s+(.+)/i)!;
       return this.handleCompare(match[1], match[2], members);
     }
 
-    // ---- 13. Similar to [song title] ----
     if (/similar\s+to\s+(.+)/i.test(q)) {
       const match = q.match(/similar\s+to\s+(.+)/i)!;
       return this.handleSimilar(match[1].trim(), songs, albums);
     }
 
-    // ---- 10. What era has the highest [feature] / which era ----
     if (/(?:what|which)\s+era\s+(?:has\s+(?:the\s+)?)?(?:highest|most|best)\s+(\w+)/i.test(q)) {
       const match = q.match(/(?:what|which)\s+era\s+(?:has\s+(?:the\s+)?)?(?:highest|most|best)\s+(\w+)/i)!;
       return this.handleEraRanking(match[1], songs, albums);
     }
 
-    // ---- 9. Songs in [era] era / songs from [era] ----
     if (/songs?\s+(?:in|from)\s+(?:the\s+)?(.+?)(?:\s+era)?$/i.test(q)) {
       const match = q.match(/songs?\s+(?:in|from)\s+(?:the\s+)?(.+?)(?:\s+era)?$/i)!;
       return this.handleSongsInEra(match[1].trim(), songs, albums);
     }
 
-    // ---- 2. Most energetic / highest energy ----
     if (/most energetic|highest energy/i.test(q)) {
       return this.handleSortedSongs(songs, albums, 'energy', 'desc', 'most energetic');
     }
 
-    // ---- 3. Most danceable / best dance ----
     if (/most danceable|best dance/i.test(q)) {
       return this.handleSortedSongs(songs, albums, 'danceability', 'desc', 'most danceable');
     }
 
-    // ---- 4. Saddest / lowest valence / melancholic ----
     if (/saddest|lowest valence|melancholic/i.test(q)) {
       return this.handleSortedSongs(songs, albums, 'valence', 'asc', 'saddest');
     }
 
-    // ---- 5. Happiest / most positive / highest valence ----
     if (/happiest|most positive|highest valence/i.test(q)) {
       return this.handleSortedSongs(songs, albums, 'valence', 'desc', 'happiest');
     }
 
-    // ---- 6. Fastest / highest bpm ----
     if (/fastest|highest bpm/i.test(q)) {
       return this.handleSortedSongs(songs, albums, 'bpm', 'desc', 'fastest');
     }
 
-    // ---- 7. Slowest / lowest bpm ----
     if (/slowest|lowest bpm/i.test(q)) {
       return this.handleSortedSongs(songs, albums, 'bpm', 'asc', 'slowest');
     }
 
-    // ---- 14. Title tracks / lead singles ----
     if (/title tracks?|lead singles?/i.test(q)) {
       return this.handleTitleTracks(songs, albums);
     }
 
-    // ---- 11. How many songs / total songs ----
     if (/how many songs|total songs/i.test(q)) {
       return this.handleSongCount(songs);
     }
 
-    // ---- 12. How many albums ----
     if (/how many albums/i.test(q)) {
       return this.handleAlbumCount(albums);
     }
 
-    // ---- 15. Who is / about [member] / tell me about ----
     if (/(?:who(?:'s| is)|about|tell me about)\s+(.+)/i.test(q)) {
       const match = q.match(/(?:who(?:'s| is)|about|tell me about)\s+(.+)/i)!;
       const member = findMember(match[1].trim(), members);
       if (member) return this.handleAboutMember(member.stage_name, members);
     }
 
-    // ---- 15b. When was [member] born / how old is [member] / [member] birthday ----
     if (/(?:when was|how old|birthday|birth date|born)\b/i.test(q)) {
       const member = findMember(q, members);
       if (member) return this.handleMemberBirthday(member);
     }
 
-    // ---- 16. How many awards / total awards ----
     if (/how many awards|total awards/i.test(q)) {
       return this.handleAwardCount(context);
     }
 
-    // ---- 17. Awards at [ceremony] / [ceremony] awards ----
     if (/awards?\s+at\s+(.+)/i.test(q)) {
       const match = q.match(/awards?\s+at\s+(.+)/i)!;
       return this.handleAwardsByCeremony(match[1].trim(), context);
@@ -247,50 +192,42 @@ class RuleBasedQA implements QAProvider {
       return this.handleAwardsByCeremony(match[1].trim(), context);
     }
 
-    // ---- 18. Awards in [year] ----
     if (/awards?\s+in\s+(\d{4})/i.test(q)) {
       const match = q.match(/awards?\s+in\s+(\d{4})/i)!;
       return this.handleAwardsByYear(parseInt(match[1], 10), context);
     }
 
-    // ---- 19. How many concerts / total concerts / how many shows ----
     if (/how many concerts|total concerts|how many shows/i.test(q)) {
       return this.handleConcertCount(context);
     }
 
-    // ---- 20. [tour name] tour ----
     if (/(.+?)\s+tour/i.test(q)) {
       const match = q.match(/(.+?)\s+tour/i)!;
       return this.handleConcertsByTour(match[1].trim(), context);
     }
 
-    // ---- 21. Concerts in [country] / shows in [country] ----
     if (/concerts?\s+in\s+(.+)/i.test(q) || /shows?\s+in\s+(.+)/i.test(q)) {
       const match = q.match(/(?:concerts?|shows?)\s+in\s+(.+)/i)!;
       return this.handleConcertsByCountry(match[1].trim(), context);
     }
 
-    // ---- 22. Billboard / Hot 100 / chart ----
     if (/billboard|hot 100|chart/i.test(q)) {
       return this.handleChartEntries(context);
     }
 
-    // ---- 23. Number one / #1 / first place ----
     if (/number one|#1|first place/i.test(q)) {
       return this.handleNumberOnes(context);
     }
 
-    // ---- 24. Collaborations / featured / worked with ----
     if (/collaborat|featured|worked with/i.test(q)) {
       return this.handleCollaborations(context);
     }
 
-    // ---- 25. Enlistment / military / service ----
     if (/enlist|military|service/i.test(q)) {
       return this.handleEnlistment(context);
     }
 
-    // ---- Keyword-based fallback: match single words / short queries to relevant topics ----
+    // Keyword fallbacks for short queries.
     if (/\bconcert|perform|tour|show|live\b/i.test(q)) {
       return this.handleConcertCount(context);
     }
@@ -316,23 +253,18 @@ class RuleBasedQA implements QAProvider {
       return this.handleEnlistment(context);
     }
 
-    // Check if query contains a member name
     const memberMatch = findMember(q, context.members);
     if (memberMatch) {
       return this.handleAboutMember(memberMatch.stage_name, context.members);
     }
 
-    // Check if query contains a song title
     const songMatch = findSong(q, context.songs);
     if (songMatch) {
       return this.handleSongInfo(songMatch, context.songs, context.albums);
     }
 
-    // ---- Fallback ----
     return this.fallback();
   }
-
-  // -------------------- handler methods --------------------
 
   private handleTopWriter(members: Member[]): QAResponse {
     const sorted = [...members].sort((a, b) => b.writer_credits - a.writer_credits);
@@ -514,7 +446,6 @@ class RuleBasedQA implements QAProvider {
       };
     }
 
-    // Build a map of era -> values
     const eraValues = new Map<string, number[]>();
 
     for (const song of songs) {
@@ -703,8 +634,6 @@ class RuleBasedQA implements QAProvider {
       confidence: 0.95,
     };
   }
-
-  // -------------------- new handler methods (awards/charts/concerts/collabs/events) --------------------
 
   private handleAwardCount(context: QAContext): QAResponse {
     const awards = context.awards || [];
@@ -1043,8 +972,6 @@ class RuleBasedQA implements QAProvider {
     };
   }
 }
-
-// ==================== EXPORTS ====================
 
 export const qaService = new RuleBasedQA();
 

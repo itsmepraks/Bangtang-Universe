@@ -45,7 +45,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
   const withSentiment = useMemo(() => songs.filter(s => s.sentiment).length, [songs]);
   const coveragePct = songs.length > 0 ? Math.round((withSentiment / songs.length) * 100) : 0;
 
-  // ── Section 2: Sentiment Distribution ──
+  // ── Sentiment Distribution ──
   const distribution = useMemo(() => computeSentimentDistribution(songs), [songs]);
 
   const summaryStats = useMemo(() => {
@@ -80,7 +80,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
 
   const distributionChartHeight = Math.min(360, Math.max(220, distribution.length * 36));
 
-  // ── Section 3: Theme × Era Heatmap ──
+  // ── Theme × Era Heatmap ──
   const eraOrder = useMemo(() => buildEraOrder(albums), [albums]);
 
   const themeHeatmap = useMemo(() => {
@@ -129,7 +129,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
     return { themes: sortedThemes, eras: eraOrder, grid, maxCount };
   }, [lyrics, songs, albums, eraOrder]);
 
-  // ── Section 4: Sentiment Arc ──
+  // ── Sentiment Arc ──
   const sentimentArc = useMemo(() => {
     const points = lyricsAnalyzer.analyzeSentimentArc(lyrics, songs, albums);
 
@@ -156,7 +156,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
     });
   }, [lyrics, songs, albums]);
 
-  // ── Section 5: Word Cloud ──
+  // ── Word Cloud ──
   const wordCloudItems = useMemo(() => {
     const wordData = lyricsAnalyzer.getWordFrequency(lyrics, 40);
     if (wordData.length === 0) return [];

@@ -1,10 +1,3 @@
-/**
- * useConcerts Hook
- *
- * Fetches concert data from Supabase database
- * Falls back to empty array if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Concert } from '../types/database';
@@ -54,7 +47,6 @@ export function useConcerts(): UseConcertsResult {
     return { concerts, loading, error, refetch: fetchConcerts };
 }
 
-// Get concerts by tour name
 export function useConcertsByTour(tourName: string) {
     const { concerts, loading, error } = useConcerts();
     const filtered = useMemo(
@@ -64,7 +56,6 @@ export function useConcertsByTour(tourName: string) {
     return { concerts: filtered, loading, error };
 }
 
-// Get concerts by country
 export function useConcertsByCountry(country: string) {
     const { concerts, loading, error } = useConcerts();
     const filtered = useMemo(

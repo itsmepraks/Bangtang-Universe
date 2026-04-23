@@ -7,7 +7,6 @@ interface MemberTimelineProps {
     events: MemberEvent[];
 }
 
-// Map event types to colors and icons
 const EVENT_STYLES: Record<string, { color: string; icon: typeof Star }> = {
     enlistment_start: { color: '#6B7280', icon: Shield },
     enlistment_end: { color: '#10B981', icon: Shield },

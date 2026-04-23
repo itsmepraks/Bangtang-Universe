@@ -1,10 +1,3 @@
-/**
- * BTS Album Database
- * 
- * Complete album metadata for all BTS Korean studio albums,
- * compilations, and major single releases.
- */
-
 import { BORAHAE_COLORS } from '../constants/colors';
 
 export interface Album {
@@ -16,8 +9,8 @@ export interface Album {
     trackCount: number;
     description: string;
     era: string;
-    coverColor: string; // Dominant color from album art
-    coverArtUrl?: string | null; // Cover Art Archive thumbnail
+    coverColor: string;
+    coverArtUrl?: string | null;
 }
 
 export const ALBUMS: Album[] = [
@@ -190,8 +183,6 @@ export const ALBUMS: Album[] = [
         coverArtUrl: 'http://coverartarchive.org/release/47915090-9b99-4cfe-9326-92b40332c345/35879173466-500.jpg',
     }
 ];
-
-// ============ HELPER FUNCTIONS ============
 
 export const getAlbumById = (id: number): Album | undefined => {
     return ALBUMS.find(a => a.id === id);

@@ -54,7 +54,7 @@ function simpleScore(label: string, query: string): number {
   if (l === q) return 1000;
   if (l.startsWith(q)) return 500;
   if (l.includes(q)) return 250;
-  // letter subsequence
+  // Subsequence match as last resort.
   let i = 0;
   for (const ch of l) if (ch === q[i]) i++;
   return i === q.length ? 100 - (l.length - q.length) : 0;
@@ -74,17 +74,15 @@ export default function CommandPalette({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // Focus + reset on open
   useEffect(() => {
     if (open) {
       setQuery('');
       setActiveIndex(0);
-      // Next tick so the input exists
+      // rAF so the input has mounted before we focus it.
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);
 
-  // Lock body scroll when open
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -141,7 +139,6 @@ export default function CommandPalette({
 
   const results = useMemo(() => {
     if (!query.trim()) {
-      // Show top nav + moods as default
       return allItems.filter((i) => i.type === 'section' || i.type === 'mood').slice(0, 14);
     }
     return allItems
@@ -152,12 +149,10 @@ export default function CommandPalette({
       .map((x) => x.item);
   }, [query, allItems]);
 
-  // Reset active index when results change
   useEffect(() => {
     setActiveIndex(0);
   }, [query]);
 
-  // Scroll active item into view
   useEffect(() => {
     const el = listRef.current?.querySelector<HTMLElement>(`[data-palette-index="${activeIndex}"]`);
     el?.scrollIntoView({ block: 'nearest' });
@@ -195,7 +190,6 @@ export default function CommandPalette({
       className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] px-4"
       onClick={onClose}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150" />
 
       {/* Panel */}

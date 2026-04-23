@@ -1,11 +1,4 @@
-/**
- * BTS Solo Albums Fallback Data
- *
- * Local fallback dataset for solo albums, extracted from member profiles.
- * Matches the SoloAlbum DB type from src/types/database.ts.
- *
- * Data sources: Official HYBE/BTS releases, Wikipedia
- */
+// Local fallback for solo albums; matches the SoloAlbum DB type.
 
 import type { SoloAlbum } from '../types/database';
 

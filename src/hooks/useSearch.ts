@@ -1,13 +1,5 @@
-/**
- * useSearch Hook
- *
- * Builds Fuse.js search indexes from pre-loaded data passed in as arguments.
- * Data fetching is the caller's responsibility (App.tsx already has all data).
- * This avoids duplicate Supabase requests.
- *
- * When AI search is configured (VITE_ENABLE_AI_SEARCH + VITE_AI_SEARCH_API_URL),
- * searchAllAsync calls the RAG API; otherwise it falls back to local Fuse.js.
- */
+// Data is passed in (already fetched in App) to avoid duplicate Supabase reads.
+// searchAllAsync uses the RAG API when configured, else Supabase, else local Fuse.
 
 import { useMemo, useCallback } from 'react';
 import Fuse from 'fuse.js';

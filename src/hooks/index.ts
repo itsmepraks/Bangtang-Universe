@@ -1,9 +1,3 @@
-/**
- * BTS Universe Data Hooks
- * 
- * Central export for all data fetching hooks
- */
-
 export { useAlbums, useAlbumsByEra, useAlbumById, useEras, useAlbumsGroupedByEra } from './useAlbums';
 export { useSongs, useSongsByAlbum, useSongsBySentiment, useTitleTracks, useSongById, useSongsSortedBy, useSongsByMember, useSongsByWriter } from './useSongs';
 export { useMembers, useMemberById, useMemberColor, useMembersByCredits, useTotalKOMCACredits } from './useMembers';

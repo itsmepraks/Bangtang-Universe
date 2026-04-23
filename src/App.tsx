@@ -1,23 +1,19 @@
 import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 
-// Import data and hooks
 import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useMemberEvents, useMedia } from './hooks';
 import type { DashboardSection, DiscographyState } from './types/index';
 import { SECTION_ACCENTS } from './constants/colors';
 
-// Lightweight components - imported directly
 import {
   BTSLogo,
 } from './components';
 import { Breadcrumb, DataStatusBanner } from './components/ui';
 
-// Heavy components - lazy loaded for code-splitting
 const Universe3D = lazy(() => import('./components/features/Universe3D'));
 const LandingRitual = lazy(() => import('./components/features/LandingRitual'));
 const MemberDNA = lazy(() => import('./components/features/MemberDNA'));
 const SectionTransition = lazy(() => import('./components/features/sections/SectionTransition'));
 
-// Section components - lazy loaded
 const HomeSection = lazy(() => import('./components/features/sections/HomeSection'));
 const DiscographySection = lazy(() => import('./components/features/sections/Discography'));
 const MembersSection = lazy(() => import('./components/features/sections/MembersSection'));
@@ -30,7 +26,6 @@ const OnboardingFlow = lazy(() => import('./components/features/OnboardingFlow')
 const CommandPalette = lazy(() => import('./components/features/CommandPalette'));
 const DelightLayer = lazy(() => import('./components/features/DelightLayer'));
 
-// Loading fallback — three pulsing dots instead of generic spinner
 const LoadingFallback = () => (
   <div className="absolute inset-0 bg-[#0a0a0f] flex items-center justify-center">
     <div className="flex items-center gap-1.5">
@@ -68,10 +63,6 @@ import {
   Music,
 } from 'lucide-react';
 
-/**
- * Time-of-day greeting for the sidebar. Rotates across 4 buckets so returning
- * users see different personality at different hours.
- */
 function getGreeting(): string {
   const h = new Date().getHours();
   if (h < 5) return 'Burning midnight oil, ARMY';
@@ -103,7 +94,6 @@ const NAV_ITEMS: { id: DashboardSection; icon: React.ElementType; label: string 
   { id: 'search', icon: Search, label: 'Search' },
 ];
 
-// --- MAIN APPLICATION ---
 export default function App() {
   const [mode, setMode] = useState<'landing' | 'warp' | 'onboarding' | 'dashboard'>('landing');
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
@@ -116,7 +106,6 @@ export default function App() {
   });
   const [paletteOpen, setPaletteOpen] = useState(false);
 
-  // Persist sidebar collapse state
   useEffect(() => {
     try {
       localStorage.setItem('bts-sidebar-collapsed', sidebarCollapsed ? '1' : '0');
@@ -124,21 +113,16 @@ export default function App() {
   }, [sidebarCollapsed]);
   const [concertMode, setConcertMode] = useState(false);
 
-  // State for expanded sections (must be declared before useEffects that reference them)
   const [discographyState, setDiscographyState] = useState<DiscographyState>({
     selectedAlbumId: null, selectedSongId: null, view: 'grid',
   });
   const [memberSectionId, setMemberSectionId] = useState<string | null>(null);
   const [eraFilter, setEraFilter] = useState<string | null>(null);
 
-  // ── URL hash sync (deep-linkable top-level state) ─────────────
-  // Format: #/<section>[/<arg1>[/<arg2>]]
-  // discography: #/discography, #/discography/album/42, #/discography/song/42/137
-  // members:     #/members, #/members/rm
-  // analytics:   #/analytics, #/analytics/recommendations
+  // URL hash format: #/<section>[/<arg1>[/<arg2>]]. See applyHash below for
+  // section-specific sub-paths.
   const [analyticsTabFromHash, setAnalyticsTabFromHash] = useState<string | null>(null);
 
-  // Read hash on mount + on hashchange
   useEffect(() => {
     const applyHash = () => {
       const raw = window.location.hash.replace(/^#\/?/, '');
@@ -168,7 +152,6 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Write hash on state changes
   useEffect(() => {
     if (mode !== 'dashboard') return;
     let hash = `#/${activeSection}`;
@@ -188,7 +171,7 @@ export default function App() {
     }
   }, [mode, activeSection, discographyState, memberSectionId, analyticsTabFromHash]);
 
-  // ⌘K / Ctrl+K toggles command palette
+  // ⌘K / Ctrl+K toggles the command palette.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -200,12 +183,11 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // Close sidebar on navigation (mobile)
+  // Close mobile sidebar when navigating.
   useEffect(() => {
     setSidebarOpen(false);
   }, [activeSection]);
 
-  // Database hooks
   const { songs, loading: songsLoading, error: songsError, refetch: refetchSongs } = useSongs();
   const { albums, loading: albumsLoading, error: albumsError, refetch: refetchAlbums } = useAlbums();
   const { members, loading: membersLoading, error: membersError, refetch: refetchMembers } = useMembers();
@@ -245,7 +227,6 @@ export default function App() {
     setMode('onboarding');
   };
 
-  // Cross-section navigation
   const navigateTo = (section: DashboardSection, payload?: unknown) => {
     setActiveSection(section);
     if (section === 'discography') {
@@ -264,7 +245,6 @@ export default function App() {
     }
   };
 
-  // Derive breadcrumb items from current state
   const selectedAlbum = useMemo(() => albums.find(a => a.id === discographyState.selectedAlbumId) || null, [albums, discographyState.selectedAlbumId]);
   const selectedSong = useMemo(() => songs.find(s => s.id === discographyState.selectedSongId) || null, [songs, discographyState.selectedSongId]);
   const selectedMember = useMemo(() => members.find(m => m.id === memberSectionId) || null, [members, memberSectionId]);
@@ -302,29 +282,26 @@ export default function App() {
   return (
     <div className="relative w-screen h-screen bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white noise-texture">
 
-      {/* 1. UNIVERSE LAYER - Only shown during landing/warp */}
+      {/* Universe layer — landing/warp only */}
       {(mode === 'landing' || mode === 'warp') && (
         <Suspense fallback={<LoadingFallback />}>
           <Universe3D mode={mode} />
         </Suspense>
       )}
 
-      {/* 2. LANDING */}
       <Suspense fallback={<LoadingFallback />}>
         {mode === 'landing' && <LandingRitual onSync={handleSync} />}
       </Suspense>
 
-      {/* 3. ONBOARDING */}
       {mode === 'onboarding' && (
         <Suspense fallback={<LoadingFallback />}>
           <OnboardingFlow onComplete={() => setMode('dashboard')} />
         </Suspense>
       )}
 
-      {/* 4. DASHBOARD */}
       {mode === 'dashboard' && !activeMemberId && (
         <div className="absolute inset-0 z-10 flex animate-in fade-in zoom-in-95 duration-1000">
-          {/* Skip to content (visible only on keyboard focus) */}
+          {/* Skip link — visible only on keyboard focus */}
           <a
             href="#main-content"
             className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-purple-500 focus:text-white focus:text-sm focus:font-medium focus:shadow-lg"
@@ -332,7 +309,6 @@ export default function App() {
             Skip to main content
           </a>
 
-          {/* Dashboard Background */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <div className={`absolute top-[15%] right-[5%] w-[35%] h-[35%] rounded-full ${concertMode ? 'opacity-[0.12]' : 'opacity-[0.03]'}`}
               style={{ background: 'radial-gradient(circle, #EC4899 0%, transparent 70%)', filter: 'blur(80px)' }} />
@@ -340,7 +316,6 @@ export default function App() {
               style={{ background: 'radial-gradient(circle, #2563EB 0%, transparent 70%)', filter: 'blur(80px)' }} />
           </div>
 
-          {/* Mobile sidebar backdrop */}
           {sidebarOpen && (
             <div
               className="fixed inset-0 bg-black/60 z-40 md:hidden"
@@ -348,9 +323,7 @@ export default function App() {
             />
           )}
 
-          {/* Sidebar */}
           <div className={`fixed inset-y-0 left-0 ${sidebarCollapsed ? 'w-[72px]' : 'w-56'} bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-4 ${sidebarCollapsed ? 'px-3' : 'px-4'} z-50 transform transition-[transform,width,padding] duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
-            {/* Top row: logo + collapse toggle (typical sidebar affordance) */}
             <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} mb-6`}>
               <div
                 onClick={() => setMode('landing')}
@@ -376,7 +349,6 @@ export default function App() {
               )}
             </div>
 
-            {/* Expand button — shows when collapsed, positioned below the logo */}
             {sidebarCollapsed && (
               <button
                 onClick={() => setSidebarCollapsed(false)}
@@ -465,10 +437,8 @@ export default function App() {
 
           </div>
 
-          {/* Content Area */}
           <div className="flex-1 flex flex-col min-w-0 relative z-10">
 
-            {/* Header */}
             <header className="flex flex-col bg-[#0c0c12]/50 border-b border-white/[0.06]">
               <div className="h-14 flex items-center justify-between px-4 md:px-8">
                 <div className="flex items-center">
@@ -498,7 +468,6 @@ export default function App() {
               />
             </header>
 
-            {/* Main Views */}
             <main
               id="main-content"
               tabIndex={-1}
@@ -592,7 +561,6 @@ export default function App() {
         </div>
       )}
 
-      {/* COMMAND PALETTE (⌘K) */}
       {mode === 'dashboard' && (
         <Suspense fallback={null}>
           <CommandPalette
@@ -615,14 +583,12 @@ export default function App() {
         </Suspense>
       )}
 
-      {/* 5. MEMBER DETAIL OVERLAY (FULL SCREEN) */}
       <Suspense fallback={<LoadingFallback />}>
         {activeMemberId && (
           <MemberDNA memberId={activeMemberId} onClose={() => setActiveMemberId(null)} />
         )}
       </Suspense>
 
-      {/* Hidden delights — Konami code + console greeting */}
       <Suspense fallback={null}>
         <DelightLayer />
       </Suspense>

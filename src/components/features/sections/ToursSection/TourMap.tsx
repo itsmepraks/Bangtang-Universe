@@ -55,7 +55,7 @@ export default function TourMap({ concerts }: TourMapProps) {
     if (selectedYear !== null) {
       return concerts.filter((c) => new Date(c.date).getFullYear() === selectedYear);
     }
-    // Timeline slider: show all concerts up to the slider date (cumulative)
+    // Cumulative: show all concerts up to the slider date.
     return concerts.filter((c) => new Date(c.date).getTime() <= sliderValue);
   }, [concerts, selectedYear, sliderValue]);
 

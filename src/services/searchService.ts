@@ -1,14 +1,8 @@
-/**
- * Search Service - Fuse.js Configuration & Utilities
- *
- * Provides Fuse.js config objects and result mapping functions.
- * Actual Fuse instances are created in useSearch hook with live data.
- */
+// Fuse.js options and result mappers. Fuse instances are constructed in
+// useSearch against live data.
 
 import type { IFuseOptions, FuseResult } from 'fuse.js';
 import type { Song, Member, Album, Award, Concert } from '../types/database';
-
-// ============ SEARCH RESULT TYPES ============
 
 export interface SearchResult {
     id: number | string;
@@ -20,8 +14,6 @@ export interface SearchResult {
     color?: string;
     item: Song | Member | Album | Award | Concert;
 }
-
-// ============ FUSE CONFIGURATIONS ============
 
 export const SONG_FUSE_OPTIONS: IFuseOptions<Song> = {
     keys: [
@@ -90,8 +82,6 @@ export const CONCERT_FUSE_OPTIONS: IFuseOptions<Concert> = {
     minMatchCharLength: 2,
 };
 
-// ============ RESULT MAPPERS ============
-
 export const mapSongResult = (r: FuseResult<Song>): SearchResult => ({
     id: r.item.id,
     type: 'song',
@@ -143,8 +133,6 @@ export const mapConcertResult = (r: FuseResult<Concert>): SearchResult => ({
     context: `${r.item.venue} \u2014 ${r.item.date}`,
     item: r.item,
 });
-
-// ============ MOOD MAP ============
 
 export const MOOD_MAP: Record<string, string[]> = {
     happy: ['Joy', 'Celebration', 'Confidence'],

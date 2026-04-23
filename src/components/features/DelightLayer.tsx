@@ -1,16 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { MEMBER_COLORS } from '../../constants/colors';
 
-/**
- * Hidden delight layer.
- *
- * - Konami code unlocks a 2-second burst of member-color confetti
- *   rising from the bottom of the viewport.
- * - Logs a Borahae greeting to the console for curious devtools visitors.
- *
- * Both respect prefers-reduced-motion. If the user has reduced motion on,
- * the confetti is disabled (but the console message still prints).
- */
+// Konami code → confetti burst. Also logs a Borahae greeting in devtools.
+// Respects prefers-reduced-motion (confetti disabled, console message still prints).
 
 const KONAMI_SEQUENCE = [
   'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
@@ -46,7 +38,6 @@ export default function DelightLayer() {
   const [particles, setParticles] = useState<Particle[]>([]);
   const sequenceRef = useRef<string[]>([]);
 
-  // Console greeting — runs once on mount
   useEffect(() => {
     const styles = [
       'color: #A855F7',
@@ -63,7 +54,6 @@ export default function DelightLayer() {
     );
   }, []);
 
-  // Konami listener
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
@@ -75,7 +65,7 @@ export default function DelightLayer() {
           triggerBurst();
         }
       } else {
-        // Reset on wrong key; but allow restart from current key if it's the first
+        // Allow restart if the wrong key happens to be the sequence's first.
         sequenceRef.current = key === KONAMI_SEQUENCE[0] ? [key] : [];
       }
     };
@@ -84,7 +74,6 @@ export default function DelightLayer() {
   }, []);
 
   const triggerBurst = () => {
-    // Respect reduced motion
     if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       // eslint-disable-next-line no-console
       console.log('%c💜 Borahae!', 'color: #A855F7; font-size: 18px; font-weight: 700');

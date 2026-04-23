@@ -9,11 +9,6 @@ interface EmptyStateProps {
   className?: string;
 }
 
-/**
- * Unified empty-state panel for zero-data, pre-selection, and "nothing yet" panels.
- * Provides an icon, title, short explainer, and an optional CTA — per Nielsen #1/#9
- * (visibility of system status, error recovery guidance).
- */
 export default function EmptyState({
   icon: Icon,
   title,

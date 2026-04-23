@@ -37,14 +37,12 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
   const types = useMemo(() => [...new Set(albums.map(a => a.type).filter(Boolean))].map(t => ({ value: t!, label: t! })), [albums]);
   const eras = useMemo(() => [...new Set(albums.map(a => a.era).filter(Boolean))].sort().map(e => ({ value: e!, label: e! })), [albums]);
 
-  // Build a lookup from album_id to album for era filtering of songs
   const albumMap = useMemo(() => {
     const map: Record<number, Album> = {};
     albums.forEach(a => { map[a.id] = a; });
     return map;
   }, [albums]);
 
-  // Filter songs by era (using their album's era)
   const eraFilteredSongs = useMemo(() => {
     if (!activeEra) return songs;
     return songs.filter(s => {
@@ -54,7 +52,6 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
     });
   }, [songs, activeEra, albumMap]);
 
-  // Solo songs grouped by member
   const soloSongsByMember = useMemo(() => {
     const soloSongs = eraFilteredSongs.filter(s => s.is_solo === true);
     const grouped: Record<string, Song[]> = {};
@@ -69,12 +66,10 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
         grouped[member].push(s);
       });
     });
-    // Sort members alphabetically
     const sorted = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
     return sorted;
   }, [eraFilteredSongs]);
 
-  // Collab songs
   const collabSongs = useMemo(() => {
     return eraFilteredSongs.filter(s => s.is_collab === true);
   }, [eraFilteredSongs]);

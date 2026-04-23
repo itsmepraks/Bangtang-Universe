@@ -1,94 +1,35 @@
-/**
- * BTS Neural Archive - Color Constants
- * 
- * Centralized color definitions following the "Borahae" (보라해) aesthetic.
- * Borahae means "I Purple You" - a phrase coined by V representing love and trust.
- */
-
-/**
- * Primary purple color palette inspired by BTS's signature "Borahae" purple
- */
 export const BORAHAE_COLORS = {
-  /** Primary purple - Main accent color */
   PRIMARY: '#A855F7',
-
-  /** Light purple - Soft highlights */
   LIGHT: '#D8B4FE',
-
-  /** Indigo purple - Cool tones */
   INDIGO: '#818CF8',
-
-  /** Violet purple - Warm tones */
   VIOLET: '#C084FC',
-
-  /** Dark purple - Deep shadows */
   DARK: '#7E22CE',
 } as const;
 
-/**
- * Individual member signature colors
- * Each member has a unique color representing their personality
- */
 export const MEMBER_COLORS = {
-  /** RM - Blue (Leader, intellectual) */
   RM: '#2563EB',
-
-  /** Jin - Pink (Visual, warmth) */
   JIN: '#EC4899',
-
-  /** SUGA - Green (Producer, growth) */
   SUGA: '#10B981',
-
-  /** J-Hope - Red (Main Dancer, energy) */
   J_HOPE: '#EF4444',
-
-  /** Jimin - Gold (Lead Vocalist, elegance) */
   JIMIN: '#F59E0B',
-
-  /** V - Green (Visual, natural) */
   V: '#22c55e',
-
-  /** Jungkook - Purple (Golden Maknae, versatility) */
   JUNGKOOK: '#8B5CF6',
 } as const;
 
-/**
- * Background and ambient colors for the cosmic universe
- */
 export const UNIVERSE_COLORS = {
-  /** Deep space background */
   SPACE: '#020005',
-
-  /** Nebula effect */
   NEBULA: 'rgba(88, 28, 135, 0.4)',
-
-  /** Star colors (white and purple variations) */
   STARS: ['#ffffff', '#A855F7', '#D8B4FE', '#818CF8', '#C084FC'],
 } as const;
 
-/**
- * UI element colors for glass morphism and panels
- */
 export const UI_COLORS = {
-  /** Glass panel background */
   GLASS_BG: 'rgba(255, 255, 255, 0.03)',
-
-  /** Glass panel border */
   GLASS_BORDER: 'rgba(255, 255, 255, 0.08)',
-
-  /** Text primary color */
   TEXT_PRIMARY: 'rgba(255, 255, 255, 0.95)',
-
-  /** Text secondary color */
   TEXT_SECONDARY: 'rgba(255, 255, 255, 0.70)',
-
-  /** Text muted color */
   TEXT_MUTED: 'rgba(255, 255, 255, 0.50)',
 } as const;
 
-/**
- * Shared Recharts chart styling constants
- */
 export const CHART_STYLES = {
   AXIS: { fontSize: 12, fill: 'rgba(255,255,255,0.5)' },
   GRID: { strokeDasharray: '3 3', stroke: 'rgba(255,255,255,0.06)' },
@@ -107,54 +48,34 @@ export const CHART_STYLES = {
     labelStyle: { color: 'rgba(255,255,255,0.95)', fontWeight: 700, fontSize: '13px' },
     cursor: { fill: 'rgba(255,255,255,0.02)' },
   },
-  /** Subtle hover for Bar charts — prevents the bright default Recharts highlight */
+  // Subtle hover for Bar charts — prevents the bright default Recharts highlight
   BAR_ACTIVE: { fillOpacity: 0.95 },
 } as const;
 
-/**
- * Sentiment-based colors for emotional analysis
- */
 export const SENTIMENT_COLORS = {
-  JOY: '#FBBF24',        // Yellow/Gold
-  GRATITUDE: '#A78BFA',  // Soft Purple
-  DETERMINATION: '#F59E0B', // Orange
-  FEAR: '#EF4444',       // Red
-  LONGING: '#3B82F6',    // Blue
-  PAIN: '#DC2626',       // Deep Red
-  COMFORT: '#10B981',    // Green
-  DESTINY: '#8B5CF6',    // Purple
-  CELEBRATION: '#EC4899', // Pink
-  CONFIDENCE: '#F59E0B', // Gold
+  JOY: '#FBBF24',
+  GRATITUDE: '#A78BFA',
+  DETERMINATION: '#F59E0B',
+  FEAR: '#EF4444',
+  LONGING: '#3B82F6',
+  PAIN: '#DC2626',
+  COMFORT: '#10B981',
+  DESTINY: '#8B5CF6',
+  CELEBRATION: '#EC4899',
+  CONFIDENCE: '#F59E0B',
 } as const;
 
-/**
- * Section-specific accent colors — each section has its own concert spotlight.
- * Purple remains the brand color; these are section highlights only.
- */
 export const SECTION_ACCENTS = {
-  overview: '#A855F7',     // purple — brand home
-  discography: '#818CF8',  // indigo — musical
-  members: '#EC4899',      // pink — personality
-  analytics: '#06B6D4',    // cyan — data/tech
-  awards: '#FBBF24',       // gold — trophies
-  tours: '#10B981',        // emerald — global/travel
-  media: '#F97316',        // orange — visual/creative
-  search: '#A855F7',       // purple — brand
+  overview: '#A855F7',
+  discography: '#818CF8',
+  members: '#EC4899',
+  analytics: '#06B6D4',
+  awards: '#FBBF24',
+  tours: '#10B981',
+  media: '#F97316',
+  search: '#A855F7',
 } as const;
 
-/**
- * Retrieves the signature color for a BTS member by their ID
- * 
- * @param memberId - The member's ID (case-insensitive): 'rm', 'jin', 'suga', 'jh', 'jm', 'v', 'jk'
- * @returns The member's signature color as a hex string, or primary purple if not found
- * 
- * @example
- * ```typescript
- * getMemberColor('rm');      // '#2563EB' (blue)
- * getMemberColor('jm');      // '#F59E0B' (gold)
- * getMemberColor('unknown'); // '#A855F7' (fallback purple)
- * ```
- */
 export const getMemberColor = (memberId: string): string => {
   const colorMap: Record<string, string> = {
     'rm': MEMBER_COLORS.RM,
@@ -169,47 +90,11 @@ export const getMemberColor = (memberId: string): string => {
   return colorMap[memberId.toLowerCase()] || BORAHAE_COLORS.PRIMARY;
 };
 
-/**
- * Retrieves the color associated with an emotional sentiment
- * 
- * Maps sentiment strings to their corresponding color values from the
- * SENTIMENT_COLORS palette. Handles multi-word sentiments by converting
- * spaces to underscores. Falls back to primary Borahae purple for
- * unrecognized sentiments.
- * 
- * @param sentiment - The emotional sentiment (case-insensitive)
- *                    Examples: 'joy', 'gratitude', 'determination', etc.
- * @returns The corresponding color as a hex string
- * 
- * @example
- * ```typescript
-  * const joyColor = getSentimentColor('joy');      // '#FBBF24'
- * const painColor = getSentimentColor('pain');    // '#DC2626'
- * const unknownColor = getSentimentColor('xyz');  // '#A855F7' (fallback)
- * ```
- */
 export const getSentimentColor = (sentiment: string): string => {
   const sentimentKey = sentiment.toUpperCase().replace(/\s+/g, '_');
   return SENTIMENT_COLORS[sentimentKey as keyof typeof SENTIMENT_COLORS] || BORAHAE_COLORS.PRIMARY;
 };
 
-/**
- * Adds alpha transparency to a hex color code
- * 
- * Converts a hex color to RGBA format with specified transparency.
- * Useful for glassmorphism effects and layered overlays.
- * 
- * @param hex - Hex color code (with '#' prefix)
- * @param alpha - Alpha value (0.0 = transparent, 1.0 = opaque)
- * @returns RGBA color string
- * 
- * @example
- * ```typescript
- * withAlpha('#A855F7', 0.5);  // 'rgba(168, 85, 247, 0.5)'
- * withAlpha('#FFFFFF', 0.1);  // 'rgba(255, 255, 255, 0.1)'
- * withAlpha('#000000', 0.75); // 'rgba(0, 0, 0, 0.75)'
- * ```
- */
 export const withAlpha = (hex: string, alpha: number): string => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -217,7 +102,6 @@ export const withAlpha = (hex: string, alpha: number): string => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-// Export all color constants as a single object for convenience
 export const COLORS = {
   BORAHAE: BORAHAE_COLORS,
   MEMBERS: MEMBER_COLORS,

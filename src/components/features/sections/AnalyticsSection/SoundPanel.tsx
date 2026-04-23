@@ -54,7 +54,6 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
     [songs],
   );
 
-  // 1. Mood quadrant scatter data
   const scatterData = useMemo(
     () =>
       songs
@@ -75,7 +74,6 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
     [songs],
   );
 
-  // 2. Era evolution
   const eraStats = useMemo(() => computeEraEvolution(songs, albums), [songs, albums]);
 
   const lineChartData = useMemo(
@@ -98,14 +96,13 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
     [eraStats],
   );
 
-  // 3. Audio feature histograms
   const histograms = useMemo(() => computeAudioHistograms(songs), [songs]);
 
   const selectedHistogram = useMemo(() => {
     const hist = histograms.find((h) => h.feature === selectedFeature) ?? null;
     if (!hist) return null;
 
-    // Use 5 buckets when data is sparse
+    // Merge adjacent bucket pairs down to 5 buckets when data is sparse.
     if (withAudio < 100 && hist.buckets.length === 10) {
       const merged = [];
       for (let i = 0; i < 10; i += 2) {
@@ -125,7 +122,6 @@ export default function SoundPanel({ songs, albums }: SoundPanelProps) {
     return hist;
   }, [histograms, selectedFeature, withAudio]);
 
-  // 4. Song rankings
   const rankings = useMemo(() => computeRankings(songs, albums), [songs, albums]);
 
   const rankingCategories = useMemo(() => rankings.map((r) => r.category), [rankings]);

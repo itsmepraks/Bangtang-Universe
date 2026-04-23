@@ -2,19 +2,13 @@ import { AlertTriangle, RefreshCw, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface DataStatusBannerProps {
-  /** True if any critical data hook returned an error. */
   hasError: boolean;
-  /** Re-run all failed fetches. */
   onRetry: () => void;
-  /** True while a retry is in flight. */
   retrying?: boolean;
 }
 
-/**
- * Non-blocking banner shown when live data fetches fail and the app has
- * fallen back to the bundled cached archive. Users keep browsing; they get
- * one clear recovery action. (Nielsen #1 visibility, #9 error recovery.)
- */
+// Non-blocking banner — shown when live fetches fail and we've fallen back to
+// the bundled cache. Users keep browsing; one clear recovery action.
 export default function DataStatusBanner({ hasError, onRetry, retrying = false }: DataStatusBannerProps) {
   const [dismissed, setDismissed] = useState(false);
 

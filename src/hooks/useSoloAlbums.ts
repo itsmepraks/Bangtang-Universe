@@ -1,10 +1,3 @@
-/**
- * useSoloAlbums Hook
- *
- * Fetches solo album data from Supabase database
- * Falls back to local data if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { SoloAlbum } from '../types/database';

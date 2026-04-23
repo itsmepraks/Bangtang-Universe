@@ -35,7 +35,6 @@ export default function AwardStats({ awards }: AwardStatsProps) {
       .sort((a, b) => a.year - b.year);
   }, [awards]);
 
-  // Top ceremonies by win count
   const byCeremonyData = useMemo(() => {
     const counts: Record<string, { won: number; total: number }> = {};
     awards.forEach((a) => {
@@ -53,12 +52,10 @@ export default function AwardStats({ awards }: AwardStatsProps) {
       .slice(0, 10);
   }, [awards]);
 
-  // Win rate
   const totalWon = awards.filter((a) => a.result === 'won').length;
   const totalAwards = awards.length;
   const winRate = totalAwards > 0 ? ((totalWon / totalAwards) * 100).toFixed(1) : '0';
 
-  // Scope breakdown
   const scopeBreakdown = useMemo(() => {
     const counts = { group: 0, solo: 0, unit: 0 };
     awards.forEach((a) => {

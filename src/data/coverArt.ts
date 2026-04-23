@@ -1,11 +1,5 @@
-/**
- * Cover Art Lookup Map
- *
- * Maps album titles (both MusicBrainz and English variants) to
- * Cover Art Archive thumbnail URLs (500px).
- *
- * Source: scripts/cache/cover-art.json (Cover Art Archive via MusicBrainz)
- */
+// Maps album titles (MusicBrainz and English variants) to Cover Art Archive
+// thumbnail URLs. Source: scripts/cache/cover-art.json.
 
 const COVER_ART_MAP: Record<string, string> = {
     // --- School Trilogy ---
@@ -108,10 +102,6 @@ const COVER_ART_MAP: Record<string, string> = {
     'ARIRANG': 'https://coverartarchive.org/release/ef672e3a-6d58-4887-b8f7-2ec629d19139/44096800112-500.jpg',
 };
 
-/**
- * Look up cover art thumbnail URL for an album by title.
- * Returns null if no cover art is available.
- */
 export function getCoverArtUrl(albumTitle: string): string | null {
     return COVER_ART_MAP[albumTitle] ?? null;
 }

@@ -1,10 +1,3 @@
-/**
- * Supabase Client Configuration
- * 
- * This module initializes and exports the Supabase client
- * for use throughout the application.
- */
-
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database';
 
@@ -18,23 +11,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
     );
 }
 
-/**
- * Supabase client instance
- * Use this for all database operations
- */
 export const supabase = createClient<Database>(
     supabaseUrl || '',
     supabaseAnonKey || '',
     {
         auth: {
-            persistSession: false, // We don't need auth for this app
+            persistSession: false,
         },
     }
 );
 
-/**
- * Check if Supabase is properly configured
- */
 export const isSupabaseConfigured = (): boolean => {
     return Boolean(supabaseUrl && supabaseAnonKey);
 };

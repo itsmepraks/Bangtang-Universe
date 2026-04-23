@@ -7,8 +7,7 @@ export interface LandingRitualProps {
     onSync: () => void;
 }
 
-// 7 BTS members — signature concert color, pulse delay, stage name
-// Colors tuned for concert spotlight visibility and member identity
+// Signature concert colors and pulse delays for the 7 spotlight columns.
 const MEMBERS = [
   { color: '#3B82F6', glow: '#60A5FA', delay: 0.00, name: 'RM',     short: 'RM'  },  // blue
   { color: '#F472B6', glow: '#FB7185', delay: 0.30, name: 'JIN',    short: 'JIN' },  // pink
@@ -19,7 +18,7 @@ const MEMBERS = [
   { color: '#A78BFA', glow: '#C4B5FD', delay: 0.25, name: 'JK',     short: 'JK'  },  // purple
 ] as const;
 
-// Foreground army bomb orbs — purple ocean glow (you're in the crowd)
+// Purple-ocean glow orbs — simulates the crowd's army bombs seen from stage.
 const FOREGROUND_BOMBS = [
   { x:  3, y:  2, size: 62, color: BORAHAE_COLORS.PRIMARY, blur: 20, opacity: 0.52, dur: 3.2, delay: 0.0 },
   { x:  9, y: 12, size: 50, color: '#8B5CF6', blur: 16, opacity: 0.42, dur: 2.8, delay: 0.8 },
