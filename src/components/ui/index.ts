@@ -9,3 +9,4 @@ export { default as ChartPanel } from './ChartPanel';
 export { default as ChartSection } from './ChartSection';
 export { default as EmptyState } from './EmptyState';
 export { default as DataStatusBanner } from './DataStatusBanner';
+export { default as DotLoader } from './DotLoader';

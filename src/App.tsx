@@ -7,7 +7,7 @@ import { SECTION_ACCENTS } from './constants/colors';
 import {
   BTSLogo,
 } from './components';
-import { Breadcrumb, DataStatusBanner } from './components/ui';
+import { Breadcrumb, DataStatusBanner, DotLoader } from './components/ui';
 
 const Universe3D = lazy(() => import('./components/features/Universe3D'));
 const LandingRitual = lazy(() => import('./components/features/LandingRitual'));
@@ -28,21 +28,13 @@ const DelightLayer = lazy(() => import('./components/features/DelightLayer'));
 
 const LoadingFallback = () => (
   <div className="absolute inset-0 bg-[#0a0a0f] flex items-center justify-center">
-    <div className="flex items-center gap-1.5">
-      <div className="w-2 h-2 rounded-full bg-purple-400/60 animate-pulse" />
-      <div className="w-2 h-2 rounded-full bg-pink-400/60 animate-pulse" style={{ animationDelay: '150ms' }} />
-      <div className="w-2 h-2 rounded-full bg-blue-400/60 animate-pulse" style={{ animationDelay: '300ms' }} />
-    </div>
+    <DotLoader tone="gradient" size="md" />
   </div>
 );
 
 const SectionSpinner = () => (
   <div className="flex items-center justify-center h-full py-20">
-    <div className="flex items-center gap-1.5">
-      <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
-      <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '150ms' }} />
-      <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '300ms' }} />
-    </div>
+    <DotLoader />
   </div>
 );
 

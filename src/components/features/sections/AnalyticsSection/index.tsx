@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { BarChart3, Heart, Network, Sparkles, Trophy } from 'lucide-react';
 import type { Song, Album, Member, Lyrics, Award, ChartEntry, Concert, MemberEvent } from '../../../../types/database';
+import { DotLoader } from '../../../ui';
 
 const SoundPanel = lazy(() => import('./SoundPanel'));
 const MoodPanel = lazy(() => import('./MoodPanel'));
@@ -96,11 +97,7 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
         <Suspense
           fallback={
             <div className="flex items-center justify-center h-64">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" />
-                <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '150ms' }} />
-                <div className="w-1.5 h-1.5 rounded-full bg-white/40 animate-pulse" style={{ animationDelay: '300ms' }} />
-              </div>
+              <DotLoader />
             </div>
           }
         >
