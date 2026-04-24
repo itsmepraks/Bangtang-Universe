@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { ChartEntry } from '../types/database';
+import type { AsyncResource } from './types';
 
-interface UseChartEntriesResult {
+interface UseChartEntriesResult extends AsyncResource {
     chartEntries: ChartEntry[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useChartEntries(): UseChartEntriesResult {

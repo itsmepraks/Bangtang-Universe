@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Collaboration } from '../types/database';
+import type { AsyncResource } from './types';
 
-interface UseCollaborationsResult {
+interface UseCollaborationsResult extends AsyncResource {
     collaborations: Collaboration[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useCollaborations(): UseCollaborationsResult {

@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Concert } from '../types/database';
+import type { AsyncResource } from './types';
 
-interface UseConcertsResult {
+interface UseConcertsResult extends AsyncResource {
     concerts: Concert[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useConcerts(): UseConcertsResult {

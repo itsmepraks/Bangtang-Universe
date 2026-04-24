@@ -3,12 +3,10 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Member } from '../types/database';
 import { MEMBER_DATA } from '../data/members';
 import { BORAHAE_COLORS } from '../constants/colors';
+import type { AsyncResource } from './types';
 
-interface UseMembersResult {
+interface UseMembersResult extends AsyncResource {
     members: Member[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 function convertLocalMember(m: typeof MEMBER_DATA[0]): Member {

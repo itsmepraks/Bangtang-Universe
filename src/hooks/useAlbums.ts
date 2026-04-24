@@ -3,12 +3,10 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Album } from '../types/database';
 import { ALBUMS } from '../data/albums';
 import { getCoverArtUrl } from '../data/coverArt';
+import type { AsyncResource } from './types';
 
-interface UseAlbumsResult {
+interface UseAlbumsResult extends AsyncResource {
     albums: Album[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useAlbums(): UseAlbumsResult {

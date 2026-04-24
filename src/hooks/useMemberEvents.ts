@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { MemberEvent } from '../types/database';
+import type { AsyncResource } from './types';
 
-interface UseMemberEventsResult {
+interface UseMemberEventsResult extends AsyncResource {
     memberEvents: MemberEvent[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useMemberEvents(): UseMemberEventsResult {

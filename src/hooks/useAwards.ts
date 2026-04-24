@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Award } from '../types/database';
+import type { AsyncResource } from './types';
 
-interface UseAwardsResult {
+interface UseAwardsResult extends AsyncResource {
     awards: Award[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useAwards(): UseAwardsResult {

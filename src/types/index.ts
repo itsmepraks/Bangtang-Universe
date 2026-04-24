@@ -45,16 +45,6 @@ export interface DiscographyState {
   view: 'grid' | 'album' | 'song';
 }
 
-export interface GlassHUDProps {
-  title: string;
-  icon?: React.ElementType;
-  children: React.ReactNode;
-  className?: string;
-  onClose?: () => void;
-  headerAction?: React.ReactNode;
-  accentColor?: string;
-}
-
 export interface Star {
   // Spherical coordinates: theta (azimuth), phi (polar), r (radial distance).
   theta: number;
@@ -81,30 +71,11 @@ export interface FloatingParticle {
   size: number;
 }
 
-export interface SearchResult {
-  id: number;
-  title: string;
-  score: number;
-  context: string;
-}
-
-export interface SearchState {
-  query: string;
-  results: SearchResult[];
-  searching: boolean;
-}
-
 export interface AudioMetrics {
   energy: number;
   valence: number;
   bpm: number;
   dance: number;
-}
-
-export interface SonicAnalyzerProps {
-  playing: boolean;
-  togglePlay: () => void;
-  accentColor?: string;
 }
 
 export interface LyricGeneratorState {
@@ -144,27 +115,6 @@ export interface AnimationTiming {
   duration: number;
   delay?: number;
   easing?: string;
-}
-
-export interface UniverseProps {
-  mode: AppMode;
-}
-
-export interface LandingRitualProps {
-  onSync: () => void;
-}
-
-export interface MemberDNAProps {
-  memberId: string;
-  onClose: () => void;
-}
-
-export interface RAGNetworkProps {
-  accentColor?: string;
-}
-
-export interface DataHubProps {
-  accentColor?: string;
 }
 
 export interface ColorPalette {

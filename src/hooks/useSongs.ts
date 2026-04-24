@@ -2,12 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Song } from '../types/database';
 import { SONGS, type Song as LocalSong } from '../data/songs';
+import type { AsyncResource } from './types';
 
-interface UseSongsResult {
+interface UseSongsResult extends AsyncResource {
     songs: Song[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 function convertLocalSong(s: LocalSong): Song {
