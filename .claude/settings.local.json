@@ -58,7 +58,15 @@
       "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/track/search?q=BTS+Dynamite\")",
       "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/track/search/BTS%20Dynamite\")",
       "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/\")",
-      "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/track?name=Dynamite&artist=BTS\")"
+      "Bash(curl -s --max-time 10 \"https://api.reccobeats.com/v1/track?name=Dynamite&artist=BTS\")",
+      "Bash(npx knip *)",
+      "Bash(npx madge *)",
+      "Bash(gh run *)",
+      "Bash(awk '-F  ' '{print $NF}')",
+      "Bash(echo \"exit: $?\")",
+      "Bash(echo \"tsc exit: $?\")",
+      "Bash(echo \"build exit: $?\")",
+      "Bash(python3 -c \"import json,sys;d=json.load\\(sys.stdin\\);print\\('state:',d.get\\('mergeStateStatus'\\)\\);[print\\(f\\\\\"  {c.get\\('name','?'\\)}: {c.get\\('conclusion'\\) or c.get\\('state','?'\\)}\\\\\"\\) for c in d.get\\('statusCheckRollup',[]\\)]\")"
     ],
     "additionalDirectories": [
       "c:\\Development\\BTS universe"

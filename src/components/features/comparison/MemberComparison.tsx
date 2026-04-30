@@ -15,21 +15,20 @@ export default function MemberComparison({ members, songs }: MemberComparisonPro
   const memberA = useMemo(() => members.find(m => m.id === memberAId) || null, [members, memberAId]);
   const memberB = useMemo(() => members.find(m => m.id === memberBId) || null, [members, memberBId]);
 
-  const getSongCount = (member: Member) => {
-    const name = member.stage_name.toLowerCase();
-    return songs.filter(s =>
-      (s.member_credits || []).some(c => c.toLowerCase().includes(name)) ||
-      (s.writers || []).some(w => w.toLowerCase().includes(name))
-    ).length;
-  };
-
   const chartData = useMemo(() => {
     if (!memberA || !memberB) return [];
+    const songCount = (member: Member) => {
+      const name = member.stage_name.toLowerCase();
+      return songs.filter(s =>
+        (s.member_credits || []).some(c => c.toLowerCase().includes(name)) ||
+        (s.writers || []).some(w => w.toLowerCase().includes(name))
+      ).length;
+    };
     return [
       { stat: 'KOMCA', [memberA.stage_name]: memberA.komca_credits || 0, [memberB.stage_name]: memberB.komca_credits || 0 },
       { stat: 'Writer', [memberA.stage_name]: memberA.writer_credits || 0, [memberB.stage_name]: memberB.writer_credits || 0 },
       { stat: 'Producer', [memberA.stage_name]: memberA.producer_credits || 0, [memberB.stage_name]: memberB.producer_credits || 0 },
-      { stat: 'Songs', [memberA.stage_name]: getSongCount(memberA), [memberB.stage_name]: getSongCount(memberB) },
+      { stat: 'Songs', [memberA.stage_name]: songCount(memberA), [memberB.stage_name]: songCount(memberB) },
     ];
   }, [memberA, memberB, songs]);
 

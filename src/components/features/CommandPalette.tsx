@@ -76,7 +76,7 @@ export default function CommandPalette({
 
   useEffect(() => {
     if (open) {
-      // Reset state when palette opens; lint rule complains but this is intentional.
+      // Intentional reset-on-open. setState in effect is the right pattern here.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('');
       // eslint-disable-next-line react-hooks/set-state-in-effect
