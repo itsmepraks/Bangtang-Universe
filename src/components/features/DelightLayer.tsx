@@ -45,14 +45,24 @@ export default function DelightLayer() {
       'font-weight: 600',
       'padding: 2px 0',
     ].join(';');
-    // eslint-disable-next-line no-console
+     
     console.log('%c💜 Borahae — you found the source.', styles);
-    // eslint-disable-next-line no-console
+     
     console.log(
       '%cBuilt by fans, for fans. Try the Konami code on the keyboard.',
       'color: rgba(255,255,255,0.6); font-size: 12px',
     );
   }, []);
+
+  const triggerBurst = () => {
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+
+      console.log('%c💜 Borahae!', 'color: #A855F7; font-size: 18px; font-weight: 700');
+      return;
+    }
+    setParticles(createBurst(80));
+    setTimeout(() => setParticles([]), 3000);
+  };
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -72,16 +82,6 @@ export default function DelightLayer() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, []);
-
-  const triggerBurst = () => {
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      // eslint-disable-next-line no-console
-      console.log('%c💜 Borahae!', 'color: #A855F7; font-size: 18px; font-weight: 700');
-      return;
-    }
-    setParticles(createBurst(80));
-    setTimeout(() => setParticles([]), 3000);
-  };
 
   if (particles.length === 0) return null;
 

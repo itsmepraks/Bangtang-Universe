@@ -102,9 +102,9 @@ async function scrapeLyricsPage(url: string): Promise<{ ko: string | null; en: s
         // Korean | Romanization | English
         // Or it may use divs with specific classes
 
-        let koreanLines: string[] = [];
-        let romanizedLines: string[] = [];
-        let englishLines: string[] = [];
+        const koreanLines: string[] = [];
+        const romanizedLines: string[] = [];
+        const englishLines: string[] = [];
 
         // Strategy 1: Look for a lyrics table with 3 columns
         const lyricsTable = $('table').filter((_, table) => {

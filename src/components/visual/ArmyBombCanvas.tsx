@@ -1,3 +1,6 @@
+/* eslint-disable react-hooks/purity */
+// Decorative ARMY bomb field — Math.random() inside the useMemo is intentional.
+// Bombs are generated once on mount (deps: []) and never re-randomize.
 import React, { useRef, useEffect, useMemo } from 'react';
 import { BORAHAE_COLORS } from '../../constants/colors';
 

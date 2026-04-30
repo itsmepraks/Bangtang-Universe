@@ -107,9 +107,9 @@ async function fetchDiscography(): Promise<MBAlbum[]> {
         const releases = rgDetail.releases || [];
 
         // Prefer Korean release, fall back to first available
+         
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let bestRelease = releases.find((r: any) => {
+        const bestRelease = releases.find((r: any) => {
             const country = r.country || '';
             return country === 'KR' || country === 'XW'; // KR = Korea, XW = Worldwide
         }) || releases[0];

@@ -229,6 +229,7 @@ export class LocalLyricsAnalyzer implements LyricsAnalysisProvider {
 
     points.sort((a, b) => a.releaseDate.localeCompare(b.releaseDate));
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return points.map(({ releaseDate: _, ...point }) => point);
   }
 }

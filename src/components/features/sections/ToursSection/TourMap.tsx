@@ -43,6 +43,8 @@ export default function TourMap({ concerts }: TourMapProps) {
   const [sliderValue, setSliderValue] = useState<number>(dateRange.max);
 
   useEffect(() => {
+    // Slider tracks the max date; reset when concert data updates.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (dateRange.max > 0) setSliderValue(dateRange.max);
   }, [dateRange.max]);
 

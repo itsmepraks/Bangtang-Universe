@@ -151,7 +151,7 @@ async function main() {
   let lyricsUpdated = 0;
   let songsUpdated = 0;
   let songsSkipped = 0;
-  let labelCounts = new Map<string, number>();
+  const labelCounts = new Map<string, number>();
   const errors: string[] = [];
 
   for (const lyric of lyricsRows) {

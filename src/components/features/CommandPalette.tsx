@@ -76,9 +76,11 @@ export default function CommandPalette({
 
   useEffect(() => {
     if (open) {
+      // Reset state when palette opens; lint rule complains but this is intentional.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveIndex(0);
-      // rAF so the input has mounted before we focus it.
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);
@@ -150,6 +152,7 @@ export default function CommandPalette({
   }, [query, allItems]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveIndex(0);
   }, [query]);
 

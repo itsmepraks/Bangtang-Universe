@@ -290,7 +290,7 @@ function parseTrackListing(wikitext: string, albumTitle: string): WikiTrack[] {
         let match: RegExpExecArray | null;
         const seenTitles = new Set<string>();
         while ((match = listPattern.exec(wikitext)) !== null) {
-            let title = cleanWikitext(match[1]).trim();
+            const title = cleanWikitext(match[1]).trim();
             if (!title || title.length > 200) continue;
             // Skip duplicate titles (e.g. same song in different editions)
             if (seenTitles.has(title.toLowerCase())) continue;
@@ -330,7 +330,7 @@ function findTrackListingTemplates(wikitext: string): string[] {
 
     while ((match = pattern.exec(wikitext)) !== null) {
         let depth = 0;
-        let start = match.index;
+        const start = match.index;
         let i = start;
 
         while (i < wikitext.length) {

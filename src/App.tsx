@@ -141,7 +141,7 @@ export default function App() {
     applyHash();
     window.addEventListener('hashchange', applyHash);
     return () => window.removeEventListener('hashchange', applyHash);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   useEffect(() => {
