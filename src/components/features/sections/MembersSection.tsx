@@ -6,8 +6,8 @@ import { useSoloAlbumsByMember, useAwardsByMember, useCollaborationsByMember, us
 import MemberTimeline from './Members/MemberTimeline';
 import Badge from '../../ui/Badge';
 import MemberComparison from '../comparison/MemberComparison';
-import SectionIntro from '../../ui/SectionIntro';
-import GlossaryTip from '../../ui/GlossaryTip';
+import { getMemberColor, BORAHAE_COLORS } from '../../../constants/colors';
+
 
 interface MembersSectionProps {
   members: Member[];
@@ -24,14 +24,27 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
         <button
           key={m.id}
           onClick={() => onSelect(m.id)}
-          className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:border-white/[0.12] hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
+          className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] flex flex-col"
+          style={{
+            '--member-color': getMemberColor(m.id),
+          } as React.CSSProperties}
+          onMouseEnter={(e) => {
+            const el = e.currentTarget;
+            el.style.borderColor = `${getMemberColor(m.id)}40`;
+            el.style.boxShadow = `0 0 20px ${getMemberColor(m.id)}15, 0 0 40px ${getMemberColor(m.id)}08`;
+          }}
+          onMouseLeave={(e) => {
+            const el = e.currentTarget;
+            el.style.borderColor = '';
+            el.style.boxShadow = '';
+          }}
         >
           {/* Photo */}
           <div className="aspect-[3/4] relative overflow-hidden rounded-t-2xl">
             {m.image_url ? (
-              <img src={m.image_url} alt={m.stage_name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" />
+              <img src={m.image_url} alt={m.stage_name} width={300} height={420} decoding="async" loading="lazy" className="w-full h-full object-cover img-outline grayscale group-hover:grayscale-0 transition-[filter] duration-700" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${m.color || '#A855F7'}30, transparent)` }}>
+              <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${m.color || BORAHAE_COLORS.PRIMARY}30, transparent)` }}>
                 <User size={48} className="text-white/20" />
               </div>
             )}
@@ -43,7 +56,7 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
           </div>
           {/* Info */}
           <div className="p-5 space-y-3">
-            <p className="text-xs font-medium text-white/50 uppercase tracking-wide">{m.role}</p>
+            <p className="text-xs font-medium text-white/50">{m.role}</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <PenTool size={12} className="text-white/40" />
@@ -52,12 +65,17 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
               <div
                 className="w-3 h-3 rounded-full transition-shadow duration-300 group-hover:shadow-[0_0_12px_var(--glow)]"
                 style={{
-                  backgroundColor: m.color || '#A855F7',
+                  backgroundColor: m.color || BORAHAE_COLORS.PRIMARY,
                   '--glow': `${m.color}80`,
                 } as React.CSSProperties}
               />
             </div>
           </div>
+          {/* Signature color accent bar */}
+          <div
+            className="h-0.5 mt-auto rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 mx-4 mb-3"
+            style={{ backgroundColor: getMemberColor(m.id) }}
+          />
         </button>
       ))}
     </div>
@@ -111,13 +129,15 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
         <button onClick={onBack} className="flex items-center gap-2 text-white/50 hover:text-white text-xs tracking-wide uppercase transition-colors">
           <ChevronLeft size={16} /> All Members
         </button>
-        <button onClick={onOpenFullProfile} className="text-xs text-purple-400/60 hover:text-purple-300 tracking-wide uppercase transition-colors">
+        <button onClick={onOpenFullProfile} className="text-xs tracking-wide uppercase transition-colors" style={{ color: `${getMemberColor(member.id)}90` }}>
           Full Profile View
         </button>
       </div>
 
       {/* ── Hero Header ── */}
       <div className="relative rounded-2xl overflow-hidden border border-white/[0.06] mb-6">
+        {/* Signature color accent bar */}
+        <div className="h-1 w-full rounded-full" style={{ background: `linear-gradient(to right, ${getMemberColor(member.id)}, ${getMemberColor(member.id)}40)` }} />
         {/* Background gradient with member color */}
         <div
           className="absolute inset-0"
@@ -131,7 +151,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
           {/* Photo */}
           <div className="w-32 h-40 md:w-44 md:h-56 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-white/[0.08] shadow-2xl">
             {member.image_url ? (
-              <img src={member.image_url} alt={member.stage_name} className="w-full h-full object-cover" />
+              <img src={member.image_url} alt={member.stage_name} width={300} height={420} decoding="async" loading="lazy" className="w-full h-full object-cover img-outline" />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-[#111118]">
                 <User size={48} className="text-white/20" />
@@ -150,7 +170,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
               </h2>
               <div
                 className="w-3 h-3 rounded-full shadow-lg"
-                style={{ backgroundColor: member.color || '#A855F7', boxShadow: `0 0 12px ${member.color}60` }}
+                style={{ backgroundColor: member.color || BORAHAE_COLORS.PRIMARY, boxShadow: `0 0 12px ${member.color}60` }}
               />
             </div>
             {member.full_name && <p className="text-sm text-white/50 mb-3">{member.full_name}</p>}
@@ -183,7 +203,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
                 <div key={stat.label} className="flex flex-col">
                   <span
                     className="text-xl md:text-2xl font-semibold tabular-nums"
-                    style={{ color: stat.accent ? (member.color || '#A855F7') : 'rgba(255,255,255,0.85)' }}
+                    style={{ color: stat.accent ? (member.color || BORAHAE_COLORS.PRIMARY) : 'rgba(255,255,255,0.85)' }}
                   >
                     {stat.value}
                   </span>
@@ -206,9 +226,14 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium tracking-wide transition-all duration-200 flex-shrink-0 ${
                 isActive
-                  ? 'bg-white/[0.08] text-white shadow-sm'
+                  ? 'text-white shadow-sm'
                   : 'text-white/40 hover:text-white/70 hover:bg-white/[0.03]'
               }`}
+              style={isActive ? {
+                backgroundColor: `${getMemberColor(member.id)}18`,
+                boxShadow: `0 0 12px ${getMemberColor(member.id)}10`,
+                borderBottom: `2px solid ${getMemberColor(member.id)}`,
+              } : undefined}
             >
               <Icon size={14} />
               {tab.label}
@@ -262,7 +287,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
                       className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                       style={{ backgroundColor: `${member.color}15`, border: `1px solid ${member.color}25` }}
                     >
-                      <Award size={11} style={{ color: member.color || '#A855F7' }} />
+                      <Award size={11} style={{ color: member.color || BORAHAE_COLORS.PRIMARY }} />
                     </div>
                     <span className="group-hover:text-white/80 transition-colors">{a}</span>
                   </div>
@@ -375,7 +400,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
               {/* Awards summary bar */}
               <div className="flex items-center gap-4 px-5 py-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
                 <div className="flex items-center gap-2">
-                  <Trophy size={14} style={{ color: member.color || '#A855F7' }} />
+                  <Trophy size={14} style={{ color: member.color || BORAHAE_COLORS.PRIMARY }} />
                   <span className="text-sm font-semibold text-white/80">{memberAwards.length}</span>
                   <span className="text-xs text-white/40">total</span>
                 </div>
@@ -435,15 +460,8 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
 
   return (
     <div className="space-y-8">
-      <SectionIntro
-        description={
-          <>
-            The seven members of BTS — their profiles, solo careers, and <GlossaryTip term="KOMCA" /> songwriting credits.
-            Click a member to explore their full profile, discography, and awards.
-          </>
-        }
-      />
       <MemberGrid members={members} onSelect={onSelectMember} />
+      <div className="border-t border-white/[0.04] my-2" />
       <GlassHUD title="Compare Members" icon={GitCompare}>
         <MemberComparison members={members} songs={songs} />
       </GlassHUD>

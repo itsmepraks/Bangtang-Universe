@@ -1,17 +1,13 @@
 import { useMemo } from 'react';
-import { Music, Disc, Users, PenTool, Trophy, MapPin } from 'lucide-react';
+import { Music, Disc, Users, PenTool, Trophy, MapPin, Sparkles, MessageSquare, Search as SearchIcon, ArrowRight } from 'lucide-react';
 import {
   AreaChart,
   Area,
   BarChart,
   Bar,
-  ScatterChart,
-  Scatter,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
-  Cell,
   ResponsiveContainer,
 } from 'recharts';
 import type { Song, Album, Member, Award, Concert } from '../../../../types/database';
@@ -22,7 +18,7 @@ import {
   computeEraEvolution,
   computeMemberContributions,
 } from '../../../../services/analyticsService';
-import { getSentimentColor, CHART_STYLES } from '../../../../constants/colors';
+import { CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
 
 interface HomeSectionProps {
   songs: Song[];
@@ -30,12 +26,10 @@ interface HomeSectionProps {
   members: Member[];
   awards: Award[];
   concerts: Concert[];
-  onNavigate: (section: DashboardSection, payload?: unknown) => void;
+  onNavigate: (section: DashboardSection, payload?: string | number) => void;
 }
 
-/** Produce a short but unique era label for the Music area chart x-axis.
- *  "Love Yourself: Her" → "LY:Her"  |  "WINGS" → "WINGS"  |  "Dark & Wild" → "D&W"
- */
+// "Love Yourself: Her" → "LY:Her"; "WINGS" → "WINGS"; "Dark & Wild" → "D&W"
 function abbreviateEra(era: string): string {
   if (era.includes(':')) {
     const [main, sub] = era.split(':').map((s) => s.trim());
@@ -66,6 +60,10 @@ export default function HomeSection({
     [members],
   );
   const awardsWon = useMemo(() => awards.filter((a) => a.result === 'won').length, [awards]);
+  const latestAlbum = useMemo(
+    () => [...albums].sort((a, b) => (b.release_date ?? '').localeCompare(a.release_date ?? ''))[0] ?? null,
+    [albums],
+  );
   const uniqueTours = useMemo(
     () => new Set(concerts.map((c) => c.tour_name)).size,
     [concerts],
@@ -97,28 +95,6 @@ export default function HomeSection({
     [contributions],
   );
   const topContributor = contributions[0]?.stageName ?? '—';
-
-  // ── MOOD card ─────────────────────────────────────────────────
-  const scatterData = useMemo(
-    () =>
-      songs
-        .filter((s) => s.valence != null && s.energy != null)
-        .map((s) => ({
-          valence: s.valence as number,
-          energy: s.energy as number,
-          sentiment: s.sentiment ?? 'Unknown',
-          color: getSentimentColor(s.sentiment ?? ''),
-          title: s.title,
-        })),
-    [songs],
-  );
-  const topSentiment = useMemo(() => {
-    const counts: Record<string, number> = {};
-    songs.forEach((s) => {
-      if (s.sentiment) counts[s.sentiment] = (counts[s.sentiment] || 0) + 1;
-    });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
-  }, [songs]);
 
   // ── AWARDS card ───────────────────────────────────────────────
   const uniqueCeremonies = useMemo(
@@ -154,15 +130,14 @@ export default function HomeSection({
   }, [concerts]);
 
   return (
-    <main className="space-y-6">
+    <main className="space-y-8">
       {/* ── Page title + tagline ─────────────────────────────────── */}
       <div className="pt-1">
         <h1 className="text-xs font-semibold text-white/40 uppercase tracking-widest">
           Bangtan Universe
         </h1>
         <p className="text-sm text-white/35 mt-1">
-          A complete data archive of BTS — music, members, awards, concerts, and deep audio
-          analytics across every era.
+          11 years. 7 members. The numbers behind the music.
         </p>
       </div>
 
@@ -174,6 +149,45 @@ export default function HomeSection({
         <StatCard label="KOMCA Credits" value={totalKomca} icon={PenTool} accent="#D8B4FE" subtitle="total production" />
         <StatCard label="Awards Won" value={awardsWon} icon={Trophy} accent="#FBBF24" subtitle={`${awards.length} nominations`} />
         <StatCard label="Concerts" value={concerts.length} icon={MapPin} accent="#10B981" subtitle={`${uniqueTours} tours`} />
+      </div>
+
+      {/* ── Try this: quick entry cards (Nielsen #6, #7 — surface hidden features) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          {
+            icon: SearchIcon,
+            label: 'Search by mood',
+            hint: 'Happy, sad, energetic…',
+            onClick: () => onNavigate('search'),
+          },
+          {
+            icon: Sparkles,
+            label: 'Find songs like…',
+            hint: 'Recommendations by mood & era',
+            onClick: () => { window.location.hash = '#/analytics/discover'; },
+          },
+          {
+            icon: MessageSquare,
+            label: 'Ask about BTS',
+            hint: '"Who has the most credits?"',
+            onClick: () => { window.location.hash = '#/analytics/discover'; },
+          },
+        ].map(({ icon: Icon, label, hint, onClick }) => (
+          <button
+            key={label}
+            onClick={onClick}
+            className="group flex items-center gap-3 text-left bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3 hover:bg-white/[0.05] hover:border-purple-500/20 active:scale-[0.96] transition-[background-color,border-color,transform] duration-200"
+          >
+            <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center flex-shrink-0">
+              <Icon className="w-4 h-4 text-purple-300/80" aria-hidden="true" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">{label}</div>
+              <div className="text-[11px] text-white/40 truncate">{hint}</div>
+            </div>
+            <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-purple-300 group-hover:translate-x-0.5 transition-[color,transform] flex-shrink-0" aria-hidden="true" />
+          </button>
+        ))}
       </div>
 
       {/* ── Bento grid ──────────────────────────────────────────── */}
@@ -192,7 +206,7 @@ export default function HomeSection({
           {/* Legend */}
           <div className="flex items-center gap-3 mb-2">
             <span className="flex items-center gap-1.5 text-[10px] text-white/35">
-              <span className="w-3 h-0.5 rounded bg-[#A855F7] inline-block" />
+              <span className="w-3 h-0.5 rounded inline-block" style={{ backgroundColor: BORAHAE_COLORS.PRIMARY }} />
               Energy
             </span>
             <span className="flex items-center gap-1.5 text-[10px] text-white/35">
@@ -213,8 +227,8 @@ export default function HomeSection({
               <Area
                 type="monotone"
                 dataKey="energy"
-                stroke="#A855F7"
-                fill="#A855F7"
+                stroke={BORAHAE_COLORS.PRIMARY}
+                fill={BORAHAE_COLORS.PRIMARY}
                 fillOpacity={0.15}
                 strokeWidth={2}
                 dot={false}
@@ -270,94 +284,50 @@ export default function HomeSection({
           </div>
         </BentoCard>
 
-        {/* MOOD QUADRANT — col 3, rows 1+2 (tall) */}
+        {/* LATEST RELEASE — col 3, rows 1+2 (tall) */}
         <BentoCard
-          title="Mood Quadrant"
+          title="Latest Release"
           metrics={[
-            { value: scatterData.length, label: 'songs plotted' },
-            { value: topSentiment, label: 'top sentiment' },
+            { value: latestAlbum?.title ?? '—', label: 'album' },
+            { value: latestAlbum?.release_date?.slice(0, 4) ?? '—', label: 'year' },
           ]}
-          onExplore={() => onNavigate('analytics')}
+          onExplore={() => latestAlbum && onNavigate('discography', latestAlbum.id)}
           className="lg:row-span-2 lg:col-span-1"
         >
-          {/* Quadrant axis labels overlaid on the chart */}
-          <div className="relative h-full min-h-[280px]">
-            <span className="absolute top-0 inset-x-0 text-center text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
-              Energetic ↑
-            </span>
-            <span className="absolute bottom-1 inset-x-0 text-center text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
-              ↓ Calm
-            </span>
-            <span className="absolute top-1/2 left-0 -translate-y-1/2 text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
-              Sad
-            </span>
-            <span className="absolute top-1/2 right-0 -translate-y-1/2 text-[9px] text-white/25 uppercase tracking-wide pointer-events-none select-none">
-              Happy
-            </span>
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 18, right: 28, bottom: 18, left: 24 }}>
-                <CartesianGrid {...CHART_STYLES.GRID} />
-                <XAxis
-                  type="number"
-                  dataKey="valence"
-                  domain={[0, 1]}
-                  name="Valence"
-                  tick={false}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  type="number"
-                  dataKey="energy"
-                  domain={[0, 1]}
-                  name="Energy"
-                  tick={false}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip
-                  content={({ payload }) => {
-                    if (!payload?.length) return null;
-                    const d = payload[0].payload as (typeof scatterData)[number];
-                    const valPct = Math.round(d.valence * 100);
-                    const engPct = Math.round(d.energy * 100);
-                    return (
-                      <div style={{ ...CHART_STYLES.TOOLTIP.contentStyle, minWidth: 160 }}>
-                        <p style={CHART_STYLES.TOOLTIP.labelStyle}>{d.title}</p>
-                        <p style={{ color: d.color, fontSize: 11, marginTop: 3, marginBottom: 8 }}>
-                          {d.sentiment}
-                        </p>
-                        {/* Valence bar */}
-                        <div style={{ marginBottom: 6 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>Valence</span>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>{valPct}%</span>
-                          </div>
-                          <div style={{ height: 3, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
-                            <div style={{ height: '100%', width: `${valPct}%`, background: '#C084FC', borderRadius: 2 }} />
-                          </div>
-                        </div>
-                        {/* Energy bar */}
-                        <div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>Energy</span>
-                            <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>{engPct}%</span>
-                          </div>
-                          <div style={{ height: 3, background: 'rgba(255,255,255,0.08)', borderRadius: 2 }}>
-                            <div style={{ height: '100%', width: `${engPct}%`, background: '#A855F7', borderRadius: 2 }} />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }}
-                />
-                <Scatter data={scatterData} isAnimationActive={false}>
-                  {scatterData.map((entry, i) => (
-                    <Cell key={`scatter-${i}`} fill={entry.color} fillOpacity={0.75} />
-                  ))}
-                </Scatter>
-              </ScatterChart>
-            </ResponsiveContainer>
+          <div className="relative h-full min-h-[280px] rounded-xl overflow-hidden">
+            {latestAlbum?.cover_art_url ? (
+              <img
+                src={latestAlbum.cover_art_url}
+                alt={latestAlbum.title}
+                width={600}
+                height={600}
+                decoding="async"
+                className="w-full h-full object-cover img-outline opacity-80"
+                loading="lazy"
+              />
+            ) : (
+              <div
+                className="w-full h-full"
+                style={{
+                  background: `linear-gradient(135deg, ${latestAlbum?.cover_color || BORAHAE_COLORS.PRIMARY}60, ${latestAlbum?.cover_color || BORAHAE_COLORS.PRIMARY}10)`,
+                }}
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent" />
+            <div className="absolute top-3 left-3">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-[#0a0a0f] tracking-wide">NEW</span>
+            </div>
+            <div className="absolute bottom-4 left-4 right-4">
+              <p className="text-lg font-bold text-white">{latestAlbum?.title}</p>
+              <div className="flex items-center gap-2 mt-1">
+                {latestAlbum?.era && (
+                  <span className="text-xs text-white/60">{latestAlbum.era}</span>
+                )}
+                {latestAlbum?.track_count && (
+                  <span className="text-xs text-white/40">{latestAlbum.track_count} tracks</span>
+                )}
+              </div>
+            </div>
           </div>
         </BentoCard>
 
@@ -388,7 +358,7 @@ export default function HomeSection({
               <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
               <Bar
                 dataKey="count"
-                fill="#A855F7"
+                fill={BORAHAE_COLORS.PRIMARY}
                 fillOpacity={0.8}
                 radius={[3, 3, 0, 0]}
                 isAnimationActive={false}

@@ -14,7 +14,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
-import { createSupabaseAdmin, delay, normalizeTitle, logStart, logSuccess, logError, logWarning, logDone } from './scrape-utils.js';
+import { createSupabaseAdmin, delay, normalizeTitle, logStart, logSuccess, logError, logWarning, logDone, errorMessage } from './scrape-utils.js';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
@@ -78,8 +78,9 @@ async function searchGenius(title: string): Promise<{ url: string; id: number } 
                     return { url: song.url, id: song.id };
                 }
             }
-        } catch (err: any) {
-            if (err.response?.status === 429) {
+        } catch (err: unknown) {
+            const status = (err as { response?: { status?: number } }).response?.status;
+            if (status === 429) {
                 logWarning('Rate limited, waiting 10s...');
                 await delay(10000);
             }

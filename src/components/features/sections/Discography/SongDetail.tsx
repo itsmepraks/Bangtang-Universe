@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ChevronLeft, Music } from 'lucide-react';
 import type { Song, Album } from '../../../../types/database';
-import { getSentimentColor } from '../../../../constants/colors';
+import { getSentimentColor, BORAHAE_COLORS } from '../../../../constants/colors';
 import { getRecommendations } from '../../../../services/recommendationService';
 import Badge from '../../../ui/Badge';
 import TabBar from '../../../ui/TabBar';
@@ -58,7 +58,7 @@ export default function SongDetail({ song, songs, albums, onBack, onSelectSong }
       <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
         <div
           className="w-24 h-24 md:w-32 md:h-32 rounded-2xl flex-shrink-0 flex items-center justify-center"
-          style={{ background: `linear-gradient(135deg, ${album?.cover_color || '#A855F7'}60, ${album?.cover_color || '#A855F7'}15)` }}
+          style={{ background: `linear-gradient(135deg, ${album?.cover_color || BORAHAE_COLORS.PRIMARY}60, ${album?.cover_color || BORAHAE_COLORS.PRIMARY}15)` }}
         >
           <Music size={36} className="text-white/20" />
         </div>

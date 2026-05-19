@@ -1,9 +1,4 @@
-/**
- * BTS Album Database
- * 
- * Complete album metadata for all BTS Korean studio albums,
- * compilations, and major single releases.
- */
+import { BORAHAE_COLORS } from '../constants/colors';
 
 export interface Album {
     id: number;
@@ -14,8 +9,8 @@ export interface Album {
     trackCount: number;
     description: string;
     era: string;
-    coverColor: string; // Dominant color from album art
-    coverArtUrl?: string | null; // Cover Art Archive thumbnail
+    coverColor: string;
+    coverArtUrl?: string | null;
 }
 
 export const ALBUMS: Album[] = [
@@ -171,7 +166,7 @@ export const ALBUMS: Album[] = [
         releaseDate: '2022-06-10',
         type: 'Compilation',
         trackCount: 48,
-        description: 'Anthology album for BTS\'s 9th anniversary, featuring hits from 2013-2022 plus new tracks before hiatus.',
+        description: 'Anthology album for BTS\'s 9th anniversary, featuring hits from 2013–2022 plus new tracks released just before the group\'s solo / military-service chapter (2022–2025).',
         era: 'Proof',
         coverColor: '#020617',
         coverArtUrl: 'http://coverartarchive.org/release/18f3f673-ae29-4dda-b855-ef4830041663/32750960123-500.jpg',
@@ -184,12 +179,10 @@ export const ALBUMS: Album[] = [
         trackCount: 1,
         description: 'Digital single released for BTS\'s 10th anniversary FESTA, expressing gratitude to ARMY.',
         era: 'Chapter 2',
-        coverColor: '#A855F7',
+        coverColor: BORAHAE_COLORS.PRIMARY,
         coverArtUrl: 'http://coverartarchive.org/release/47915090-9b99-4cfe-9326-92b40332c345/35879173466-500.jpg',
     }
 ];
-
-// ============ HELPER FUNCTIONS ============
 
 export const getAlbumById = (id: number): Album | undefined => {
     return ALBUMS.find(a => a.id === id);

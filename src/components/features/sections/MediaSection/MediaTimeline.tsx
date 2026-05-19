@@ -21,7 +21,6 @@ export default function MediaTimeline({ media, members }: MediaTimelineProps) {
         [members]
     );
 
-    // Group by year, sorted chronologically (oldest first for timeline)
     const yearGroups = useMemo(() => {
         const sorted = [...media].sort((a, b) => {
             const da = a.release_date || '';

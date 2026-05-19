@@ -8,7 +8,7 @@
  */
 
 import { MusicBrainzApi } from 'musicbrainz-api';
-import { delay, saveCache, loadCache, logStart, logProgress, logSuccess, logError, logWarning, logDone } from './scrape-utils.js';
+import { delay, saveCache, loadCache, logStart, logProgress, logSuccess, logError, logWarning, logDone, errorMessage } from './scrape-utils.js';
 
 const BTS_MBID = '0d79fe8e-ba27-4859-bb8c-2f255f346853';
 
@@ -56,7 +56,8 @@ async function fetchDiscography(): Promise<MBAlbum[]> {
 
     // Step 1: Get all release groups (albums)
     console.log('   📡 Fetching release groups...');
-    const releaseGroups: any[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const releaseGroups: any[] = []; // TODO: tighten type — MusicBrainz response shape is untyped
     let offset = 0;
     const limit = 100;
 
@@ -94,18 +95,21 @@ async function fetchDiscography(): Promise<MBAlbum[]> {
         await delay(1200);
 
         // Step 3: Get releases for this release group
-        let rgDetail: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let rgDetail: any; // TODO: tighten type — MusicBrainz response shape is untyped
         try {
             rgDetail = await mbApi.lookup('release-group', rg.id, ['releases']);
-        } catch (err: any) {
-            logWarning(`Failed to fetch release group ${rg.title}: ${err.message}`);
+        } catch (err: unknown) {
+            logWarning(`Failed to fetch release group ${rg.title}: ${errorMessage(err)}`);
             continue;
         }
 
         const releases = rgDetail.releases || [];
 
         // Prefer Korean release, fall back to first available
-        let bestRelease = releases.find((r: any) => {
+         
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const bestRelease = releases.find((r: any) => {
             const country = r.country || '';
             return country === 'KR' || country === 'XW'; // KR = Korea, XW = Worldwide
         }) || releases[0];
@@ -118,11 +122,12 @@ async function fetchDiscography(): Promise<MBAlbum[]> {
         await delay(1200);
 
         // Step 4: Get track listing
-        let releaseDetail: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let releaseDetail: any; // TODO: tighten type — MusicBrainz API response shape is untyped
         try {
             releaseDetail = await mbApi.lookup('release', bestRelease.id, ['recordings']);
-        } catch (err: any) {
-            logWarning(`Failed to fetch release ${rg.title}: ${err.message}`);
+        } catch (err: unknown) {
+            logWarning(`Failed to fetch release ${rg.title}: ${errorMessage(err)}`);
             continue;
         }
 

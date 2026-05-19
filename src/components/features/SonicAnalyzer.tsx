@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Play, Pause, ChevronDown } from 'lucide-react';
 import type { Song } from '../../types/database';
+import { BORAHAE_COLORS } from '../../constants/colors';
 
 export interface SonicAnalyzerProps {
     playing: boolean;
@@ -17,7 +18,7 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
     togglePlay,
     song,
     onSelectSong,
-    accentColor = "#A855F7",
+    accentColor = BORAHAE_COLORS.PRIMARY,
     songs = [],
     getAlbumTitle
 }) => {
@@ -62,7 +63,8 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
 
                     <div className="relative group">
                         <select
-                            className="w-full bg-transparent text-xl text-white font-semibold tracking-wide appearance-none focus:outline-none cursor-pointer py-1 border-b border-transparent hover:border-white/20 transition-colors [&>option]:text-black"
+                            aria-label="Select song to analyze"
+                            className="w-full bg-transparent text-xl text-white font-semibold tracking-wide appearance-none focus:outline-none focus:border-purple-500/40 cursor-pointer py-1 border-b border-transparent hover:border-white/20 transition-colors [&>option]:text-black"
                             value={song?.id || ""}
                             onChange={(e) => {
                                 const s = songs.find(song => song.id === Number(e.target.value));
@@ -89,19 +91,25 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
                     style={{ background: `linear-gradient(to top, ${accentColor} 0%, transparent 100%)` }} />
                 {[...Array(24)].map((_, i) => {
                     const seed = song ? (song.id * 13 + i * 7) % 100 : Math.sin(i * 0.4) * 10 + 15;
-                    const pausedHeight = song ? 10 + (seed % 60) : 15 + Math.sin(i * 0.4) * 10;
+                    // Paused state: bars sit at a static fraction of full height.
+                    // Played state: CSS `equalizer` keyframe animates transform.scaleY,
+                    // so we keep height: 100% and ride the GPU-accelerated transform.
+                    const pausedHeightPct = song ? 10 + (seed % 60) : 15 + Math.sin(i * 0.4) * 10;
+                    const pausedScale = pausedHeightPct / 100;
 
                     return (
                         <div
                             key={i}
-                            className="flex-1 rounded-full transition-all duration-500 ease-out shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                            className="flex-1 rounded-full transition-[opacity,transform] duration-500 ease-out shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                             style={{
-                                height: `${pausedHeight}%`,
+                                height: '100%',
+                                transformOrigin: 'bottom center',
+                                transform: playing ? undefined : `scaleY(${pausedScale})`,
                                 animation: playing ? `equalizer ${0.5 + (i % 5) * 0.1}s ease-in-out infinite alternate` : 'none',
                                 background: `linear-gradient(to top, ${accentColor} 0%, white 100%)`,
                                 filter: 'blur(0.5px)',
                                 opacity: playing ? 0.9 : 0.2,
-                                transitionDelay: `${i * 20}ms`
+                                transitionDelay: `${i * 20}ms`,
                             }}
                         />
                     )
@@ -109,20 +117,14 @@ export const SonicAnalyzer: React.FC<SonicAnalyzerProps> = ({
 
                 <button
                     onClick={togglePlay}
-                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-700 bg-black/20 backdrop-blur-[4px]"
+                    aria-label={playing ? 'Pause analyzer' : 'Play analyzer'}
+                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-black/20 backdrop-blur-[4px]"
                 >
-                    <div className="w-24 h-24 bg-white/10 border border-white/20 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-white/20 transition-all duration-500 backdrop-blur-xl">
-                        {playing ? <Pause className="fill-white text-white" size={32} /> : <Play className="fill-white text-white ml-2" size={32} />}
+                    <div className="w-24 h-24 bg-white/10 border border-white/20 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-white/20 transition-[background-color,transform] duration-500">
+                        {playing ? <Pause className="fill-white text-white" size={32} aria-hidden="true" /> : <Play className="fill-white text-white ml-2" size={32} aria-hidden="true" />}
                     </div>
                 </button>
 
-                <style>{`
-        @keyframes equalizer {
-          0% { height: 15%; }
-          50% { height: 80%; }
-          100% { height: 30%; }
-        }
-      `}</style>
             </div>
 
             <div className="grid grid-cols-4 gap-4 px-2">

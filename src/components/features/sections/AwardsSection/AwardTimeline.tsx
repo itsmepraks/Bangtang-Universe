@@ -34,7 +34,6 @@ export default function AwardTimeline({ awards, members }: AwardTimelineProps) {
       .map(([year, yearAwards]): YearGroup => ({
         year: Number(year),
         awards: yearAwards.sort((a, b) => {
-          // Sort won first, then by ceremony name
           if (a.result !== b.result) return a.result === 'won' ? -1 : 1;
           return a.ceremony.localeCompare(b.ceremony);
         }),

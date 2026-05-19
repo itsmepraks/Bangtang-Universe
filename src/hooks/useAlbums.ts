@@ -1,21 +1,12 @@
-/**
- * useAlbums Hook
- * 
- * Fetches album data from Supabase database
- * Falls back to local data if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Album } from '../types/database';
 import { ALBUMS } from '../data/albums';
 import { getCoverArtUrl } from '../data/coverArt';
+import type { AsyncResource } from './types';
 
-interface UseAlbumsResult {
+interface UseAlbumsResult extends AsyncResource {
     albums: Album[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useAlbums(): UseAlbumsResult {
@@ -24,7 +15,6 @@ export function useAlbums(): UseAlbumsResult {
     const [error, setError] = useState<Error | null>(null);
 
     const fetchAlbums = async () => {
-        // If Supabase isn't configured, use local data
         if (!isSupabaseConfigured()) {
             setAlbums(ALBUMS.map(a => ({
                 id: a.id,
@@ -56,7 +46,6 @@ export function useAlbums(): UseAlbumsResult {
 
             if (dbError) throw dbError;
 
-            // Enrich albums missing cover art with local lookup
             const albums = (data || []) as Album[];
             const enriched = albums.map(album => {
                 if (!album.cover_art_url) {
@@ -69,7 +58,6 @@ export function useAlbums(): UseAlbumsResult {
         } catch (err) {
             console.error('Failed to fetch albums:', err);
             setError(err as Error);
-            // Fallback to local data
             setAlbums(ALBUMS.map(a => ({
                 id: a.id,
                 title: a.title,
@@ -99,7 +87,6 @@ export function useAlbums(): UseAlbumsResult {
     return { albums, loading, error, refetch: fetchAlbums };
 }
 
-// Helper hooks for specific queries
 export function useAlbumsByEra(era: string) {
     const { albums, loading, error } = useAlbums();
     return {
@@ -118,7 +105,6 @@ export function useAlbumById(id: number) {
     };
 }
 
-// Get unique eras as a sorted list
 export function useEras() {
     const { albums, loading, error } = useAlbums();
     const eras = useMemo(
@@ -128,7 +114,6 @@ export function useEras() {
     return { eras, loading, error };
 }
 
-// Group albums by era
 export function useAlbumsGroupedByEra() {
     const { albums, loading, error } = useAlbums();
     const grouped = useMemo(() => {

@@ -27,7 +27,6 @@ export default function TourList({ concerts }: TourListProps) {
   const [countryFilter, setCountryFilter] = useState('');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
-  // Derive unique tour names and countries for filters
   const { tourNames, countries } = useMemo(() => {
     const tourSet = new Set<string>();
     const countrySet = new Set<string>();
@@ -41,7 +40,6 @@ export default function TourList({ concerts }: TourListProps) {
     };
   }, [concerts]);
 
-  // Group concerts by tour_name and apply filters
   const tourGroups = useMemo(() => {
     let filtered = concerts;
 
@@ -130,6 +128,7 @@ export default function TourList({ concerts }: TourListProps) {
         </div>
 
         <select
+          aria-label="Filter by tour"
           value={tourFilter}
           onChange={(e) => setTourFilter(e.target.value)}
           className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-white/70 outline-none focus:border-purple-500/40 transition-colors"
@@ -143,6 +142,7 @@ export default function TourList({ concerts }: TourListProps) {
         </select>
 
         <select
+          aria-label="Filter by country"
           value={countryFilter}
           onChange={(e) => setCountryFilter(e.target.value)}
           className="bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-1.5 text-sm text-white/70 outline-none focus:border-purple-500/40 transition-colors"

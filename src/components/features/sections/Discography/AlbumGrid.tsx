@@ -4,8 +4,16 @@ import type { Song, Album } from '../../../../types/database';
 import FilterBar from '../../../ui/FilterBar';
 import Badge from '../../../ui/Badge';
 import BtsLogo from '../../../ui/BtsLogo';
-import SectionIntro from '../../../ui/SectionIntro';
-import GlossaryTip from '../../../ui/GlossaryTip';
+import { BORAHAE_COLORS } from '../../../../constants/colors';
+
+
+// Custom caret SVG for `<select>` elements — Tailwind doesn't ship a
+// "white chevron on transparent" appearance, so we paint it ourselves.
+const SELECT_CARET_STYLE = {
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'no-repeat' as const,
+  backgroundPosition: 'right 10px center',
+};
 
 type Category = 'all' | 'group' | 'solo' | 'collab';
 
@@ -37,14 +45,12 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
   const types = useMemo(() => [...new Set(albums.map(a => a.type).filter(Boolean))].map(t => ({ value: t!, label: t! })), [albums]);
   const eras = useMemo(() => [...new Set(albums.map(a => a.era).filter(Boolean))].sort().map(e => ({ value: e!, label: e! })), [albums]);
 
-  // Build a lookup from album_id to album for era filtering of songs
   const albumMap = useMemo(() => {
     const map: Record<number, Album> = {};
     albums.forEach(a => { map[a.id] = a; });
     return map;
   }, [albums]);
 
-  // Filter songs by era (using their album's era)
   const eraFilteredSongs = useMemo(() => {
     if (!activeEra) return songs;
     return songs.filter(s => {
@@ -54,7 +60,6 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
     });
   }, [songs, activeEra, albumMap]);
 
-  // Solo songs grouped by member
   const soloSongsByMember = useMemo(() => {
     const soloSongs = eraFilteredSongs.filter(s => s.is_solo === true);
     const grouped: Record<string, Song[]> = {};
@@ -69,12 +74,10 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
         grouped[member].push(s);
       });
     });
-    // Sort members alphabetically
     const sorted = Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b));
     return sorted;
   }, [eraFilteredSongs]);
 
-  // Collab songs
   const collabSongs = useMemo(() => {
     return eraFilteredSongs.filter(s => s.is_collab === true);
   }, [eraFilteredSongs]);
@@ -111,16 +114,6 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
 
   return (
     <div className="space-y-6">
-      <SectionIntro
-        description={
-          <>
-            The complete BTS discography — group albums, solo projects, and collaborations.
-            Each album belongs to an <GlossaryTip term="era" /> that defines its thematic universe.
-            Click any album to explore tracks and audio details.
-          </>
-        }
-      />
-
       {/* Category Filter */}
       <div className="space-y-4">
         <FilterBar
@@ -138,19 +131,21 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
       {showAlbumGrid && (
         <div className="flex items-center gap-3 flex-wrap">
           <select
+            aria-label="Filter albums by type"
             value={typeFilter || ''}
             onChange={(e) => { setTypeFilter(e.target.value || null); setActiveEra(null); }}
             className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Types</option>
             {types.map(t => <option key={t.value} value={t.value} style={{ background: '#111118' }}>{t.label}</option>)}
           </select>
           <select
+            aria-label="Filter albums by era"
             value={activeEra || ''}
             onChange={(e) => { setActiveEra(e.target.value || null); setTypeFilter(null); }}
             className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Eras</option>
             {eras.map(e => <option key={e.value} value={e.value} style={{ background: '#111118' }}>{e.label}</option>)}
@@ -170,10 +165,11 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
       {!showAlbumGrid && eras.length > 0 && (
         <div className="flex items-center gap-3">
           <select
+            aria-label="Filter by era"
             value={activeEra || ''}
             onChange={(e) => setActiveEra(e.target.value || null)}
             className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Eras</option>
             {eras.map(e => <option key={e.value} value={e.value} style={{ background: '#111118' }}>{e.label}</option>)}
@@ -201,13 +197,16 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
               >
                 <div
                   className="h-32 w-full relative overflow-hidden"
-                  style={{ background: `linear-gradient(135deg, ${album.cover_color || '#A855F7'}40, ${album.cover_color || '#A855F7'}10)` }}
+                  style={{ background: `linear-gradient(135deg, ${album.cover_color || BORAHAE_COLORS.PRIMARY}40, ${album.cover_color || BORAHAE_COLORS.PRIMARY}10)` }}
                 >
                   {album.cover_art_url ? (
                     <img
                       src={album.cover_art_url}
                       alt={album.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      width={400}
+                      height={400}
+                      decoding="async"
+                      className="w-full h-full object-cover img-outline group-hover:scale-105 transition-transform duration-700"
                       loading="lazy"
                     />
                   ) : (

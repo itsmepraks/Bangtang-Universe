@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { Trophy, TrendingUp, Users, Percent } from 'lucide-react';
 import type { Award, Member } from '../../../../types/database';
-import { CHART_STYLES } from '../../../../constants/colors';
+import { CHART_STYLES, BORAHAE_COLORS, withAlpha } from '../../../../constants/colors';
 
 interface AwardStatsProps {
   awards: Award[];
@@ -35,7 +35,6 @@ export default function AwardStats({ awards }: AwardStatsProps) {
       .sort((a, b) => a.year - b.year);
   }, [awards]);
 
-  // Top ceremonies by win count
   const byCeremonyData = useMemo(() => {
     const counts: Record<string, { won: number; total: number }> = {};
     awards.forEach((a) => {
@@ -53,12 +52,10 @@ export default function AwardStats({ awards }: AwardStatsProps) {
       .slice(0, 10);
   }, [awards]);
 
-  // Win rate
   const totalWon = awards.filter((a) => a.result === 'won').length;
   const totalAwards = awards.length;
   const winRate = totalAwards > 0 ? ((totalWon / totalAwards) * 100).toFixed(1) : '0';
 
-  // Scope breakdown
   const scopeBreakdown = useMemo(() => {
     const counts = { group: 0, solo: 0, unit: 0 };
     awards.forEach((a) => {
@@ -133,7 +130,7 @@ export default function AwardStats({ awards }: AwardStatsProps) {
               <Bar
                 dataKey="nominated"
                 stackId="awards"
-                fill="#A855F7"
+                fill={BORAHAE_COLORS.PRIMARY}
                 radius={[4, 4, 0, 0]}
                 name="Nominated"
                 activeBar={CHART_STYLES.BAR_ACTIVE}
@@ -165,7 +162,7 @@ export default function AwardStats({ awards }: AwardStatsProps) {
                 cursor={CHART_STYLES.TOOLTIP.cursor}
               />
               <Bar dataKey="won" fill="#FBBF24" radius={[0, 4, 4, 0]} name="Won" activeBar={CHART_STYLES.BAR_ACTIVE} />
-              <Bar dataKey="total" fill="rgba(168, 85, 247, 0.3)" radius={[0, 4, 4, 0]} name="Total" activeBar={CHART_STYLES.BAR_ACTIVE} />
+              <Bar dataKey="total" fill={withAlpha(BORAHAE_COLORS.PRIMARY, 0.3)} radius={[0, 4, 4, 0]} name="Total" activeBar={CHART_STYLES.BAR_ACTIVE} />
             </BarChart>
           </ResponsiveContainer>
         </div>

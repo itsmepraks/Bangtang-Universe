@@ -78,8 +78,9 @@ async function searchGeniusSong(trackTitle: string, albumTitle: string): Promise
                     return await fetchSongDetails(song.id, trackTitle, albumTitle);
                 }
             }
-        } catch (err: any) {
-            if (err.response?.status === 429) {
+        } catch (err: unknown) {
+            const status = (err as { response?: { status?: number } }).response?.status;
+            if (status === 429) {
                 logWarning('Rate limited, waiting 5s...');
                 await delay(5000);
                 continue;
@@ -97,9 +98,10 @@ async function fetchSongDetails(geniusId: number, trackTitle: string, albumTitle
     const { data } = await geniusApi.get(`/songs/${geniusId}`);
     const song = data.response?.song;
 
-    const writers: string[] = (song?.writer_artists || []).map((w: any) => w.name);
-    const producers: string[] = (song?.producer_artists || []).map((p: any) => p.name);
-    const featured: string[] = (song?.featured_artists || []).map((f: any) => f.name);
+    type NamedArtist = { name: string };
+    const writers: string[] = (song?.writer_artists || []).map((w: NamedArtist) => w.name);
+    const producers: string[] = (song?.producer_artists || []).map((p: NamedArtist) => p.name);
+    const featured: string[] = (song?.featured_artists || []).map((f: NamedArtist) => f.name);
 
     return {
         track_title: trackTitle,

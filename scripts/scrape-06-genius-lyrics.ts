@@ -9,7 +9,7 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { createSupabaseAdmin, delay, loadCache, saveCache, logStart, logProgress, logSuccess, logError, logWarning, logDone, normalizeTitle } from './scrape-utils.js';
+import { createSupabaseAdmin, delay, loadCache, saveCache, logStart, logProgress, logSuccess, logError, logWarning, logDone, errorMessage, normalizeTitle } from './scrape-utils.js';
 
 const supabase = createSupabaseAdmin();
 
@@ -61,8 +61,9 @@ async function scrapeLyrics(url: string): Promise<string | null> {
         }
 
         return lyrics || null;
-    } catch (err: any) {
-        if (err.response?.status === 403) {
+    } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } }).response?.status;
+        if (status === 403) {
             return null; // Page not accessible
         }
         throw err;
@@ -130,9 +131,9 @@ async function main() {
                 failed++;
                 logWarning('No lyrics found on page');
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             failed++;
-            logWarning(`Error: ${err.message}`);
+            logWarning(`Error: ${errorMessage(err)}`);
         }
 
         // Save progress every 20 songs

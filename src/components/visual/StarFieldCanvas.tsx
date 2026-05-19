@@ -20,7 +20,10 @@ export const StarFieldCanvas: React.FC<StarFieldCanvasProps> = ({ mode }) => {
     const lastTimeRef = useRef(0);
 
     const stars = useMemo<Star3D[]>(() => {
-        const rawStars = generateStars(800);
+        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+        const isLowPower = typeof navigator !== 'undefined' && (navigator.hardwareConcurrency || 8) < 4;
+        const starCount = isMobile || isLowPower ? 350 : 800;
+        const rawStars = generateStars(starCount);
         return rawStars.map(s => ({
             x: s.r * Math.sin(s.phi) * Math.cos(s.theta),
             y: s.r * Math.sin(s.phi) * Math.sin(s.theta),
@@ -48,7 +51,12 @@ export const StarFieldCanvas: React.FC<StarFieldCanvasProps> = ({ mode }) => {
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         };
         resize();
-        window.addEventListener('resize', resize);
+        let resizeTimer: number | undefined;
+        const onResize = () => {
+            if (resizeTimer) window.clearTimeout(resizeTimer);
+            resizeTimer = window.setTimeout(resize, 150);
+        };
+        window.addEventListener('resize', onResize);
 
         // Pre-render glow sprites per unique color
         const glowSprites = new Map<string, HTMLCanvasElement>();
@@ -127,7 +135,8 @@ export const StarFieldCanvas: React.FC<StarFieldCanvasProps> = ({ mode }) => {
 
         return () => {
             cancelAnimationFrame(animId);
-            window.removeEventListener('resize', resize);
+            if (resizeTimer) window.clearTimeout(resizeTimer);
+            window.removeEventListener('resize', onResize);
         };
     }, [stars, mode]);
 

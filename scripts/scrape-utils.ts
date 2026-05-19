@@ -43,6 +43,19 @@ export function saveCache(filename: string, data: unknown): void {
     console.log(`   💾 Cached to ${path.relative(process.cwd(), filePath)}`);
 }
 
+// ==================== ERROR HANDLING ====================
+
+/** Safe extraction of an error message from an unknown thrown value. */
+export function errorMessage(err: unknown): string {
+    if (err instanceof Error) return err.message;
+    if (typeof err === 'string') return err;
+    try {
+        return JSON.stringify(err);
+    } catch {
+        return String(err);
+    }
+}
+
 // ==================== LOGGING ====================
 
 export function logStart(task: string) { console.log(`\n🚀 ${task}\n${'━'.repeat(50)}`); }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { BORAHAE_COLORS } from '../../constants/colors';
 
 export interface GlassHUDProps {
     title: string;
@@ -18,7 +19,7 @@ export const GlassHUD: React.FC<GlassHUDProps> = ({
     className = "",
     onClose,
     headerAction,
-    accentColor = "#A855F7"
+    accentColor = BORAHAE_COLORS.PRIMARY
 }) => (
     <div className={`relative rounded-2xl flex flex-col overflow-hidden border border-white/[0.06] bg-[#111118] ${className}`}>
         <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
@@ -29,8 +30,8 @@ export const GlassHUD: React.FC<GlassHUDProps> = ({
             <div className="flex gap-2">
                 {headerAction}
                 {onClose && (
-                    <button onClick={onClose} aria-label="Close" className="p-2 hover:bg-white/10 rounded-xl transition-all text-white/40 hover:text-white">
-                        <X size={16} />
+                    <button onClick={onClose} aria-label="Close" className="p-2 hover:bg-white/10 rounded-xl transition-[background-color,color] text-white/60 hover:text-white">
+                        <X size={16} aria-hidden="true" />
                     </button>
                 )}
             </div>

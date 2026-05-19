@@ -1,23 +1,13 @@
-/**
- * useSongs Hook
- * 
- * Fetches song data from Supabase database
- * Falls back to local data if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Song } from '../types/database';
 import { SONGS, type Song as LocalSong } from '../data/songs';
+import type { AsyncResource } from './types';
 
-interface UseSongsResult {
+interface UseSongsResult extends AsyncResource {
     songs: Song[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
-// Convert local song format to database format
 function convertLocalSong(s: LocalSong): Song {
     return {
         id: s.id,
@@ -88,7 +78,6 @@ export function useSongs(): UseSongsResult {
     return { songs, loading, error, refetch: fetchSongs };
 }
 
-// Get songs by album
 export function useSongsByAlbum(albumId: number) {
     const { songs, loading, error } = useSongs();
     const filteredSongs = useMemo(
@@ -98,7 +87,6 @@ export function useSongsByAlbum(albumId: number) {
     return { songs: filteredSongs, loading, error };
 }
 
-// Get songs by sentiment
 export function useSongsBySentiment(sentiment: string) {
     const { songs, loading, error } = useSongs();
     const filteredSongs = useMemo(
@@ -108,7 +96,6 @@ export function useSongsBySentiment(sentiment: string) {
     return { songs: filteredSongs, loading, error };
 }
 
-// Get title tracks only
 export function useTitleTracks() {
     const { songs, loading, error } = useSongs();
     const titleTracks = useMemo(
@@ -118,7 +105,6 @@ export function useTitleTracks() {
     return { songs: titleTracks, loading, error };
 }
 
-// Get song by ID
 export function useSongById(id: number) {
     const { songs, loading, error } = useSongs();
     return {
@@ -128,7 +114,6 @@ export function useSongById(id: number) {
     };
 }
 
-// Get songs sorted by a feature
 export function useSongsSortedBy(feature: 'bpm' | 'energy' | 'valence' | 'danceability', ascending = false) {
     const { songs, loading, error } = useSongs();
 
@@ -145,7 +130,6 @@ export function useSongsSortedBy(feature: 'bpm' | 'energy' | 'valence' | 'dancea
     return { songs: sortedSongs, loading, error };
 }
 
-// Get songs where a specific member appears in member_credits
 export function useSongsByMember(memberName: string) {
     const { songs, loading, error } = useSongs();
     const filtered = useMemo(
@@ -157,7 +141,6 @@ export function useSongsByMember(memberName: string) {
     return { songs: filtered, loading, error };
 }
 
-// Get songs where a specific person appears in writers array
 export function useSongsByWriter(writerName: string) {
     const { songs, loading, error } = useSongs();
     const filtered = useMemo(

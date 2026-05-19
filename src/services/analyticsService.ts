@@ -1,27 +1,19 @@
-/**
- * Analytics Engine for Bangtan Universe
- *
- * Pure TypeScript service — no React imports.
- * Provides statistical analysis of BTS discography data including
- * era evolution, writing networks, audio feature histograms,
- * sentiment analysis, correlations, and auto-generated insights.
- */
-
 import type { Song, Album, Member, Award, Concert } from '../types/database';
 
-// ==================== CONSTANTS ====================
-
-const ERA_ORDER: string[] = [
-  'School Trilogy',
-  'HYYH',
-  'Wings',
-  'Love Yourself',
-  'Map of the Soul',
-  'BE',
-  'Butter',
-  'Proof',
-  'Chapter 2',
-];
+// Orders eras by the earliest release date of any album in that era.
+export function buildEraOrder(albums: Album[]): string[] {
+  const eraFirstDate = new Map<string, string>();
+  for (const album of albums) {
+    if (!album.era) continue;
+    const existing = eraFirstDate.get(album.era);
+    if (!existing || (album.release_date && album.release_date < existing)) {
+      eraFirstDate.set(album.era, album.release_date ?? '9999');
+    }
+  }
+  return [...eraFirstDate.entries()]
+    .sort((a, b) => a[1].localeCompare(b[1]))
+    .map(([era]) => era);
+}
 
 // ==================== EXPORTED TYPES ====================
 
@@ -104,28 +96,22 @@ export interface Insight {
   category: 'era' | 'audio' | 'writing' | 'sentiment' | 'general';
 }
 
-// ==================== INTERNAL HELPERS ====================
-
-/** Safely compute the arithmetic mean of an array of numbers. Returns 0 when empty. */
 function mean(values: number[]): number {
   if (values.length === 0) return 0;
   return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
-/** Round a number to a fixed number of decimal places. */
 function round(value: number, decimals: number = 2): number {
   const factor = Math.pow(10, decimals);
   return Math.round(value * factor) / factor;
 }
 
-/** Extract non-null numeric values from a song array for a given feature. */
 function extractNumeric(songs: Song[], key: keyof Song): number[] {
   return songs
     .map((s) => s[key])
     .filter((v): v is number => typeof v === 'number' && v !== null);
 }
 
-/** Build an album lookup map keyed by album id. */
 function buildAlbumMap(albums: Album[]): Map<number, Album> {
   const map = new Map<number, Album>();
   for (const album of albums) {
@@ -134,21 +120,14 @@ function buildAlbumMap(albums: Album[]): Map<number, Album> {
   return map;
 }
 
-/** Generate a deterministic pair key so (A,B) and (B,A) map to the same entry. */
+// Deterministic so (A,B) and (B,A) collapse to the same key.
 function pairKey(a: string, b: string): string {
   return a < b ? `${a}|||${b}` : `${b}|||${a}`;
 }
 
-// ==================== EXPORTED FUNCTIONS ====================
-
-/**
- * Group songs by their album's era and compute average audio features per era.
- * Results are sorted chronologically according to ERA_ORDER.
- */
 export function computeEraEvolution(songs: Song[], albums: Album[]): EraStats[] {
   const albumMap = buildAlbumMap(albums);
 
-  // Accumulate songs per era
   const eraMap = new Map<
     string,
     { songs: Song[]; albumTitles: Set<string> }
@@ -157,7 +136,7 @@ export function computeEraEvolution(songs: Song[], albums: Album[]): EraStats[] 
   for (const song of songs) {
     if (song.album_id === null) continue;
     const album = albumMap.get(song.album_id);
-    if (!album || !album.era || !ERA_ORDER.includes(album.era)) continue;
+    if (!album || !album.era) continue;
 
     const era = album.era;
     if (!eraMap.has(era)) {
@@ -168,10 +147,10 @@ export function computeEraEvolution(songs: Song[], albums: Album[]): EraStats[] 
     entry.albumTitles.add(album.title);
   }
 
-  // Build stats and sort by ERA_ORDER
+  const eraOrder = buildEraOrder(albums);
   const results: EraStats[] = [];
 
-  for (const era of ERA_ORDER) {
+  for (const era of eraOrder) {
     const entry = eraMap.get(era);
     if (!entry) continue;
 
@@ -188,29 +167,9 @@ export function computeEraEvolution(songs: Song[], albums: Album[]): EraStats[] 
     });
   }
 
-  // Append any eras not in ERA_ORDER (future-proofing)
-  for (const [era, entry] of eraMap.entries()) {
-    if (ERA_ORDER.includes(era)) continue;
-    const eraSongs = entry.songs;
-    results.push({
-      era,
-      songCount: eraSongs.length,
-      avgBpm: round(mean(extractNumeric(eraSongs, 'bpm'))),
-      avgEnergy: round(mean(extractNumeric(eraSongs, 'energy'))),
-      avgValence: round(mean(extractNumeric(eraSongs, 'valence'))),
-      avgDanceability: round(mean(extractNumeric(eraSongs, 'danceability'))),
-      avgAcousticness: round(mean(extractNumeric(eraSongs, 'acousticness'))),
-      albums: Array.from(entry.albumTitles),
-    });
-  }
-
   return results;
 }
 
-/**
- * Analyse the writing network: per-writer song counts and co-occurrence pairs.
- * Returns the full writer list, all pairs, and the top 10 pairs by co-occurrences.
- */
 export function computeWritingNetwork(songs: Song[]): {
   writers: WriterStats[];
   pairs: WritingPair[];
@@ -223,14 +182,12 @@ export function computeWritingNetwork(songs: Song[]): {
     const writers = song.writers;
     if (!writers || writers.length === 0) continue;
 
-    // Deduplicate writers within a single song
     const unique = Array.from(new Set(writers));
 
     for (const writer of unique) {
       writerCounts.set(writer, (writerCounts.get(writer) ?? 0) + 1);
     }
 
-    // Generate all unordered pairs
     for (let i = 0; i < unique.length; i++) {
       for (let j = i + 1; j < unique.length; j++) {
         const key = pairKey(unique[i], unique[j]);
@@ -258,17 +215,11 @@ export function computeWritingNetwork(songs: Song[]): {
   return { writers: writerStats, pairs: allPairs, topPairs };
 }
 
-/**
- * Compute per-member contribution statistics.
- * Uses Member table data for KOMCA / writer / producer credits and scans
- * Song.member_credits arrays for song-level credit counts.
- * Sorted by komcaCredits descending.
- */
+// Sorted by komcaCredits descending.
 export function computeMemberContributions(
   members: Member[],
   songs: Song[],
 ): MemberContribution[] {
-  // Pre-compute song credit counts per stage name
   const songCreditCounts = new Map<string, number>();
   for (const song of songs) {
     if (!song.member_credits) continue;
@@ -292,10 +243,6 @@ export function computeMemberContributions(
   return contributions;
 }
 
-/**
- * Compute the distribution of sentiment labels across songs.
- * Null sentiments are skipped. Results sorted by count descending.
- */
 export function computeSentimentDistribution(songs: Song[]): SentimentDistribution[] {
   const counts = new Map<string, number>();
   let total = 0;
@@ -317,22 +264,17 @@ export function computeSentimentDistribution(songs: Song[]): SentimentDistributi
   return distribution;
 }
 
-/**
- * Compute sentiment distribution broken down by era.
- * Keys are era names; values are SentimentDistribution arrays.
- */
 export function computeSentimentByEra(
   songs: Song[],
   albums: Album[],
 ): Record<string, SentimentDistribution[]> {
   const albumMap = buildAlbumMap(albums);
 
-  // Group songs by era
   const eraSongs = new Map<string, Song[]>();
   for (const song of songs) {
     if (song.album_id === null) continue;
     const album = albumMap.get(song.album_id);
-    if (!album || !album.era || !ERA_ORDER.includes(album.era)) continue;
+    if (!album || !album.era) continue;
     if (!eraSongs.has(album.era)) {
       eraSongs.set(album.era, []);
     }
@@ -341,26 +283,17 @@ export function computeSentimentByEra(
 
   const result: Record<string, SentimentDistribution[]> = {};
 
-  // Iterate in ERA_ORDER for consistent key ordering
-  for (const era of ERA_ORDER) {
+  const eraOrder = buildEraOrder(albums);
+  for (const era of eraOrder) {
     const songs = eraSongs.get(era);
     if (!songs) continue;
-    result[era] = computeSentimentDistribution(songs);
-  }
-
-  // Append eras not in ERA_ORDER
-  for (const [era, songs] of eraSongs.entries()) {
-    if (ERA_ORDER.includes(era)) continue;
     result[era] = computeSentimentDistribution(songs);
   }
 
   return result;
 }
 
-/**
- * Create 10-bucket histograms for key audio features.
- * BPM uses range 60-200; energy, valence, danceability, acousticness use 0-1.
- */
+// BPM ranges 60-200; the four 0-1 features get equal 10-bucket slices.
 export function computeAudioHistograms(songs: Song[]): AudioFeatureHistogram[] {
   const features: Array<{ key: keyof Song; label: string; min: number; max: number }> = [
     { key: 'bpm', label: 'BPM', min: 60, max: 200 },
@@ -393,10 +326,9 @@ export function computeAudioHistograms(songs: Song[]): AudioFeatureHistogram[] {
     }
 
     for (const v of values) {
-      // Clamp value to [min, max) then assign to bucket
       const clamped = Math.min(Math.max(v, min), max);
       let idx = Math.floor((clamped - min) / step);
-      // Values exactly equal to max go into the last bucket
+      // Values equal to max fall into the last bucket rather than overflow.
       if (idx >= bucketCount) idx = bucketCount - 1;
       buckets[idx].count += 1;
     }
@@ -405,10 +337,6 @@ export function computeAudioHistograms(songs: Song[]): AudioFeatureHistogram[] {
   });
 }
 
-/**
- * Compute top-10 song rankings across multiple audio feature categories.
- * Each ranking includes the album title when available.
- */
 export function computeRankings(songs: Song[], albums: Album[]): SongRanking[] {
   const albumMap = buildAlbumMap(albums);
 
@@ -456,14 +384,9 @@ export function computeRankings(songs: Song[], albums: Album[]): SongRanking[] {
   });
 }
 
-/**
- * Compute per-album audio feature averages.
- * Sorted by album release_date ascending.
- */
 export function computeAlbumStats(songs: Song[], albums: Album[]): AlbumStats[] {
   const albumMap = buildAlbumMap(albums);
 
-  // Group songs by album_id
   const songsByAlbum = new Map<number, Song[]>();
   for (const song of songs) {
     if (song.album_id === null) continue;
@@ -503,11 +426,7 @@ export function computeAlbumStats(songs: Song[], albums: Album[]): AlbumStats[] 
   return stats;
 }
 
-/**
- * Compute the Pearson correlation coefficient between two numeric song features.
- * Returns the scatter-plot points and the coefficient.
- * Songs with null values for either feature are excluded.
- */
+// Pearson correlation. Songs with null values on either axis are excluded.
 export function computeCorrelation(
   songs: Song[],
   featureX: keyof Song,
@@ -528,7 +447,6 @@ export function computeCorrelation(
     return { points, coefficient: 0 };
   }
 
-  // Pearson correlation
   const n = points.length;
   const sumX = points.reduce((s, p) => s + p.x, 0);
   const sumY = points.reduce((s, p) => s + p.y, 0);
@@ -546,11 +464,6 @@ export function computeCorrelation(
   return { points, coefficient };
 }
 
-/**
- * Auto-generate 8-12 textual insights from the full dataset.
- * Each insight has a unique id, descriptive text, an optional highlighted value,
- * and a category tag.
- */
 export function generateInsights(
   songs: Song[],
   albums: Album[],
@@ -560,11 +473,9 @@ export function generateInsights(
 ): Insight[] {
   const insights: Insight[] = [];
 
-  // --- Era insights ---
   const eras = computeEraEvolution(songs, albums);
 
   if (eras.length > 0) {
-    // Most energetic era
     const mostEnergetic = [...eras].sort((a, b) => b.avgEnergy - a.avgEnergy)[0];
     insights.push({
       id: 'era-most-energetic',
@@ -573,7 +484,6 @@ export function generateInsights(
       category: 'era',
     });
 
-    // BPM trend across eras
     if (eras.length >= 2) {
       const first = eras[0];
       const last = eras[eras.length - 1];
@@ -586,7 +496,6 @@ export function generateInsights(
       });
     }
 
-    // Largest era by song count
     const largestEra = [...eras].sort((a, b) => b.songCount - a.songCount)[0];
     insights.push({
       id: 'era-largest',
@@ -596,11 +505,10 @@ export function generateInsights(
     });
   }
 
-  // --- Writing insights ---
   const memberContributions = computeMemberContributions(members, songs);
 
   if (memberContributions.length > 0) {
-    const topWriter = memberContributions[0]; // sorted by komcaCredits desc
+    const topWriter = memberContributions[0];
     insights.push({
       id: 'writing-top-komca',
       text: `${topWriter.stageName} leads songwriting with ${topWriter.komcaCredits} KOMCA credits`,
@@ -620,7 +528,6 @@ export function generateInsights(
     });
   }
 
-  // --- Sentiment insights ---
   const sentiments = computeSentimentDistribution(songs);
 
   if (sentiments.length > 0) {
@@ -643,7 +550,6 @@ export function generateInsights(
     }
   }
 
-  // --- Audio feature insights ---
   const bpmValues = extractNumeric(songs, 'bpm');
   if (bpmValues.length > 0) {
     const above120 = bpmValues.filter((v) => v > 120).length;
@@ -656,7 +562,6 @@ export function generateInsights(
     });
   }
 
-  // Energy-Valence correlation
   const evCorrelation = computeCorrelation(songs, 'energy', 'valence');
   if (evCorrelation.points.length >= 2) {
     const strength =
@@ -673,7 +578,6 @@ export function generateInsights(
     });
   }
 
-  // --- General insights ---
   const titleTracks = songs.filter((s) => s.is_title_track);
   insights.push({
     id: 'general-title-tracks',
@@ -698,7 +602,6 @@ export function generateInsights(
     category: 'writing',
   });
 
-  // --- Awards insights ---
   if (awards && awards.length > 0) {
     const awardsWon = awards.filter(a => a.result === 'won').length;
     const ceremonies = new Set(awards.map(a => a.ceremony));
@@ -715,7 +618,6 @@ export function generateInsights(
     });
   }
 
-  // --- Concert insights ---
   if (concerts && concerts.length > 0) {
     const countries = new Set(concerts.map(c => c.country));
     const tours = new Set(concerts.map(c => c.tour_name));
@@ -727,7 +629,6 @@ export function generateInsights(
     });
   }
 
-  // --- Chart-friendly era insight ---
   if (eras.length > 0) {
     const eraTitleTrackCounts = eras.map(era => {
       const albumMap = buildAlbumMap(albums);

@@ -24,6 +24,7 @@ import {
     logDone,
     normalizeTitle,
     titlesMatch,
+    errorMessage,
 } from './scrape-utils.js';
 
 const USER_AGENT = 'BangtanUniverse/1.0 (https://github.com/itsmepraks/BTS-universe)';
@@ -359,8 +360,8 @@ async function matchEntriesToDb(entries: ChartEntry[]): Promise<ChartEntry[]> {
         }
 
         logSuccess(`Matched ${matchedSongs} songs, ${matchedAlbums} albums out of ${entries.length} entries`);
-    } catch (err: any) {
-        logWarning(`DB matching skipped (${err.message}). Entries saved without song/album IDs.`);
+    } catch (err: unknown) {
+        logWarning(`DB matching skipped (${errorMessage(err)}). Entries saved without song/album IDs.`);
     }
 
     return entries;

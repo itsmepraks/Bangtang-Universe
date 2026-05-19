@@ -42,7 +42,6 @@ export default function TourStats({ concerts }: TourStatsProps) {
       .sort((a, b) => parseInt(a.year) - parseInt(b.year));
   }, [concerts]);
 
-  // Top countries by concert count
   const topCountries = useMemo(() => {
     const countryMap = new Map<string, number>();
     concerts.forEach((c) => {
@@ -54,7 +53,6 @@ export default function TourStats({ concerts }: TourStatsProps) {
       .slice(0, 15);
   }, [concerts]);
 
-  // Total attendance per tour
   const attendancePerTour = useMemo(() => {
     const tourMap = new Map<string, number>();
     concerts.forEach((c) => {
@@ -62,7 +60,7 @@ export default function TourStats({ concerts }: TourStatsProps) {
     });
     return Array.from(tourMap.entries())
       .map(([tour, attendance]) => ({
-        tour: tour.length > 25 ? tour.slice(0, 22) + '...' : tour,
+        tour: tour.length > 25 ? tour.slice(0, 22) + '…' : tour,
         fullTour: tour,
         attendance,
       }))
@@ -224,21 +222,14 @@ export default function TourStats({ concerts }: TourStatsProps) {
                   contentStyle={CHART_STYLES.TOOLTIP.contentStyle}
                   labelStyle={CHART_STYLES.TOOLTIP.labelStyle}
                   cursor={{ fill: 'rgba(255,255,255,0.03)' }}
-                  formatter={((value: number) => [
-                    value != null ? value.toLocaleString() : '0',
-                    'Attendance' as const,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  ]) as any}
-                  labelFormatter={((
-                    _label: unknown,
-                    payload?: ReadonlyArray<{ payload?: { fullTour?: string } }>
-                  ) => {
-                    if (payload && payload.length > 0 && payload[0].payload) {
-                      return payload[0].payload.fullTour || String(_label);
-                    }
-                    return String(_label);
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  }) as any}
+                  formatter={(value) => [
+                    typeof value === 'number' ? value.toLocaleString() : '0',
+                    'Attendance',
+                  ]}
+                  labelFormatter={(label, payload) => {
+                    const row = payload?.[0]?.payload as { fullTour?: string } | undefined;
+                    return row?.fullTour ?? String(label);
+                  }}
                 />
                 <Bar
                   dataKey="attendance"

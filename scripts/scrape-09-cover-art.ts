@@ -10,7 +10,7 @@
  */
 
 import axios from 'axios';
-import { createSupabaseAdmin, delay, saveCache, loadCache, logStart, logProgress, logSuccess, logError, logWarning, logDone } from './scrape-utils.js';
+import { createSupabaseAdmin, delay, saveCache, loadCache, logStart, logProgress, logSuccess, logError, logWarning, logDone, errorMessage } from './scrape-utils.js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const UPSERT = process.argv.includes('--upsert');
@@ -44,8 +44,9 @@ async function fetchCoverArt(mbReleaseGroupId: string): Promise<{ front: string 
         });
 
         // Find the front image
-        const images = data.images || [];
-        const frontImage = images.find((img: any) => img.front === true) || images[0];
+        type CaaImage = { front?: boolean; image?: string; thumbnails?: { large?: string; small?: string } };
+        const images: CaaImage[] = data.images || [];
+        const frontImage = images.find((img) => img.front === true) || images[0];
 
         if (frontImage) {
             return {
@@ -55,8 +56,9 @@ async function fetchCoverArt(mbReleaseGroupId: string): Promise<{ front: string 
         }
 
         return { front: null, thumbnail: null };
-    } catch (err: any) {
-        if (err.response?.status === 404) {
+    } catch (err: unknown) {
+        const status = (err as { response?: { status?: number } }).response?.status;
+        if (status === 404) {
             // No cover art available - this is normal
             return { front: null, thumbnail: null };
         }
@@ -172,8 +174,8 @@ async function main() {
                 logWarning(`${album.title}: no cover art available`);
                 notFound++;
             }
-        } catch (err: any) {
-            logWarning(`${album.title}: error fetching cover art - ${err.message}`);
+        } catch (err: unknown) {
+            logWarning(`${album.title}: error fetching cover art - ${errorMessage(err)}`);
             results.push({
                 album_title: album.title,
                 mb_release_group_id: album.mb_release_group_id,

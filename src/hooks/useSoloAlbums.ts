@@ -1,20 +1,11 @@
-/**
- * useSoloAlbums Hook
- *
- * Fetches solo album data from Supabase database
- * Falls back to local data if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { SoloAlbum } from '../types/database';
 import { SOLO_ALBUMS } from '../data/soloAlbums';
+import type { AsyncResource } from './types';
 
-interface UseSoloAlbumsResult {
+interface UseSoloAlbumsResult extends AsyncResource {
     soloAlbums: SoloAlbum[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useSoloAlbums(): UseSoloAlbumsResult {

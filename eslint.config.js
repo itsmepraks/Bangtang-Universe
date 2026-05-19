@@ -37,7 +37,7 @@ export default defineConfig([
    * - '*.config.js': Config files (if you prefer not to lint them)
    * - '.vite': Vite cache directory
    */
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'scripts']),
 
   /**
    * Main Configuration Object

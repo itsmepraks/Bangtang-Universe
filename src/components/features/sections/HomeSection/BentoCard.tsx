@@ -24,13 +24,13 @@ export default function BentoCard({
     <div
       role="region"
       aria-labelledby={`bento-${title.toLowerCase().replace(/\s+/g, '-')}`}
-      className={`bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-5 flex flex-col gap-4 hover:border-white/[0.10] transition-all duration-300 ${className}`}
+      className={`bg-[#0e0e14] border border-white/[0.06] rounded-2xl p-5 flex flex-col gap-4 hover:border-white/[0.15] transition-colors duration-300 ${className}`}
     >
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2
           id={`bento-${title.toLowerCase().replace(/\s+/g, '-')}`}
-          className="text-[10px] font-semibold text-white/50 uppercase tracking-widest"
+          className="text-xs font-semibold text-white/50 tracking-wide"
         >
           {title}
         </h2>
@@ -38,7 +38,7 @@ export default function BentoCard({
           <button
             type="button"
             onClick={onExplore}
-            aria-label={`Explore ${title}`}
+            aria-label={`See all ${title.toLowerCase()}`}
             className="text-white/40 hover:text-purple-400/70 transition-colors duration-200 text-sm leading-none p-3 -mr-1"
           >
             {'\u2192'}
@@ -54,7 +54,7 @@ export default function BentoCard({
               <p className="text-2xl font-bold text-white/95 tabular-nums leading-none">
                 {typeof m.value === 'number' ? m.value.toLocaleString() : m.value}
               </p>
-              <p className="text-[10px] text-white/40 uppercase tracking-wide mt-0.5">
+              <p className="text-[10px] text-white/40 mt-0.5">
                 {m.label}
               </p>
             </div>

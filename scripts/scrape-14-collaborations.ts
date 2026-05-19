@@ -25,6 +25,7 @@ import {
     MEMBER_NAME_MAP,
     normalizeTitle,
     titlesMatch,
+    errorMessage,
 } from './scrape-utils.js';
 
 const USER_AGENT = 'BangtanUniverse/1.0 (https://github.com/itsmepraks/BTS-universe)';
@@ -380,7 +381,7 @@ async function scrapeMemberPages(): Promise<Collaboration[]> {
                     usedUrl = url;
                     break;
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 // Try next URL
             }
             await delay(1000);
@@ -527,8 +528,8 @@ async function matchToDb(collabs: Collaboration[]): Promise<Collaboration[]> {
             }
         }
         logSuccess(`Matched ${matched} collaborations to existing songs`);
-    } catch (err: any) {
-        logWarning(`DB matching skipped (${err.message}). Entries saved without song IDs.`);
+    } catch (err: unknown) {
+        logWarning(`DB matching skipped (${errorMessage(err)}). Entries saved without song IDs.`);
     }
 
     return collabs;

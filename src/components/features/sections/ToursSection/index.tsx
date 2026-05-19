@@ -1,7 +1,7 @@
-import { useState, Suspense, lazy } from 'react';
+import { useState, useRef, Suspense, lazy } from 'react';
 import { MapPin, BarChart3, Globe } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
-import SectionIntro from '../../../ui/SectionIntro';
+
 
 const TourList = lazy(() => import('./TourList'));
 const TourStats = lazy(() => import('./TourStats'));
@@ -21,6 +21,26 @@ type TabId = (typeof TABS)[number]['id'];
 
 export default function ToursSection({ concerts }: ToursSectionProps) {
   const [activeTab, setActiveTab] = useState<TabId>('map');
+  const tablistRef = useRef<HTMLDivElement>(null);
+
+  const handleTabKeyDown = (e: React.KeyboardEvent) => {
+    const idx = TABS.findIndex((t) => t.id === activeTab);
+    let next: number | null = null;
+    if (e.key === 'ArrowRight') next = (idx + 1) % TABS.length;
+    else if (e.key === 'ArrowLeft') next = (idx - 1 + TABS.length) % TABS.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = TABS.length - 1;
+    if (next !== null) {
+      e.preventDefault();
+      const nextId = TABS[next].id;
+      setActiveTab(nextId);
+      requestAnimationFrame(() => {
+        tablistRef.current
+          ?.querySelector<HTMLButtonElement>(`[data-tab-id="${nextId}"]`)
+          ?.focus();
+      });
+    }
+  };
 
   const renderPanel = () => {
     switch (activeTab) {
@@ -37,10 +57,14 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
 
   return (
     <div className="space-y-6">
-      <SectionIntro description="Every BTS concert mapped worldwide — from early Korean showcases to sold-out stadium tours across six continents." />
-
-      <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex items-center gap-2" role="tablist" aria-label="Tours views">
+      <div className="overflow-x-auto scrollbar-hide scroll-fade-x">
+        <div
+          ref={tablistRef}
+          className="flex items-center gap-2"
+          role="tablist"
+          aria-label="Tours views"
+          onKeyDown={handleTabKeyDown}
+        >
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -48,13 +72,16 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
             return (
               <button
                 key={tab.id}
+                data-tab-id={tab.id}
                 role="tab"
                 aria-selected={isActive}
+                aria-controls="tours-panel"
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
                   isActive
-                    ? 'bg-purple-500/10 text-white border border-purple-500/30'
-                    : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
+                    ? 'bg-emerald-500/10 text-white border border-emerald-500/30'
+                    : 'text-white/60 hover:text-white/85 hover:bg-white/[0.03] border border-transparent'
                 }`}
               >
                 <Icon className="w-4 h-4" aria-hidden="true" />
@@ -66,6 +93,7 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
       </div>
 
       <div
+        id="tours-panel"
         className={`bg-[#111118] rounded-2xl border border-white/[0.06] ${activeTab === 'map' ? 'p-0 overflow-hidden' : 'p-4 sm:p-6'}`}
         role="tabpanel"
       >

@@ -1,7 +1,7 @@
 import { useState, Suspense, lazy } from 'react';
 import { Trophy, Calendar, BarChart3, LayoutList } from 'lucide-react';
 import type { Award, Member } from '../../../../types/database';
-import SectionIntro from '../../../ui/SectionIntro';
+
 
 const AwardGrid = lazy(() => import('./AwardGrid'));
 const AwardTimeline = lazy(() => import('./AwardTimeline'));
@@ -42,8 +42,6 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
 
   return (
     <div className="space-y-6">
-      <SectionIntro description="Every major award BTS has won and been nominated for — from Korean music shows to the Grammys. Filter by ceremony, year, or browse the full trophy room." />
-
       <div className="overflow-x-auto scrollbar-hide">
         <div className="flex items-center gap-2" role="tablist" aria-label="Awards views">
           {TABS.map((tab) => {
@@ -58,7 +56,7 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-purple-500/10 text-white border border-purple-500/30'
+                    ? 'bg-amber-500/15 text-white border border-amber-500/30'
                     : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
                 }`}
               >

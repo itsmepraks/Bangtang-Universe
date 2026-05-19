@@ -1,19 +1,10 @@
-/**
- * useLyrics Hook
- *
- * Fetches lyrics data from Supabase database
- * No local fallback - returns empty array if unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Lyrics } from '../types/database';
+import type { AsyncResource } from './types';
 
-interface UseLyricsResult {
+interface UseLyricsResult extends AsyncResource {
     lyrics: Lyrics[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useLyrics(): UseLyricsResult {

@@ -1,18 +1,10 @@
-/**
- * useMedia Hook
- *
- * Fetches media data (documentaries, variety shows, etc.) from Supabase
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { Media } from '../types/database';
+import type { AsyncResource } from './types';
 
-interface UseMediaResult {
+interface UseMediaResult extends AsyncResource {
     media: Media[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useMedia(): UseMediaResult {

@@ -14,13 +14,13 @@ export default function ProgressBar({ value, label, showPercent = false, color, 
     <div>
       {(label || showPercent) && (
         <div className="flex justify-between mb-1.5">
-          {label && <span className="text-xs font-medium text-white/50 uppercase tracking-wide">{label}</span>}
+          {label && <span className="text-xs font-medium text-white/50">{label}</span>}
           {showPercent && <span className="text-xs text-white/60 font-mono">{pct}%</span>}
         </div>
       )}
       <div className={`${barHeight} bg-white/[0.06] rounded-full overflow-hidden`}>
         <div
-          className={`h-full rounded-full transition-all duration-1000`}
+          className={`h-full rounded-full transition-[width] duration-1000`}
           style={{
             width: `${pct}%`,
             backgroundColor: color || 'rgba(168, 85, 247, 0.6)',

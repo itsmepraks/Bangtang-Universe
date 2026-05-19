@@ -1,10 +1,4 @@
-/**
- * Database Types for Supabase
- * 
- * TypeScript types matching our PostgreSQL schema
- */
-
-// ==================== TABLE TYPES ====================
+// TypeScript types matching our Supabase/PostgreSQL schema.
 
 export interface Album {
     id: number;
@@ -183,8 +177,6 @@ export interface Media {
     created_at: string;
 }
 
-// ==================== DATABASE SCHEMA TYPE ====================
-
 export interface Database {
     public: {
         Tables: {
@@ -247,8 +239,6 @@ export interface Database {
     };
 }
 
-// ==================== HELPER TYPES ====================
-
 export type AlbumInsert = Database['public']['Tables']['albums']['Insert'];
 export type SongInsert = Database['public']['Tables']['songs']['Insert'];
 export type MemberInsert = Database['public']['Tables']['members']['Insert'];
@@ -260,12 +250,10 @@ export type CollaborationInsert = Database['public']['Tables']['collaborations']
 export type MemberEventInsert = Database['public']['Tables']['member_events']['Insert'];
 export type MediaInsert = Database['public']['Tables']['media']['Insert'];
 
-// Song with joined album data
 export interface SongWithAlbum extends Song {
     album: Album | null;
 }
 
-// Member with solo albums
 export interface MemberWithSoloAlbums extends Member {
     solo_albums: SoloAlbum[];
 }

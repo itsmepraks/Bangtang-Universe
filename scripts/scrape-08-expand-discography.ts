@@ -10,7 +10,7 @@
  */
 
 import { MusicBrainzApi } from 'musicbrainz-api';
-import { createSupabaseAdmin, delay, saveCache, loadCache, logStart, logProgress, logSuccess, logError, logWarning, logDone } from './scrape-utils.js';
+import { createSupabaseAdmin, delay, saveCache, loadCache, logStart, logProgress, logSuccess, logError, logWarning, logDone, errorMessage } from './scrape-utils.js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const UPSERT = process.argv.includes('--upsert');
@@ -99,7 +99,8 @@ async function fetchMemberReleases(memberKey: string): Promise<SoloRelease[]> {
     const member = MEMBER_MBIDS[memberKey];
     console.log(`\n   --- Fetching releases for ${member.name} (${member.mbid}) ---`);
 
-    const releaseGroups: any[] = [];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const releaseGroups: any[] = []; // TODO: tighten type — MusicBrainz response shape is untyped
     let offset = 0;
     const limit = 100;
 
@@ -116,8 +117,8 @@ async function fetchMemberReleases(memberKey: string): Promise<SoloRelease[]> {
             if (releaseGroups.length >= (result['release-group-count'] || 0)) break;
             offset += limit;
             await delay(1200);
-        } catch (err: any) {
-            logWarning(`Failed to browse release groups for ${member.name}: ${err.message}`);
+        } catch (err: unknown) {
+            logWarning(`Failed to browse release groups for ${member.name}: ${errorMessage(err)}`);
             break;
         }
     }
@@ -139,17 +140,19 @@ async function fetchMemberReleases(memberKey: string): Promise<SoloRelease[]> {
         await delay(1200);
 
         // Lookup release group to get releases
-        let rgDetail: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let rgDetail: any; // TODO: tighten type — MusicBrainz response shape is untyped
         try {
             rgDetail = await mbApi.lookup('release-group', rg.id, ['releases']);
-        } catch (err: any) {
-            logWarning(`Failed to fetch release group ${rg.title}: ${err.message}`);
+        } catch (err: unknown) {
+            logWarning(`Failed to fetch release group ${rg.title}: ${errorMessage(err)}`);
             continue;
         }
 
         const rgReleases = rgDetail.releases || [];
 
         // Prefer Korean or Worldwide release
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const bestRelease = rgReleases.find((r: any) => {
             const country = r.country || '';
             return country === 'KR' || country === 'XW';
@@ -163,11 +166,12 @@ async function fetchMemberReleases(memberKey: string): Promise<SoloRelease[]> {
         await delay(1200);
 
         // Fetch track listing
-        let releaseDetail: any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let releaseDetail: any; // TODO: tighten type — MusicBrainz response shape is untyped
         try {
             releaseDetail = await mbApi.lookup('release', bestRelease.id, ['recordings']);
-        } catch (err: any) {
-            logWarning(`Failed to fetch release ${rg.title}: ${err.message}`);
+        } catch (err: unknown) {
+            logWarning(`Failed to fetch release ${rg.title}: ${errorMessage(err)}`);
             continue;
         }
 

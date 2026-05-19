@@ -1,19 +1,10 @@
-/**
- * useMemberEvents Hook
- *
- * Fetches member event data from Supabase database
- * Falls back to empty array if database is unavailable
- */
-
 import { useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { MemberEvent } from '../types/database';
+import type { AsyncResource } from './types';
 
-interface UseMemberEventsResult {
+interface UseMemberEventsResult extends AsyncResource {
     memberEvents: MemberEvent[];
-    loading: boolean;
-    error: Error | null;
-    refetch: () => Promise<void>;
 }
 
 export function useMemberEvents(): UseMemberEventsResult {
@@ -54,7 +45,6 @@ export function useMemberEvents(): UseMemberEventsResult {
     return { memberEvents, loading, error, refetch: fetchMemberEvents };
 }
 
-// Get member events by member
 export function useMemberEventsByMember(memberId: string) {
     const { memberEvents, loading, error } = useMemberEvents();
     const filtered = useMemo(
@@ -64,7 +54,6 @@ export function useMemberEventsByMember(memberId: string) {
     return { memberEvents: filtered, loading, error };
 }
 
-// Get member events by type
 export function useMemberEventsByType(eventType: string) {
     const { memberEvents, loading, error } = useMemberEvents();
     const filtered = useMemo(

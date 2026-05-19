@@ -137,7 +137,9 @@ async function main() {
             const existing = existingMap.get(existingKey);
 
             // Find matching wiki and genius data
-            let wikiTrack: any = wikiTracks?.get(normTitle) || null;
+            // Wiki track shape is dynamic (from web scraping); fields accessed: title, title_korean, is_title_track, has_mv
+            type WikiTrack = { title: string; title_korean?: string | null; is_title_track?: boolean; has_mv?: boolean };
+            let wikiTrack: WikiTrack | null = wikiTracks?.get(normTitle) || null;
             // Try fuzzy match on wiki
             if (!wikiTrack && wikiTracks) {
                 for (const [wNorm, wt] of wikiTracks) {
@@ -152,7 +154,7 @@ async function main() {
 
             if (existing) {
                 // UPDATE existing song - enrich with scraped data
-                const updates: Record<string, any> = {};
+                const updates: Record<string, unknown> = {};
 
                 // Duration from MusicBrainz (authoritative)
                 if (track.duration_seconds && track.duration_seconds !== existing.duration_seconds) {
@@ -211,7 +213,7 @@ async function main() {
                     releaseDate = `${releaseDate}-01`;
                 }
 
-                const newSong: Record<string, any> = {
+                const newSong: Record<string, unknown> = {
                     title: track.title,
                     title_korean: wikiTrack?.title_korean || null,
                     album_id: albumId,

@@ -1,10 +1,7 @@
-/**
- * Static [longitude, latitude] coordinates for known BTS concert cities.
- * Key format: "City, Country" (must match concert.city + ", " + concert.country exactly).
- *
- * Fallback: COUNTRY_CENTROIDS used when city is unknown.
- * If country is also unknown, the concert is silently skipped on the map.
- */
+// [longitude, latitude] for concert cities. Key format must match
+// concert.city + ", " + concert.country exactly. Falls back to
+// COUNTRY_CENTROIDS when city is unknown; if country is also unknown,
+// the concert is skipped on the map.
 export const CITY_COORDS: Record<string, [number, number]> = {
   // South Korea
   "Seoul, South Korea": [126.978, 37.566],
@@ -89,7 +86,6 @@ export const CITY_COORDS: Record<string, [number, number]> = {
   "Mexico City, Mexico": [-99.133, 19.433],
   "Bogotá, Colombia": [-74.072, 4.711],
 
-  // Japan (auto-generated)
   "Kobe, Japan": [135.114, 34.412],
   "Chiba, Japan": [140.622, 35.362],
   "Yokohama, Japan": [139.65, 35.45],
@@ -98,32 +94,18 @@ export const CITY_COORDS: Record<string, [number, number]> = {
   "Sapporo, Japan": [141.211, 43.343],
   "Fukuroi, Japan": [137.917, 34.75],
 
-  // Hong Kong SAR China (auto-generated)
   "Islands District, Hong Kong SAR China": [114.067, 22.45],
-
-  // Philippines (auto-generated)
   "Pasay City, Philippines": [121, 14.55],
-
-  // South Korea (auto-generated)
   "Gangneung, South Korea": [128.872, 37.753],
   "Goyang-si, South Korea": [126.835, 37.656],
   "Incheon, South Korea": [126.732, 37.454],
-
-  // United States (auto-generated)
   "Grand Prairie, United States": [-96.998, 32.746],
   "Rosemont, United States": [-87.885, 41.995],
-
-  // Indonesia (auto-generated)
   "Tangerang, Indonesia": [106.63, -6.178],
-
-  // France (auto-generated)
   "Saint-Denis, France": [2.367, 48.933],
 };
 
-/**
- * Country-level centroid fallback when a city is not found in CITY_COORDS.
- * Key: concert.country string.
- */
+// Country-level centroid fallback. Key: concert.country.
 export const COUNTRY_CENTROIDS: Record<string, [number, number]> = {
   "South Korea": [127.766, 35.907],
   "Japan": [138.252, 36.204],
@@ -153,14 +135,10 @@ export const COUNTRY_CENTROIDS: Record<string, [number, number]> = {
   "Mexico": [-102.553, 23.634],
   "Colombia": [-74.297, 4.571],
 
-  // Auto-generated
   "Hong Kong SAR China": [114.067, 22.45],
 };
 
-/**
- * Resolve a concert's coordinates.
- * Returns [lng, lat] or null if neither city nor country is found.
- */
+// Returns [lng, lat] or null if neither city nor country resolves.
 export function resolveCoords(city: string, country: string): [number, number] | null {
   const cityKey = `${city}, ${country}`;
   if (CITY_COORDS[cityKey]) return CITY_COORDS[cityKey];

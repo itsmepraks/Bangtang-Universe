@@ -1,13 +1,6 @@
-/**
- * BTS Member Data - Complete & Accurate Profiles
- * 
- * Data sources: KOMCA, Wikipedia, Official BTS/HYBE releases
- * Last updated: January 2026
- */
-
 import type { Member } from '../types/index';
+import { BORAHAE_COLORS } from '../constants/colors';
 
-// Extended member interface with additional fields
 export interface ExtendedMember extends Member {
     birthDate: string;
     birthPlace: string;
@@ -21,7 +14,11 @@ export interface ExtendedMember extends Member {
     featuredTracks: string[];
     producerCredits: number;
     writerCredits: number;
-    image: string; // Path to member image
+    image: string;
+    /** ISO date the member began mandatory military service, if known. */
+    enlistmentStart?: string;
+    /** ISO date the member completed service, if known. */
+    enlistmentEnd?: string;
 }
 
 export interface SoloAlbum {
@@ -36,10 +33,10 @@ export const MEMBER_DATA: ExtendedMember[] = [
         id: 'rm',
         name: 'RM',
         full: 'Kim Namjoon',
-        color: '#2563EB', // Blue
+        color: '#2563EB',
         role: 'Leader / Main Rapper / Producer',
         mic: 'Blue',
-        komca: 227, // As of 2024
+        komca: 227,
         image: '/assets/members/rm.jpg',
         bio: 'The philosophical leader and main rapper of BTS. A self-taught English speaker with an IQ of 148, RM is the primary songwriter of the group and has been credited on over 200 songs. His solo work explores themes of nature, identity, and the human condition.',
         soloTracks: ['Wild Flower', 'Still Life', 'Yun', 'All Day', 'Lonely', 'Change pt.2', 'Closer', 'Domodachi', 'Come back to me'],
@@ -86,13 +83,15 @@ export const MEMBER_DATA: ExtendedMember[] = [
         ],
         featuredTracks: ['Champion (Remix) with Fall Out Boy', 'Waste It On Me with Steve Aoki', 'Seoul Town Road with Lil Nas X'],
         producerCredits: 175,
-        writerCredits: 218
+        writerCredits: 218,
+        enlistmentStart: '2023-12-11',
+        enlistmentEnd: '2025-06-10',
     },
     {
         id: 'jin',
         name: 'JIN',
         full: 'Kim Seokjin',
-        color: '#EC4899', // Pink
+        color: '#EC4899',
         role: 'Sub Vocalist / Visual',
         mic: 'Pink',
         komca: 35,
@@ -101,7 +100,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         soloTracks: ['The Astronaut', 'Epiphany', 'Awake', 'Moon', 'Abyss', 'Yours', 'Super Tuna', 'Tonight', 'Running Wild'],
         achievements: [
             'Order of Cultural Merit (2018)',
-            'Military service completed (2024)',
+            'Mandatory military service completed (Jun 2024) — first member discharged',
             'The Astronaut #1 in 102 countries on iTunes',
             'First BTS member to release official OST (Yours)',
             'Konkuk University Alumni of the Year'
@@ -124,13 +123,15 @@ export const MEMBER_DATA: ExtendedMember[] = [
         ],
         featuredTracks: ['Yours (Jirisan OST)', 'It\'s Definitely You (Hwarang OST) with V'],
         producerCredits: 5,
-        writerCredits: 35
+        writerCredits: 35,
+        enlistmentStart: '2022-12-13',
+        enlistmentEnd: '2024-06-12',
     },
     {
         id: 'suga',
         name: 'SUGA',
         full: 'Min Yoongi',
-        color: '#64748B', // Slate gray
+        color: '#64748B',
         role: 'Lead Rapper / Producer',
         mic: 'Black',
         komca: 177,
@@ -139,6 +140,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         soloTracks: ['Daechwita', 'Haegeum', 'People', 'Amygdala', 'Snooze', 'The Last', 'Agust D', 'Give It To Me', 'HUH?!', 'SDL'],
         achievements: [
             'Order of Cultural Merit (2018)',
+            'Mandatory military service completed as social-service agent (Jun 2025)',
             'First K-pop soloist to headline US stadium tour',
             'D-DAY #1 on Billboard 200',
             'Produced for IU, PSY, Halsey, MAX, Juice WRLD',
@@ -175,13 +177,15 @@ export const MEMBER_DATA: ExtendedMember[] = [
         ],
         featuredTracks: ['Eight (IU)', 'Blueberry Eyes (MAX)', 'That That (PSY)', 'Girl of My Dreams (Juice WRLD)'],
         producerCredits: 150,
-        writerCredits: 175
+        writerCredits: 175,
+        enlistmentStart: '2023-09-22',
+        enlistmentEnd: '2025-06-21',
     },
     {
         id: 'jh',
         name: 'J-HOPE',
         full: 'Jung Hoseok',
-        color: '#EF4444', // Red (representing his energy)
+        color: '#EF4444',
         role: 'Main Dancer / Sub Rapper',
         mic: 'Silver',
         komca: 150,
@@ -190,6 +194,7 @@ export const MEMBER_DATA: ExtendedMember[] = [
         soloTracks: ['Arson', 'MORE', 'Chicken Noodle Soup', 'Daydream', 'Airplane', 'Blue Side', 'On the Street', 'NEURON', 'i wonder...'],
         achievements: [
             'Order of Cultural Merit (2018)',
+            'Mandatory military service completed (Oct 2024)',
             'First Korean artist to headline Lollapalooza',
             'Jack In The Box #1 in 49 countries',
             'Louis Vuitton Global Ambassador',
@@ -225,13 +230,15 @@ export const MEMBER_DATA: ExtendedMember[] = [
         ],
         featuredTracks: ['Chicken Noodle Soup (with Becky G)', 'On the Street (with J. Cole)', 'Dance The Night Away'],
         producerCredits: 95,
-        writerCredits: 145
+        writerCredits: 145,
+        enlistmentStart: '2023-04-18',
+        enlistmentEnd: '2024-10-17',
     },
     {
         id: 'jm',
         name: 'JIMIN',
         full: 'Park Jimin',
-        color: '#F59E0B', // Amber/Gold
+        color: '#F59E0B',
         role: 'Lead Vocalist / Main Dancer',
         mic: 'Gold',
         komca: 27,
@@ -240,7 +247,8 @@ export const MEMBER_DATA: ExtendedMember[] = [
         soloTracks: ['Like Crazy', 'Set Me Free Pt.2', 'Face-Off', 'Interlude: Dive', 'Alone', 'Letter', 'Serendipity', 'Filter', 'Promise', 'Who'],
         achievements: [
             'Order of Cultural Merit (2018)',
-            'Billboard Hot 100 #1 (Like Crazy) - First Korean solo artist',
+            'Mandatory military service completed (Jun 2025)',
+            'Billboard Hot 100 #1 (Like Crazy) — first Korean solo artist',
             'FACE #1 on Billboard 200',
             'Dior Global Ambassador',
             'Tiffany & Co. Ambassador',
@@ -270,13 +278,15 @@ export const MEMBER_DATA: ExtendedMember[] = [
         ],
         featuredTracks: ['With You (Our Blues OST with Ha Sung-woon)', 'Christmas Love', 'Promise (self-composed)'],
         producerCredits: 8,
-        writerCredits: 25
+        writerCredits: 25,
+        enlistmentStart: '2023-12-12',
+        enlistmentEnd: '2025-06-11',
     },
     {
         id: 'v',
         name: 'V',
         full: 'Kim Taehyung',
-        color: '#22C55E', // Green
+        color: '#22C55E',
         role: 'Sub Vocalist / Visual',
         mic: 'Green',
         komca: 25,
@@ -285,8 +295,9 @@ export const MEMBER_DATA: ExtendedMember[] = [
         soloTracks: ['Slow Dancing', 'Rainy Days', 'Love Me Again', 'Blue', 'For Us', 'Singularity', 'Stigma', 'Inner Child', 'Winter Bear', 'Sweet Night'],
         achievements: [
             'Order of Cultural Merit (2018)',
-            'Sweet Night #1 in 117 countries (Most #1s for OST)',
-            'Layover highest first-week sales for K-pop solo album (2023)',
+            'Mandatory military service completed (Jun 2025)',
+            'Sweet Night #1 in 117 countries (most #1s for an OST)',
+            'Layover highest first-week sales for a K-pop solo album (2023)',
             'CELINE Global Ambassador',
             'Cartier Global Ambassador',
             'Vogue Korea Cover Star'
@@ -309,13 +320,15 @@ export const MEMBER_DATA: ExtendedMember[] = [
         ],
         featuredTracks: ['Sweet Night (Itaewon Class OST)', 'It\'s Definitely You (Hwarang OST) with Jin', 'Winter Bear', 'Scenery', 'Christmas Tree (Our Beloved Summer OST)'],
         producerCredits: 5,
-        writerCredits: 24
+        writerCredits: 24,
+        enlistmentStart: '2023-12-11',
+        enlistmentEnd: '2025-06-10',
     },
     {
         id: 'jk',
         name: 'JK',
         full: 'Jeon Jungkook',
-        color: '#8B5CF6', // Purple
+        color: '#8B5CF6',
         role: 'Main Vocalist / Lead Dancer / Center / Maknae',
         mic: 'Purple',
         komca: 30,
@@ -324,11 +337,12 @@ export const MEMBER_DATA: ExtendedMember[] = [
         soloTracks: ['Standing Next to You', 'Seven', '3D', 'Yes or No', 'Please Don\'t Change', 'Hate You', 'Euphoria', 'My Time', 'Still With You', 'Left and Right'],
         achievements: [
             'Order of Cultural Merit (2018)',
+            'Mandatory military service completed (Jun 2025)',
             'FIFA World Cup 2022 Official Soundtrack (Dreamers)',
-            'Seven - Most weeks at #1 on Billboard Global 200',
-            'GOLDEN - Highest-selling solo album in Hanteo history',
+            'Seven — most weeks at #1 on Billboard Global 200',
+            'GOLDEN — highest-selling solo album in Hanteo history',
             'Calvin Klein Global Ambassador',
-            'First Korean solo artist to perform at VMAs'
+            'First Korean solo artist to perform at the VMAs'
         ],
         birthDate: '1997-09-01',
         birthPlace: 'Busan, South Korea',
@@ -348,27 +362,25 @@ export const MEMBER_DATA: ExtendedMember[] = [
         ],
         featuredTracks: ['Dreamers (FIFA World Cup 2022)', 'Left and Right (with Charlie Puth)', 'Bad Decisions (with Benny Blanco & Snoop Dogg)', 'Stay Alive (Chakho OST)'],
         producerCredits: 10,
-        writerCredits: 28
+        writerCredits: 28,
+        enlistmentStart: '2023-12-12',
+        enlistmentEnd: '2025-06-11',
     }
 ];
 
-// Helper function to get member by ID
 export const getMemberById = (id: string): ExtendedMember | undefined => {
     return MEMBER_DATA.find(m => m.id === id);
 };
 
-// Helper function to get member color
 export const getMemberColor = (id: string): string => {
     const member = getMemberById(id);
-    return member?.color || '#A855F7';
+    return member?.color || BORAHAE_COLORS.PRIMARY;
 };
 
-// Get total KOMCA credits across all members
 export const getTotalKOMCACredits = (): number => {
     return MEMBER_DATA.reduce((sum, m) => sum + m.komca, 0);
 };
 
-// Get members sorted by KOMCA credits
 export const getMembersByCredits = (): ExtendedMember[] => {
     return [...MEMBER_DATA].sort((a, b) => b.komca - a.komca);
 };
