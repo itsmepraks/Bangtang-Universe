@@ -47,6 +47,32 @@
 @import "tailwindcss";
 
 /* ============================================================================
+   DESIGN TOKENS
+   ============================================================================
+   Hoisted from inline style strings repeated throughout components.
+*/
+:root {
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* ============================================================================
+   REDUCED MOTION — SAFETY NET
+   ============================================================================
+   Honour `prefers-reduced-motion: reduce` for every animation/transition on
+   the page. Individual rules can override with their own
+   `prefers-reduced-motion` media query when a tailored fallback is needed
+   (e.g. fade instead of slide). This is the catch-all.
+*/
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================================
    MIKROKOSMOS THEME ANIMATIONS
    ============================================================================
    
@@ -72,47 +98,6 @@
   100% {
     transform: translateX(var(--star-dx, 300px)) translateY(var(--star-dy, 300px));
     opacity: 0;
-  }
-}
-
-/* Star twinkle effect */
-@keyframes star-twinkle {
-
-  0%,
-  100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.8;
-    transform: scale(1.2);
-  }
-}
-
-/* Nebula pulse - slow breathing */
-@keyframes nebula-breathe {
-
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.15;
-  }
-
-  50% {
-    transform: translate(-50%, -50%) scale(1.1);
-    opacity: 0.25;
-  }
-}
-
-/* Distant galaxy rotation */
-@keyframes galaxy-rotate {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
   }
 }
 
@@ -265,58 +250,6 @@
  * }
  */
 
-/* ----------------------------------------------------------------------------
-   FLOAT ANIMATION
-   ----------------------------------------------------------------------------
-   
-   Animates particles floating across the screen in a diagonal path, creating
-   the effect of cosmic dust drifting through space.
-   
-   **Effect:** Particles move from bottom-left to top-right with slight rotation
-   
-   **Path:**
-   - Start: 20% left of origin
-   - Middle: 50% right, 20% up
-   - End: 120% right, 10% up (off-screen)
-   
-   **Duration:** 10-20 seconds for slow, ambient movement
-   
-   **Use Cases:**
-   - Floating particles in the cosmic background
-   - Ambient dust effects
-   - Gentle drifting elements
-   
-   **Performance:** Excellent - transform is GPU-accelerated
-*/
-@keyframes float {
-  0% {
-    transform: translate(-20%, 0) rotate(0deg);
-    /* Start position */
-  }
-
-  50% {
-    transform: translate(50%, -20%) rotate(5deg);
-    /* Midpoint with slight rotation */
-  }
-
-  100% {
-    transform: translate(120%, -10%) rotate(-5deg);
-    /* End off-screen */
-  }
-}
-
-/**
- * Usage Example:
- * 
- * .floating-particle {
- *   animation: float 15s linear infinite;
- *   animation-delay: calc(var(--particle-index) * 0.2s);
- * }
- * 
- * Performance Note:
- * Use translate() instead of left/top for better performance.
- * Transform is composited on the GPU, avoiding layout recalculation.
- */
 
 /* ----------------------------------------------------------------------------
    BOKEH-FLOAT ANIMATION
@@ -343,31 +276,6 @@
    
    **Performance:** Good - uses transform and opacity, but large blur is GPU-intensive
 */
-@keyframes bokeh-float {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-    /* Start/end position */
-    opacity: 0.2;
-    /* Low opacity for subtle effect */
-  }
-
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-    /* Float up-right, grow */
-    opacity: 0.3;
-    /* Peak opacity */
-  }
-
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-    /* Float down-left, shrink */
-    opacity: 0.15;
-    /* Lower opacity */
-  }
-}
-
 /**
  * Usage Example:
  * 
@@ -413,27 +321,6 @@
    
    **Performance:** Excellent - GPU-accelerated properties
 */
-@keyframes draw-line {
-  0% {
-    stroke-dashoffset: 1000;
-    /* Line fully hidden */
-    opacity: 0;
-    /* Fade in from invisible */
-  }
-
-  50% {
-    opacity: 0.5;
-    /* Mid-fade for smooth appearance */
-  }
-
-  100% {
-    stroke-dashoffset: 0;
-    /* Line fully drawn */
-    opacity: 0.3;
-    /* Final subtle opacity */
-  }
-}
-
 /**
  * Usage Example:
  * 
@@ -481,20 +368,6 @@
    
    **Performance:** Good - filter is GPU-accelerated but can be intensive
 */
-@keyframes pulse-glow {
-
-  0%,
-  100% {
-    filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.3));
-    /* Subtle glow */
-  }
-
-  50% {
-    filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.6));
-    /* Prominent glow */
-  }
-}
-
 /**
  * Usage Example:
  * 
@@ -679,24 +552,6 @@
    
    **Performance:** Good - minimal transform and filter changes
 */
-@keyframes logo-glow {
-
-  0%,
-  100% {
-    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.3));
-    /* Subtle glow */
-    transform: scale(1);
-    /* Normal size */
-  }
-
-  50% {
-    filter: drop-shadow(0 0 30px rgba(168, 85, 247, 0.7));
-    /* Prominent glow */
-    transform: scale(1.02);
-    /* Slight growth */
-  }
-}
-
 /**
  * Usage Example:
  * 
@@ -916,31 +771,6 @@
    
    **Performance:** Heavy - uses scale, rotate, blur simultaneously
 */
-@keyframes warp-portal {
-  0% {
-    transform: scale(0) rotate(0deg);
-    /* Start: tiny point */
-    opacity: 0;
-    /* Invisible */
-    filter: blur(0px);
-    /* Sharp */
-  }
-
-  30% {
-    opacity: 1;
-    /* Fully visible */
-  }
-
-  100% {
-    transform: scale(40) rotate(360deg);
-    /* End: massive and rotated */
-    opacity: 0;
-    /* Fade to white */
-    filter: blur(20px);
-    /* Very blurred */
-  }
-}
-
 /**
  * Usage Example:
  * 
@@ -1070,7 +900,7 @@ body,
   /* Deep space black with slight purple tint */
   color: white;
   /* Default text color */
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: var(--font-display);
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1392,16 +1222,6 @@ p {
    
    **Duration:** 30-60 seconds for slow, mesmerizing orbit
 */
-@keyframes orbit {
-  from {
-    transform: rotate(0deg) translateX(100px) rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg) translateX(100px) rotate(-360deg);
-  }
-}
-
 /**
  * Usage Example:
  * 
@@ -1439,24 +1259,6 @@ p {
    
    **Effect:** Particles drift and pulse in size with opacity changes
 */
-@keyframes float-particle {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1);
-    /* Start/end position */
-    opacity: 0;
-    /* Invisible at endpoints */
-  }
-
-  50% {
-    transform: translate(20px, -20px) scale(1.5);
-    /* Drift and grow */
-    opacity: 0.5;
-    /* Peak visibility */
-  }
-}
-
 /**
  * Usage Example:
  * 
@@ -1772,13 +1574,24 @@ p {
    Made with 보라해 (Borahae) for BTS & ARMY
 */
 
-/* ── Concert stage animations ── */
-@keyframes scanline {
-  0%   { transform: translateY(-100%); opacity: 0.6; }
-  50%  { opacity: 1; }
-  100% { transform: translateY(200%); opacity: 0.6; }
+/* Chant beat flash — fires once per chant beat. Bursts in with high opacity
+   and slight scale, then decays out so each beat reads as an impact moment. */
+@keyframes chant-flash {
+  0%   { opacity: 0; transform: scale(0.94); }
+  12%  { opacity: 1; transform: scale(1.02); }
+  35%  { opacity: 0.85; }
+  100% { opacity: 0; transform: scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Still flash, just no scale movement */
+  @keyframes chant-flash {
+    0%   { opacity: 0; }
+    20%  { opacity: 1; }
+    100% { opacity: 0; }
+  }
 }
 
+/* ── Concert stage animations ── */
 @keyframes led-pulse {
   0%, 100% { opacity: 0.55; }
   50%       { opacity: 0.9; }
@@ -1795,16 +1608,6 @@ p {
   0%   { opacity: 0.6; }
   50%  { opacity: 1; }
   100% { opacity: 0.6; }
-}
-
-@keyframes truss-glow {
-  0%, 100% { opacity: 0.25; }
-  50%       { opacity: 0.55; }
-}
-
-@keyframes stage-shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
 }
 
 /* ── Foreground army bomb bokeh animation ── */
@@ -1864,4 +1667,14 @@ p {
   background-repeat: repeat;
   background-size: 256px 256px;
   mix-blend-mode: overlay;
+}
+
+/* ── Equalizer bars (SonicAnalyzer) ──
+   Transform-based — animates GPU-accelerated scaleY instead of CSS height
+   so the bars don't trigger layout on every frame. Bars are full-height;
+   `transform-origin: bottom` keeps them rooted to the stage. */
+@keyframes equalizer {
+  0%   { transform: scaleY(0.15); }
+  50%  { transform: scaleY(0.80); }
+  100% { transform: scaleY(0.30); }
 }
