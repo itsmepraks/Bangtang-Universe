@@ -7,6 +7,14 @@ import BtsLogo from '../../../ui/BtsLogo';
 import { BORAHAE_COLORS } from '../../../../constants/colors';
 
 
+// Custom caret SVG for `<select>` elements — Tailwind doesn't ship a
+// "white chevron on transparent" appearance, so we paint it ourselves.
+const SELECT_CARET_STYLE = {
+  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+  backgroundRepeat: 'no-repeat' as const,
+  backgroundPosition: 'right 10px center',
+};
+
 type Category = 'all' | 'group' | 'solo' | 'collab';
 
 const categoryOptions = [
@@ -123,19 +131,21 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
       {showAlbumGrid && (
         <div className="flex items-center gap-3 flex-wrap">
           <select
+            aria-label="Filter albums by type"
             value={typeFilter || ''}
             onChange={(e) => { setTypeFilter(e.target.value || null); setActiveEra(null); }}
             className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Types</option>
             {types.map(t => <option key={t.value} value={t.value} style={{ background: '#111118' }}>{t.label}</option>)}
           </select>
           <select
+            aria-label="Filter albums by era"
             value={activeEra || ''}
             onChange={(e) => { setActiveEra(e.target.value || null); setTypeFilter(null); }}
             className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Eras</option>
             {eras.map(e => <option key={e.value} value={e.value} style={{ background: '#111118' }}>{e.label}</option>)}
@@ -155,10 +165,11 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
       {!showAlbumGrid && eras.length > 0 && (
         <div className="flex items-center gap-3">
           <select
+            aria-label="Filter by era"
             value={activeEra || ''}
             onChange={(e) => setActiveEra(e.target.value || null)}
             className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
-            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(255,255,255,0.3)' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+            style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Eras</option>
             {eras.map(e => <option key={e.value} value={e.value} style={{ background: '#111118' }}>{e.label}</option>)}
@@ -192,6 +203,9 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
                     <img
                       src={album.cover_art_url}
                       alt={album.title}
+                      width={400}
+                      height={400}
+                      decoding="async"
                       className="w-full h-full object-cover img-outline group-hover:scale-105 transition-transform duration-700"
                       loading="lazy"
                     />

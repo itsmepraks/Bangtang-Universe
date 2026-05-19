@@ -75,6 +75,14 @@ const SECTION_TITLES: Record<DashboardSection, string> = {
   search: 'Search',
 };
 
+const ANALYTICS_TAB_LABELS: Record<string, string> = {
+  sound: 'The sound',
+  mood: 'Mood & lyrics',
+  credits: 'Who writes',
+  discover: 'Discover',
+  milestones: 'Milestones',
+};
+
 const NAV_ITEMS: { id: DashboardSection; icon: React.ElementType; label: string }[] = [
   { id: 'overview', icon: Home, label: 'Overview' },
   { id: 'discography', icon: Disc, label: 'Discography' },
@@ -180,6 +188,16 @@ export default function App() {
     setSidebarOpen(false);
   }, [activeSection]);
 
+  // ESC closes the mobile sidebar drawer.
+  useEffect(() => {
+    if (!sidebarOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSidebarOpen(false);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [sidebarOpen]);
+
   const { songs, loading: songsLoading, error: songsError, refetch: refetchSongs } = useSongs();
   const { albums, loading: albumsLoading, error: albumsError, refetch: refetchAlbums } = useAlbums();
   const { members, loading: membersLoading, error: membersError, refetch: refetchMembers } = useMembers();
@@ -268,8 +286,12 @@ export default function App() {
       items.push({ label: selectedMember.stage_name });
     }
 
+    if (activeSection === 'analytics' && analyticsTabFromHash && ANALYTICS_TAB_LABELS[analyticsTabFromHash]) {
+      items.push({ label: ANALYTICS_TAB_LABELS[analyticsTabFromHash] });
+    }
+
     return items;
-  }, [activeSection, selectedAlbum, selectedSong, selectedMember]);
+  }, [activeSection, selectedAlbum, selectedSong, selectedMember, analyticsTabFromHash]);
 
   return (
     <div className="relative w-screen h-screen bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white noise-texture">
@@ -325,7 +347,7 @@ export default function App() {
                 {!sidebarCollapsed && (
                   <div className="min-w-0">
                     <span className="block text-sm font-semibold text-white/80 leading-tight truncate">Bangtan Universe</span>
-                    <span className="block text-[10px] text-white/30 leading-tight truncate">{getGreeting()}</span>
+                    <span className="block text-[10px] text-white/55 leading-tight truncate">{getGreeting()}</span>
                   </div>
                 )}
               </div>
@@ -353,45 +375,58 @@ export default function App() {
             )}
 
             <nav aria-label="Main navigation" className="flex flex-col gap-1 flex-1">
-              {NAV_ITEMS.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  aria-current={activeSection === item.id ? 'page' : undefined}
-                  title={sidebarCollapsed ? item.label : undefined}
-                  className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-xl transition-[color,background-color,box-shadow] duration-200 w-full text-left ${
-                    activeSection === item.id
-                      ? 'text-white'
-                      : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
-                  }`}
-                  style={activeSection === item.id ? {
-                    backgroundColor: `${SECTION_ACCENTS[item.id]}15`,
-                    boxShadow: sidebarCollapsed ? undefined : `inset 3px 0 0 0 ${SECTION_ACCENTS[item.id]}`,
-                  } : undefined}
-                >
-                  <item.icon size={18} aria-hidden="true" className="flex-shrink-0" />
-                  {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
-                </button>
-              ))}
+              {NAV_ITEMS.map(item => {
+                const isActive = activeSection === item.id;
+                const accent = SECTION_ACCENTS[item.id];
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
+                    aria-current={isActive ? 'page' : undefined}
+                    title={sidebarCollapsed ? item.label : undefined}
+                    className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-xl transition-[color,background-color] duration-200 w-full text-left ${
+                      isActive
+                        ? 'text-white'
+                        : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
+                    }`}
+                    style={isActive ? { backgroundColor: `${accent}22` } : undefined}
+                  >
+                    {/* Active items recolor the icon to the section accent —
+                        replaces the previous left-stripe indicator. */}
+                    <item.icon
+                      size={18}
+                      aria-hidden="true"
+                      className="flex-shrink-0"
+                      style={isActive ? { color: accent } : undefined}
+                    />
+                    {!sidebarCollapsed && (
+                      <span className={`text-sm ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                        {item.label}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </nav>
 
             <div className={`pt-4 border-t border-white/[0.06] mb-3 ${sidebarCollapsed ? 'px-0' : 'px-2'} space-y-2`}>
               <button
                 onClick={() => setConcertMode(c => !c)}
-                title={sidebarCollapsed ? (concertMode ? 'Concert mode ON' : 'Concert mode') : undefined}
+                aria-pressed={concertMode}
+                title="Concert mode: brighter ambient glow that cycles through member colors, like a stadium during a tour"
                 className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'gap-2 px-4'} py-2.5 rounded-xl text-xs font-medium transition-[color,background-color,border-color] duration-200 w-full text-left ${
                   concertMode
                     ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30'
-                    : 'text-white/40 hover:text-white/60 hover:bg-white/[0.03]'
+                    : 'text-white/60 hover:text-white/80 hover:bg-white/[0.03]'
                 }`}
               >
-                <span className="text-base">{concertMode ? '🔥' : '🎆'}</span>
-                {!sidebarCollapsed && <span>{concertMode ? 'Concert mode ON' : 'Concert mode'}</span>}
+                <span className="text-base" aria-hidden="true">{concertMode ? '🔥' : '🎆'}</span>
+                {!sidebarCollapsed && <span>{concertMode ? 'Concert mode on' : 'Concert mode'}</span>}
               </button>
               <button
                 onClick={() => setMode('onboarding')}
                 title={sidebarCollapsed ? 'About this project' : undefined}
-                className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2'} text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer`}
+                className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2'} text-xs text-white/55 hover:text-white/80 transition-colors cursor-pointer`}
               >
                 <Info size={14} />
                 {!sidebarCollapsed && <span>About this project</span>}
@@ -419,7 +454,7 @@ export default function App() {
                       <div key={label} className="flex items-center gap-1.5 py-1">
                         <Icon size={11} style={{ color: `${color}cc` }} className="flex-shrink-0" aria-hidden="true" />
                         <span className="text-xs font-semibold text-white/70 tabular-nums">{value.toLocaleString()}</span>
-                        <span className="text-[10px] text-white/30">{label}</span>
+                        <span className="text-[10px] text-white/55">{label}</span>
                       </div>
                     ))}
                   </div>
@@ -450,7 +485,7 @@ export default function App() {
                 >
                   <Search size={14} aria-hidden="true" />
                   <span className="hidden sm:inline">Search…</span>
-                  <kbd className="hidden sm:inline-block text-[10px] px-1 rounded bg-white/[0.06] border border-white/[0.08] font-mono">⌘K</kbd>
+                  <kbd className="hidden sm:inline-block text-[10px] px-1 rounded bg-white/[0.06] border border-white/[0.08] font-mono">⌘&nbsp;K</kbd>
                 </button>
               </div>
               <DataStatusBanner

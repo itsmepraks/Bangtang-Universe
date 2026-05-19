@@ -16,6 +16,38 @@ export const MEMBER_COLORS = {
   JUNGKOOK: '#8B5CF6',
 } as const;
 
+/**
+ * Stage-lighting palette used on the concert landing — these are the
+ * spotlight beam + name-glow colors per member, distinct from MEMBER_COLORS
+ * (which is the member's identity/brand color used elsewhere in the app).
+ * Kept separate so the landing's lighting choices don't fight with the
+ * member section's color identity.
+ */
+/**
+ * Purple/lavender shades layered on the landing's foreground "army bomb"
+ * ocean. Keeps the crowd palette tight — these are the only colors the
+ * front-row bombs should ever reach for. White stays on the ARMY bomb
+ * canvas behind them.
+ */
+export const PURPLE_OCEAN = {
+  PRIMARY: BORAHAE_COLORS.PRIMARY,   // #A855F7
+  MID:     '#8B5CF6',
+  VIOLET:  BORAHAE_COLORS.VIOLET,    // #C084FC
+  DEEP:    '#9333EA',
+  LIGHT:   BORAHAE_COLORS.LIGHT,     // #D8B4FE
+  LAVENDER:'#B47EE5',
+} as const;
+
+export const MEMBER_STAGE_LIGHTS = {
+  RM:      { color: '#3B82F6', glow: '#60A5FA' }, // blue
+  JIN:     { color: '#F472B6', glow: '#FB7185' }, // pink
+  SUGA:    { color: '#CBD5E1', glow: '#E2E8F0' }, // silver
+  J_HOPE:  { color: '#F8FAFC', glow: '#FFFFFF' }, // white
+  JIMIN:   { color: '#FBBF24', glow: '#FCD34D' }, // amber
+  V:       { color: '#34D399', glow: '#6EE7B7' }, // green
+  JK:      { color: '#A78BFA', glow: '#C4B5FD' }, // purple
+} as const;
+
 export const UNIVERSE_COLORS = {
   SPACE: '#020005',
   NEBULA: 'rgba(88, 28, 135, 0.4)',
@@ -41,7 +73,7 @@ export const CHART_STYLES = {
       padding: '10px 14px',
       fontSize: '12px',
       color: 'rgba(255,255,255,0.85)',
-      fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+      fontFamily: 'var(--font-display)',
       boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
       letterSpacing: '-0.01em',
     },
