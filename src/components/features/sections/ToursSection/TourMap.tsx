@@ -4,7 +4,7 @@ import type { Geography as GeographyShape } from 'react-simple-maps';
 import { MapPin, Plus, Minus, RotateCcw } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
 import { resolveCoords } from '../../../../data/cityCoords';
-import { BORAHAE_COLORS } from '../../../../constants/colors';
+import { BORAHAE_COLORS, withAlpha } from '../../../../constants/colors';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore – world-atlas ships plain JSON with no type declarations
 import worldData from 'world-atlas/countries-50m.json';
@@ -138,12 +138,12 @@ export default function TourMap({ concerts }: TourMapProps) {
                   key={geo.rsmKey}
                   geography={geo}
                   fill="rgba(255,255,255,0.04)"
-                  stroke="rgba(168,85,247,0.18)"
+                  stroke={withAlpha(BORAHAE_COLORS.PRIMARY, 0.18)}
                   strokeWidth={0.5 / zoom}
                   style={{
                     outline: 'none',
                     default: { outline: 'none' },
-                    hover: { outline: 'none', fill: 'rgba(168,85,247,0.10)' },
+                    hover: { outline: 'none', fill: withAlpha(BORAHAE_COLORS.PRIMARY, 0.1) },
                     pressed: { outline: 'none' },
                   }}
                 />
@@ -167,7 +167,7 @@ export default function TourMap({ concerts }: TourMapProps) {
                 onMouseLeave={() => setTooltip(null)}
               >
                 {/* Glow ring */}
-                <circle r={r * 1.8} fill="rgba(168,85,247,0.12)" />
+                <circle r={r * 1.8} fill={withAlpha(BORAHAE_COLORS.PRIMARY, 0.12)} />
                 {/* Core dot */}
                 <circle
                   r={r}
@@ -261,6 +261,7 @@ export default function TourMap({ concerts }: TourMapProps) {
           <div className="bg-black/50 backdrop-blur-md border border-white/[0.08] rounded-xl px-5 py-3">
             <input
               type="range"
+              aria-label="Filter concerts by year"
               min={dateRange.min}
               max={dateRange.max}
               value={sliderValue}

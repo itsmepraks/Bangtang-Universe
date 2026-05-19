@@ -158,6 +158,7 @@ export default function DiscoverPanel({
               Song Recommendations
             </h3>
             <select
+              aria-label="Select a song to find similar tracks"
               value={selectedSongId ?? ''}
               onChange={(e) => {
                 const val = e.target.value;
@@ -172,7 +173,7 @@ export default function DiscoverPanel({
               }}
             >
               <option value="" style={{ background: '#0c0c12' }}>
-                Select a song...
+                Select a song…
               </option>
               {songs.map((song) => (
                 <option key={song.id} value={song.id} style={{ background: '#0c0c12' }}>
@@ -283,7 +284,7 @@ export default function DiscoverPanel({
               <MessageSquare className="w-4 h-4 text-purple-400" />
               <h3 className="text-base font-bold text-white/85">Ask About BTS</h3>
             </div>
-            <p className="text-xs text-white/40">
+            <p className="text-xs text-white/60">
               Ask questions about the discography, members, and more
             </p>
           </div>
@@ -292,6 +293,9 @@ export default function DiscoverPanel({
           <div className="relative">
             <input
               type="text"
+              aria-label="Ask a question about BTS"
+              autoComplete="off"
+              spellCheck={false}
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -303,7 +307,7 @@ export default function DiscoverPanel({
               className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-purple-400 hover:text-purple-300 transition-colors"
               aria-label="Send question"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
 

@@ -51,26 +51,28 @@ export default function MemberComparison({ members, songs }: MemberComparisonPro
       {/* Member Selectors */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         <div>
-          <label className="text-xs font-medium text-white/50 uppercase tracking-wide block mb-2">Member A</label>
+          <label htmlFor="member-compare-a" className="text-xs font-medium text-white/60 uppercase tracking-wide block mb-2">Member A</label>
           <select
+            id="member-compare-a"
             value={memberAId}
             onChange={(e) => setMemberAId(e.target.value)}
             className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/80 outline-none focus:border-purple-500/30"
           >
-            <option value="">Select a member...</option>
+            <option value="">Select a member…</option>
             {members.map(m => (
               <option key={m.id} value={m.id}>{m.stage_name}</option>
             ))}
           </select>
         </div>
         <div>
-          <label className="text-xs font-medium text-white/50 uppercase tracking-wide block mb-2">Member B</label>
+          <label htmlFor="member-compare-b" className="text-xs font-medium text-white/60 uppercase tracking-wide block mb-2">Member B</label>
           <select
+            id="member-compare-b"
             value={memberBId}
             onChange={(e) => setMemberBId(e.target.value)}
             className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-white/80 outline-none focus:border-purple-500/30"
           >
-            <option value="">Select a member...</option>
+            <option value="">Select a member…</option>
             {members.map(m => (
               <option key={m.id} value={m.id}>{m.stage_name}</option>
             ))}

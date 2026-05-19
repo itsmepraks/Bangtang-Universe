@@ -299,6 +299,9 @@ export default function HomeSection({
               <img
                 src={latestAlbum.cover_art_url}
                 alt={latestAlbum.title}
+                width={600}
+                height={600}
+                decoding="async"
                 className="w-full h-full object-cover img-outline opacity-80"
                 loading="lazy"
               />

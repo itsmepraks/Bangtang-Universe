@@ -47,10 +47,13 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
                         return (
                             <button
                                 key={tab.id}
+                                id={`media-tab-${tab.id}`}
                                 role="tab"
                                 aria-selected={isActive}
+                                aria-controls="media-panel"
+                                tabIndex={isActive ? 0 : -1}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-[background-color,color,border-color] duration-200 ${
                                     isActive
                                         ? 'bg-purple-500/10 text-white border border-purple-500/30'
                                         : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
@@ -69,7 +72,13 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
                 </div>
             </div>
 
-            <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-4 sm:p-6" role="tabpanel">
+            <div
+                id="media-panel"
+                role="tabpanel"
+                aria-labelledby={`media-tab-${activeTab}`}
+                tabIndex={0}
+                className="bg-[#111118] rounded-2xl border border-white/[0.06] p-4 sm:p-6 focus:outline-none"
+            >
                 <Suspense
                     fallback={
                         <div className="flex items-center justify-center h-64">

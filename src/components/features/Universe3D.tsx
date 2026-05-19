@@ -25,7 +25,7 @@ export const Universe3D: React.FC<UniverseProps> = ({ mode }) => {
             <StarFieldCanvas mode={mode} />
 
             <div
-                className={`absolute inset-0 flex items-center justify-center transform-style-3d transition-all duration-[2500ms] cubic-bezier(0.4, 0, 0.2, 1)
+                className={`absolute inset-0 flex items-center justify-center transform-style-3d transition-[transform,opacity,filter] duration-[2500ms] ease-out
           ${mode === 'warp' ? 'scale-[8] translate-z-[2000px] blur-sm opacity-50' : mode === 'dashboard' ? 'scale-[0.95] rotate-x-5' : 'scale-100'}
         `}
             >
@@ -41,7 +41,7 @@ export const Universe3D: React.FC<UniverseProps> = ({ mode }) => {
                             return (
                                 <div
                                     key={m.id}
-                                    className="absolute flex items-center justify-center transition-all duration-1000"
+                                    className="absolute flex items-center justify-center transition-transform duration-1000"
                                     style={{ transform: `translate(${x}px, ${y}px) rotate(${-angle}rad)` }}
                                 >
                                     <div

@@ -78,6 +78,9 @@ export default function AlbumDetail({ album, songs, onSelectSong, onBack }: Albu
             <img
               src={album.cover_art_url}
               alt={album.title}
+              width={400}
+              height={400}
+              decoding="async"
               className="w-full h-full object-cover"
               loading="lazy"
             />

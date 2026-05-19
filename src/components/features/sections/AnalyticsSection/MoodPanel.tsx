@@ -18,7 +18,7 @@ import {
   buildEraOrder,
 } from '../../../../services/analyticsService';
 import { lyricsAnalyzer, extractThemes } from '../../../../services/lyricsAnalysisService';
-import { getSentimentColor, CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
+import { getSentimentColor, CHART_STYLES, BORAHAE_COLORS, withAlpha } from '../../../../constants/colors';
 import ChartSection from '../../../ui/ChartSection';
 
 const POSITIVE_SENTIMENTS = new Set([
@@ -308,7 +308,7 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
       {/* ===== 3. Theme x Era Heatmap ===== */}
       <div className="bg-[#0c0c14] rounded-2xl p-4 md:p-6">
         <h3 className="text-base font-bold text-white/85 mb-1">Theme Evolution Across Eras</h3>
-        <p className="text-[10px] text-white/30 mb-4">
+        <p className="text-[11px] text-white/60 mb-4">
           How BTS&apos;s lyrical themes shifted over time — darker cells = more songs with that theme
         </p>
 
@@ -351,9 +351,9 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
                           style={{
                             backgroundColor:
                               count > 0
-                                ? `rgba(168, 85, 247, ${0.08 + intensity * 0.72})`
+                                ? withAlpha(BORAHAE_COLORS.PRIMARY, 0.08 + intensity * 0.72)
                                 : 'rgba(255, 255, 255, 0.02)',
-                            boxShadow: isHovered ? '0 0 0 1px rgba(168, 85, 247, 0.5)' : 'none',
+                            boxShadow: isHovered ? `0 0 0 1px ${withAlpha(BORAHAE_COLORS.PRIMARY, 0.5)}` : 'none',
                           }}
                           onMouseEnter={() => setHoveredCell({ theme, era, count })}
                           onMouseLeave={() => setHoveredCell(null)}
@@ -389,9 +389,9 @@ export default function MoodPanel({ songs, albums, lyrics }: MoodPanelProps) {
       </div>
 
       {/* ===== 4. Sentiment Arc ===== */}
-      <div className="bg-[#0e0e16] border-l-2 border-l-pink-500/20 border border-white/[0.04] rounded-xl p-4 md:p-6">
+      <div className="bg-gradient-to-r from-pink-500/[0.04] to-[#0e0e16] border border-white/[0.04] rounded-xl p-4 md:p-6">
         <h3 className="text-base font-bold text-white/85 mb-1">Sentiment Score Across Albums</h3>
-        <p className="text-[10px] text-white/30 mb-4">
+        <p className="text-[11px] text-white/60 mb-4">
           Average emotional tone per album — positive (above line) vs negative (below line)
         </p>
 

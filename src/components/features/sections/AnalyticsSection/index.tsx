@@ -92,7 +92,9 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
       <div
         role="tabpanel"
         id="analytics-panel"
-        className="bg-[#111118] rounded-2xl border border-white/[0.06] p-2 md:p-4"
+        aria-labelledby={`analytics-tab-${activeTab}`}
+        tabIndex={0}
+        className="bg-[#111118] rounded-2xl border border-white/[0.06] p-2 md:p-4 focus:outline-none"
       >
         <Suspense
           fallback={
@@ -160,6 +162,7 @@ function AnalyticsTabStrip({
               )}
               <button
                 data-tab-id={tab.id}
+                id={`analytics-tab-${tab.id}`}
                 role="tab"
                 aria-selected={isActive}
                 aria-controls="analytics-panel"

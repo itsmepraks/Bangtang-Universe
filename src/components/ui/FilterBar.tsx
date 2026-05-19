@@ -19,7 +19,7 @@ export default function FilterBar({ options, value, onChange, allLabel = 'All', 
       {showAll && (
         <button
           onClick={() => onChange(null)}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-300 ${
+          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-[background-color,border-color,color] duration-300 ${
             value === null
               ? 'bg-purple-500/15 border-purple-500/30 text-purple-300'
               : 'bg-white/[0.04] border-white/[0.08] text-white/50 hover:text-white/70 hover:border-white/[0.15]'
@@ -32,7 +32,7 @@ export default function FilterBar({ options, value, onChange, allLabel = 'All', 
         <button
           key={opt.value}
           onClick={() => onChange(opt.value === value ? null : opt.value)}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-300 ${
+          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-[background-color,border-color,color] duration-300 ${
             value === opt.value
               ? 'bg-purple-500/15 border-purple-500/30 text-purple-300'
               : 'bg-white/[0.04] border-white/[0.08] text-white/50 hover:text-white/70 hover:border-white/[0.15]'

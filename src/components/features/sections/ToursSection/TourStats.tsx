@@ -60,7 +60,7 @@ export default function TourStats({ concerts }: TourStatsProps) {
     });
     return Array.from(tourMap.entries())
       .map(([tour, attendance]) => ({
-        tour: tour.length > 25 ? tour.slice(0, 22) + '...' : tour,
+        tour: tour.length > 25 ? tour.slice(0, 22) + '…' : tour,
         fullTour: tour,
         attendance,
       }))

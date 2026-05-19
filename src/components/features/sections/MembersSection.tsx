@@ -42,7 +42,7 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
           {/* Photo */}
           <div className="aspect-[3/4] relative overflow-hidden rounded-t-2xl">
             {m.image_url ? (
-              <img src={m.image_url} alt={m.stage_name} className="w-full h-full object-cover img-outline grayscale group-hover:grayscale-0 transition-[filter] duration-700" />
+              <img src={m.image_url} alt={m.stage_name} width={300} height={420} decoding="async" loading="lazy" className="w-full h-full object-cover img-outline grayscale group-hover:grayscale-0 transition-[filter] duration-700" />
             ) : (
               <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${m.color || BORAHAE_COLORS.PRIMARY}30, transparent)` }}>
                 <User size={48} className="text-white/20" />
@@ -151,7 +151,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
           {/* Photo */}
           <div className="w-32 h-40 md:w-44 md:h-56 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-white/[0.08] shadow-2xl">
             {member.image_url ? (
-              <img src={member.image_url} alt={member.stage_name} className="w-full h-full object-cover img-outline" />
+              <img src={member.image_url} alt={member.stage_name} width={300} height={420} decoding="async" loading="lazy" className="w-full h-full object-cover img-outline" />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-[#111118]">
                 <User size={48} className="text-white/20" />

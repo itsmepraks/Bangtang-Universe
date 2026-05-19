@@ -30,6 +30,7 @@ const MOOD_LABELS: Record<string, string> = {
 
 export default function SearchSection({ songs, members, albums, awards, concerts, onSelectSong, onNavigate }: SearchSectionProps) {
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [typeFilter, setTypeFilter] = useState<'all' | 'song' | 'album' | 'member' | 'award' | 'concert'>('all');
@@ -53,10 +54,16 @@ export default function SearchSection({ songs, members, albums, awards, concerts
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Debounce the query so Fuse suggestions only re-run after a typing pause.
+  useEffect(() => {
+    const id = window.setTimeout(() => setDebouncedQuery(query), 200);
+    return () => window.clearTimeout(id);
+  }, [query]);
+
   const suggestions = useMemo(() => {
-    if (query.length < 2) return [];
-    return getSuggestions(query, 5);
-  }, [query, getSuggestions]);
+    if (debouncedQuery.length < 2) return [];
+    return getSuggestions(debouncedQuery, 5);
+  }, [debouncedQuery, getSuggestions]);
 
   const runSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) return;
@@ -141,12 +148,15 @@ export default function SearchSection({ songs, members, albums, awards, concerts
           )}
           <input
             ref={inputRef}
-            type="text"
+            type="search"
+            inputMode="search"
+            autoComplete="off"
+            spellCheck={false}
             value={query}
             onChange={(e) => { setQuery(e.target.value); setShowSuggestions(true); }}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             onFocus={() => setShowSuggestions(true)}
-            placeholder="Search songs, albums, members..."
+            placeholder="Search songs, albums, members…"
             aria-label="Search BTS"
             className="flex-1 bg-transparent text-base text-white/80 outline-none placeholder:text-white/40"
           />
@@ -258,15 +268,29 @@ export default function SearchSection({ songs, members, albums, awards, concerts
           </div>
         </div>
       ) : (
-        <EmptyState
-          icon={query || activeMood ? Network : Search}
-          title={query || activeMood ? 'No results found' : 'Search BTS'}
-          description={
-            query || activeMood
-              ? 'Try different words or pick a mood above.'
-              : 'Songs, albums, members, moods.'
-          }
-        />
+        <div className="space-y-6">
+          <EmptyState
+            icon={query || activeMood ? Network : Search}
+            title={query || activeMood ? 'No results found' : 'Search BTS'}
+            description={
+              query || activeMood
+                ? 'Try different words or pick a mood above.'
+                : 'Songs, albums, members, moods.'
+            }
+          />
+          <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
+            <span className="text-[11px] text-white/50 uppercase tracking-wide w-full text-center">Try</span>
+            {['Dynamite', 'Yoongi', 'love yourself', 'Grammy', 'Wembley'].map((example) => (
+              <button
+                key={example}
+                onClick={() => { setQuery(example); runSearch(example); }}
+                className="px-3 py-1.5 text-xs rounded-full bg-white/[0.04] border border-white/[0.08] text-white/70 hover:text-white hover:border-purple-500/30 hover:bg-purple-500/10 transition-colors"
+              >
+                {example}
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
@@ -330,7 +354,7 @@ function PreviewPanel({ result }: { result: SearchResult }) {
     return (
       <div className="space-y-4">
         {member.image_url && (
-          <img src={member.image_url} alt={member.stage_name} className="w-full h-32 object-cover rounded-xl img-outline" />
+          <img src={member.image_url} alt={member.stage_name} width={400} height={128} decoding="async" loading="lazy" className="w-full h-32 object-cover rounded-xl img-outline" />
         )}
         <div>
           <h4 className="text-sm font-semibold text-white/90">{member.stage_name}</h4>
