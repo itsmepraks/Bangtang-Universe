@@ -76,7 +76,7 @@ const CHANT_SCHEDULE: Array<{ id: 'RM' | 'JIN' | 'SUGA' | 'J-HOPE' | 'JIMIN' | '
   { id: 'JIN',    t: 14.5 },
   { id: 'SUGA',   t: 16.5 },
   { id: 'J-HOPE', t: 17.5 },
-  { id: 'JIMIN',  t: 19.5 },
+  { id: 'JIMIN',  t: 19.0 },  // -0.5s earlier in pass 2 (user-tuned)
   { id: 'V',      t: 20.5 },
   { id: 'JK',     t: 21.5 },
   { id: 'ALL',    t: 22.5 },  // +0.5s slower than pass-1 cadence (user-tuned)
