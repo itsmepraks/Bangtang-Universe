@@ -61,8 +61,9 @@ const YT_CHANT_TAIL_MS = 1500;
  */
 const CHANT_SCHEDULE: Array<{ id: 'RM' | 'JIN' | 'SUGA' | 'J-HOPE' | 'JIMIN' | 'V' | 'JK' | 'ALL'; t: number }> = [
   // All beats nudged 0.5s earlier globally to fix a slight late-feel.
-  // First pass
-  { id: 'RM',     t: 0.5 },
+  // First pass — RM's first call sits 0.5 s later than the global nudge
+  // to match where the YouTube audio actually says "Kim Namjoon".
+  { id: 'RM',     t: 1.0 },
   { id: 'JIN',    t: 2.5 },
   { id: 'SUGA',   t: 4.5 },
   { id: 'J-HOPE', t: 6.5 },
