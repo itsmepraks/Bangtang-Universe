@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ChevronLeft, PenTool, Disc, Award } from 'lucide-react';
 import { useMemberById } from '../../hooks';
 import { BTSLogo } from '../visual';
@@ -8,19 +8,54 @@ export interface MemberDNAProps {
     onClose: () => void;
 }
 
+// Calibrates the KOMCA-credits progress bar. RM (the most-credited member)
+// sits at ~220 so the bar reads "almost full" for him and proportionally
+// shorter for the others. Bump this if a member ever crosses it.
+const KOMCA_CREDITS_FULL_SCALE = 220;
+
 export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
     const { member, loading } = useMemberById(memberId);
+    const closeBtnRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        const previouslyFocused = document.activeElement as HTMLElement | null;
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKey);
+        if (closeBtnRef.current) closeBtnRef.current.focus();
+        return () => {
+            window.removeEventListener('keydown', handleKey);
+            previouslyFocused?.focus?.();
+        };
+    }, [onClose]);
 
     if (loading) return (
-        <div className="absolute inset-0 z-[100] bg-[#020005]/85 backdrop-blur-[80px] flex items-center justify-center">
-            <div className="text-white/50 text-lg tracking-wide uppercase animate-pulse">Loading...</div>
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Loading member profile"
+            className="absolute inset-0 z-[100] bg-[#020005]/85 backdrop-blur-md flex items-center justify-center"
+            style={{ overscrollBehavior: 'contain' }}
+        >
+            <div className="text-white/60 text-lg tracking-wide uppercase animate-pulse">Loading…</div>
         </div>
     );
 
     if (!member) return null;
 
     return (
-        <div className="absolute inset-0 z-[100] bg-[#020005]/85 backdrop-blur-[80px] animate-in fade-in duration-700 flex flex-col overflow-hidden">
+        <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="member-dna-title"
+            tabIndex={-1}
+            className="absolute inset-0 z-[100] bg-[#020005]/85 backdrop-blur-md animate-in fade-in duration-700 flex flex-col overflow-hidden"
+            style={{ overscrollBehavior: 'contain' }}
+        >
             {/* Dynamic Member Aura */}
             <div className="absolute inset-0 pointer-events-none opacity-50">
                 <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[140%] opacity-40 blur-[180px]"
@@ -35,11 +70,16 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                 style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%)' }}
             >
                 <div className="flex items-center gap-4 md:gap-8">
-                    <button onClick={onClose} className="p-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-all duration-500 hover:scale-105 group border border-white/[0.06] hover:border-white/20">
-                        <ChevronLeft size={24} className="text-white group-hover:text-purple-300 transition-colors" />
+                    <button
+                        ref={closeBtnRef}
+                        onClick={onClose}
+                        aria-label="Close member profile"
+                        className="p-3 bg-white/5 rounded-2xl hover:bg-white/10 transition-[background-color,border-color,transform] duration-500 hover:scale-105 group border border-white/[0.06] hover:border-white/20"
+                    >
+                        <ChevronLeft size={24} className="text-white group-hover:text-purple-300 transition-colors" aria-hidden="true" />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-semibold tracking-wide text-white/95">
+                        <h1 id="member-dna-title" className="text-2xl font-semibold tracking-wide text-white/95">
                             Artist Profile
                         </h1>
                         <div className="text-xs text-white/50 mt-1">Subject: {member.stage_name}</div>
@@ -70,7 +110,10 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                             <img
                                 src={member.image_url || ''}
                                 alt={member.stage_name}
-                                className="absolute inset-0 w-full h-full object-cover opacity-80 transition-all duration-1000 group-hover:scale-105 group-hover:opacity-100 filter grayscale group-hover:grayscale-0"
+                                width={600}
+                                height={840}
+                                decoding="async"
+                                className="absolute inset-0 w-full h-full object-cover opacity-80 transition-[opacity,transform,filter] duration-1000 group-hover:scale-105 group-hover:opacity-100 filter grayscale group-hover:grayscale-0"
                                 onError={(e) => {
                                     e.currentTarget.style.display = 'none';
                                     e.currentTarget.parentElement?.querySelector('.placeholder-fallback')?.classList.remove('hidden');
@@ -104,7 +147,7 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                                 <div className="text-xs text-white/50 mb-3 tracking-wide uppercase">Verified Productions</div>
                             </div>
                             <div className="mt-8 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                                <div className="h-full bg-current transition-all duration-1000 w-[70%]" style={{ backgroundColor: member.color || '#fff', width: `${((member.komca_credits || 0) / 220) * 100}%` }} />
+                                <div className="h-full bg-current transition-all duration-1000 w-[70%]" style={{ backgroundColor: member.color || '#fff', width: `${Math.min(100, ((member.komca_credits || 0) / KOMCA_CREDITS_FULL_SCALE) * 100)}%` }} />
                             </div>
                         </div>
                     </div>
@@ -113,8 +156,8 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                     <div className="md:col-span-7 space-y-8 md:space-y-16 animate-in slide-in-from-right-12 duration-1000">
                         {/* Bio */}
                         <div className="space-y-6">
-                            <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wide">Biography</h3>
-                            <p className="text-lg md:text-2xl text-white/80 leading-[1.6] font-normal border-l-4 pl-6 md:pl-12 transition-all duration-1000 hover:border-white/40" style={{ borderColor: member.color || '#fff' }}>
+                            <h3 className="text-xs font-semibold text-white/60 uppercase tracking-wide">Biography</h3>
+                            <p className="text-lg md:text-2xl text-white/80 leading-[1.6] font-normal pl-6 md:pl-12 max-w-[65ch]">
                                 {member.bio}
                             </p>
                         </div>
@@ -141,14 +184,16 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
                         <div className="space-y-8">
                             <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wide">Achievements</h3>
                             <div className="grid grid-cols-1 gap-4">
-                                {(member.achievements || []).map((ach, i) => (
+                                {(member.achievements || []).map((ach) => (
                                     <div key={ach}
-                                        className="flex items-center gap-8 p-6 bg-gradient-to-r from-white/[0.03] to-transparent rounded-2xl border-l-4 group transition-all duration-500 hover:translate-x-2"
-                                        style={{ borderColor: member.color || '#fff', animationDelay: `${i * 0.2}s` }}>
-                                        <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center">
-                                            <Award className="text-white/50 group-hover:text-yellow-400 transition-colors" size={20} />
+                                        className="flex items-center gap-8 p-6 bg-gradient-to-r from-white/[0.03] to-transparent rounded-2xl border border-white/[0.04] group transition-transform duration-500 hover:translate-x-2">
+                                        <div
+                                            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                                            style={{ backgroundColor: `${member.color || '#A855F7'}20`, color: member.color || '#fff' }}
+                                        >
+                                            <Award size={20} aria-hidden="true" />
                                         </div>
-                                        <span className="text-base text-white/70 tracking-wide group-hover:text-white transition-colors">{ach}</span>
+                                        <span className="text-base text-white/75 tracking-wide group-hover:text-white transition-colors">{ach}</span>
                                     </div>
                                 ))}
                             </div>

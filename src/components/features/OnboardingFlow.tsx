@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Sparkles,
   Disc,
@@ -30,11 +30,12 @@ const TOTAL_STEPS = 3;
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(0);
+  const skipBtnRef = useRef<HTMLButtonElement>(null);
 
-  const handleComplete = () => {
+  const handleComplete = useCallback(() => {
     try { localStorage.setItem('bts-onboarded', '1'); } catch { /* noop */ }
     onComplete();
-  };
+  }, [onComplete]);
 
   const next = () => {
     if (step < TOTAL_STEPS - 1) setStep(step + 1);
@@ -45,12 +46,37 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     if (step > 0) setStep(step - 1);
   };
 
+  useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        handleComplete();
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    if (skipBtnRef.current) skipBtnRef.current.focus();
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      previouslyFocused?.focus?.();
+    };
+  }, [handleComplete]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a0a0f]/95 backdrop-blur-sm animate-in fade-in duration-500">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Welcome tour"
+      tabIndex={-1}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0a0a0f]/95 backdrop-blur-sm animate-in fade-in duration-500"
+      style={{ overscrollBehavior: 'contain' }}
+    >
       {/* Skip button */}
       <button
+        ref={skipBtnRef}
         onClick={handleComplete}
-        className="absolute top-6 right-6 text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer"
+        aria-label="Skip onboarding"
+        className="absolute top-6 right-6 text-xs text-white/60 hover:text-white/80 transition-colors cursor-pointer"
       >
         Skip
       </button>
@@ -85,7 +111,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <h2 className="text-lg font-semibold text-white/90 mb-1">
                   What's Inside
                 </h2>
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-white/65">
                   Explore 10+ years of music, data, and stories
                 </p>
               </div>
@@ -100,7 +126,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     </div>
                     <div>
                       <div className="text-sm font-medium text-white/80">{label}</div>
-                      <div className="text-[11px] text-white/35 leading-snug mt-0.5">{desc}</div>
+                      <div className="text-[11px] text-white/60 leading-snug mt-0.5">{desc}</div>
                     </div>
                   </div>
                 ))}
@@ -118,7 +144,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 <h2 className="text-lg font-semibold text-white/90 mb-2">
                   Ready to explore?
                 </h2>
-                <p className="text-sm text-white/45 max-w-xs mx-auto">
+                <p className="text-sm text-white/65 max-w-xs mx-auto">
                   Dive into the complete BTS archive — discography, analytics, awards, and more.
                 </p>
               </div>
@@ -140,19 +166,30 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               disabled={step === 0}
               className={`flex items-center gap-1 text-xs transition-colors cursor-pointer ${
                 step === 0
-                  ? 'text-white/15 cursor-default'
-                  : 'text-white/40 hover:text-white/70'
+                  ? 'text-white/25 cursor-default'
+                  : 'text-white/60 hover:text-white/80'
               }`}
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               Back
             </button>
 
-            {/* Dot indicators */}
-            <div className="flex items-center gap-2">
+            {/* Step indicator — exposed as a labelled progressbar so screen
+                readers announce position ("Step 2 of 3"). The dots are still
+                decorative; the role lives on the wrapper. */}
+            <div
+              role="progressbar"
+              aria-label="Onboarding progress"
+              aria-valuemin={1}
+              aria-valuemax={TOTAL_STEPS}
+              aria-valuenow={step + 1}
+              aria-valuetext={`Step ${step + 1} of ${TOTAL_STEPS}`}
+              className="flex items-center gap-2"
+            >
               {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
                 <div
                   key={i}
+                  aria-hidden="true"
                   className={`rounded-full transition-all duration-300 ${
                     i === step
                       ? 'w-6 h-1.5 bg-purple-400'
@@ -166,7 +203,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             {step < TOTAL_STEPS - 1 ? (
               <button
                 onClick={next}
-                className="flex items-center gap-1 text-xs text-white/40 hover:text-white/70 transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-xs text-white/60 hover:text-white/80 transition-colors cursor-pointer"
               >
                 Next
                 <ChevronRight className="w-3.5 h-3.5" />

@@ -73,15 +73,22 @@ export default function CommandPalette({
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (open) {
+      // Remember where focus was before opening, so we can restore it on close.
+      previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
       // Intentional reset-on-open. setState in effect is the right pattern here.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('');
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveIndex(0);
       requestAnimationFrame(() => inputRef.current?.focus());
+    } else if (previouslyFocusedRef.current) {
+      previouslyFocusedRef.current.focus();
+      previouslyFocusedRef.current = null;
     }
   }, [open]);
 
@@ -180,6 +187,27 @@ export default function CommandPalette({
     } else if (e.key === 'Escape') {
       e.preventDefault();
       onClose();
+    } else if (e.key === 'Tab') {
+      // Focus trap — keep keyboard users inside the dialog while it's open.
+      // Cycle between the first focusable (input) and the last (currently the
+      // ESC kbd is not focusable, so the input is both first and last actively
+      // tab-targeted element; result buttons are reached via Arrow keys, not Tab).
+      const panel = panelRef.current;
+      if (!panel) return;
+      const focusables = panel.querySelectorAll<HTMLElement>(
+        'input, button:not([disabled]), [href], select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const activeEl = document.activeElement as HTMLElement | null;
+      if (e.shiftKey && activeEl === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && activeEl === last) {
+        e.preventDefault();
+        first.focus();
+      }
     }
   };
 
@@ -197,20 +225,25 @@ export default function CommandPalette({
 
       {/* Panel */}
       <div
+        ref={panelRef}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
-        className="relative w-full max-w-xl bg-[#0c0c12] border border-white/[0.10] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="relative w-full max-w-xl max-h-[80vh] flex flex-col bg-[#0c0c12] border border-white/[0.10] rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
       >
         {/* Input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-white/[0.06]">
           <Search className="w-4 h-4 text-white/40 flex-shrink-0" aria-hidden="true" />
           <input
             ref={inputRef}
+            type="search"
+            inputMode="search"
+            autoComplete="off"
+            spellCheck={false}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search songs, albums, members, moods…"
             aria-label="Search"
-            className="flex-1 bg-transparent text-sm text-white/90 placeholder:text-white/30 outline-none"
+            className="flex-1 bg-transparent text-sm text-white/90 placeholder:text-white/40 outline-none"
           />
           <kbd className="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/[0.08] text-white/40 font-mono">
             ESC
@@ -218,7 +251,7 @@ export default function CommandPalette({
         </div>
 
         {/* Results */}
-        <div ref={listRef} className="max-h-[50vh] overflow-y-auto pretty-scrollbar py-2">
+        <div ref={listRef} className="flex-1 min-h-0 max-h-[50vh] overflow-y-auto pretty-scrollbar py-2">
           {results.length === 0 ? (
             <p className="text-xs text-white/40 text-center py-8 px-4">
               No matches. Try a song title, member name, or album.
@@ -246,7 +279,7 @@ export default function CommandPalette({
                       <div className="text-[11px] text-white/40 truncate">{item.sublabel}</div>
                     )}
                   </div>
-                  <span className="text-[10px] text-white/30 flex-shrink-0">
+                  <span className="text-[10px] text-white/55 flex-shrink-0 uppercase tracking-wide">
                     {item.type}
                   </span>
                 </button>
