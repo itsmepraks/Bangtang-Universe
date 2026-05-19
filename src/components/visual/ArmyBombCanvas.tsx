@@ -33,9 +33,13 @@ export const ArmyBombCanvas: React.FC<ArmyBombCanvasProps> = ({ audioRef }) => {
     const bombs = useMemo<Bomb[]>(() => {
         const result: Omit<Bomb, 'twinkleSpeed'>[] = [];
 
+        // Density tuning — full desktop density was drawing ~2,500 sprites
+        // per frame at 60 fps, which dominated the landing's CPU budget.
+        // 0.7 on desktop still reads as a packed stadium but cuts the draw
+        // cost ~30%; mobile / low-power devices get 0.4.
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
         const isLowPower = typeof navigator !== 'undefined' && (navigator.hardwareConcurrency || 8) < 4;
-        const density = isMobile || isLowPower ? 0.5 : 1;
+        const density = isMobile || isLowPower ? 0.4 : 0.7;
 
         const colors = [
             BORAHAE_COLORS.PRIMARY, '#9333EA', '#7C3AED', '#8B5CF6', '#C084FC', '#B47EE5',

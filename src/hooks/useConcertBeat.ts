@@ -252,15 +252,19 @@ export function useConcertBeat({
     playlistRef.current = state.playlist;
   }, [state.playlist]);
 
-  // ── YouTube IFrame Player — preloaded so the chant intro can stream the
-  //    official video the moment the user taps for sound. The iframe is
-  //    parked off-screen; only its audio is used. If the video can't be
-  //    embedded (deleted / region-locked / embedding disabled) we mark it
-  //    failed and the runChant flow falls through to chant.mp3 → synth.
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
+  // ── YouTube IFrame Player — lazily initialized.
+  //    Originally injected the script + iframe on mount, which spent ~150 KB
+  //    of network + ~50 ms of main-thread work for every visitor whether or
+  //    not they tapped for sound. Now we wait for the user's first start()
+  //    gesture and defer all of it. The cleanup-on-unmount path below tears
+  //    down whatever ensureYouTubePlayer() managed to build, if anything.
+  const ytContainerRef = useRef<HTMLDivElement | null>(null);
+  const ytInitStartedRef = useRef(false);
 
-    // 1. Inject the IFrame API script once (shared across all consumers).
+  const ensureYouTubePlayer = useCallback(() => {
+    if (typeof window === 'undefined' || ytInitStartedRef.current) return;
+    ytInitStartedRef.current = true;
+
     if (!document.getElementById('yt-iframe-api-script')) {
       const script = document.createElement('script');
       script.id = 'yt-iframe-api-script';
@@ -269,7 +273,6 @@ export function useConcertBeat({
       document.head.appendChild(script);
     }
 
-    // 2. Off-screen container that hosts the iframe.
     const container = document.createElement('div');
     container.id = 'yt-chant-container';
     container.style.cssText = [
@@ -286,11 +289,10 @@ export function useConcertBeat({
     target.id = 'yt-chant-target';
     container.appendChild(target);
     document.body.appendChild(container);
-
-    let destroyed = false;
+    ytContainerRef.current = container;
 
     const buildPlayer = () => {
-      if (destroyed || !window.YT?.Player || ytPlayerRef.current) return;
+      if (!window.YT?.Player || ytPlayerRef.current) return;
       try {
         ytPlayerRef.current = new window.YT.Player('yt-chant-target', {
           videoId: YT_CHANT_VIDEO_ID,
@@ -306,10 +308,7 @@ export function useConcertBeat({
             iv_load_policy: 3,
           },
           events: {
-            onReady: () => {
-              if (destroyed) return;
-              ytReadyRef.current = true;
-            },
+            onReady: () => { ytReadyRef.current = true; },
             onError: () => {
               ytFailedRef.current = true;
               ytReadyRef.current = false;
@@ -324,22 +323,26 @@ export function useConcertBeat({
     if (window.YT?.Player) {
       buildPlayer();
     } else {
-      // Chain after any existing handler so we don't stomp other consumers.
       const prev = window.onYouTubeIframeAPIReady;
       window.onYouTubeIframeAPIReady = () => {
         if (prev) try { prev(); } catch { /* noop */ }
         buildPlayer();
       };
     }
+  }, []);
 
+  // Cleanup only — handles whatever ensureYouTubePlayer() built, if anything.
+  useEffect(() => {
     return () => {
-      destroyed = true;
       if (ytPlayerRef.current) {
         try { ytPlayerRef.current.destroy(); } catch { /* noop */ }
         ytPlayerRef.current = null;
       }
       ytReadyRef.current = false;
-      container.remove();
+      if (ytContainerRef.current) {
+        ytContainerRef.current.remove();
+        ytContainerRef.current = null;
+      }
     };
   }, []);
 
@@ -367,10 +370,15 @@ export function useConcertBeat({
     };
   }, []);
 
-  // ── Pre-fetch all preview URLs in parallel on mount ──────────────────
+  // ── Pre-fetch all preview URLs once the browser is idle.
+  //    Firing 5 parallel cross-origin requests on mount competed with paint
+  //    on the first impression. requestIdleCallback (with a setTimeout
+  //    fallback for Safari) lets the landing finish rendering first.
   useEffect(() => {
     let cancelled = false;
     const controller = new AbortController();
+    let idleHandle: number | null = null;
+    let timeoutHandle: number | null = null;
 
     const resolveTrack = async (query: string): Promise<PlaylistEntry> => {
       try {
@@ -390,18 +398,30 @@ export function useConcertBeat({
       }
     };
 
-    Promise.all(tracks.map(resolveTrack)).then((resolved) => {
+    const kickOff = () => {
       if (cancelled) return;
-      setState((s) => ({
-        ...s,
-        playlist: resolved,
-        currentTrack: resolved[0] ?? null,
-      }));
-    });
+      void Promise.all(tracks.map(resolveTrack)).then((resolved) => {
+        if (cancelled) return;
+        setState((s) => ({
+          ...s,
+          playlist: resolved,
+          currentTrack: resolved[0] ?? null,
+        }));
+      });
+    };
+
+    const w = typeof window !== 'undefined' ? (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number; cancelIdleCallback?: (h: number) => void }) : null;
+    if (w?.requestIdleCallback) {
+      idleHandle = w.requestIdleCallback(kickOff, { timeout: 2000 });
+    } else {
+      timeoutHandle = window.setTimeout(kickOff, 800);
+    }
 
     return () => {
       cancelled = true;
       controller.abort();
+      if (idleHandle !== null && w?.cancelIdleCallback) w.cancelIdleCallback(idleHandle);
+      if (timeoutHandle !== null) window.clearTimeout(timeoutHandle);
     };
   }, [tracks]);
 
@@ -471,6 +491,13 @@ export function useConcertBeat({
 
     let lastZeroed = false; // avoid spamming setState when already at rest
 
+    // React-state throttle. The canvas reads beatRef every frame (60 fps),
+    // but LandingRitual's JSX only needs to re-render fast enough for the
+    // eye — ~20 fps is plenty for the bass-driven filter values, and it cuts
+    // React reconciliation work to a third.
+    let lastReactStateMs = 0;
+    const REACT_STATE_INTERVAL_MS = 50; // ~20 Hz
+
     const loop = (time: number) => {
       const streaming = streamPlayingRef.current;
       const analyser = analyserRef.current;
@@ -512,15 +539,20 @@ export function useConcertBeat({
         beatRef.current = { bass, mid, treble, isBeat, isChorus };
         lastZeroed = false;
 
-        setState((s) => ({
-          ...s,
-          pulse: Math.min(1, bass * 1.4),
-          bass, mid, treble, isBeat, isChorus,
-          // Advance the lead-spotlight chase on every kick; trigger a fresh
-          // strobe burst on every detected chorus drop.
-          beatCount: isBeat ? s.beatCount + 1 : s.beatCount,
-          strobeId: isChorus ? s.strobeId + 1 : s.strobeId,
-        }));
+        // Always push when a discrete event lands (beat / chorus) so the
+        // spotlight chase + strobe stay tight to the music. Between events,
+        // throttle continuous band updates to ~20 Hz.
+        const shouldUpdateContinuous = time - lastReactStateMs >= REACT_STATE_INTERVAL_MS;
+        if (isBeat || isChorus || shouldUpdateContinuous) {
+          lastReactStateMs = time;
+          setState((s) => ({
+            ...s,
+            pulse: Math.min(1, bass * 1.4),
+            bass, mid, treble, isBeat, isChorus,
+            beatCount: isBeat ? s.beatCount + 1 : s.beatCount,
+            strobeId: isChorus ? s.strobeId + 1 : s.strobeId,
+          }));
+        }
       } else if (audioOn) {
         // Audio is on but not streamed (e.g. synth pad swell). Run the fallback
         // metronome so spotlights still pulse to *something*.
@@ -1035,6 +1067,11 @@ export function useConcertBeat({
   }, [playIndex, startSynth]);
 
   const start = useCallback(async () => {
+    // Now is the right time to spin up the YouTube IFrame player — the user
+    // has actually asked for sound. Doing this on mount was eating network
+    // and main-thread time for visitors who never tapped.
+    ensureYouTubePlayer();
+
     // First-time start: run the chant intro, then auto-advance to the playlist.
     // If the user already heard the chant (or opted out), go straight to songs.
     if (!skipChant && chantPhaseRef.current === 'idle') {
@@ -1045,7 +1082,7 @@ export function useConcertBeat({
       return;
     }
     await startPlaylist();
-  }, [skipChant, runChant, startPlaylist]);
+  }, [ensureYouTubePlayer, skipChant, runChant, startPlaylist]);
 
   const skip = useCallback(async () => {
     // Skip during chant → abort, then start the playlist.
