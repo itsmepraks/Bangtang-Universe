@@ -74,7 +74,7 @@ const CHANT_SCHEDULE: Array<{ id: 'RM' | 'JIN' | 'SUGA' | 'J-HOPE' | 'JIMIN' | '
   // Second pass
   { id: 'RM',     t: 12.5 },
   { id: 'JIN',    t: 14.5 },
-  { id: 'SUGA',   t: 16.5 },
+  { id: 'SUGA',   t: 16.0 },  // -0.5s earlier in pass 2 (user-tuned)
   { id: 'J-HOPE', t: 17.5 },
   { id: 'JIMIN',  t: 19.0 },  // -0.5s earlier in pass 2 (user-tuned)
   { id: 'V',      t: 20.5 },
