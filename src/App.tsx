@@ -83,6 +83,22 @@ const ANALYTICS_TAB_LABELS: Record<string, string> = {
   milestones: 'Milestones',
 };
 
+// Concert-mode background bokeh — fixed positions so the field looks
+// composed rather than random per render. Mix of brand purple, soft
+// lavender, and the occasional member-color highlight.
+const CONCERT_BOMBS = [
+  { x:  6, y:  4, size: 130, color: '#A855F7', blur: 36, delay:  0,    duration: 22 },
+  { x: 18, y:  8, size:  90, color: '#C084FC', blur: 28, delay:  3.5,  duration: 19 },
+  { x: 28, y:  2, size: 110, color: '#8B5CF6', blur: 32, delay:  6.2,  duration: 24 },
+  { x: 41, y: 10, size: 100, color: '#EC4899', blur: 30, delay:  1.8,  duration: 21 },
+  { x: 55, y:  3, size: 140, color: '#A855F7', blur: 38, delay:  9,    duration: 25 },
+  { x: 68, y:  9, size:  85, color: '#FBBF24', blur: 26, delay:  4.4,  duration: 20 },
+  { x: 78, y:  5, size: 115, color: '#9333EA', blur: 32, delay:  7.8,  duration: 23 },
+  { x: 88, y:  1, size:  95, color: '#D8B4FE', blur: 28, delay: 11.5,  duration: 22 },
+  { x: 94, y: 12, size: 105, color: '#2563EB', blur: 30, delay:  2.6,  duration: 24 },
+  { x: 12, y: 14, size:  80, color: '#34D399', blur: 24, delay: 13,    duration: 20 },
+];
+
 const NAV_ITEMS: { id: DashboardSection; icon: React.ElementType; label: string }[] = [
   { id: 'overview', icon: Home, label: 'Overview' },
   { id: 'discography', icon: Disc, label: 'Discography' },
@@ -328,7 +344,34 @@ export default function App() {
               style={{ background: 'radial-gradient(circle, #EC4899 0%, transparent 70%)', filter: 'blur(80px)' }} />
             <div className={`absolute bottom-[20%] left-[10%] w-[30%] h-[30%] rounded-full ${concertMode ? 'opacity-[0.12]' : 'opacity-[0.03]'}`}
               style={{ background: 'radial-gradient(circle, #2563EB 0%, transparent 70%)', filter: 'blur(80px)' }} />
+
+            {/* Concert mode — drifting ARMY-bomb bokeh layer. Renders only
+                when the toggle is on; orbs slowly float up the viewport
+                like fans waving light sticks. Static array so positions
+                stay stable; the keyframe handles the motion. */}
+            {concertMode && CONCERT_BOMBS.map((b, i) => (
+              <div
+                key={i}
+                className="concert-bomb"
+                style={{
+                  left: `${b.x}%`,
+                  bottom: `${b.y}%`,
+                  width: `${b.size}px`,
+                  height: `${b.size}px`,
+                  background: `radial-gradient(circle, ${b.color} 0%, ${b.color}80 30%, transparent 70%)`,
+                  filter: `blur(${b.blur}px)`,
+                  animationDelay: `${b.delay}s`,
+                  animationDuration: `${b.duration}s`,
+                }}
+                aria-hidden="true"
+              />
+            ))}
           </div>
+
+          {/* Concert mode — thin LED strip across the top of the viewport.
+              Slides member-color gradient sideways; subtle but signals
+              "the show is on." */}
+          {concertMode && <div className="concert-led-strip" aria-hidden="true" />}
 
           {sidebarOpen && (
             <div

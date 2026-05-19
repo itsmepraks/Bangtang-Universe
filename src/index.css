@@ -1678,3 +1678,55 @@ p {
   50%  { transform: scaleY(0.80); }
   100% { transform: scaleY(0.30); }
 }
+/* ── Concert mode — stadium ambience ──────────────────────────────────
+   Two layers that only render when the user toggles concert mode on:
+   (1) drifting ARMY-bomb bokeh in the page background, (2) a thin
+   LED strip across the very top of the viewport that cycles member
+   colors. Both are decorative, pointer-events:none, and gated on
+   prefers-reduced-motion by the global rule near the top of this file.
+*/
+
+/* (1) Drifting bombs — a single soft glow orb. Multiple instances are
+   composed with different positions, sizes, hues, and delays in JSX. */
+.concert-bomb {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: concert-bomb-drift 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+@keyframes concert-bomb-drift {
+  0%   { transform: translate3d(0, 30vh, 0)  scale(0.85); opacity: 0; }
+  15%  { opacity: 0.55; }
+  50%  { transform: translate3d(2vw, -10vh, 0) scale(1);    opacity: 0.55; }
+  85%  { opacity: 0.4; }
+  100% { transform: translate3d(-2vw, -55vh, 0) scale(0.9); opacity: 0; }
+}
+
+/* (2) Stage LED strip — a 3px gradient bar pinned to the top of the
+   viewport that slowly slides a member-color gradient sideways.
+   Subtle but unmistakably "the show is on." */
+.concert-led-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 60;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    #2563EB, #EC4899, #10B981, #EF4444, #F59E0B, #22C55E, #8B5CF6, #A855F7,
+    #2563EB, #EC4899, #10B981, #EF4444, #F59E0B, #22C55E, #8B5CF6, #A855F7
+  );
+  background-size: 200% 100%;
+  animation: concert-led-slide 24s linear infinite;
+  filter: blur(0.5px) saturate(1.15);
+  opacity: 0.85;
+}
+@keyframes concert-led-slide {
+  0%   { background-position:   0% 50%; }
+  100% { background-position: 200% 50%; }
+}
