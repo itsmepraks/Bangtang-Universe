@@ -10,3 +10,4 @@ export { useConcerts, useConcertsByTour, useConcertsByCountry } from './useConce
 export { useCollaborations, useCollaborationsByMember, useCollaborationsByArtist } from './useCollaborations';
 export { useMemberEvents, useMemberEventsByMember, useMemberEventsByType } from './useMemberEvents';
 export { useMedia, useMediaByType, useMediaByMember } from './useMedia';
+export { useConcertBeat, type ConcertBeatState, type ConcertBeatOptions } from './useConcertBeat';
