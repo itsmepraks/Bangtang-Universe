@@ -439,10 +439,10 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                     className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white/90 tracking-[0.12em] uppercase animate-in fade-in slide-in-from-top-8 duration-1000"
                     style={{
                         fontFamily: "var(--font-display)",
-                        // Glow blur radius + alpha grow with bass; chorus drops add a brief scale bump
-                        textShadow: `0 0 ${16 + bass * 24}px rgba(236,72,153,${0.3 + bass * 0.5}), 0 0 ${32 + bass * 40}px rgba(139,92,246,${0.2 + bass * 0.4}), 0 2px 8px rgba(0,0,0,0.7)`,
-                        transform: `scale(${1 + (isChorus ? 0.04 : bass * 0.015)})`,
-                        transition: 'transform 80ms linear, text-shadow 60ms linear',
+                        // Static glow — used to scale + pulse with the bass band,
+                        // but per-user request the title shouldn't move or change
+                        // once it's landed.
+                        textShadow: '0 0 16px rgba(236,72,153,0.3), 0 0 32px rgba(139,92,246,0.2), 0 2px 8px rgba(0,0,0,0.7)',
                     }}
                 >
                     Bangtan Universe
