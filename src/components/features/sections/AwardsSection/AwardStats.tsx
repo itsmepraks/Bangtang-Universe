@@ -10,7 +10,7 @@ import {
 } from 'recharts';
 import { Trophy, TrendingUp, Users, Percent } from 'lucide-react';
 import type { Award, Member } from '../../../../types/database';
-import { CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
+import { CHART_STYLES, BORAHAE_COLORS, withAlpha } from '../../../../constants/colors';
 
 interface AwardStatsProps {
   awards: Award[];
@@ -162,7 +162,7 @@ export default function AwardStats({ awards }: AwardStatsProps) {
                 cursor={CHART_STYLES.TOOLTIP.cursor}
               />
               <Bar dataKey="won" fill="#FBBF24" radius={[0, 4, 4, 0]} name="Won" activeBar={CHART_STYLES.BAR_ACTIVE} />
-              <Bar dataKey="total" fill="rgba(168, 85, 247, 0.3)" radius={[0, 4, 4, 0]} name="Total" activeBar={CHART_STYLES.BAR_ACTIVE} />
+              <Bar dataKey="total" fill={withAlpha(BORAHAE_COLORS.PRIMARY, 0.3)} radius={[0, 4, 4, 0]} name="Total" activeBar={CHART_STYLES.BAR_ACTIVE} />
             </BarChart>
           </ResponsiveContainer>
         </div>
