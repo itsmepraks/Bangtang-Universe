@@ -331,9 +331,26 @@ export function useConcertBeat({
     }
   }, []);
 
-  // Cleanup only — handles whatever ensureYouTubePlayer() built, if anything.
+  // Pre-warm the YouTube player during idle time so it's almost always
+  // ready by the time the visitor taps for sound. We don't do it inline on
+  // mount (that blocked first paint), and we don't wait until start() to
+  // begin (that would gate the chant on a fresh script download). Idle is
+  // the sweet spot — paint finishes, then YT loads in the background.
   useEffect(() => {
+    const w = typeof window !== 'undefined'
+      ? (window as Window & { requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number; cancelIdleCallback?: (h: number) => void })
+      : null;
+    let idleHandle: number | null = null;
+    let timeoutHandle: number | null = null;
+    if (w?.requestIdleCallback) {
+      idleHandle = w.requestIdleCallback(() => ensureYouTubePlayer(), { timeout: 3000 });
+    } else {
+      timeoutHandle = window.setTimeout(() => ensureYouTubePlayer(), 1500);
+    }
+
     return () => {
+      if (idleHandle !== null && w?.cancelIdleCallback) w.cancelIdleCallback(idleHandle);
+      if (timeoutHandle !== null) window.clearTimeout(timeoutHandle);
       if (ytPlayerRef.current) {
         try { ytPlayerRef.current.destroy(); } catch { /* noop */ }
         ytPlayerRef.current = null;
@@ -344,6 +361,21 @@ export function useConcertBeat({
         ytContainerRef.current = null;
       }
     };
+  }, [ensureYouTubePlayer]);
+
+  // Wait up to `timeoutMs` for the YouTube player to report ready. Used by
+  // runChant() to give the player a chance to finish booting if the user
+  // tapped before the idle prewarm fired.
+  const waitForYouTubeReady = useCallback(async (timeoutMs = 2500): Promise<boolean> => {
+    if (ytFailedRef.current) return false;
+    if (ytReadyRef.current && ytPlayerRef.current) return true;
+    const deadline = performance.now() + timeoutMs;
+    while (performance.now() < deadline) {
+      if (ytReadyRef.current && ytPlayerRef.current) return true;
+      if (ytFailedRef.current) return false;
+      await new Promise<void>((r) => setTimeout(r, 80));
+    }
+    return ytReadyRef.current && !!ytPlayerRef.current;
   }, []);
 
   // ── Optional custom chant audio — if the user drops a file at
@@ -854,6 +886,11 @@ export function useConcertBeat({
     //   1) YouTube IFrame Player (reference video the user provided)
     //   2) /public/chant.mp3 if it exists
     //   3) Synthesized stinger
+    //
+    // Wait briefly for the player to finish booting in case the user tapped
+    // before the idle prewarm fired. Bail to the next source once we hit
+    // ~2.5 s rather than make people stare at a frozen overlay.
+    await waitForYouTubeReady(2500);
     const ytPlayer = ytPlayerRef.current;
     const useYouTube = !!ytPlayer && ytReadyRef.current && !ytFailedRef.current;
 
@@ -1037,7 +1074,7 @@ export function useConcertBeat({
     chantPhaseRef.current = 'done';
     setState((s) => ({ ...s, chantPhase: 'done', chantMember: null }));
     return !chantAbortRef.current;
-  }, [ensureWebAudio, playChantBeat, playVocalStab, playCrowdCheer, playFinaleHit, chantBeatMs]);
+  }, [ensureWebAudio, waitForYouTubeReady, playChantBeat, playVocalStab, playCrowdCheer, playFinaleHit, chantBeatMs]);
 
   const startSynth = useCallback(async () => {
     const ctx = ensureWebAudio();
