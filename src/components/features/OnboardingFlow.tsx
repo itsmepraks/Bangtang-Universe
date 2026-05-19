@@ -21,7 +21,7 @@ const SECTIONS = [
   { icon: Disc, label: 'Discography', desc: 'Every album, track, and audio feature across all eras' },
   { icon: Users, label: 'Members', desc: 'Profiles, credits, and career timelines for all 7 members' },
   { icon: BarChart3, label: 'Audio Analytics', desc: 'Energy, tempo, sentiment analysis, and lyrical themes' },
-  { icon: Trophy, label: 'Awards', desc: '289+ awards tracked across global ceremonies' },
+  { icon: Trophy, label: 'Awards', desc: 'Wins and nominations tracked across global ceremonies' },
   { icon: MapPin, label: 'World Tours', desc: 'Every concert mapped across the globe' },
   { icon: Film, label: 'Filmography', desc: 'Documentaries, reality shows, and solo projects' },
 ] as const;

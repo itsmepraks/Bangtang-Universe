@@ -166,7 +166,7 @@ export const ALBUMS: Album[] = [
         releaseDate: '2022-06-10',
         type: 'Compilation',
         trackCount: 48,
-        description: 'Anthology album for BTS\'s 9th anniversary, featuring hits from 2013-2022 plus new tracks before hiatus.',
+        description: 'Anthology album for BTS\'s 9th anniversary, featuring hits from 2013–2022 plus new tracks released just before the group\'s solo / military-service chapter (2022–2025).',
         era: 'Proof',
         coverColor: '#020617',
         coverArtUrl: 'http://coverartarchive.org/release/18f3f673-ae29-4dda-b855-ef4830041663/32750960123-500.jpg',
