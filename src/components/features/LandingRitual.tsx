@@ -49,6 +49,19 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
         start: startAudio, stop: stopAudio, skip: skipTrack,
     } = useConcertBeat();
 
+    // Enter-the-universe handler. If audio is playing, fade it out first
+    // (~600 ms fade, matches the stop() routine in useConcertBeat) and then
+    // unmount the landing — feels like the music gracefully bowing out
+    // instead of being yanked. If audio's off, transition immediately.
+    const handleEnter = () => {
+        if (audioOn) {
+            stopAudio();
+            window.setTimeout(onSync, 650);
+        } else {
+            onSync();
+        }
+    };
+
     // During the chant, the spotlight focus is driven by the hook instead
     // of the user's click. ALL means every spotlight blooms together.
     const isChanting = chantPhase === 'running';
@@ -555,7 +568,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
             {/* ENTER THE UNIVERSE — CTA */}
             <div className="absolute top-[80%] left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-3 pointer-events-auto">
                 <button
-                    onClick={() => { if (!audioOn) void startAudio(); onSync(); }}
+                    onClick={handleEnter}
                     aria-label="Enter Bangtan Universe"
                     className="relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-transform duration-500 cursor-pointer select-none hover:scale-105 active:scale-95 group animate-in fade-in zoom-in-95 duration-1000 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-full"
                     style={{ WebkitTapHighlightColor: 'transparent' }}
@@ -566,7 +579,7 @@ export const LandingRitual: React.FC<LandingRitualProps> = ({ onSync }) => {
                     </div>
                 </button>
                 <button
-                    onClick={() => { if (!audioOn) void startAudio(); onSync(); }}
+                    onClick={handleEnter}
                     className="flex items-center group cursor-pointer hover:opacity-100 transition-opacity duration-400 animate-in fade-in slide-in-from-bottom-8 duration-1000"
                 >
                     <span
