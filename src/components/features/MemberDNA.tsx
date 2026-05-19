@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { ChevronLeft, PenTool, Disc, Award } from 'lucide-react';
 import { useMemberById } from '../../hooks';
 import { BTSLogo } from '../visual';
+import GlossaryTip from '../ui/GlossaryTip';
 
 export interface MemberDNAProps {
     memberId: string;
@@ -139,8 +140,10 @@ export const MemberDNA: React.FC<MemberDNAProps> = ({ memberId, onClose }) => {
 
                         <div className="p-4 md:p-8 bg-[#111118] rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all duration-700 shadow-2xl group">
                             <div className="flex items-center gap-4 mb-6" style={{ color: member.color || '#fff' }}>
-                                <PenTool size={22} />
-                                <span className="text-xs font-semibold tracking-wide uppercase opacity-70">KOMCA credits</span>
+                                <PenTool size={22} aria-hidden="true" />
+                                <span className="text-xs font-semibold tracking-wide uppercase opacity-70">
+                                    <GlossaryTip term="KOMCA">KOMCA</GlossaryTip> credits
+                                </span>
                             </div>
                             <div className="flex items-end gap-4">
                                 <div className="text-3xl md:text-6xl font-semibold text-white tracking-tight">{member.komca_credits || 0}</div>
