@@ -1123,7 +1123,13 @@ export function useConcertBeat({
   }, [ensureYouTubePlayer, skipChant, runChant, startPlaylist]);
 
   const skip = useCallback(async () => {
-    // Skip during chant → abort, then start the playlist.
+    // Skip during chant → silence the intro cleanly, then start the playlist.
+    // Used to overlap the chant audio with the first song for 200-400 ms
+    // because YouTube.pauseVideo() is a postMessage round-trip (async). Now
+    // we (a) kill the volume fade-in interval, (b) silence + pause YouTube,
+    // (c) quick-fade the custom chant audio, (d) wait long enough for the
+    // iframe to actually process the pause and for any in-flight synth
+    // stinger to decay, then (e) start the playlist.
     let inChant = false;
     setState((s) => {
       inChant = s.chantPhase === 'running';
@@ -1136,14 +1142,44 @@ export function useConcertBeat({
         clearTimeout(chantTimerRef.current);
         chantTimerRef.current = null;
       }
-      // Pause YouTube + custom audio mid-playback
+
+      // Stop the YouTube volume-ramp interval if it's still climbing —
+      // otherwise it can keep calling setVolume(>0) after we've muted.
       const yt = ytPlayerRef.current;
       if (yt) {
-        try { yt.pauseVideo(); yt.setVolume(0); } catch { /* noop */ }
+        const ytWithTimer = yt as unknown as { _fadeInTimer?: number };
+        if (ytWithTimer._fadeInTimer !== undefined) {
+          window.clearInterval(ytWithTimer._fadeInTimer);
+          ytWithTimer._fadeInTimer = undefined;
+        }
+        try {
+          yt.setVolume(0);
+          yt.pauseVideo();
+          yt.stopVideo();
+        } catch { /* noop */ }
       }
+
+      // Quick volume fade on the custom chant element (if any).
       const ca = customChantAudioRef.current;
-      if (ca && !ca.paused) ca.pause();
+      if (ca && !ca.paused) {
+        const startVol = ca.volume;
+        const fadeStart = performance.now();
+        const fade = () => {
+          const t = Math.min((performance.now() - fadeStart) / 150, 1);
+          ca.volume = startVol * (1 - t);
+          if (t < 1) requestAnimationFrame(fade);
+          else ca.pause();
+        };
+        requestAnimationFrame(fade);
+      }
+
       setState((s) => ({ ...s, chantPhase: 'done', chantMember: null }));
+
+      // Give the iframe ~280 ms to actually pause + any residual synth
+      // stinger to decay before the song's own fade-in begins. Without
+      // this the two audios overlap audibly.
+      await new Promise<void>((r) => window.setTimeout(r, 280));
+
       await startPlaylist();
       return;
     }
