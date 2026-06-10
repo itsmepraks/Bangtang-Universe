@@ -51,6 +51,15 @@ export const SOLO_ALBUMS: SoloAlbum[] = [
         tracks: ['Running Wild', 'I\'ll Be There', 'Another Level', 'Until It Reaches You', 'Heart on the Window', 'In Yearning/Longing'],
         created_at: '2024-01-01T00:00:00Z'
     },
+    {
+        id: 16,
+        member_id: 'jin',
+        title: 'Echo',
+        release_date: '2025-05-16',
+        type: 'EP',
+        tracks: ['Don\'t Say You Love Me'],
+        created_at: '2026-05-20T00:00:00Z'
+    },
 
     // ============ SUGA ============
     {

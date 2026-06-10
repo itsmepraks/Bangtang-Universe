@@ -119,6 +119,12 @@ export const MEMBER_DATA: ExtendedMember[] = [
                 releaseDate: '2024-11-15',
                 type: 'Studio',
                 tracks: ['Running Wild', 'I\'ll Be There', 'Another Level', 'Until It Reaches You', 'Heart on the Window', 'In Yearning/Longing']
+            },
+            {
+                title: 'Echo',
+                releaseDate: '2025-05-16',
+                type: 'EP',
+                tracks: ['Don\'t Say You Love Me']
             }
         ],
         featuredTracks: ['Yours (Jirisan OST)', 'It\'s Definitely You (Hwarang OST) with V'],

@@ -181,6 +181,17 @@ export const ALBUMS: Album[] = [
         era: 'Chapter 2',
         coverColor: BORAHAE_COLORS.PRIMARY,
         coverArtUrl: 'http://coverartarchive.org/release/47915090-9b99-4cfe-9326-92b40332c345/35879173466-500.jpg',
+    },
+    {
+        id: 16,
+        title: 'Arirang',
+        releaseDate: '2026-03-20',
+        type: 'Studio',
+        trackCount: 14,
+        description: 'BTS\'s 6th Korean studio album and first full-group LP since Proof (2022) — the comeback after all seven members completed military service. Lead single "Swim" is track 7; the album debuted #1 on Billboard 200 for two consecutive weeks.',
+        era: 'Arirang',
+        coverColor: '#8B5CF6',
+        coverArtUrl: null,
     }
 ];
 
