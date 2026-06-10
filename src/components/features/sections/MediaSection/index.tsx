@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy } from 'react';
 import { Film, Tv, User, LayoutGrid } from 'lucide-react';
 import type { Media, Member } from '../../../../types/database';
+import { EditorialPageHeader, GallerySection } from '../../../editorial';
 
 
 const MediaGrid = lazy(() => import('./MediaGrid'));
@@ -23,6 +24,8 @@ type TabId = (typeof TABS)[number]['id'];
 
 export default function MediaSection({ media, members }: MediaSectionProps) {
     const [activeTab, setActiveTab] = useState<TabId>('all');
+    const documentaries = media.filter(m => m.type === 'documentary' || m.type === 'concert_film' || m.type === 'docu_series').length;
+    const soloMedia = media.filter(m => m.scope === 'solo' || m.scope === 'unit').length;
 
     const filteredMedia = (() => {
         switch (activeTab) {
@@ -39,6 +42,20 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
 
     return (
         <div className="space-y-6">
+            <EditorialPageHeader
+                eyebrow="Viewing Room / Media"
+                title="The archive remembers through screens."
+                note="Documentaries, concert films, reality shows, and solo appearances preserve the public memory around the music. This room keeps media browsable while treating each record as part of the collection."
+                meta={
+                    <>
+                        <span>{media.length.toLocaleString()} records</span>
+                        <span>{documentaries} documentaries and films</span>
+                        <span>{soloMedia} solo or unit records</span>
+                        <span>{members.length} linked members</span>
+                    </>
+                }
+            />
+
             <div className="overflow-x-auto scrollbar-hide">
                 <div className="flex items-center gap-2" role="tablist" aria-label="Media views">
                     {TABS.map((tab) => {
@@ -72,27 +89,35 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
                 </div>
             </div>
 
-            <div
-                id="media-panel"
-                role="tabpanel"
-                aria-labelledby={`media-tab-${activeTab}`}
-                tabIndex={0}
-                className="bg-[#111118] rounded-2xl border border-white/[0.06] p-4 sm:p-6 focus:outline-none"
+            <GallerySection
+                number="01"
+                label="Viewing Index"
+                title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Media records'}
+                claim="The media room is still a tool, but its frame is archival: format, scope, platform, and member links matter."
+                caption="Use the filters to move between the full media timeline, documentary records, variety and reality entries, and solo or unit media."
             >
-                <Suspense
-                    fallback={
-                        <div className="flex items-center justify-center h-64">
-                            <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                        </div>
-                    }
+                <div
+                    id="media-panel"
+                    role="tabpanel"
+                    aria-labelledby={`media-tab-${activeTab}`}
+                    tabIndex={0}
+                    className="focus:outline-none"
                 >
-                    {activeTab === 'all' ? (
-                        <MediaTimeline media={filteredMedia} members={members} />
-                    ) : (
-                        <MediaGrid media={filteredMedia} members={members} />
-                    )}
-                </Suspense>
-            </div>
+                    <Suspense
+                        fallback={
+                            <div className="flex items-center justify-center h-64">
+                                <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                            </div>
+                        }
+                    >
+                        {activeTab === 'all' ? (
+                            <MediaTimeline media={filteredMedia} members={members} />
+                        ) : (
+                            <MediaGrid media={filteredMedia} members={members} />
+                        )}
+                    </Suspense>
+                </div>
+            </GallerySection>
         </div>
     );
 }

@@ -8,6 +8,7 @@ import type { DashboardSection } from '../../../types/index';
 import Badge from '../../ui/Badge';
 import ProgressBar from '../../ui/ProgressBar';
 import EmptyState from '../../ui/EmptyState';
+import { EditorialPageHeader, GallerySection } from '../../editorial';
 
 interface SearchSectionProps {
   songs: Song[];
@@ -132,6 +133,28 @@ export default function SearchSection({ songs, members, albums, awards, concerts
 
   return (
     <div className="space-y-5">
+      <EditorialPageHeader
+        eyebrow="Research Desk / Search"
+        title="Start with a question, then follow the record."
+        note="Search stays direct and fast, but the frame is archival: songs, albums, members, awards, and concerts are all entry points into the same collection."
+        meta={
+          <>
+            <span>{songs.length.toLocaleString()} songs</span>
+            <span>{albums.length.toLocaleString()} releases</span>
+            <span>{awards.length.toLocaleString()} awards</span>
+            <span>{concerts.length.toLocaleString()} shows</span>
+          </>
+        }
+      />
+
+      <GallerySection
+        number="01"
+        label="Archive Query"
+        title="Search is the research desk."
+        claim="Use the input when you know the object. Use mood chips when you know the feeling before the title."
+        caption="Results preserve their existing routing into songs, albums, members, awards, and concert records."
+      >
+      <div className="space-y-5">
       {/* Search Bar */}
       <div className="relative">
         <div className="flex items-center gap-4 bg-[#111118] border border-white/[0.06] rounded-2xl px-6 py-4 focus-within:border-purple-500/30 transition-colors">
@@ -292,6 +315,8 @@ export default function SearchSection({ songs, members, albums, awards, concerts
           </div>
         </div>
       )}
+      </div>
+      </GallerySection>
     </div>
   );
 }

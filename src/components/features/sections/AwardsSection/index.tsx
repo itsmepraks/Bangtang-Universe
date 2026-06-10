@@ -1,6 +1,7 @@
 import { useState, Suspense, lazy } from 'react';
 import { Trophy, Calendar, BarChart3, LayoutList } from 'lucide-react';
 import type { Award, Member } from '../../../../types/database';
+import { EditorialPageHeader, GallerySection } from '../../../editorial';
 
 
 const AwardGrid = lazy(() => import('./AwardGrid'));
@@ -24,6 +25,8 @@ type TabId = (typeof TABS)[number]['id'];
 
 export default function AwardsSection({ awards, members }: AwardsSectionProps) {
   const [activeTab, setActiveTab] = useState<TabId>('grid');
+  const wins = awards.filter((award) => award.result === 'won').length;
+  const ceremonies = new Set(awards.map((award) => award.ceremony)).size;
 
   const renderPanel = () => {
     switch (activeTab) {
@@ -42,6 +45,19 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
 
   return (
     <div className="space-y-6">
+      <EditorialPageHeader
+        eyebrow="Recognition Room / Awards"
+        title="Recognition arrived in waves."
+        note="Awards are not a pile of trophies. They are a chronology of institutions, categories, nominations, wins, and solo/group distinction accumulating over time."
+        meta={
+          <>
+            <span>{wins.toLocaleString()} wins</span>
+            <span>{awards.length.toLocaleString()} nominations</span>
+            <span>{ceremonies} ceremonies</span>
+          </>
+        }
+      />
+
       <div className="overflow-x-auto scrollbar-hide">
         <div className="flex items-center gap-2" role="tablist" aria-label="Awards views">
           {TABS.map((tab) => {
@@ -68,17 +84,25 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
         </div>
       </div>
 
-      <div className="bg-[#111118] rounded-2xl border border-white/[0.06] p-4 sm:p-6" role="tabpanel">
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center h-64">
-              <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-            </div>
-          }
-        >
-          {renderPanel()}
-        </Suspense>
-      </div>
+      <GallerySection
+        number="01"
+        label="Recognition Chronology"
+        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Award evidence'}
+        claim="The useful question is when recognition concentrates, which ceremonies repeat, and where solo records enter the archive."
+        caption="The existing trophy room, podium, timeline, and statistics stay intact but now sit inside a curatorial frame."
+      >
+        <div role="tabpanel">
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+              </div>
+            }
+          >
+            {renderPanel()}
+          </Suspense>
+        </div>
+      </GallerySection>
     </div>
   );
 }

@@ -1,24 +1,16 @@
 import { useMemo } from 'react';
-import { Music, Disc, Users, PenTool, Trophy, MapPin, Sparkles, MessageSquare, Search as SearchIcon, ArrowRight } from 'lucide-react';
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import type { Song, Album, Member, Award, Concert } from '../../../../types/database';
 import type { DashboardSection } from '../../../../types/index';
-import StatCard from './StatCard';
-import BentoCard from './BentoCard';
 import {
-  computeEraEvolution,
-  computeMemberContributions,
-} from '../../../../services/analyticsService';
-import { CHART_STYLES, BORAHAE_COLORS } from '../../../../constants/colors';
+  CollectionIndex,
+  EditorialPageHeader,
+  EvidencePanel,
+  GallerySection,
+  ObjectLabel,
+} from '../../../editorial';
+import { computeEraEvolution, computeMemberContributions } from '../../../../services/analyticsService';
+import { BORAHAE_COLORS, CHART_STYLES, SECTION_ACCENTS } from '../../../../constants/colors';
 
 interface HomeSectionProps {
   songs: Song[];
@@ -29,17 +21,24 @@ interface HomeSectionProps {
   onNavigate: (section: DashboardSection, payload?: string | number) => void;
 }
 
-// "Love Yourself: Her" → "LY:Her"; "WINGS" → "WINGS"; "Dark & Wild" → "D&W"
+function formatYear(date?: string | null): string {
+  return date ? date.slice(0, 4) : 'Undated';
+}
+
 function abbreviateEra(era: string): string {
   if (era.includes(':')) {
     const [main, sub] = era.split(':').map((s) => s.trim());
     const initials = main.split(/\s+/).map((w) => w[0]?.toUpperCase() ?? '').join('');
-    const subFirst = sub.split(/\s+/)[0].slice(0, 3);
-    return `${initials}:${subFirst}`;
+    return `${initials}:${sub.split(/\s+/)[0].slice(0, 3)}`;
   }
   const words = era.split(/\s+/);
-  if (words.length === 1) return era.slice(0, 6);
+  if (words.length === 1) return era.slice(0, 7);
   return words.map((w) => w[0]?.toUpperCase() ?? '').join('');
+}
+
+function formatReleaseDate(date?: string | null): string {
+  if (!date) return 'Unknown date';
+  return new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' }).format(new Date(date));
 }
 
 export default function HomeSection({
@@ -50,356 +49,238 @@ export default function HomeSection({
   concerts,
   onNavigate,
 }: HomeSectionProps) {
-  // ── Stats strip ───────────────────────────────────────────────
-  const eras = useMemo(
-    () => [...new Set(albums.map((a) => a.era).filter(Boolean))],
-    [albums],
-  );
-  const totalKomca = useMemo(
-    () => members.reduce((sum, m) => sum + (m.komca_credits || 0), 0),
-    [members],
-  );
-  const awardsWon = useMemo(() => awards.filter((a) => a.result === 'won').length, [awards]);
+  const eras = useMemo(() => [...new Set(albums.map((a) => a.era).filter(Boolean))], [albums]);
   const latestAlbum = useMemo(
     () => [...albums].sort((a, b) => (b.release_date ?? '').localeCompare(a.release_date ?? ''))[0] ?? null,
     [albums],
   );
-  const uniqueTours = useMemo(
-    () => new Set(concerts.map((c) => c.tour_name)).size,
-    [concerts],
-  );
+  const awardsWon = useMemo(() => awards.filter((a) => a.result === 'won').length, [awards]);
+  const uniqueTours = useMemo(() => new Set(concerts.map((c) => c.tour_name)).size, [concerts]);
+  const uniqueCountries = useMemo(() => new Set(concerts.map((c) => c.country)).size, [concerts]);
+  const totalKomca = useMemo(() => members.reduce((sum, m) => sum + (m.komca_credits || 0), 0), [members]);
+  const titleTracksCount = useMemo(() => songs.filter((s) => s.is_title_track).length, [songs]);
 
-  // ── MUSIC card ────────────────────────────────────────────────
-  const eraStats = useMemo(() => computeEraEvolution(songs, albums), [songs, albums]);
-  const musicChartData = useMemo(
+  const eraEvolution = useMemo(() => computeEraEvolution(songs, albums), [songs, albums]);
+  const eraStory = useMemo(() => {
+    return eraEvolution.slice(0, 8).map((era, index) => {
+      const eraAlbums = albums
+        .filter((album) => album.era === era.era)
+        .sort((a, b) => (a.release_date ?? '').localeCompare(b.release_date ?? ''));
+      const eraSongs = songs.filter((song) => {
+        if (!song.album_id) return false;
+        return eraAlbums.some((album) => album.id === song.album_id);
+      });
+      const firstAlbum = eraAlbums[0];
+      const lastAlbum = eraAlbums[eraAlbums.length - 1];
+      return {
+        id: era.era,
+        index,
+        era: era.era,
+        short: abbreviateEra(era.era),
+        year: formatYear(firstAlbum?.release_date),
+        range: firstAlbum && lastAlbum
+          ? `${formatReleaseDate(firstAlbum.release_date)} - ${formatReleaseDate(lastAlbum.release_date)}`
+          : 'Undated',
+        releases: eraAlbums.length,
+        songs: eraSongs.length,
+        energy: era.avgEnergy,
+        valence: era.avgValence,
+        anchor: firstAlbum?.title ?? era.era,
+        color: firstAlbum?.cover_color || (index % 2 === 0 ? BORAHAE_COLORS.LIGHT : '#e8d8ad'),
+      };
+    });
+  }, [albums, songs, eraEvolution]);
+  const eraChartData = useMemo(
     () =>
-      eraStats.map((e) => ({
-        era: abbreviateEra(e.era),
-        energy: e.avgEnergy,
-        valence: e.avgValence,
+      eraEvolution.map((era) => ({
+        era: abbreviateEra(era.era),
+        energy: era.avgEnergy,
+        valence: era.avgValence,
       })),
-    [eraStats],
-  );
-  const titleTracksCount = useMemo(
-    () => songs.filter((s) => s.is_title_track).length,
-    [songs],
+    [eraEvolution],
   );
 
-  // ── MEMBERS card ──────────────────────────────────────────────
-  const contributions = useMemo(
-    () => computeMemberContributions(members, songs),
-    [members, songs],
-  );
-  const memberChartData = useMemo(
-    () => contributions.map((c) => ({ name: c.stageName, value: c.komcaCredits, color: c.color })),
-    [contributions],
-  );
-  const topContributor = contributions[0]?.stageName ?? '—';
+  const contributions = useMemo(() => computeMemberContributions(members, songs), [members, songs]);
+  const topContributor = contributions[0];
 
-  // ── AWARDS card ───────────────────────────────────────────────
-  const uniqueCeremonies = useMemo(
-    () => new Set(awards.map((a) => a.ceremony)).size,
-    [awards],
-  );
   const winsByYear = useMemo(() => {
     const map: Record<number, number> = {};
     awards
-      .filter((a) => a.result === 'won')
-      .forEach((a) => {
-        map[a.year] = (map[a.year] || 0) + 1;
+      .filter((award) => award.result === 'won')
+      .forEach((award) => {
+        map[award.year] = (map[award.year] || 0) + 1;
       });
     return Object.entries(map)
       .sort(([a], [b]) => Number(a) - Number(b))
-      .map(([year, count]) => ({ year: `'${String(year).slice(2)}`, count: Number(count) }));
+      .map(([year, count]) => ({ year: `'${year.slice(2)}`, count }));
   }, [awards]);
 
-  // ── CONCERTS card ─────────────────────────────────────────────
-  const uniqueCountries = useMemo(
-    () => new Set(concerts.map((c) => c.country)).size,
-    [concerts],
-  );
-  const concertChartData = useMemo(() => {
-    const map: Record<string, number> = {};
-    concerts.forEach((c) => {
-      map[c.tour_name] = (map[c.tour_name] || 0) + 1;
-    });
-    return Object.entries(map)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-      .map(([name, count]) => ({ name, count }));
-  }, [concerts]);
-
   return (
-    <main className="space-y-8">
-      {/* ── Page title + tagline ─────────────────────────────────── */}
-      <div className="pt-1">
-        <h1 className="text-xs font-semibold text-white/40 uppercase tracking-widest">
-          Bangtan Universe
-        </h1>
-        <p className="text-sm text-white/35 mt-1">
-          11 years. 7 members. The numbers behind the music.
-        </p>
-      </div>
+    <main className="space-y-6">
+      <EditorialPageHeader
+        eyebrow="Bangtan Universe / Permanent Collection"
+        title="Seven artists, one moving archive."
+        note="From debut releases to solo authorship and stadium-scale tours, the BTS archive is best read as a system of eras: music, movement, recognition, and memory changing together."
+        meta={
+          <>
+            <span>{formatYear(albums[0]?.release_date)}-{formatYear(latestAlbum?.release_date)}</span>
+            <span>{eras.length} eras</span>
+            <span>{songs.length.toLocaleString()} catalog records</span>
+          </>
+        }
+        aside={
+          <CollectionIndex
+            onNavigate={(section) => onNavigate(section)}
+            items={[
+              { label: 'Songs', value: songs.length, section: 'discography', note: `${titleTracksCount} title tracks`, accent: SECTION_ACCENTS.discography },
+              { label: 'Members', value: members.length, section: 'members', note: `${totalKomca.toLocaleString()} KOMCA credits`, accent: SECTION_ACCENTS.members },
+              { label: 'Awards', value: awardsWon, section: 'awards', note: `${awards.length.toLocaleString()} nominations tracked`, accent: SECTION_ACCENTS.awards },
+              { label: 'Tours', value: uniqueTours, section: 'tours', note: `${uniqueCountries} countries in the archive`, accent: SECTION_ACCENTS.tours },
+            ]}
+          />
+        }
+      />
 
-      {/* ── Stats strip ─────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-        <StatCard label="Songs" value={songs.length} icon={Music} subtitle={`across ${eras.length} eras`} />
-        <StatCard label="Albums" value={albums.length} icon={Disc} accent="#818CF8" />
-        <StatCard label="Members" value={members.length} icon={Users} accent="#C084FC" subtitle="active artists" />
-        <StatCard label="KOMCA Credits" value={totalKomca} icon={PenTool} accent="#D8B4FE" subtitle="total production" />
-        <StatCard label="Awards Won" value={awardsWon} icon={Trophy} accent="#FBBF24" subtitle={`${awards.length} nominations`} />
-        <StatCard label="Concerts" value={concerts.length} icon={MapPin} accent="#10B981" subtitle={`${uniqueTours} tours`} />
-      </div>
-
-      {/* ── Try this: quick entry cards (Nielsen #6, #7 — surface hidden features) ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {[
-          {
-            icon: SearchIcon,
-            label: 'Search by mood',
-            hint: 'Happy, sad, energetic…',
-            onClick: () => onNavigate('search'),
-          },
-          {
-            icon: Sparkles,
-            label: 'Find songs like…',
-            hint: 'Recommendations by mood & era',
-            onClick: () => { window.location.hash = '#/analytics/discover'; },
-          },
-          {
-            icon: MessageSquare,
-            label: 'Ask about BTS',
-            hint: '"Who has the most credits?"',
-            onClick: () => { window.location.hash = '#/analytics/discover'; },
-          },
-        ].map(({ icon: Icon, label, hint, onClick }) => (
-          <button
-            key={label}
-            onClick={onClick}
-            className="group flex items-center gap-3 text-left bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-3 hover:bg-white/[0.05] hover:border-purple-500/20 active:scale-[0.96] transition-[background-color,border-color,transform] duration-200"
-          >
-            <div className="w-9 h-9 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-4 h-4 text-purple-300/80" aria-hidden="true" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">{label}</div>
-              <div className="text-[11px] text-white/40 truncate">{hint}</div>
-            </div>
-            <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-purple-300 group-hover:translate-x-0.5 transition-[color,transform] flex-shrink-0" aria-hidden="true" />
-          </button>
-        ))}
-      </div>
-
-      {/* ── Bento grid ──────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-        {/* MUSIC — col 1, row 1 */}
-        <BentoCard
-          title="Music"
-          metrics={[
-            { value: songs.length, label: 'songs' },
-            { value: eras.length, label: 'eras' },
-            { value: titleTracksCount, label: 'title tracks' },
-          ]}
-          onExplore={() => onNavigate('discography')}
+      <div className="grid grid-cols-1 xl:grid-cols-[1.25fr_0.75fr] gap-6">
+        <GallerySection
+          number="01"
+          label="Era Spine"
+          title="The archive moves through eras, not just releases."
+          claim="Chronology becomes the first visual path: each era is a room with releases, songs, sound, and one anchor object."
+          caption="Read top to bottom as an exhibition wall. The chart sits beside the spine as supporting evidence."
+          source="Source: local song and album records."
+          className="gallery-section--wide"
         >
-          {/* Legend */}
-          <div className="flex items-center gap-3 mb-2">
-            <span className="flex items-center gap-1.5 text-[10px] text-white/35">
-              <span className="w-3 h-0.5 rounded inline-block" style={{ backgroundColor: BORAHAE_COLORS.PRIMARY }} />
-              Energy
-            </span>
-            <span className="flex items-center gap-1.5 text-[10px] text-white/35">
-              <span className="w-3 h-0.5 rounded bg-[#C084FC] inline-block" />
-              Valence
-            </span>
-          </div>
-          <ResponsiveContainer width="100%" height={120}>
-            <AreaChart data={musicChartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <XAxis
-                dataKey="era"
-                tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis domain={[0, 1]} tick={false} axisLine={false} tickLine={false} />
-              <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ stroke: 'rgba(255,255,255,0.06)' }} />
-              <Area
-                type="monotone"
-                dataKey="energy"
-                stroke={BORAHAE_COLORS.PRIMARY}
-                fill={BORAHAE_COLORS.PRIMARY}
-                fillOpacity={0.15}
-                strokeWidth={2}
-                dot={false}
-                name="Energy"
-                isAnimationActive={false}
-              />
-              <Area
-                type="monotone"
-                dataKey="valence"
-                stroke="#C084FC"
-                fill="#C084FC"
-                fillOpacity={0.10}
-                strokeWidth={1.5}
-                dot={false}
-                name="Valence"
-                isAnimationActive={false}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </BentoCard>
-
-        {/* MEMBERS — col 2, row 1 */}
-        <BentoCard
-          title="Members"
-          metrics={[
-            { value: members.length, label: 'artists' },
-            { value: totalKomca, label: 'KOMCA' },
-            { value: topContributor, label: 'top writer' },
-          ]}
-          onExplore={() => onNavigate('members')}
-        >
-          <div className="space-y-2.5">
-            {memberChartData.map((member) => (
-              <div key={member.name} className="flex items-center gap-2.5">
-                <span className="text-[10px] text-white/50 w-[46px] text-right shrink-0 font-medium">
-                  {member.name}
-                </span>
-                <div className="flex-1 h-2 bg-white/[0.06] rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${(member.value / (memberChartData[0]?.value || 1)) * 100}%`,
-                      backgroundColor: member.color,
-                      opacity: 0.8,
-                    }}
-                  />
-                </div>
-                <span className="text-[10px] text-white/30 w-7 text-right tabular-nums shrink-0">
-                  {member.value}
-                </span>
+          <div className="story-wall">
+            <div className="era-spine" aria-label="Era timeline">
+              {eraStory.map((era) => (
+                <button
+                  type="button"
+                  key={era.id}
+                  onClick={() => onNavigate('discography', era.era)}
+                  className="era-spine__item"
+                  style={{ '--era-color': era.color } as React.CSSProperties}
+                >
+                  <span className="era-spine__year">{era.year}</span>
+                  <span className="era-spine__marker" aria-hidden="true" />
+                  <span className="era-spine__content">
+                    <span className="era-spine__kicker">Gallery {String(era.index + 1).padStart(2, '0')} / {era.short}</span>
+                    <span className="era-spine__title">{era.era}</span>
+                    <span className="era-spine__range">{era.range}</span>
+                    <span className="era-spine__anchor">{era.anchor}</span>
+                    <span className="era-spine__metrics">
+                      <span>{era.releases} releases</span>
+                      <span>{era.songs} songs</span>
+                      <span>{Math.round(era.energy * 100)} energy</span>
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+            <EvidencePanel
+              title="Sound profile as evidence"
+              eyebrow="Evidence wall"
+              caption="Energy and valence are normalized from 0 to 1. The useful reading is the shape between eras, not a single score."
+              className="story-wall__evidence"
+            >
+              <div className="h-[360px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={eraChartData} margin={{ top: 12, right: 12, bottom: 0, left: -18 }}>
+                    <XAxis dataKey="era" tick={{ fontSize: 11, fill: 'rgba(242,234,223,0.45)' }} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 1]} tick={false} axisLine={false} tickLine={false} />
+                    <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ stroke: 'rgba(242,234,223,0.12)' }} />
+                    <Area type="monotone" dataKey="energy" stroke={BORAHAE_COLORS.LIGHT} fill={BORAHAE_COLORS.PRIMARY} fillOpacity={0.16} strokeWidth={2} dot={false} name="Energy" isAnimationActive={false} />
+                    <Area type="monotone" dataKey="valence" stroke="#e8d8ad" fill="#e8d8ad" fillOpacity={0.08} strokeWidth={1.8} dot={false} name="Valence" isAnimationActive={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
-            ))}
+            </EvidencePanel>
           </div>
-        </BentoCard>
+        </GallerySection>
 
-        {/* LATEST RELEASE — col 3, rows 1+2 (tall) */}
-        <BentoCard
-          title="Latest Release"
-          metrics={[
-            { value: latestAlbum?.title ?? '—', label: 'album' },
-            { value: latestAlbum?.release_date?.slice(0, 4) ?? '—', label: 'year' },
-          ]}
-          onExplore={() => latestAlbum && onNavigate('discography', latestAlbum.id)}
-          className="lg:row-span-2 lg:col-span-1"
+        <GallerySection
+          number="02"
+          label="Featured Labels"
+          title="Four objects explain the collection."
+          claim="A museum entrance does not show everything; it chooses the labels that orient the room."
         >
-          <div className="relative h-full min-h-[280px] rounded-xl overflow-hidden">
-            {latestAlbum?.cover_art_url ? (
-              <img
-                src={latestAlbum.cover_art_url}
-                alt={latestAlbum.title}
-                width={600}
-                height={600}
-                decoding="async"
-                className="w-full h-full object-cover img-outline opacity-80"
-                loading="lazy"
-              />
-            ) : (
-              <div
-                className="w-full h-full"
-                style={{
-                  background: `linear-gradient(135deg, ${latestAlbum?.cover_color || BORAHAE_COLORS.PRIMARY}60, ${latestAlbum?.cover_color || BORAHAE_COLORS.PRIMARY}10)`,
-                }}
-              />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/40 to-transparent" />
-            <div className="absolute top-3 left-3">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-white/90 text-[#0a0a0f] tracking-wide">NEW</span>
-            </div>
-            <div className="absolute bottom-4 left-4 right-4">
-              <p className="text-lg font-bold text-white">{latestAlbum?.title}</p>
-              <div className="flex items-center gap-2 mt-1">
-                {latestAlbum?.era && (
-                  <span className="text-xs text-white/60">{latestAlbum.era}</span>
-                )}
-                {latestAlbum?.track_count && (
-                  <span className="text-xs text-white/40">{latestAlbum.track_count} tracks</span>
-                )}
-              </div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
+            <ObjectLabel
+              classification="Release"
+              title={latestAlbum?.title ?? 'Latest release unavailable'}
+              detail={latestAlbum ? `${formatYear(latestAlbum.release_date)} · ${latestAlbum.era ?? latestAlbum.type}` : undefined}
+              value={latestAlbum?.track_count ?? '—'}
+              valueLabel="tracks"
+              description="The latest catalog object anchors the archive in present tense."
+              accent={SECTION_ACCENTS.discography}
+              actionLabel="Open catalog"
+              onClick={() => latestAlbum && onNavigate('discography', latestAlbum.id)}
+              media={latestAlbum?.cover_art_url ? (
+                <img src={latestAlbum.cover_art_url} alt={latestAlbum.title} className="h-full w-full object-cover" loading="lazy" decoding="async" />
+              ) : undefined}
+            />
+            <ObjectLabel
+              classification="Authorship"
+              title={topContributor?.stageName ?? 'Member credits'}
+              detail="KOMCA writing and production record"
+              value={topContributor?.komcaCredits ?? totalKomca}
+              valueLabel="credits"
+              description="The member archive is also a record of creative labor and authorship."
+              accent={SECTION_ACCENTS.members}
+              actionLabel="View members"
+              onClick={() => onNavigate('members')}
+            />
+            <ObjectLabel
+              classification="Movement"
+              title="Tour footprint"
+              detail={`${uniqueTours} tours · ${uniqueCountries} countries`}
+              value={concerts.length}
+              valueLabel="shows"
+              description="The archive becomes geographic through venues, routes, and repeat cities."
+              accent={SECTION_ACCENTS.tours}
+              actionLabel="Open map"
+              onClick={() => onNavigate('tours')}
+            />
+            <ObjectLabel
+              classification="Recognition"
+              title="Awards chronology"
+              detail={`${awards.length.toLocaleString()} tracked nominations`}
+              value={awardsWon}
+              valueLabel="wins"
+              description="Recognition arrives in waves, across ceremonies, categories, group work, and solo work."
+              accent={SECTION_ACCENTS.awards}
+              actionLabel="Enter room"
+              onClick={() => onNavigate('awards')}
+            />
           </div>
-        </BentoCard>
-
-        {/* AWARDS — col 1, row 2 */}
-        <BentoCard
-          title="Awards"
-          metrics={[
-            { value: awardsWon, label: 'won' },
-            { value: awards.length - awardsWon, label: 'nominated' },
-            { value: uniqueCeremonies, label: 'ceremonies' },
-          ]}
-          onExplore={() => onNavigate('awards')}
-        >
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={winsByYear} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <XAxis
-                dataKey="year"
-                tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                tick={{ fontSize: 9, fill: 'rgba(255,255,255,0.3)' }}
-                tickLine={false}
-                axisLine={false}
-                allowDecimals={false}
-              />
-              <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
-              <Bar
-                dataKey="count"
-                fill={BORAHAE_COLORS.PRIMARY}
-                fillOpacity={0.8}
-                radius={[3, 3, 0, 0]}
-                isAnimationActive={false}
-                name="Wins"
-                activeBar={{ fillOpacity: 0.95 }}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </BentoCard>
-
-        {/* CONCERTS — col 2, row 2 */}
-        <BentoCard
-          title="Concerts"
-          metrics={[
-            { value: concerts.length, label: 'shows' },
-            { value: uniqueCountries, label: 'countries' },
-            { value: uniqueTours, label: 'tours' },
-          ]}
-          onExplore={() => onNavigate('tours')}
-        >
-          <div className="space-y-2">
-            {concertChartData.map((tour) => (
-              <div key={tour.name} className="flex items-center gap-2">
-                <span className="text-[10px] text-white/50 flex-[2] min-w-0 truncate">
-                  {tour.name}
-                </span>
-                <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden min-w-[32px]">
-                  <div
-                    className="h-full rounded-full bg-emerald-500/70"
-                    style={{ width: `${(tour.count / (concertChartData[0]?.count ?? 1)) * 100}%` }}
-                  />
-                </div>
-                <span className="text-[10px] text-white/30 shrink-0 w-5 text-right tabular-nums">
-                  {tour.count}
-                </span>
-              </div>
-            ))}
-          </div>
-        </BentoCard>
-
+        </GallerySection>
       </div>
+
+      <GallerySection
+        number="03"
+        label="Recognition"
+        title="Awards are a chronology, not a trophy pile."
+        claim="The useful view is the rhythm of recognition over time: dense years, quiet years, and the institutions that repeat."
+        caption="This compact view keeps the overview restrained while pointing to the full awards room."
+      >
+        <EvidencePanel
+          title="Wins by year"
+          eyebrow="Recognition timeline"
+          caption="Counts include records marked as won in the local awards table."
+          source="Source: awards dataset."
+        >
+          <div className="h-[220px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={winsByYear} margin={{ top: 12, right: 8, bottom: 0, left: -20 }}>
+                <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgba(242,234,223,0.45)' }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: 'rgba(242,234,223,0.38)' }} tickLine={false} axisLine={false} allowDecimals={false} />
+                <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ fill: 'rgba(232,216,173,0.05)' }} />
+                <Bar dataKey="count" fill="#e8d8ad" fillOpacity={0.82} radius={[2, 2, 0, 0]} name="Wins" isAnimationActive={false} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </EvidencePanel>
+      </GallerySection>
     </main>
   );
 }

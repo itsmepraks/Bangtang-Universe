@@ -1,6 +1,7 @@
 import { useState, useRef, Suspense, lazy } from 'react';
 import { MapPin, BarChart3, Globe } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
+import { EditorialPageHeader, GallerySection } from '../../../editorial';
 
 
 const TourList = lazy(() => import('./TourList'));
@@ -22,6 +23,8 @@ type TabId = (typeof TABS)[number]['id'];
 export default function ToursSection({ concerts }: ToursSectionProps) {
   const [activeTab, setActiveTab] = useState<TabId>('map');
   const tablistRef = useRef<HTMLDivElement>(null);
+  const uniqueCountries = new Set(concerts.map((concert) => concert.country)).size;
+  const uniqueTours = new Set(concerts.map((concert) => concert.tour_name)).size;
 
   const handleTabKeyDown = (e: React.KeyboardEvent) => {
     const idx = TABS.findIndex((t) => t.id === activeTab);
@@ -57,6 +60,19 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
 
   return (
     <div className="space-y-6">
+      <EditorialPageHeader
+        eyebrow="Geographic Exhibition / Tours"
+        title="The archive became geographic."
+        note="Tour records turn releases into routes: cities, venues, countries, setlists, and the scale of a global audience moving with the music."
+        meta={
+          <>
+            <span>{concerts.length.toLocaleString()} shows</span>
+            <span>{uniqueTours} tours</span>
+            <span>{uniqueCountries} countries</span>
+          </>
+        }
+      />
+
       <div className="overflow-x-auto scrollbar-hide scroll-fade-x">
         <div
           ref={tablistRef}
@@ -92,21 +108,29 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
         </div>
       </div>
 
-      <div
-        id="tours-panel"
-        className={`bg-[#111118] rounded-2xl border border-white/[0.06] ${activeTab === 'map' ? 'p-0 overflow-hidden' : 'p-4 sm:p-6'}`}
-        role="tabpanel"
+      <GallerySection
+        number="01"
+        label="Tour Room"
+        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Tour evidence'}
+        claim="The map and lists are evidence of movement: repeated markets, expanded routes, and the changing scale of the live archive."
+        caption="Switch between map, list, and statistics without leaving the geographic exhibition."
       >
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center h-64">
-              <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-            </div>
-          }
+        <div
+          id="tours-panel"
+          className={activeTab === 'map' ? 'overflow-hidden rounded-md' : ''}
+          role="tabpanel"
         >
-          {renderPanel()}
-        </Suspense>
-      </div>
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-64">
+                <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+              </div>
+            }
+          >
+            {renderPanel()}
+          </Suspense>
+        </div>
+      </GallerySection>
     </div>
   );
 }

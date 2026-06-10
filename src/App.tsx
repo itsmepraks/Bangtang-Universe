@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 
 import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useMemberEvents, useMedia } from './hooks';
 import type { DashboardSection, DiscographyState } from './types/index';
@@ -7,7 +7,7 @@ import { SECTION_ACCENTS } from './constants/colors';
 import {
   BTSLogo,
 } from './components';
-import { Breadcrumb, DataStatusBanner, DotLoader } from './components/ui';
+import { DataStatusBanner, DotLoader } from './components/ui';
 
 const Universe3D = lazy(() => import('./components/features/Universe3D'));
 const LandingRitual = lazy(() => import('./components/features/LandingRitual'));
@@ -50,9 +50,7 @@ import {
   Menu,
   X,
   Info,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Music,
+  Settings2,
 } from 'lucide-react';
 
 function getGreeting(): string {
@@ -63,25 +61,6 @@ function getGreeting(): string {
   if (h < 22) return 'Good evening, ARMY';
   return 'Night owl, ARMY';
 }
-
-const SECTION_TITLES: Record<DashboardSection, string> = {
-  overview: 'Overview',
-  discography: 'Discography',
-  members: 'Members',
-  analytics: 'Analytics',
-  awards: 'Awards',
-  tours: 'Tours',
-  media: 'Media',
-  search: 'Search',
-};
-
-const ANALYTICS_TAB_LABELS: Record<string, string> = {
-  sound: 'The sound',
-  mood: 'Mood & lyrics',
-  credits: 'Who writes',
-  discover: 'Discover',
-  milestones: 'Milestones',
-};
 
 // Concert-mode background bokeh — fixed positions so the field looks
 // composed rather than random per render. Mix of brand purple, soft
@@ -115,18 +94,8 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    try {
-      return localStorage.getItem('bts-sidebar-collapsed') === '1';
-    } catch { return false; }
-  });
   const [paletteOpen, setPaletteOpen] = useState(false);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('bts-sidebar-collapsed', sidebarCollapsed ? '1' : '0');
-    } catch { /* noop */ }
-  }, [sidebarCollapsed]);
+  const [projectMenuOpen, setProjectMenuOpen] = useState(false);
   const [concertMode, setConcertMode] = useState(false);
 
   const [discographyState, setDiscographyState] = useState<DiscographyState>({
@@ -214,17 +183,16 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [sidebarOpen]);
 
-  const { songs, loading: songsLoading, error: songsError, refetch: refetchSongs } = useSongs();
-  const { albums, loading: albumsLoading, error: albumsError, refetch: refetchAlbums } = useAlbums();
-  const { members, loading: membersLoading, error: membersError, refetch: refetchMembers } = useMembers();
+  const { songs, error: songsError, refetch: refetchSongs } = useSongs();
+  const { albums, error: albumsError, refetch: refetchAlbums } = useAlbums();
+  const { members, error: membersError, refetch: refetchMembers } = useMembers();
   const { lyrics, error: lyricsError, refetch: refetchLyrics } = useLyrics();
-  const { awards, loading: awardsLoading, error: awardsError, refetch: refetchAwards } = useAwards();
+  const { awards, error: awardsError, refetch: refetchAwards } = useAwards();
   const { chartEntries, error: chartEntriesError, refetch: refetchChartEntries } = useChartEntries();
-  const { concerts, loading: concertsLoading, error: concertsError, refetch: refetchConcerts } = useConcerts();
+  const { concerts, error: concertsError, refetch: refetchConcerts } = useConcerts();
   const { memberEvents, error: memberEventsError, refetch: refetchMemberEvents } = useMemberEvents();
-  const { media, loading: mediaLoading, error: mediaError, refetch: refetchMedia } = useMedia();
+  const { media, error: mediaError, refetch: refetchMedia } = useMedia();
 
-  const dataLoading = songsLoading || albumsLoading || membersLoading || awardsLoading || concertsLoading || mediaLoading;
   const hasDataError = Boolean(
     songsError || albumsError || membersError || lyricsError || awardsError ||
     chartEntriesError || concertsError || memberEventsError || mediaError
@@ -271,44 +239,6 @@ export default function App() {
     }
   };
 
-  const selectedAlbum = useMemo(() => albums.find(a => a.id === discographyState.selectedAlbumId) || null, [albums, discographyState.selectedAlbumId]);
-  const selectedSong = useMemo(() => songs.find(s => s.id === discographyState.selectedSongId) || null, [songs, discographyState.selectedSongId]);
-  const selectedMember = useMemo(() => members.find(m => m.id === memberSectionId) || null, [members, memberSectionId]);
-
-  const breadcrumbs = useMemo(() => {
-    const items: { label: string; onClick?: () => void }[] = [
-      {
-        label: SECTION_TITLES[activeSection],
-        onClick: () => {
-          if (activeSection === 'discography') setDiscographyState({ selectedAlbumId: null, selectedSongId: null, view: 'grid' });
-          if (activeSection === 'members') setMemberSectionId(null);
-        },
-      },
-    ];
-
-    if (activeSection === 'discography') {
-      if (selectedAlbum) {
-        items.push({
-          label: selectedAlbum.title,
-          onClick: () => setDiscographyState({ selectedAlbumId: selectedAlbum.id, selectedSongId: null, view: 'album' }),
-        });
-      }
-      if (selectedSong) {
-        items.push({ label: selectedSong.title });
-      }
-    }
-
-    if (activeSection === 'members' && selectedMember) {
-      items.push({ label: selectedMember.stage_name });
-    }
-
-    if (activeSection === 'analytics' && analyticsTabFromHash && ANALYTICS_TAB_LABELS[analyticsTabFromHash]) {
-      items.push({ label: ANALYTICS_TAB_LABELS[analyticsTabFromHash] });
-    }
-
-    return items;
-  }, [activeSection, selectedAlbum, selectedSong, selectedMember, analyticsTabFromHash]);
-
   return (
     <div className="relative w-screen h-screen bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white noise-texture">
 
@@ -330,7 +260,7 @@ export default function App() {
       )}
 
       {mode === 'dashboard' && !activeMemberId && (
-        <div className="absolute inset-0 z-10 flex animate-in fade-in zoom-in-95 duration-1000">
+        <div className="editorial-dashboard absolute inset-0 z-10 flex animate-in fade-in zoom-in-95 duration-1000">
           {/* Skip link — visible only on keyboard focus */}
           <a
             href="#main-content"
@@ -374,162 +304,175 @@ export default function App() {
           {concertMode && <div className="concert-led-strip" aria-hidden="true" />}
 
           {sidebarOpen && (
-            <div
-              className="fixed inset-0 bg-black/60 z-40 md:hidden"
-              onClick={() => setSidebarOpen(false)}
-            />
-          )}
-
-          <div className={`fixed inset-y-0 left-0 ${sidebarCollapsed ? 'w-[72px]' : 'w-56'} bg-[#0c0c12] border-r border-white/[0.06] flex flex-col py-4 ${sidebarCollapsed ? 'px-3' : 'px-4'} z-50 transform transition-[transform,width,padding] duration-300 ease-in-out ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0`}>
-            <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} mb-6`}>
-              <div
-                onClick={() => setMode('landing')}
-                className={`flex items-center ${sidebarCollapsed ? '' : 'gap-3'} group cursor-pointer min-w-0`}
-              >
-                <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300 flex-shrink-0" />
-                {!sidebarCollapsed && (
-                  <div className="min-w-0">
-                    <span className="block text-sm font-semibold text-white/80 leading-tight truncate">Bangtan Universe</span>
-                    <span className="block text-[10px] text-white/55 leading-tight truncate">{getGreeting()}</span>
+            <div className="fixed inset-0 z-40 xl:hidden">
+              <div className="absolute inset-0 bg-black/65" onClick={() => setSidebarOpen(false)} />
+              <aside className="absolute inset-y-0 left-0 w-[min(88vw,360px)] bg-[#12100e] border-r border-[var(--editorial-border-soft)] px-5 py-5 shadow-2xl">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <BTSLogo className="w-7 h-7 text-white" />
+                    <div>
+                      <p className="text-sm font-semibold text-white/90 leading-tight">Bangtan Universe</p>
+                      <p className="text-[10px] uppercase tracking-[0.16em] text-white/40">Collection index</p>
+                    </div>
                   </div>
-                )}
-              </div>
-              {!sidebarCollapsed && (
-                <button
-                  onClick={() => setSidebarCollapsed(true)}
-                  className="hidden md:flex items-center justify-center w-7 h-7 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/[0.04] transition-colors flex-shrink-0"
-                  aria-label="Collapse sidebar"
-                  title="Collapse sidebar"
-                >
-                  <PanelLeftClose size={16} />
-                </button>
-              )}
-            </div>
-
-            {sidebarCollapsed && (
-              <button
-                onClick={() => setSidebarCollapsed(false)}
-                className="hidden md:flex items-center justify-center w-full h-9 mb-3 rounded-lg text-white/40 hover:text-white/80 hover:bg-white/[0.04] transition-colors"
-                aria-label="Expand sidebar"
-                title="Expand sidebar"
-              >
-                <PanelLeftOpen size={16} />
-              </button>
-            )}
-
-            <nav aria-label="Main navigation" className="flex flex-col gap-1 flex-1">
-              {NAV_ITEMS.map(item => {
-                const isActive = activeSection === item.id;
-                const accent = SECTION_ACCENTS[item.id];
-                return (
                   <button
-                    key={item.id}
-                    onClick={() => setActiveSection(item.id)}
-                    aria-current={isActive ? 'page' : undefined}
-                    title={sidebarCollapsed ? item.label : undefined}
-                    className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-4'} py-3 rounded-xl transition-[color,background-color] duration-200 w-full text-left ${
-                      isActive
-                        ? 'text-white'
-                        : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03]'
-                    }`}
-                    style={isActive ? { backgroundColor: `${accent}22` } : undefined}
+                    type="button"
+                    onClick={() => setSidebarOpen(false)}
+                    className="grid h-9 w-9 place-items-center rounded-md border border-white/[0.08] text-white/55 hover:text-white"
+                    aria-label="Close collection index"
                   >
-                    {/* Active items recolor the icon to the section accent —
-                        replaces the previous left-stripe indicator. */}
-                    <item.icon
-                      size={18}
-                      aria-hidden="true"
-                      className="flex-shrink-0"
-                      style={isActive ? { color: accent } : undefined}
-                    />
-                    {!sidebarCollapsed && (
-                      <span className={`text-sm ${isActive ? 'font-semibold' : 'font-medium'}`}>
-                        {item.label}
-                      </span>
-                    )}
+                    <X size={17} />
                   </button>
-                );
-              })}
-            </nav>
-
-            <div className={`pt-4 border-t border-white/[0.06] mb-3 ${sidebarCollapsed ? 'px-0' : 'px-2'} space-y-2`}>
-              <button
-                onClick={() => setConcertMode(c => !c)}
-                aria-pressed={concertMode}
-                title="Concert mode: brighter ambient glow that cycles through member colors, like a stadium during a tour"
-                className={`flex items-center ${sidebarCollapsed ? 'justify-center px-0' : 'gap-2 px-4'} py-2.5 rounded-xl text-xs font-medium transition-[color,background-color,border-color] duration-200 w-full text-left ${
-                  concertMode
-                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white border border-purple-500/30'
-                    : 'text-white/60 hover:text-white/80 hover:bg-white/[0.03]'
-                }`}
-              >
-                <span className="text-base" aria-hidden="true">{concertMode ? '🔥' : '🎆'}</span>
-                {!sidebarCollapsed && <span>{concertMode ? 'Concert mode on' : 'Concert mode'}</span>}
-              </button>
-              <button
-                onClick={() => setMode('onboarding')}
-                title={sidebarCollapsed ? 'About this project' : undefined}
-                className={`flex items-center ${sidebarCollapsed ? 'justify-center w-full' : 'gap-2'} text-xs text-white/55 hover:text-white/80 transition-colors cursor-pointer`}
-              >
-                <Info size={14} />
-                {!sidebarCollapsed && <span>About this project</span>}
-              </button>
+                </div>
+                <nav aria-label="Collection navigation" className="mt-8 grid gap-1">
+                  {NAV_ITEMS.map((item, index) => {
+                    const isActive = activeSection === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          setActiveSection(item.id);
+                          setSidebarOpen(false);
+                        }}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={`flex items-center justify-between border-b border-white/[0.07] px-1 py-3 text-left transition-colors ${
+                          isActive ? 'text-white' : 'text-white/55 hover:text-white/85'
+                        }`}
+                      >
+                        <span className="flex items-center gap-3">
+                          <span className="text-[10px] tabular-nums text-white/35">{String(index + 1).padStart(2, '0')}</span>
+                          <span className="text-sm font-medium">{item.label}</span>
+                        </span>
+                        <item.icon size={15} aria-hidden="true" />
+                      </button>
+                    );
+                  })}
+                </nav>
+                <div className="mt-8 grid gap-2 border-t border-white/[0.08] pt-5">
+                  <button
+                    type="button"
+                    onClick={() => setConcertMode(c => !c)}
+                    aria-pressed={concertMode}
+                    className="flex items-center justify-between rounded-md border border-white/[0.08] px-3 py-2 text-xs text-white/65 hover:text-white"
+                  >
+                    <span>Concert mode</span>
+                    <span>{concertMode ? 'On' : 'Off'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setMode('onboarding');
+                    }}
+                    className="flex items-center gap-2 rounded-md border border-white/[0.08] px-3 py-2 text-xs text-white/65 hover:text-white"
+                  >
+                    <Info size={14} />
+                    About this project
+                  </button>
+                </div>
+              </aside>
             </div>
-
-            {!sidebarCollapsed && (
-              <div className="pt-4 border-t border-white/[0.06] mb-2">
-                {dataLoading ? (
-                  <div className="grid grid-cols-2 gap-1.5 px-2">
-                    {[1,2,3,4,5,6].map(i => (
-                      <div key={i} className="h-8 rounded-md bg-white/[0.02] animate-pulse" />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-x-2 gap-y-1 px-2">
-                    {[
-                      { icon: Music, label: 'songs', value: songs.length, color: SECTION_ACCENTS.discography },
-                      { icon: Disc, label: 'albums', value: albums.length, color: SECTION_ACCENTS.discography },
-                      { icon: Users, label: 'members', value: members.length, color: SECTION_ACCENTS.members },
-                      { icon: Trophy, label: 'awards', value: awards.length, color: SECTION_ACCENTS.awards },
-                      { icon: MapPin, label: 'shows', value: concerts.length, color: SECTION_ACCENTS.tours },
-                      { icon: Film, label: 'media', value: media.length, color: SECTION_ACCENTS.media },
-                    ].map(({ icon: Icon, label, value, color }) => (
-                      <div key={label} className="flex items-center gap-1.5 py-1">
-                        <Icon size={11} style={{ color: `${color}cc` }} className="flex-shrink-0" aria-hidden="true" />
-                        <span className="text-xs font-semibold text-white/70 tabular-nums">{value.toLocaleString()}</span>
-                        <span className="text-[10px] text-white/55">{label}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-          </div>
+          )}
 
           <div className="flex-1 flex flex-col min-w-0 relative z-10">
 
-            <header className="flex flex-col bg-[#0c0c12]/50 border-b border-white/[0.06]">
-              <div className="h-14 flex items-center justify-between px-4 md:px-8">
-                <div className="flex items-center">
+            <header className="flex flex-col border-b border-[var(--editorial-border-soft)] bg-[#100f0d]/88 backdrop-blur-xl">
+              <div className="min-h-16 flex items-center justify-between gap-4 px-4 md:px-8">
+                <div className="flex items-center gap-3 min-w-0">
                   <button
                     onClick={() => setSidebarOpen(prev => !prev)}
-                    className="md:hidden p-2 -ml-2 mr-2 text-white/60 hover:text-white"
-                    aria-label="Toggle navigation"
+                    className="xl:hidden grid h-9 w-9 place-items-center rounded-md border border-white/[0.08] text-white/60 hover:text-white"
+                    aria-label="Open collection index"
                   >
-                    {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                    <Menu size={18} />
                   </button>
-                  <Breadcrumb items={breadcrumbs} />
+                  <button
+                    type="button"
+                    onClick={() => setMode('landing')}
+                    className="hidden sm:flex items-center gap-3 text-left group min-w-0"
+                    aria-label="Return to landing page"
+                  >
+                    <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300 flex-shrink-0" />
+                    <span className="min-w-0">
+                      <span className="block text-sm font-semibold text-white/90 leading-tight truncate">Bangtan Universe</span>
+                      <span className="block text-[10px] uppercase tracking-[0.16em] text-white/42 leading-tight truncate">{getGreeting()}</span>
+                    </span>
+                  </button>
                 </div>
-                <button
-                  onClick={() => setPaletteOpen(true)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-white/50 hover:text-white/80 hover:bg-white/[0.06] transition-colors text-xs"
-                  aria-label="Open command palette"
-                >
-                  <Search size={14} aria-hidden="true" />
-                  <span className="hidden sm:inline">Search…</span>
-                  <kbd className="hidden sm:inline-block text-[10px] px-1 rounded bg-white/[0.06] border border-white/[0.08] font-mono">⌘&nbsp;K</kbd>
-                </button>
+
+                <nav aria-label="Collection navigation" className="hidden xl:flex items-center justify-center gap-1 flex-1">
+                  {NAV_ITEMS.map((item, index) => {
+                    const isActive = activeSection === item.id;
+                    const accent = SECTION_ACCENTS[item.id];
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setActiveSection(item.id)}
+                        aria-current={isActive ? 'page' : undefined}
+                        className={`group relative px-3 py-5 text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors ${
+                          isActive ? 'text-white' : 'text-white/43 hover:text-white/78'
+                        }`}
+                      >
+                        <span className="mr-2 text-[9px] font-medium text-white/25 tabular-nums">{String(index + 1).padStart(2, '0')}</span>
+                        {item.label}
+                        <span
+                          className={`absolute inset-x-3 bottom-0 h-px transition-opacity ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'}`}
+                          style={{ backgroundColor: accent }}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    );
+                  })}
+                </nav>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPaletteOpen(true)}
+                    className="flex items-center gap-2 rounded-md border border-white/[0.08] bg-white/[0.025] px-3 py-2 text-xs text-white/50 hover:bg-white/[0.045] hover:text-white/80 transition-colors"
+                    aria-label="Open command palette"
+                  >
+                    <Search size={14} aria-hidden="true" />
+                    <span className="hidden sm:inline">Search</span>
+                    <kbd className="hidden sm:inline-block rounded border border-white/[0.08] bg-white/[0.045] px-1 text-[10px] font-mono">⌘ K</kbd>
+                  </button>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setProjectMenuOpen(open => !open)}
+                      className="grid h-9 w-9 place-items-center rounded-md border border-white/[0.08] bg-white/[0.025] text-white/50 hover:bg-white/[0.045] hover:text-white/80 transition-colors"
+                      aria-label="Open project menu"
+                      aria-expanded={projectMenuOpen}
+                    >
+                      <Settings2 size={15} />
+                    </button>
+                    {projectMenuOpen && (
+                      <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-md border border-[var(--editorial-border-soft)] bg-[#15120f] p-2 shadow-2xl">
+                        <button
+                          type="button"
+                          onClick={() => setConcertMode(c => !c)}
+                          aria-pressed={concertMode}
+                          className="flex w-full items-center justify-between rounded px-3 py-2 text-left text-xs text-white/62 hover:bg-white/[0.045] hover:text-white"
+                        >
+                          <span>Concert mode</span>
+                          <span className="text-white/38">{concertMode ? 'On' : 'Off'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProjectMenuOpen(false);
+                            setMode('onboarding');
+                          }}
+                          className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-xs text-white/62 hover:bg-white/[0.045] hover:text-white"
+                        >
+                          <Info size={14} />
+                          About this project
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
               <DataStatusBanner
                 hasError={hasDataError}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { BarChart3, Heart, Network, Sparkles, Trophy } from 'lucide-react';
 import type { Song, Album, Member, Lyrics, Award, ChartEntry, Concert, MemberEvent } from '../../../../types/database';
 import { DotLoader } from '../../../ui';
+import { EditorialPageHeader, GallerySection } from '../../../editorial';
 
 const SoundPanel = lazy(() => import('./SoundPanel'));
 const MoodPanel = lazy(() => import('./MoodPanel'));
@@ -80,7 +81,20 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <EditorialPageHeader
+        eyebrow="Research Wing / Analytics"
+        title="Sound, authorship, and recognition moved together."
+        note="This section keeps the exploratory tools, but frames each tab as a research chapter: a question, a body of evidence, and a pattern worth noticing."
+        meta={
+          <>
+            <span>{songs.length.toLocaleString()} songs</span>
+            <span>{albums.length.toLocaleString()} releases</span>
+            <span>{members.length} members</span>
+          </>
+        }
+      />
+
       {/* Flat single-row tab strip — keyboard-navigable via arrow keys */}
       <AnalyticsTabStrip
         tabs={TABS}
@@ -89,23 +103,31 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
       />
 
       {/* Panel */}
-      <div
-        role="tabpanel"
-        id="analytics-panel"
-        aria-labelledby={`analytics-tab-${activeTab}`}
-        tabIndex={0}
-        className="bg-[#111118] rounded-2xl border border-white/[0.06] p-2 md:p-4 focus:outline-none"
+      <GallerySection
+        number="01"
+        label="Analytical Chapter"
+        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'The evidence'}
+        claim="Charts should explain what changed, not simply prove that data exists."
+        caption="Use the tab strip to move between sound, lyrics, authorship, discovery, and milestone evidence."
       >
-        <Suspense
-          fallback={
-            <div className="flex items-center justify-center h-64">
-              <DotLoader />
-            </div>
-          }
+        <div
+          role="tabpanel"
+          id="analytics-panel"
+          aria-labelledby={`analytics-tab-${activeTab}`}
+          tabIndex={0}
+          className="focus:outline-none"
         >
-          {renderPanel()}
-        </Suspense>
-      </div>
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center h-64">
+                <DotLoader />
+              </div>
+            }
+          >
+            {renderPanel()}
+          </Suspense>
+        </div>
+      </GallerySection>
     </div>
   );
 }
@@ -145,7 +167,7 @@ function AnalyticsTabStrip({
       <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#0a0a0f] to-transparent pointer-events-none z-10" />
       <div
         ref={tablistRef}
-        className="flex items-center gap-0.5 overflow-x-auto scrollbar-hide border-b border-white/[0.06]"
+        className="editorial-tabs flex items-center overflow-x-auto scrollbar-hide"
         role="tablist"
         aria-label="Analytics views"
         onKeyDown={handleKeyDown}
@@ -168,10 +190,10 @@ function AnalyticsTabStrip({
                 aria-controls="analytics-panel"
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => onChange(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 whitespace-nowrap border-b-2 -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0 rounded-sm ${
+                className={`editorial-tab flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 whitespace-nowrap -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0 ${
                   isActive
-                    ? 'text-white border-cyan-500'
-                    : 'text-white/55 border-transparent hover:text-white/80 hover:border-white/20'
+                    ? ''
+                    : 'hover:text-white/80 hover:border-white/20'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />

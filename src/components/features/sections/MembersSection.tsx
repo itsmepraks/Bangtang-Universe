@@ -7,6 +7,7 @@ import MemberTimeline from './Members/MemberTimeline';
 import Badge from '../../ui/Badge';
 import MemberComparison from '../comparison/MemberComparison';
 import { getMemberColor, BORAHAE_COLORS } from '../../../constants/colors';
+import { EditorialPageHeader, GallerySection } from '../../editorial';
 
 
 interface MembersSectionProps {
@@ -19,12 +20,12 @@ interface MembersSectionProps {
 
 function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: string) => void }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="member-equal-wall" aria-label="Equal artist label wall">
       {members.map(m => (
         <button
           key={m.id}
           onClick={() => onSelect(m.id)}
-          className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] flex flex-col"
+          className="member-equal-card group"
           style={{
             '--member-color': getMemberColor(m.id),
           } as React.CSSProperties}
@@ -40,7 +41,7 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
           }}
         >
           {/* Photo */}
-          <div className="aspect-[3/4] relative overflow-hidden rounded-t-2xl">
+          <div className="aspect-[3/4] relative overflow-hidden">
             {m.image_url ? (
               <img src={m.image_url} alt={m.stage_name} width={300} height={420} decoding="async" loading="lazy" className="w-full h-full object-cover img-outline grayscale group-hover:grayscale-0 transition-[filter] duration-700" />
             ) : (
@@ -50,13 +51,14 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-[#020005] via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
-              <h3 className="text-lg font-semibold text-white/95" style={{ textShadow: `0 0 20px ${m.color}80` }}>{m.stage_name}</h3>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-white/50">Artist label</p>
+              <h3 className="text-lg font-semibold text-white/95">{m.stage_name}</h3>
               {m.full_name && <p className="text-xs text-white/60 mt-1">{m.full_name}</p>}
             </div>
           </div>
           {/* Info */}
           <div className="p-5 space-y-3">
-            <p className="text-xs font-medium text-white/50">{m.role}</p>
+            <p className="text-xs font-medium text-white/55 leading-relaxed">{m.role}</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <PenTool size={12} className="text-white/40" />
@@ -446,6 +448,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
 
 export default function MembersSection({ members, songs, selectedMemberId, onSelectMember, onOpenFullProfile }: MembersSectionProps) {
   const selectedMember = useMemo(() => members.find(m => m.id === selectedMemberId) || null, [members, selectedMemberId]);
+  const totalKomca = useMemo(() => members.reduce((sum, member) => sum + (member.komca_credits || 0), 0), [members]);
 
   if (selectedMember) {
     return (
@@ -459,12 +462,38 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
   }
 
   return (
-    <div className="space-y-8">
-      <MemberGrid members={members} onSelect={onSelectMember} />
-      <div className="border-t border-white/[0.04] my-2" />
-      <GlassHUD title="Compare Members" icon={GitCompare}>
-        <MemberComparison members={members} songs={songs} />
-      </GlassHUD>
+    <div className="space-y-6">
+      <EditorialPageHeader
+        eyebrow="Career Gallery / Members"
+        title="Seven careers, one shared origin."
+        note="The member room treats each artist as a career object: role, authorship, solo work, collaboration, and milestones extending from the same group archive."
+        meta={
+          <>
+            <span>{members.length} artists</span>
+            <span>{totalKomca.toLocaleString()} KOMCA credits</span>
+            <span>{songs.length.toLocaleString()} linked songs</span>
+          </>
+        }
+      />
+      <GallerySection
+        number="01"
+        label="Artist Labels"
+        title="Each member is a record of creative labor."
+        claim="The gallery view keeps the portraits, but the labels foreground role, authorship, and the path into each detailed profile."
+        caption="Select an artist label to open biography, career, music, and awards records."
+      >
+        <MemberGrid members={members} onSelect={onSelectMember} />
+      </GallerySection>
+      <GallerySection
+        number="02"
+        label="Comparison Table"
+        title="The shared archive can be compared carefully."
+        claim="Comparison belongs after the individual labels, where it can support a question instead of reducing the members to a leaderboard."
+      >
+        <GlassHUD title="Compare Members" icon={GitCompare}>
+          <MemberComparison members={members} songs={songs} />
+        </GlassHUD>
+      </GallerySection>
     </div>
   );
 }
