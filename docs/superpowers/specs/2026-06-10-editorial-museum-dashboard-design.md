@@ -162,6 +162,38 @@ Existing components such as `StatCard`, `BentoCard`, and `ChartPanel` should eit
 - Search and command palette remain useful entry points.
 - Mobile layouts should preserve the thesis-first reading order.
 
+## Navigation Direction
+
+The persistent desktop sidebar should be removed. Its current shape reads as generic SaaS dashboard chrome: large app brand block, vertical icon list, purple active pill, utility links, and data-count footer. That pattern conflicts with the editorial museum direction.
+
+Primary navigation should become **Top Collection Navigation**:
+
+- A restrained top bar that behaves like a museum/publication site header
+- Global destinations expressed as collection rooms: Overview, Catalog, Members, Research, Tours, Awards, Media, Search
+- Search and command palette remain available in the top bar
+- The active state should be quiet: text weight, underline, or hairline marker rather than a large filled pill
+- The bar should use the editorial material system: ink, hairlines, small caps, and selective purple annotation
+
+Long pages should also get **Page-Level Wayfinding**:
+
+- Use an "On this page" or chapter index for long editorial sections
+- Link to galleries such as Artist Labels, Comparison Table, Era Catalog, Recognition Chronology, and Viewing Index
+- Keep local wayfinding contextual to the page rather than repeating global navigation
+
+Mobile and narrow screens should use a **Collection Drawer**:
+
+- A menu button opens the collection index
+- The drawer contains the global destinations and secondary project actions
+- The drawer should feel like an archive index, not a collapsed admin sidebar
+
+Utility actions should move out of primary navigation:
+
+- Concert mode belongs in a small Project or Settings menu
+- About this project belongs in the same secondary menu
+- Data counts should not live in persistent navigation; they belong in Overview or page-level metadata
+
+The existing sidebar should not be restyled in place. The structural pattern is the mismatch.
+
 ## Accessibility And Responsiveness
 
 - Maintain semantic headings and landmarks.
