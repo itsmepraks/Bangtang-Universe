@@ -73,14 +73,13 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
         }
       />
 
-      <div className="overflow-x-auto scrollbar-hide scroll-fade-x">
-        <div
-          ref={tablistRef}
-          className="flex items-center gap-2"
-          role="tablist"
-          aria-label="Tours views"
-          onKeyDown={handleTabKeyDown}
-        >
+      <div
+        ref={tablistRef}
+        className="archive-tab-row scroll-fade-x"
+        role="tablist"
+        aria-label="Tours views"
+        onKeyDown={handleTabKeyDown}
+      >
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -94,18 +93,14 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
                 aria-controls="tours-panel"
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 ${
-                  isActive
-                    ? 'bg-emerald-500/10 text-white border border-emerald-500/30'
-                    : 'text-white/60 hover:text-white/85 hover:bg-white/[0.03] border border-transparent'
-                }`}
+                className="archive-tab-btn focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
+                style={{ '--tab-accent': '#10B981' } as React.CSSProperties}
               >
                 <Icon className="w-4 h-4" aria-hidden="true" />
                 <span className="whitespace-nowrap">{tab.label}</span>
               </button>
             );
           })}
-        </div>
       </div>
 
       <GallerySection

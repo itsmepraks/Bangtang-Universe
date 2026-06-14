@@ -16,7 +16,7 @@ export default function EditorialPageHeader({
   aside,
 }: EditorialPageHeaderProps) {
   return (
-    <header className="editorial-surface editorial-page-header">
+    <header className={`editorial-surface editorial-page-header ${aside ? '' : 'editorial-page-header--solo'}`}>
       <div className="min-w-0">
         <p className="editorial-kicker">{eyebrow}</p>
         <h1 className="editorial-title">{title}</h1>

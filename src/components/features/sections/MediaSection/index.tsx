@@ -56,8 +56,7 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
                 }
             />
 
-            <div className="overflow-x-auto scrollbar-hide">
-                <div className="flex items-center gap-2" role="tablist" aria-label="Media views">
+            <div className="archive-tab-row" role="tablist" aria-label="Media views">
                     {TABS.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
@@ -70,11 +69,8 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
                                 aria-controls="media-panel"
                                 tabIndex={isActive ? 0 : -1}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-[background-color,color,border-color] duration-200 ${
-                                    isActive
-                                        ? 'bg-purple-500/10 text-white border border-purple-500/30'
-                                        : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
-                                }`}
+                                className="archive-tab-btn"
+                                style={{ '--tab-accent': '#b68cff' } as React.CSSProperties}
                             >
                                 <Icon className="w-4 h-4" aria-hidden="true" />
                                 <span className="whitespace-nowrap">{tab.label}</span>
@@ -86,7 +82,6 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
                     <div className="ml-auto">
                         <MediaStats media={media} />
                     </div>
-                </div>
             </div>
 
             <GallerySection

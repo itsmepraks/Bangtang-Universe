@@ -190,7 +190,7 @@ function AnalyticsTabStrip({
                 aria-controls="analytics-panel"
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => onChange(tab.id)}
-                className={`editorial-tab flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 whitespace-nowrap -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 focus-visible:ring-offset-0 ${
+                className={`editorial-tab flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-all duration-200 whitespace-nowrap -mb-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-0 ${
                   isActive
                     ? ''
                     : 'hover:text-white/80 hover:border-white/20'

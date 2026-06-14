@@ -58,8 +58,7 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
         }
       />
 
-      <div className="overflow-x-auto scrollbar-hide">
-        <div className="flex items-center gap-2" role="tablist" aria-label="Awards views">
+      <div className="archive-tab-row" role="tablist" aria-label="Awards views">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -70,18 +69,14 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? 'bg-amber-500/15 text-white border border-amber-500/30'
-                    : 'text-white/50 hover:text-white/70 hover:bg-white/[0.03] border border-transparent'
-                }`}
+                className="archive-tab-btn"
+                style={{ '--tab-accent': '#FBBF24' } as React.CSSProperties}
               >
                 <Icon className="w-4 h-4" aria-hidden="true" />
                 <span className="whitespace-nowrap">{tab.label}</span>
               </button>
             );
           })}
-        </div>
       </div>
 
       <GallerySection
