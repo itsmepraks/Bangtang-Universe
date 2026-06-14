@@ -29,18 +29,18 @@ const SECTIONS = [
 const STEPS = [
   {
     eyebrow: 'Entry / Permanent Collection',
-    title: 'Seven artists, one moving archive.',
-    body: 'Bangtan Universe is organized like an exhibition: eras, objects, evidence, routes, recognition, and memory. Start with the collection, then follow the records wherever they lead.',
+    title: 'Start with the collection.',
+    body: 'Bangtan Universe keeps albums, songs, members, awards, tours, and media in one place. Start broad, then open the records you want to inspect.',
   },
   {
-    eyebrow: 'Rooms / What You Can Enter',
-    title: 'Each room has a different kind of evidence.',
-    body: 'The archive is not just a pile of data. Catalog objects, artist labels, maps, timelines, awards, and media records each explain a different part of the story.',
+    eyebrow: 'Sections / What You Can Open',
+    title: 'Each section answers a different question.',
+    body: 'Use Catalog for releases, Members for artist records, Research for charts, Awards for recognition, Tours for routes, and Media for films and shows.',
   },
   {
     eyebrow: 'Ready / Begin The Walkthrough',
-    title: 'Enter the collection.',
-    body: 'You can use the top collection navigation, search, or any object label to move through the archive. The first room opens on the overview.',
+    title: 'Open the overview.',
+    body: 'Use the top navigation, search, or any record label to move around. The overview gives you the shortest path into the full archive.',
   },
 ] as const;
 
@@ -91,8 +91,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       style={{ overscrollBehavior: 'contain' }}
     >
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_16%,rgba(168,85,247,0.16),transparent_26%),radial-gradient(circle_at_82%_82%,rgba(232,216,173,0.08),transparent_34%)]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e8e0d3]/25 to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-px bg-[#e8e0d3]/20" />
       </div>
 
       <button
@@ -156,7 +155,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/34">Room {String(index + 1).padStart(2, '0')}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/34">Section {String(index + 1).padStart(2, '0')}</p>
                     <h2 className="mt-5 font-serif text-3xl font-medium leading-none tracking-normal text-[#f2eadf]">{label}</h2>
                   </div>
                   <div className="grid h-10 w-10 place-items-center rounded-md border border-white/[0.08] bg-black/20 text-[#b68cff]">
