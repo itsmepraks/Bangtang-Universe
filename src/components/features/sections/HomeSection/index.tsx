@@ -41,6 +41,10 @@ function formatReleaseDate(date?: string | null): string {
   return new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' }).format(new Date(date));
 }
 
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat('en', { notation: value >= 10000 ? 'compact' : 'standard' }).format(value);
+}
+
 export default function HomeSection({
   songs,
   albums,
@@ -59,6 +63,19 @@ export default function HomeSection({
   const uniqueCountries = useMemo(() => new Set(concerts.map((c) => c.country)).size, [concerts]);
   const totalKomca = useMemo(() => members.reduce((sum, m) => sum + (m.komca_credits || 0), 0), [members]);
   const titleTracksCount = useMemo(() => songs.filter((s) => s.is_title_track).length, [songs]);
+  const musicVideosCount = useMemo(() => songs.filter((s) => s.has_mv).length, [songs]);
+  const soloSongsCount = useMemo(() => songs.filter((s) => s.is_solo).length, [songs]);
+  const releaseYears = useMemo(
+    () =>
+      albums
+        .map((album) => Number(formatYear(album.release_date)))
+        .filter((year) => Number.isFinite(year))
+        .sort((a, b) => a - b),
+    [albums],
+  );
+  const archiveSpan = releaseYears.length > 1
+    ? `${releaseYears[0]}-${releaseYears[releaseYears.length - 1]}`
+    : formatYear(albums[0]?.release_date);
 
   const eraEvolution = useMemo(() => computeEraEvolution(songs, albums), [songs, albums]);
   const eraStory = useMemo(() => {
@@ -102,6 +119,10 @@ export default function HomeSection({
 
   const contributions = useMemo(() => computeMemberContributions(members, songs), [members, songs]);
   const topContributor = contributions[0];
+  const namedEraStory = useMemo(
+    () => eraStory.filter((era) => era.era.toLowerCase() !== 'unknown' && era.year !== 'Undated'),
+    [eraStory],
+  );
 
   const winsByYear = useMemo(() => {
     const map: Record<number, number> = {};
@@ -114,16 +135,77 @@ export default function HomeSection({
       .sort(([a], [b]) => Number(a) - Number(b))
       .map(([year, count]) => ({ year: `'${year.slice(2)}`, count }));
   }, [awards]);
+  const mostDenseEra = useMemo(
+    () => namedEraStory.reduce((best, era) => (era.songs > (best?.songs ?? -1) ? era : best), namedEraStory[0]),
+    [namedEraStory],
+  );
+  const highestEnergyEra = useMemo(
+    () => namedEraStory.reduce((best, era) => (era.energy > (best?.energy ?? -1) ? era : best), namedEraStory[0]),
+    [namedEraStory],
+  );
+  const peakRecognitionYear = useMemo(
+    () => winsByYear.reduce((best, year) => (year.count > best.count ? year : best), winsByYear[0] ?? { year: '--', count: 0 }),
+    [winsByYear],
+  );
+  const topCeremony = useMemo(() => {
+    const counts = new Map<string, number>();
+    awards.filter((award) => award.result === 'won').forEach((award) => {
+      counts.set(award.ceremony, (counts.get(award.ceremony) ?? 0) + 1);
+    });
+    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
+  }, [awards]);
+  const topTour = useMemo(() => {
+    const counts = new Map<string, number>();
+    concerts.forEach((concert) => counts.set(concert.tour_name, (counts.get(concert.tour_name) ?? 0) + 1));
+    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
+  }, [concerts]);
+  const topCountry = useMemo(() => {
+    const counts = new Map<string, number>();
+    concerts.forEach((concert) => counts.set(concert.country, (counts.get(concert.country) ?? 0) + 1));
+    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
+  }, [concerts]);
+  const focusSignals = [
+    {
+      label: 'Catalog span',
+      value: archiveSpan,
+      detail: `${eras.length} eras in the catalog`,
+      accent: SECTION_ACCENTS.discography,
+    },
+    {
+      label: 'Music objects',
+      value: formatNumber(songs.length),
+      detail: `${titleTracksCount} title tracks · ${musicVideosCount} MVs`,
+      accent: SECTION_ACCENTS.discography,
+    },
+    {
+      label: 'Authorship',
+      value: formatNumber(totalKomca),
+      detail: `${members.length} artist labels · ${soloSongsCount} solo tracks`,
+      accent: SECTION_ACCENTS.members,
+    },
+    {
+      label: 'Recognition peak',
+      value: `${peakRecognitionYear.count}`,
+      detail: `${peakRecognitionYear.year.replace("'", '20')} wins in one year`,
+      accent: SECTION_ACCENTS.awards,
+    },
+    {
+      label: 'Tour footprint',
+      value: formatNumber(concerts.length),
+      detail: `${uniqueCountries} countries · ${topCountry?.[0] ?? 'global'} leads`,
+      accent: SECTION_ACCENTS.tours,
+    },
+  ];
 
   return (
-    <main className="space-y-6">
+    <main className="space-y-4">
       <EditorialPageHeader
         eyebrow="Bangtan Universe / Permanent Collection"
-        title="Seven artists, one moving archive."
-        note="From debut releases to solo authorship and stadium-scale tours, the BTS archive is best read as a system of eras: music, movement, recognition, and memory changing together."
+        title="Overview"
+        note="Scan the collection by catalog span, sound, member credits, recognition, and tour reach. Use the summary rows to jump into the detailed pages."
         meta={
           <>
-            <span>{formatYear(albums[0]?.release_date)}-{formatYear(latestAlbum?.release_date)}</span>
+            <span>{archiveSpan}</span>
             <span>{eras.length} eras</span>
             <span>{songs.length.toLocaleString()} catalog records</span>
           </>
@@ -141,16 +223,59 @@ export default function HomeSection({
         }
       />
 
+      <section className="overview-signal-strip editorial-surface" aria-label="Archive summary">
+        {focusSignals.map((signal) => (
+          <button
+            type="button"
+            key={signal.label}
+            className="overview-signal"
+            style={{ '--signal-accent': signal.accent } as React.CSSProperties}
+            onClick={() => {
+              if (signal.label.includes('Music') || signal.label.includes('Catalog')) onNavigate('discography');
+              if (signal.label.includes('Authorship')) onNavigate('members');
+              if (signal.label.includes('Recognition')) onNavigate('awards');
+              if (signal.label.includes('Tour')) onNavigate('tours');
+            }}
+          >
+            <span className="overview-signal__label">{signal.label}</span>
+            <span className="overview-signal__value">{signal.value}</span>
+            <span className="overview-signal__detail">{signal.detail}</span>
+          </button>
+        ))}
+      </section>
+
       <div className="grid grid-cols-1 xl:grid-cols-[1.25fr_0.75fr] gap-6">
         <GallerySection
           number="01"
-          label="Era Spine"
-          title="The archive moves through eras, not just releases."
-          claim="Chronology becomes the first visual path: each era is a room with releases, songs, sound, and one anchor object."
-          caption="Read top to bottom as an exhibition wall. The chart sits beside the spine as supporting evidence."
+          label="Era Index"
+          title="Release chronology with sound markers"
+          claim="Each era shows its date range, anchor release, song count, and average sound profile."
+          caption="Use the timeline for sequence and the chart for energy and valence movement."
           source="Source: local song and album records."
           className="gallery-section--wide"
         >
+          <div className="overview-insight-strip" aria-label="Era highlights">
+            <div>
+              <span>Catalog-dense era</span>
+              <strong>{mostDenseEra?.era ?? 'No era data'}</strong>
+              <small>{mostDenseEra?.songs ?? 0} songs across {mostDenseEra?.releases ?? 0} releases</small>
+            </div>
+            <div>
+              <span>Highest energy era</span>
+              <strong>{highestEnergyEra?.era ?? 'No era data'}</strong>
+              <small>{Math.round((highestEnergyEra?.energy ?? 0) * 100)} average energy score</small>
+            </div>
+            <div>
+              <span>Recognition crest</span>
+              <strong>{peakRecognitionYear.year.replace("'", '20')}</strong>
+              <small>{peakRecognitionYear.count} wins recorded</small>
+            </div>
+            <div>
+              <span>Largest route</span>
+              <strong>{topTour?.[0] ?? 'No tour data'}</strong>
+              <small>{topTour?.[1] ?? 0} shows in the archive</small>
+            </div>
+          </div>
           <div className="story-wall">
             <div className="era-spine" aria-label="Era timeline">
               {eraStory.map((era) => (
@@ -178,9 +303,9 @@ export default function HomeSection({
               ))}
             </div>
             <EvidencePanel
-              title="Sound profile as evidence"
-              eyebrow="Evidence wall"
-              caption="Energy and valence are normalized from 0 to 1. The useful reading is the shape between eras, not a single score."
+              title="Energy and valence"
+              eyebrow="Sound profile"
+              caption="Scores are normalized from 0 to 1. Read the curve between eras before reading any single value."
               className="story-wall__evidence"
             >
               <div className="h-[360px]">
@@ -194,15 +319,27 @@ export default function HomeSection({
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+              <div className="overview-chart-summary" aria-label="Chart reading notes">
+                <div>
+                  <span className="overview-chart-summary__key overview-chart-summary__key--energy" />
+                  <strong>Energy</strong>
+                  <small>movement, tempo, production intensity</small>
+                </div>
+                <div>
+                  <span className="overview-chart-summary__key overview-chart-summary__key--valence" />
+                  <strong>Valence</strong>
+                  <small>emotional brightness across releases</small>
+                </div>
+              </div>
             </EvidencePanel>
           </div>
         </GallerySection>
 
         <GallerySection
           number="02"
-          label="Featured Labels"
-          title="Four objects explain the collection."
-          claim="A museum entrance does not show everything; it chooses the labels that orient the room."
+          label="Shortcuts"
+          title="Open the main archive drawers"
+          claim="Jump to release records, member credits, tour routes, or award history from the current collection totals."
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
             <ObjectLabel
@@ -225,7 +362,7 @@ export default function HomeSection({
               detail="KOMCA writing and production record"
               value={topContributor?.komcaCredits ?? totalKomca}
               valueLabel="credits"
-              description="The member archive is also a record of creative labor and authorship."
+              description="Member records show authorship, solo work, collaborations, and linked catalog credits."
               accent={SECTION_ACCENTS.members}
               actionLabel="View members"
               onClick={() => onNavigate('members')}
@@ -249,7 +386,7 @@ export default function HomeSection({
               valueLabel="wins"
               description="Recognition arrives in waves, across ceremonies, categories, group work, and solo work."
               accent={SECTION_ACCENTS.awards}
-              actionLabel="Enter room"
+              actionLabel="Open awards"
               onClick={() => onNavigate('awards')}
             />
           </div>
@@ -259,27 +396,49 @@ export default function HomeSection({
       <GallerySection
         number="03"
         label="Recognition"
-        title="Awards are a chronology, not a trophy pile."
-        claim="The useful view is the rhythm of recognition over time: dense years, quiet years, and the institutions that repeat."
-        caption="This compact view keeps the overview restrained while pointing to the full awards room."
+        title="Wins by year and ceremony"
+        claim="Track the peak years, repeat ceremonies, and the total nomination-to-win record."
+        caption="Open the awards page for category, scope, member, and ceremony filters."
       >
-        <EvidencePanel
-          title="Wins by year"
-          eyebrow="Recognition timeline"
-          caption="Counts include records marked as won in the local awards table."
-          source="Source: awards dataset."
-        >
-          <div className="h-[220px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={winsByYear} margin={{ top: 12, right: 8, bottom: 0, left: -20 }}>
-                <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgba(242,234,223,0.45)' }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 10, fill: 'rgba(242,234,223,0.38)' }} tickLine={false} axisLine={false} allowDecimals={false} />
-                <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ fill: 'rgba(232,216,173,0.05)' }} />
-                <Bar dataKey="count" fill="#e8d8ad" fillOpacity={0.82} radius={[2, 2, 0, 0]} name="Wins" isAnimationActive={false} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </EvidencePanel>
+        <div className="overview-recognition-grid">
+          <EvidencePanel
+            title="Wins by year"
+            eyebrow="Recognition timeline"
+            caption="Counts include records marked as won in the local awards table."
+            source="Source: awards dataset."
+          >
+            <div className="h-[220px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={winsByYear} margin={{ top: 12, right: 8, bottom: 0, left: -20 }}>
+                  <XAxis dataKey="year" tick={{ fontSize: 11, fill: 'rgba(250,249,245,0.5)' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'rgba(250,249,245,0.38)' }} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <Tooltip {...CHART_STYLES.TOOLTIP} cursor={{ fill: 'rgba(217,119,87,0.08)' }} />
+                  <Bar dataKey="count" fill="#d97757" fillOpacity={0.9} radius={[2, 2, 0, 0]} name="Wins" isAnimationActive={false} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </EvidencePanel>
+          <aside className="overview-ledger" aria-label="Recognition ledger">
+            <div className="overview-ledger__row">
+              <span>Peak year</span>
+              <strong>{peakRecognitionYear.year.replace("'", '20')}</strong>
+              <small>{peakRecognitionYear.count} wins recorded</small>
+            </div>
+            <div className="overview-ledger__row">
+              <span>Most repeated ceremony</span>
+              <strong>{topCeremony?.[0] ?? 'No ceremony data'}</strong>
+              <small>{topCeremony?.[1] ?? 0} wins in local records</small>
+            </div>
+            <div className="overview-ledger__row">
+              <span>Total nominations</span>
+              <strong>{formatNumber(awards.length)}</strong>
+              <small>{awardsWon} marked as won</small>
+            </div>
+            <button type="button" className="overview-ledger__action" onClick={() => onNavigate('awards')}>
+              Open awards chronology
+            </button>
+          </aside>
+        </div>
       </GallerySection>
     </main>
   );
