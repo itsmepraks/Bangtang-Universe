@@ -462,11 +462,11 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <EditorialPageHeader
         eyebrow="Career Gallery / Members"
-        title="Seven careers, one shared origin."
-        note="The member room treats each artist as a career object: role, authorship, solo work, collaboration, and milestones extending from the same group archive."
+        title="Members"
+        note="Compare the seven artist records by role, credits, solo work, collaborations, milestones, and linked songs."
         meta={
           <>
             <span>{members.length} artists</span>
@@ -478,8 +478,8 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
       <GallerySection
         number="01"
         label="Artist Labels"
-        title="Each member is a record of creative labor."
-        claim="The gallery view keeps the portraits, but the labels foreground role, authorship, and the path into each detailed profile."
+        title="Equal member records"
+        claim="Each card keeps the same footprint and shows role, KOMCA credits, and profile entry points."
         caption="Select an artist label to open biography, career, music, and awards records."
       >
         <MemberGrid members={members} onSelect={onSelectMember} />
@@ -487,8 +487,8 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
       <GallerySection
         number="02"
         label="Comparison Table"
-        title="The shared archive can be compared carefully."
-        claim="Comparison belongs after the individual labels, where it can support a question instead of reducing the members to a leaderboard."
+        title="Compare two members"
+        claim="Pick two artist records to compare roles, credits, linked songs, and solo work side by side."
       >
         <GlassHUD title="Compare Members" icon={GitCompare}>
           <MemberComparison members={members} songs={songs} />

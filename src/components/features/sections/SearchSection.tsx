@@ -132,11 +132,11 @@ export default function SearchSection({ songs, members, albums, awards, concerts
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <EditorialPageHeader
         eyebrow="Research Desk / Search"
-        title="Start with a question, then follow the record."
-        note="Search stays direct and fast, but the frame is archival: songs, albums, members, awards, and concerts are all entry points into the same collection."
+        title="Search"
+        note="Search songs, albums, members, awards, and concerts from one desk. Use exact terms, mood chips, or suggested queries."
         meta={
           <>
             <span>{songs.length.toLocaleString()} songs</span>
@@ -149,10 +149,10 @@ export default function SearchSection({ songs, members, albums, awards, concerts
 
       <GallerySection
         number="01"
-        label="Archive Query"
-        title="Search is the research desk."
-        claim="Use the input when you know the object. Use mood chips when you know the feeling before the title."
-        caption="Results preserve their existing routing into songs, albums, members, awards, and concert records."
+        label="Query Desk"
+        title="Find records across the archive"
+        claim="Type a known object, choose a mood chip, or start from the suggested searches."
+        caption="Results keep their routing into song, album, member, award, and concert records."
       >
       <div className="space-y-5">
       {/* Search Bar */}

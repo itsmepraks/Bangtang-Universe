@@ -48,11 +48,11 @@ export default function DiscographySection({ songs, albums, discographyState, on
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <EditorialPageHeader
         eyebrow="Collection Catalog / Discography"
-        title="The eras are the structure."
-        note="Albums, singles, solo records, and collaborations read best as collection objects grouped by era: each release carries a date, format, sonic position, and a path into the larger archive."
+        title="Discography"
+        note="Browse releases by era, format, group work, solo records, and collaborations. Open a release to inspect its tracklist and linked song records."
         meta={
           <>
             <span>{albums.length.toLocaleString()} releases</span>
@@ -63,10 +63,10 @@ export default function DiscographySection({ songs, albums, discographyState, on
       />
       <GallerySection
         number="01"
-        label="Era Catalog"
-        title="A release grid becomes an archive shelf."
-        claim="Filter by type, era, group work, solo records, and collaborations while keeping each album anchored as an object in the collection."
-        caption="Select an object to open its album record, tracklist, and linked song detail."
+        label="Release Shelf"
+        title="Filterable release records"
+        claim="Use type and era filters to narrow albums, singles, solo records, and collaborations."
+        caption="Select a release to open its album record, tracklist, and linked song detail."
       >
         <AlbumGrid
           albums={albums}

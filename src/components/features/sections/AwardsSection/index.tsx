@@ -44,11 +44,11 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <EditorialPageHeader
-        eyebrow="Recognition Room / Awards"
-        title="Recognition arrived in waves."
-        note="Awards are not a pile of trophies. They are a chronology of institutions, categories, nominations, wins, and solo/group distinction accumulating over time."
+        eyebrow="Recognition Index / Awards"
+        title="Awards"
+        note="Explore nominations and wins by year, ceremony, category, scope, and member-linked records."
         meta={
           <>
             <span>{wins.toLocaleString()} wins</span>
@@ -86,10 +86,10 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
 
       <GallerySection
         number="01"
-        label="Recognition Chronology"
-        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Award evidence'}
-        claim="The useful question is when recognition concentrates, which ceremonies repeat, and where solo records enter the archive."
-        caption="The existing trophy room, podium, timeline, and statistics stay intact but now sit inside a curatorial frame."
+        label="Award Records"
+        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Award records'}
+        claim="Switch between the trophy list, podium grouping, year timeline, and statistical summary."
+        caption="Use the filters inside each view to narrow ceremony, year, category, scope, and result."
       >
         <div role="tabpanel">
           <Suspense

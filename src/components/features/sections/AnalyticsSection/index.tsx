@@ -81,11 +81,11 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <EditorialPageHeader
         eyebrow="Research Wing / Analytics"
-        title="Sound, authorship, and recognition moved together."
-        note="This section keeps the exploratory tools, but frames each tab as a research chapter: a question, a body of evidence, and a pattern worth noticing."
+        title="Analytics"
+        note="Inspect sound features, lyric mood, writing credits, discovery queries, and milestones with charts and source records."
         meta={
           <>
             <span>{songs.length.toLocaleString()} songs</span>
@@ -105,10 +105,10 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
       {/* Panel */}
       <GallerySection
         number="01"
-        label="Analytical Chapter"
-        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'The evidence'}
-        claim="Charts should explain what changed, not simply prove that data exists."
-        caption="Use the tab strip to move between sound, lyrics, authorship, discovery, and milestone evidence."
+        label="Active View"
+        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Records'}
+        claim="Use the tabs to switch the analytical question without leaving the research workspace."
+        caption="Each view keeps the chart close to the supporting records, filters, or explanation."
       >
         <div
           role="tabpanel"

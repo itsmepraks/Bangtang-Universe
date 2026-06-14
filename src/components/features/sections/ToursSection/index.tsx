@@ -59,11 +59,11 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <EditorialPageHeader
         eyebrow="Geographic Exhibition / Tours"
-        title="The archive became geographic."
-        note="Tour records turn releases into routes: cities, venues, countries, setlists, and the scale of a global audience moving with the music."
+        title="Tours"
+        note="Review concerts by route, city, venue, country, setlist, tour name, and audience scale."
         meta={
           <>
             <span>{concerts.length.toLocaleString()} shows</span>
@@ -110,10 +110,10 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
 
       <GallerySection
         number="01"
-        label="Tour Room"
-        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Tour evidence'}
-        claim="The map and lists are evidence of movement: repeated markets, expanded routes, and the changing scale of the live archive."
-        caption="Switch between map, list, and statistics without leaving the geographic exhibition."
+        label="Route Records"
+        title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Tour records'}
+        claim="Switch between the world map, tour list, and route statistics."
+        caption="Use map and list views together: the map shows concentration, the list keeps exact venue records."
       >
         <div
           id="tours-panel"

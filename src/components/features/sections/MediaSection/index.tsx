@@ -41,11 +41,11 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
     })();
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <EditorialPageHeader
-                eyebrow="Viewing Room / Media"
-                title="The archive remembers through screens."
-                note="Documentaries, concert films, reality shows, and solo appearances preserve the public memory around the music. This room keeps media browsable while treating each record as part of the collection."
+                eyebrow="Viewing Index / Media"
+                title="Media"
+                note="Browse documentaries, concert films, variety, reality, solo, and unit records by format, platform, scope, and linked members."
                 meta={
                     <>
                         <span>{media.length.toLocaleString()} records</span>
@@ -91,10 +91,10 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
 
             <GallerySection
                 number="01"
-                label="Viewing Index"
+                label="Media Index"
                 title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Media records'}
-                claim="The media room is still a tool, but its frame is archival: format, scope, platform, and member links matter."
-                caption="Use the filters to move between the full media timeline, documentary records, variety and reality entries, and solo or unit media."
+                claim="Use the tabs to switch between the full timeline, documentary records, variety/reality entries, and solo or unit media."
+                caption="Each record keeps format, platform, release timing, scope, and linked member context available."
             >
                 <div
                     id="media-panel"
