@@ -1,3 +1,4 @@
+import { handleTabKeyDown } from '../../../../utils/tabKeyboard';
 import { useState, Suspense, lazy } from 'react';
 import { Film, Tv, User, LayoutGrid } from 'lucide-react';
 import type { Media, Member } from '../../../../types/database';
@@ -56,7 +57,7 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
                 }
             />
 
-            <div className="archive-tab-row" role="tablist" aria-label="Media views">
+            <div className="archive-tab-row" role="tablist" aria-label="Media views" onKeyDown={(event) => handleTabKeyDown(event, TABS.map(tab => tab.id), activeTab, setActiveTab)}>
                     {TABS.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;
@@ -85,6 +86,7 @@ export default function MediaSection({ media, members }: MediaSectionProps) {
             </div>
 
             <GallerySection
+        compact
                 number="01"
                 label="Media Index"
                 title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Media records'}

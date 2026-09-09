@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Suspense, lazy } from 'react';
+import { useState, useRef, Suspense, lazy } from 'react';
 import { BarChart3, Heart, Network, Sparkles, Trophy } from 'lucide-react';
 import type { Song, Album, Member, Lyrics, Award, ChartEntry, Concert, MemberEvent } from '../../../../types/database';
 import { DotLoader } from '../../../ui';
@@ -36,16 +36,11 @@ type TabId = (typeof TABS)[number]['id'];
 export default function AnalyticsSection({ songs, albums, members, lyrics, awards, chartEntries, concerts, memberEvents, initialTab, onTabChange }: AnalyticsSectionProps) {
   const isValidTabId = (v: string | null | undefined): v is TabId =>
     !!v && TABS.some((t) => t.id === v);
-  const [activeTab, setActiveTab] = useState<TabId>(
+  const [localTab, setActiveTab] = useState<TabId>(
     isValidTabId(initialTab) ? initialTab : 'sound',
   );
-  // Re-sync when hash-driven initialTab changes from outside
-  useEffect(() => {
-    if (isValidTabId(initialTab) && initialTab !== activeTab) {
-      setActiveTab(initialTab);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialTab]);
+  // The archive route owns selection when a navigation callback is supplied.
+  const activeTab = onTabChange ? (isValidTabId(initialTab) ? initialTab : 'sound') : localTab;
   const handleTabChange = (id: TabId) => {
     setActiveTab(id);
     onTabChange?.(id);
@@ -104,6 +99,7 @@ export default function AnalyticsSection({ songs, albums, members, lyrics, award
 
       {/* Panel */}
       <GallerySection
+        compact
         number="01"
         label="Active View"
         title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Records'}

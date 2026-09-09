@@ -7,7 +7,7 @@ interface ObjectLabelProps {
   detail?: string;
   value: string | number;
   valueLabel: string;
-  description: string;
+  description?: string;
   accent?: string;
   actionLabel?: string;
   onClick?: () => void;
@@ -41,7 +41,7 @@ export default function ObjectLabel({
             <small>{valueLabel}</small>
           </div>
         </div>
-        <p className="object-label__description">{description}</p>
+        {description && <p className="object-label__description">{description}</p>}
         {actionLabel && (
           <span className="object-label__action">
             {actionLabel}

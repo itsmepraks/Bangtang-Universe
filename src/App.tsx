@@ -1,6 +1,8 @@
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 
 import { useMembers, useSongs, useAlbums, useLyrics, useAwards, useChartEntries, useConcerts, useMemberEvents, useMedia } from './hooks';
+import { useArchiveNavigation } from './hooks/useArchiveNavigation';
+import ResourceState from './components/ui/ResourceState';
 import type { DashboardSection, DiscographyState } from './types/index';
 import { SECTION_ACCENTS } from './constants/colors';
 
@@ -90,71 +92,29 @@ const NAV_ITEMS: { id: DashboardSection; icon: React.ElementType; label: string 
 ];
 
 export default function App() {
-  const [mode, setMode] = useState<'landing' | 'warp' | 'onboarding' | 'dashboard'>('landing');
-  const [activeSection, setActiveSection] = useState<DashboardSection>('overview');
+  const [mode, setMode] = useState<'landing' | 'warp' | 'onboarding' | 'dashboard'>(() => {
+    if (window.location.hash === '#/landing') return 'landing';
+    if (/^#\/(overview|discography|members|analytics|awards|tours|media|search)(?:[/?]|$)/.test(window.location.hash)) return 'dashboard';
+    try { if (localStorage.getItem('bts-onboarded') === '1') return 'dashboard'; } catch { /* storage unavailable */ }
+    return 'landing';
+  });
+  const { route, navigate } = useArchiveNavigation();
+  const activeSection = route.section;
+  const discographyState = route.discography;
+  const setDiscographyState = (discography: DiscographyState) => navigate({ discography });
+  const memberSectionId = route.memberId;
+  const setMemberSectionId = (memberId: string | null) => navigate({ memberId });
+  const analyticsTabFromHash = route.analyticsTab;
+  const setAnalyticsTabFromHash = (analyticsTab: string) => navigate({ analyticsTab });
+  const mainRef = useRef<HTMLElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
+  const scrollPositions = useRef(new Map<string, number>());
+  const scrollKey = `${activeSection}/${discographyState.view}/${discographyState.selectedAlbumId}/${discographyState.selectedSongId}/${memberSectionId}`;
   const [activeMemberId, setActiveMemberId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [projectMenuOpen, setProjectMenuOpen] = useState(false);
   const [concertMode, setConcertMode] = useState(false);
-
-  const [discographyState, setDiscographyState] = useState<DiscographyState>({
-    selectedAlbumId: null, selectedSongId: null, view: 'grid',
-  });
-  const [memberSectionId, setMemberSectionId] = useState<string | null>(null);
-  const [eraFilter, setEraFilter] = useState<string | null>(null);
-
-  // URL hash format: #/<section>[/<arg1>[/<arg2>]]. See applyHash below for
-  // section-specific sub-paths.
-  const [analyticsTabFromHash, setAnalyticsTabFromHash] = useState<string | null>(null);
-
-  useEffect(() => {
-    const applyHash = () => {
-      const raw = window.location.hash.replace(/^#\/?/, '');
-      if (!raw) return;
-      const parts = raw.split('/').filter(Boolean);
-      const section = parts[0] as DashboardSection | undefined;
-      const validSections: DashboardSection[] = ['overview', 'discography', 'members', 'analytics', 'awards', 'tours', 'media', 'search'];
-      if (!section || !validSections.includes(section)) return;
-      setActiveSection(section);
-      if (section === 'discography') {
-        if (parts[1] === 'album' && parts[2]) {
-          setDiscographyState({ selectedAlbumId: Number(parts[2]), selectedSongId: null, view: 'album' });
-        } else if (parts[1] === 'song' && parts[2] && parts[3]) {
-          setDiscographyState({ selectedAlbumId: Number(parts[2]), selectedSongId: Number(parts[3]), view: 'song' });
-        } else {
-          setDiscographyState({ selectedAlbumId: null, selectedSongId: null, view: 'grid' });
-        }
-      } else if (section === 'members') {
-        setMemberSectionId(parts[1] ?? null);
-      } else if (section === 'analytics' && parts[1]) {
-        setAnalyticsTabFromHash(parts[1]);
-      }
-    };
-    applyHash();
-    window.addEventListener('hashchange', applyHash);
-    return () => window.removeEventListener('hashchange', applyHash);
-     
-  }, []);
-
-  useEffect(() => {
-    if (mode !== 'dashboard') return;
-    let hash = `#/${activeSection}`;
-    if (activeSection === 'discography') {
-      if (discographyState.view === 'song' && discographyState.selectedAlbumId && discographyState.selectedSongId) {
-        hash = `#/discography/song/${discographyState.selectedAlbumId}/${discographyState.selectedSongId}`;
-      } else if (discographyState.view === 'album' && discographyState.selectedAlbumId) {
-        hash = `#/discography/album/${discographyState.selectedAlbumId}`;
-      }
-    } else if (activeSection === 'members' && memberSectionId) {
-      hash = `#/members/${memberSectionId}`;
-    } else if (activeSection === 'analytics' && analyticsTabFromHash) {
-      hash = `#/analytics/${analyticsTabFromHash}`;
-    }
-    if (window.location.hash !== hash) {
-      window.history.replaceState(null, '', hash);
-    }
-  }, [mode, activeSection, discographyState, memberSectionId, analyticsTabFromHash]);
 
   // ⌘K / Ctrl+K toggles the command palette.
   useEffect(() => {
@@ -173,25 +133,40 @@ export default function App() {
     setSidebarOpen(false);
   }, [activeSection]);
 
-  // ESC closes the mobile sidebar drawer.
   useEffect(() => {
     if (!sidebarOpen) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setSidebarOpen(false);
+    const previous = document.activeElement as HTMLElement | null;
+    const drawer = drawerRef.current;
+    const controls = () => Array.from(drawer?.querySelectorAll<HTMLElement>('button, a[href]') ?? []);
+    controls()[0]?.focus();
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false);
+      if (event.key !== 'Tab') return;
+      const items = controls();
+      const first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     };
     window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
+    return () => { window.removeEventListener('keydown', handler); previous?.focus(); };
   }, [sidebarOpen]);
+
+  useEffect(() => {
+    if (!projectMenuOpen) return;
+    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setProjectMenuOpen(false); };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [projectMenuOpen]);
 
   const { songs, error: songsError, refetch: refetchSongs } = useSongs();
   const { albums, error: albumsError, refetch: refetchAlbums } = useAlbums();
   const { members, error: membersError, refetch: refetchMembers } = useMembers();
-  const { lyrics, error: lyricsError, refetch: refetchLyrics } = useLyrics();
-  const { awards, error: awardsError, refetch: refetchAwards } = useAwards();
-  const { chartEntries, error: chartEntriesError, refetch: refetchChartEntries } = useChartEntries();
-  const { concerts, error: concertsError, refetch: refetchConcerts } = useConcerts();
-  const { memberEvents, error: memberEventsError, refetch: refetchMemberEvents } = useMemberEvents();
-  const { media, error: mediaError, refetch: refetchMedia } = useMedia();
+  const { lyrics, error: lyricsError, refetch: refetchLyrics } = useLyrics(mode === 'dashboard' && activeSection === 'analytics');
+  const { awards, loading: awardsLoading, error: awardsError, refetch: refetchAwards } = useAwards();
+  const { chartEntries, error: chartEntriesError, refetch: refetchChartEntries } = useChartEntries(mode === 'dashboard' && activeSection === 'analytics');
+  const { concerts, loading: concertsLoading, error: concertsError, refetch: refetchConcerts } = useConcerts();
+  const { memberEvents, error: memberEventsError, refetch: refetchMemberEvents } = useMemberEvents(mode === 'dashboard' && activeSection === 'analytics');
+  const { media, loading: mediaLoading, error: mediaError, refetch: refetchMedia } = useMedia(mode === 'dashboard' && activeSection === 'media');
 
   const hasDataError = Boolean(
     songsError || albumsError || membersError || lyricsError || awardsError ||
@@ -212,6 +187,7 @@ export default function App() {
   };
 
   const handleSync = () => {
+    if (window.location.hash === '#/landing') navigate({});
     try {
       if (localStorage.getItem('bts-onboarded') === '1') {
         setMode('dashboard');
@@ -222,28 +198,24 @@ export default function App() {
   };
 
   const navigateTo = (section: DashboardSection, payload?: string | number) => {
-    setActiveSection(section);
     if (section === 'discography') {
-      if (typeof payload === 'number') {
-        setDiscographyState({ selectedAlbumId: payload, selectedSongId: null, view: 'album' });
-        setEraFilter(null);
-      } else if (typeof payload === 'string') {
-        setDiscographyState({ selectedAlbumId: null, selectedSongId: null, view: 'grid' });
-        setEraFilter(payload);
-      } else {
-        setEraFilter(null);
-      }
-    }
-    if (section === 'members' && typeof payload === 'string') {
-      setMemberSectionId(payload);
-    }
+      navigate({ section, discography: { selectedAlbumId: typeof payload === 'number' ? payload : null, selectedSongId: null, view: typeof payload === 'number' ? 'album' : 'grid' },
+        filters: typeof payload === 'string' ? { category: 'all', type: null, era: payload } : route.filters });
+    } else if (section === 'members') {
+      navigate({ section, memberId: typeof payload === 'string' ? payload : null });
+    } else if (section === 'search' && typeof payload === 'string') {
+      navigate({ section, searchMood: payload.startsWith('mood:') ? payload.slice(5) : null, searchQuery: payload.startsWith('mood:') ? '' : payload });
+    } else navigate({ section });
+  };
+  const selectSong = (song: { id: number; album_id: number | null }) => {
+    navigate({ section: 'discography', discography: { selectedAlbumId: song.album_id, selectedSongId: song.id, view: 'song' } });
   };
 
   return (
-    <div className="relative w-screen h-screen bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white noise-texture">
+    <div className="relative w-screen h-dvh bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white noise-texture">
 
       {/* Universe layer — landing/warp only */}
-      {(mode === 'landing' || mode === 'warp') && (
+      {mode === 'warp' && (
         <Suspense fallback={<LoadingFallback />}>
           <Universe3D mode={mode} />
         </Suspense>
@@ -260,7 +232,7 @@ export default function App() {
       )}
 
       {mode === 'dashboard' && !activeMemberId && (
-        <div className="editorial-dashboard absolute inset-0 z-10 flex animate-in fade-in zoom-in-95 duration-1000">
+        <div className="editorial-dashboard absolute inset-0 z-10 flex">
           {/* Skip link — visible only on keyboard focus */}
           <a
             href="#main-content"
@@ -306,7 +278,7 @@ export default function App() {
           {sidebarOpen && (
             <div className="fixed inset-0 z-40 xl:hidden">
               <div className="absolute inset-0 bg-black/65" onClick={() => setSidebarOpen(false)} />
-              <aside className="absolute inset-y-0 left-0 w-[min(88vw,360px)] bg-[#12100e] border-r border-[var(--editorial-border-soft)] px-5 py-5 shadow-2xl">
+              <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="Site navigation" className="absolute inset-y-0 left-0 w-[min(88vw,360px)] bg-[#12100e] border-r border-[var(--editorial-border-soft)] px-5 py-5 shadow-2xl">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <BTSLogo className="w-7 h-7 text-white" />
@@ -318,21 +290,21 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setSidebarOpen(false)}
-                    className="grid h-9 w-9 place-items-center rounded-md border border-white/[0.08] text-white/55 hover:text-white"
+                    className="grid h-11 w-11 place-items-center rounded-md border border-white/[0.08] text-white/55 hover:text-white"
                     aria-label="Close collection index"
                   >
                     <X size={17} />
                   </button>
                 </div>
                 <nav aria-label="Collection navigation" className="mt-8 grid gap-1">
-                  {NAV_ITEMS.map((item, index) => {
+                  {NAV_ITEMS.map((item) => {
                     const isActive = activeSection === item.id;
                     return (
                       <button
                         key={item.id}
                         type="button"
                         onClick={() => {
-                          setActiveSection(item.id);
+                          navigateTo(item.id);
                           setSidebarOpen(false);
                         }}
                         aria-current={isActive ? 'page' : undefined}
@@ -341,7 +313,6 @@ export default function App() {
                         }`}
                       >
                         <span className="flex items-center gap-3">
-                          <span className="text-[10px] tabular-nums text-white/35">{String(index + 1).padStart(2, '0')}</span>
                           <span className="text-sm font-medium">{item.label}</span>
                         </span>
                         <item.icon size={15} aria-hidden="true" />
@@ -375,15 +346,16 @@ export default function App() {
             </div>
           )}
 
-          <div className="flex-1 flex flex-col min-w-0 relative z-10">
+          <div inert={sidebarOpen || paletteOpen} className="flex-1 flex flex-col min-w-0 relative z-10">
 
             <header className="flex flex-col border-b border-[var(--editorial-border-soft)] bg-[#100f0d]/88 backdrop-blur-xl">
               <div className="min-h-16 flex items-center justify-between gap-4 px-4 md:px-8">
                 <div className="flex items-center gap-3 min-w-0">
                   <button
                     onClick={() => setSidebarOpen(prev => !prev)}
-                    className="xl:hidden grid h-9 w-9 place-items-center rounded-md border border-white/[0.08] text-white/60 hover:text-white"
-                    aria-label="Open collection index"
+                    className="xl:hidden grid h-11 w-11 place-items-center rounded-md border border-white/[0.08] text-white/60 hover:text-white"
+                    aria-label="Open navigation"
+                    aria-expanded={sidebarOpen}
                   >
                     <Menu size={18} />
                   </button>
@@ -402,20 +374,19 @@ export default function App() {
                 </div>
 
                 <nav aria-label="Collection navigation" className="hidden xl:flex items-center justify-center gap-1 flex-1">
-                  {NAV_ITEMS.map((item, index) => {
+                  {NAV_ITEMS.map((item) => {
                     const isActive = activeSection === item.id;
                     const accent = SECTION_ACCENTS[item.id];
                     return (
                       <button
                         key={item.id}
                         type="button"
-                        onClick={() => setActiveSection(item.id)}
+                        onClick={() => navigateTo(item.id)}
                         aria-current={isActive ? 'page' : undefined}
-                        className={`group relative px-3 py-5 text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors ${
-                          isActive ? 'text-white' : 'text-white/43 hover:text-white/78'
+                        className={`group relative px-3 py-5 text-sm font-medium transition-colors ${
+                          isActive ? 'text-white' : 'text-white/65 hover:text-white'
                         }`}
                       >
-                        <span className="mr-2 text-[9px] font-medium text-white/25 tabular-nums">{String(index + 1).padStart(2, '0')}</span>
                         {item.label}
                         <span
                           className={`absolute inset-x-3 bottom-0 h-px transition-opacity ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-50'}`}
@@ -441,7 +412,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setProjectMenuOpen(open => !open)}
-                      className="grid h-9 w-9 place-items-center rounded-md border border-white/[0.08] bg-white/[0.025] text-white/50 hover:bg-white/[0.045] hover:text-white/80 transition-colors"
+                      className="grid h-11 w-11 place-items-center rounded-md border border-white/[0.08] bg-white/[0.025] text-white/50 hover:bg-white/[0.045] hover:text-white/80 transition-colors"
                       aria-label="Open project menu"
                       aria-expanded={projectMenuOpen}
                     >
@@ -482,12 +453,14 @@ export default function App() {
             </header>
 
             <main
+              ref={mainRef}
+              onScroll={(event) => scrollPositions.current.set(scrollKey, event.currentTarget.scrollTop)}
               id="main-content"
               tabIndex={-1}
               className={`flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar focus:outline-none ${concertMode ? 'concert-intense' : 'concert-bg'}`}
             >
               <Suspense fallback={<SectionSpinner />}>
-                <SectionTransition sectionKey={activeSection}>
+                <SectionTransition sectionKey={scrollKey} restoreScroll={() => { if (mainRef.current) mainRef.current.scrollTop = scrollPositions.current.get(scrollKey) ?? 0; }}>
 
                   {activeSection === 'overview' && (
                     <HomeSection
@@ -496,6 +469,8 @@ export default function App() {
                       members={members}
                       awards={awards}
                       concerts={concerts}
+                      awardsAvailable={!awardsLoading && (!awardsError || awards.length > 0)}
+                      concertsAvailable={!concertsLoading && (!concertsError || concerts.length > 0)}
                       onNavigate={navigateTo}
                     />
                   )}
@@ -506,7 +481,8 @@ export default function App() {
                       albums={albums}
                       discographyState={discographyState}
                       onSetDiscographyState={setDiscographyState}
-                      eraFilter={eraFilter}
+                      filters={route.filters}
+                      onFiltersChange={(filters) => navigate({ filters }, true)}
                     />
                   )}
 
@@ -536,15 +512,15 @@ export default function App() {
                   )}
 
                   {activeSection === 'awards' && (
-                    <AwardsSection awards={awards} members={members} />
+                    (awardsLoading || (awardsError && !awards.length)) ? <ResourceState title="Awards" loading={awardsLoading} onRetry={refetchAwards} /> : <AwardsSection awards={awards} members={members} />
                   )}
 
                   {activeSection === 'tours' && (
-                    <ToursSection concerts={concerts} />
+                    (concertsLoading || (concertsError && !concerts.length)) ? <ResourceState title="Tours" loading={concertsLoading} onRetry={refetchConcerts} /> : <ToursSection concerts={concerts} />
                   )}
 
                   {activeSection === 'media' && (
-                    <MediaSection media={media} members={members} />
+                    (mediaLoading || (mediaError && !media.length)) ? <ResourceState title="Media" loading={mediaLoading} onRetry={refetchMedia} /> : <MediaSection media={media} members={members} />
                   )}
 
                   {activeSection === 'search' && (
@@ -554,15 +530,10 @@ export default function App() {
                       albums={albums}
                       awards={awards}
                       concerts={concerts}
-                      onSelectSong={(song) => {
-                        const album = albums.find(a => a.id === song.album_id);
-                        setDiscographyState({
-                          selectedAlbumId: album?.id ?? null,
-                          selectedSongId: song.id,
-                          view: 'song',
-                        });
-                        setActiveSection('discography');
-                      }}
+                      initialQuery={route.searchQuery}
+                      initialMood={route.searchMood}
+                      onSearchStateChange={(searchQuery, searchMood) => navigate({ searchQuery, searchMood }, true)}
+                      onSelectSong={selectSong}
                       onNavigate={navigateTo}
                     />
                   )}
@@ -583,15 +554,7 @@ export default function App() {
             albums={albums}
             members={members}
             onNavigate={navigateTo}
-            onSelectSong={(song) => {
-              const album = albums.find((a) => a.id === song.album_id);
-              setDiscographyState({
-                selectedAlbumId: album?.id ?? null,
-                selectedSongId: song.id,
-                view: 'song',
-              });
-              setActiveSection('discography');
-            }}
+            onSelectSong={selectSong}
           />
         </Suspense>
       )}

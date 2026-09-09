@@ -1,3 +1,5 @@
+import { createAudioRhythm, updateAudioRhythm, type ConcertAudioFrame } from '../utils/audioRhythm';
+import { connectStadiumAcoustics } from '../utils/stadiumReverb';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
@@ -85,8 +87,6 @@ const CHANT_SCHEDULE: Array<{ id: 'RM' | 'JIN' | 'SUGA' | 'J-HOPE' | 'JIMIN' | '
 export interface ConcertBeatOptions {
   /** Songs to queue — searched via iTunes Search API. */
   tracks?: string[];
-  /** Fallback BPM used when no streamed audio is playing. */
-  fallbackBpm?: number;
   /** Frames between beats min — prevents double-trigger on a single kick. */
   minBeatGapMs?: number;
   /** Skip the chant intro and go straight to the playlist. */
@@ -188,7 +188,6 @@ const BEAT_MIN_BASS = 0.10;  // lower minimum so quiet sections still pulse (was
 
 export function useConcertBeat({
   tracks = DEFAULT_TRACKS,
-  fallbackBpm = 120,
   minBeatGapMs = 200,
   skipChant = false,
   chantBeatMs = 820,
@@ -226,7 +225,8 @@ export function useConcertBeat({
   const synthPadRef = useRef<{ master: GainNode } | null>(null);
   // Live band values readable by canvas/imperative consumers without forcing
   // a React re-render on every frame.
-  const beatRef = useRef<{ bass: number; mid: number; treble: number; isBeat: boolean; isChorus: boolean }>({
+  const rhythmRef = useRef(createAudioRhythm());
+  const beatRef = useRef<ConcertAudioFrame>({
     bass: 0, mid: 0, treble: 0, isBeat: false, isChorus: false,
   });
   // Chant control — abort flag flips on stop()/skip(); timer ref for the
@@ -511,14 +511,10 @@ export function useConcertBeat({
     };
   }, []);
 
-  // ── Beat clock: RAF loop that runs always. When streaming is active, beats
-  //    come from real-time FFT analysis. Otherwise, falls back to a metronome
-  //    derived from `fallbackBpm`.
+  // Streamed songs drive lighting from detected audio onsets. Without an
+  // analysable source, hold a steady wash rather than inventing a beat.
   useEffect(() => {
     let rafId = 0;
-    let metroStart: number | null = null;
-    let lastMetroBeat = -1;
-    const fallbackInterval = 60_000 / fallbackBpm;
     const freqBuf = new Uint8Array(FFT_SIZE / 2);
 
     const sampleBand = (data: Uint8Array, [lo, hi]: [number, number]) => {
@@ -527,6 +523,8 @@ export function useConcertBeat({
       return sum / (hi - lo + 1) / 255; // 0..1
     };
 
+    let previousBass = 0;
+    let fluxAverage = 0;
     let lastZeroed = false; // avoid spamming setState when already at rest
 
     // React-state throttle. The canvas reads beatRef every frame (60 fps),
@@ -545,7 +543,6 @@ export function useConcertBeat({
       // Don't fight it from here — just keep the RAF alive.
       if (chantPhaseRef.current === 'running') {
         lastZeroed = false;
-        metroStart = null; // reset metronome so it doesn't drift while we wait
         rafId = requestAnimationFrame(loop);
         return;
       }
@@ -569,12 +566,16 @@ export function useConcertBeat({
         const avgTreble = trebleHist.reduce((a, b) => a + b, 0) / trebleHist.length || 0.001;
 
         const beatGap = time - lastBeatTimeRef.current;
-        const isBeat = beatGap > minBeatGapMs && bass > BEAT_THRESHOLD * avgBass && bass > BEAT_MIN_BASS;
+        const flux = Math.max(0, bass - previousBass); previousBass = bass;
+        const rising = flux > Math.max(.009, fluxAverage * 1.55);
+        fluxAverage = fluxAverage * .95 + flux * .05;
+        const isBeat = beatGap > Math.max(minBeatGapMs, 260) && bass > BEAT_MIN_BASS
+          && (rising || (bass > BEAT_THRESHOLD * avgBass && flux > .004));
         const isChorus = isBeat && treble > 1.25 * avgTreble && treble > 0.25;
 
         if (isBeat) lastBeatTimeRef.current = time;
 
-        beatRef.current = { bass, mid, treble, isBeat, isChorus };
+        beatRef.current = { bass, mid, treble, isBeat, isChorus, ...updateAudioRhythm(rhythmRef.current, time, isBeat, true) };
         lastZeroed = false;
 
         // Always push when a discrete event lands (beat / chorus) so the
@@ -591,34 +592,11 @@ export function useConcertBeat({
             strobeId: isChorus ? s.strobeId + 1 : s.strobeId,
           }));
         }
-      } else if (audioOn) {
-        // Audio is on but not streamed (e.g. synth pad swell). Run the fallback
-        // metronome so spotlights still pulse to *something*.
-        if (metroStart === null) metroStart = time;
-        const elapsed = time - metroStart;
-        const beatFloat = elapsed / fallbackInterval;
-        const beat = Math.floor(beatFloat);
-        const phase = beatFloat - beat;
-        const pulse = Math.exp(-phase * 5);
-
-        const justBeat = beat !== lastMetroBeat;
-        lastMetroBeat = beat;
-        const isChorus = justBeat && beat > 0 && beat % 8 === 0;
-
-        beatRef.current = { bass: pulse * 0.6, mid: 0, treble: 0, isBeat: justBeat, isChorus };
-        lastZeroed = false;
-
-        setState((s) => ({
-          ...s,
-          pulse, bass: pulse * 0.6, mid: 0, treble: 0, isBeat: justBeat, isChorus,
-        }));
       } else {
-        // Audio is OFF — freeze everything to zero. Visuals revert to their
-        // original CSS-only ambient state (twinkle/foreground-twinkle keyframes).
-        metroStart = null;
-        lastMetroBeat = -1;
+        // Muted, buffering, or unanalysable audio: no synthetic lighting beats.
         if (!lastZeroed) {
-          beatRef.current = { bass: 0, mid: 0, treble: 0, isBeat: false, isChorus: false };
+          beatRef.current = { bass: 0, mid: 0, treble: 0, isBeat: false, isChorus: false, ...updateAudioRhythm(rhythmRef.current, time, false, false) };
+          previousBass = 0; fluxAverage = 0;
           setState((s) => ({
             ...s,
             pulse: 0, bass: 0, mid: 0, treble: 0, isBeat: false, isChorus: false,
@@ -632,7 +610,7 @@ export function useConcertBeat({
 
     rafId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafId);
-  }, [fallbackBpm, minBeatGapMs]);
+  }, [minBeatGapMs]);
 
   // ── Lazy Web Audio setup: wire the audio element through an analyser ───
   const ensureWebAudio = useCallback(() => {
@@ -650,7 +628,7 @@ export function useConcertBeat({
     const analyser = ctx.createAnalyser();
     analyser.fftSize = FFT_SIZE;
     analyser.smoothingTimeConstant = 0.6;
-    analyser.connect(master);
+    connectStadiumAcoustics(ctx, analyser, master);
     analyserRef.current = analyser;
 
     // Connect the existing audio element through the analyser
@@ -1032,6 +1010,7 @@ export function useConcertBeat({
       }));
 
       beatRef.current = {
+        ...updateAudioRhythm(rhythmRef.current, performance.now(), true, true),
         bass: isFinale ? 1 : 0,
         mid: isFinale ? 0.6 : 0,
         treble: isFinale ? 1 : 0,

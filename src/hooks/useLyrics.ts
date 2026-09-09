@@ -7,8 +7,8 @@ interface UseLyricsResult extends AsyncResource {
     lyrics: Lyrics[];
 }
 
-export function useLyrics(): UseLyricsResult {
-    const { data: lyrics, loading, error, refetch } = useCatalogResource('lyrics');
+export function useLyrics(enabled = true): UseLyricsResult {
+    const { data: lyrics, loading, error, refetch } = useCatalogResource('lyrics', enabled);
     return { lyrics, loading, error, refetch };
 }
 

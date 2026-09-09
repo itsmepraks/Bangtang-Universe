@@ -1749,7 +1749,7 @@ p {
   --editorial-border-soft: rgba(232, 230, 220, 0.085);
   --editorial-ink: #faf9f5;
   --editorial-muted: rgba(250, 249, 245, 0.68);
-  --editorial-faint: rgba(250, 249, 245, 0.42);
+  --editorial-faint: rgba(250, 249, 245, 0.64);
   --editorial-warm: #d97757;
   --editorial-blue: #6a9bcc;
   --editorial-green: #788c5d;
@@ -2519,3 +2519,24 @@ p {
     grid-template-columns: 1fr;
   }
 }
+
+/* Archive refinement: a shorter introduction, readable controls, compact totals. */
+.editorial-title { margin-top: 0; font-size: clamp(1.9rem, 3vw, 2.75rem); line-height: 1.08; }
+.editorial-note { font-size: 1rem; line-height: 1.55; margin-top: .5rem; }
+.editorial-header-meta { font-size: .72rem; letter-spacing: .03em; margin-top: .7rem; }
+.editorial-page-header { padding: 1.15rem 1.3rem; align-items: center; }
+.collection-index__label { font-size: .75rem; letter-spacing: .03em; }
+.collection-index__note { font-size: .75rem; }
+.collection-index__item { min-height: 4.5rem; }
+.editorial-dashboard :is(button, a, select, summary):focus-visible { outline: 2px solid var(--editorial-purple); outline-offset: 3px; }
+.archive-section-enter { animation: archive-arrive 160ms ease-out; }
+@keyframes archive-arrive { from { opacity: .65; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+@media (max-width: 639px) {
+  .editorial-page-header { padding: 1rem; }
+  .collection-index { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .collection-index__item { min-height: 4rem; }
+  .collection-index__note { display: none; }
+  .editorial-header-meta { gap: .3rem; }
+  .editorial-note { font-size: 1rem; }
+}
+@media (prefers-reduced-motion: reduce) { .archive-section-enter { animation: none; } }

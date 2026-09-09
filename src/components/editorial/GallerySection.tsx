@@ -9,27 +9,26 @@ interface GallerySectionProps {
   source?: string;
   children: ReactNode;
   className?: string;
+  compact?: boolean;
 }
 
 export default function GallerySection({
-  number,
-  label,
   title,
   claim,
   caption,
   source,
   children,
   className = '',
+  compact = false,
 }: GallerySectionProps) {
   return (
     <section className={`editorial-surface gallery-section ${className}`}>
-      <div className="gallery-section__intro">
-        <p className="editorial-kicker">{number} / {label}</p>
+      {!compact && <div className="gallery-section__intro">
         <h2 className="gallery-section__title">{title}</h2>
         <p className="gallery-section__claim">{claim}</p>
-      </div>
+      </div>}
       <div className="gallery-section__body">{children}</div>
-      {(caption || source) && (
+      {(!compact && (caption || source)) && (
         <footer className="gallery-section__footer">
           {caption && <p>{caption}</p>}
           {source && <p className="gallery-section__source">{source}</p>}

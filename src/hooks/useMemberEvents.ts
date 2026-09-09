@@ -7,8 +7,8 @@ interface UseMemberEventsResult extends AsyncResource {
     memberEvents: MemberEvent[];
 }
 
-export function useMemberEvents(): UseMemberEventsResult {
-    const { data: memberEvents, loading, error, refetch } = useCatalogResource('member_events');
+export function useMemberEvents(enabled = true): UseMemberEventsResult {
+    const { data: memberEvents, loading, error, refetch } = useCatalogResource('member_events', enabled);
     return { memberEvents, loading, error, refetch };
 }
 

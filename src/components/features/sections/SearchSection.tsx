@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
-import { Search, Network, RefreshCw, Music, Disc, User, Sparkles, Trophy, MapPin } from 'lucide-react';
+import { Search, Music, Disc, User, Trophy, MapPin, X } from 'lucide-react';
 import { useSearch, type SearchResult } from '../../../hooks';
 import { MOOD_MAP } from '../../../services/searchService';
 import { getSentimentColor, BORAHAE_COLORS } from '../../../constants/colors';
@@ -7,320 +7,120 @@ import type { Song, Member, Album, Award, Concert } from '../../../types/databas
 import type { DashboardSection } from '../../../types/index';
 import Badge from '../../ui/Badge';
 import ProgressBar from '../../ui/ProgressBar';
-import EmptyState from '../../ui/EmptyState';
-import { EditorialPageHeader, GallerySection } from '../../editorial';
+import ArchiveImage from '../../ui/ArchiveImage';
+import { EditorialPageHeader } from '../../editorial';
 
 interface SearchSectionProps {
-  songs: Song[];
-  members: Member[];
-  albums: Album[];
-  awards: Award[];
-  concerts: Concert[];
+  songs: Song[]; members: Member[]; albums: Album[]; awards: Award[]; concerts: Concert[];
   onSelectSong: (s: Song) => void;
   onNavigate: (section: DashboardSection, payload?: string | number) => void;
+  initialQuery?: string;
+  initialMood?: string | null;
+  onSearchStateChange: (query: string, mood: string | null) => void;
 }
+const MOOD_LABELS: Record<string, string> = { happy: 'Happy', sad: 'Sad', energetic: 'Energetic', calm: 'Calm', romantic: 'Romantic', motivational: 'Motivational' };
+const RESULT_TYPES = ['all', 'song', 'album', 'member', 'award', 'concert'] as const;
 
-const MOOD_LABELS: Record<string, string> = {
-  happy: 'Happy',
-  sad: 'Sad',
-  energetic: 'Energetic',
-  calm: 'Calm',
-  romantic: 'Romantic',
-  motivational: 'Motivational',
-};
-
-export default function SearchSection({ songs, members, albums, awards, concerts, onSelectSong, onNavigate }: SearchSectionProps) {
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+export default function SearchSection({ songs, members, albums, awards, concerts, onSelectSong, onNavigate, initialQuery = '', initialMood = null, onSearchStateChange }: SearchSectionProps) {
+  const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [typeFilter, setTypeFilter] = useState<'all' | 'song' | 'album' | 'member' | 'award' | 'concert'>('all');
-  const [activeMood, setActiveMood] = useState<string | null>(null);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [hoveredResult, setHoveredResult] = useState<SearchResult | null>(null);
+  const [status, setStatus] = useState<'idle' | 'searching' | 'done' | 'error'>('idle');
+  const [typeFilter, setTypeFilter] = useState<typeof RESULT_TYPES[number]>('all');
+  const [preview, setPreview] = useState<SearchResult | null>(null);
+  const [selectedRecord, setSelectedRecord] = useState<SearchResult | null>(null);
+  const requestId = useRef(0);
+  const { searchAllAsync, searchByMood } = useSearch(songs, members, albums, awards, concerts);
 
-  const { searchAllAsync, searchByMood, getSuggestions, isAiSearchConfigured, isCatalogSearchEnabled } = useSearch(songs, members, albums, awards, concerts);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // Close suggestions on outside click
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target as Node) &&
-          inputRef.current && !inputRef.current.contains(e.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Debounce the query so Fuse suggestions only re-run after a typing pause.
-  useEffect(() => {
-    const id = window.setTimeout(() => setDebouncedQuery(query), 200);
-    return () => window.clearTimeout(id);
-  }, [query]);
-
-  const suggestions = useMemo(() => {
-    if (debouncedQuery.length < 2) return [];
-    return getSuggestions(debouncedQuery, 5);
-  }, [debouncedQuery, getSuggestions]);
-
-  const runSearch = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) return;
-    setSearching(true);
-    setActiveMood(null);
-    setShowSuggestions(false);
+  const runSearch = useCallback(async (text: string) => {
+    const id = ++requestId.current;
+    setSelectedRecord(null);
+    setPreview(null);
+    if (!text.trim()) { setResults([]); setStatus('idle'); return; }
+    setStatus('searching');
     try {
-      const res = await searchAllAsync(searchQuery);
-      setResults(res);
-    } finally {
-      setSearching(false);
+      const found = await searchAllAsync(text.trim());
+      if (id !== requestId.current) return;
+      setResults(found);
+      setStatus('done');
+    } catch {
+      if (id === requestId.current) setStatus('error');
     }
   }, [searchAllAsync]);
 
-  const handleSearch = () => runSearch(query);
+  useEffect(() => {
+    // Restore a bookmarked query or mood, including when browser Back returns here.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setQuery(initialQuery);
+    setTypeFilter('all');
+    setSelectedRecord(null);
+    if (initialMood && initialMood in MOOD_LABELS) {
+      ++requestId.current;
+      const found = searchByMood(initialMood as keyof typeof MOOD_MAP);
+      setResults(found.map(song => ({ id: song.id, type: 'song', title: song.title, subtitle: song.sentiment || '', score: 0, context: `${song.bpm || '?'} BPM · ${song.sentiment || 'Unknown'}`, item: song })));
+      setStatus('done');
+    } else { void runSearch(initialQuery); }
+    const pendingRequest = requestId;
+    return () => { ++pendingRequest.current; };
+  }, [initialQuery, initialMood, runSearch, searchByMood]);
 
-  const handleMoodSearch = (mood: string) => {
-    setActiveMood(mood);
-    setQuery('');
-    setShowSuggestions(false);
-    const moodSongs = searchByMood(mood as keyof typeof MOOD_MAP);
-    setResults(moodSongs.map((s, i) => ({
-      id: s.id,
-      type: 'song' as const,
-      title: s.title,
-      subtitle: s.sentiment || '',
-      score: 100 - i * 5,
-      context: `${s.bpm || '?'} BPM · ${s.sentiment || 'Unknown'}`,
-      item: s,
-    })));
+  const submit = (text: string) => {
+    if (!text.trim()) return;
+    setQuery(text);
+    if (text === initialQuery && !initialMood) void runSearch(text);
+    else onSearchStateChange(text.trim(), null);
   };
-
-  const filteredResults = useMemo(() => {
-    if (typeFilter === 'all') return results;
-    return results.filter(r => r.type === typeFilter);
-  }, [results, typeFilter]);
-
-  const handleResultClick = (result: SearchResult) => {
-    if (result.type === 'song') {
-      onSelectSong(result.item as Song);
-    } else if (result.type === 'album') {
-      onNavigate('discography', (result.item as { id: number }).id);
-    } else if (result.type === 'member') {
-      onNavigate('members', (result.item as { id: string }).id);
-    }
+  const filteredResults = useMemo(() => typeFilter === 'all' ? results : results.filter(r => r.type === typeFilter), [results, typeFilter]);
+  const openResult = (result: SearchResult) => {
+    if (result.type === 'song') onSelectSong(result.item as Song);
+    else if (result.type === 'album') onNavigate('discography', Number(result.id));
+    else if (result.type === 'member') onNavigate('members', String(result.id));
+    else { setSelectedRecord(result); setPreview(result); }
   };
+  const iconFor = (type: string) => ({ song: Music, album: Disc, member: User, award: Trophy, concert: MapPin }[type] || Search);
 
-  const resultIcon = (type: string) => {
-    switch (type) {
-      case 'song': return Music;
-      case 'album': return Disc;
-      case 'member': return User;
-      case 'award': return Trophy;
-      case 'concert': return MapPin;
-      default: return Search;
-    }
-  };
-
-  const resultAccent = (type: string) => {
-    switch (type) {
-      case 'award': return 'text-yellow-400/70';
-      case 'concert': return 'text-green-400/70';
-      default: return 'text-purple-400/70';
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <EditorialPageHeader
-        eyebrow="Research Desk / Search"
-        title="Search"
-        note="Search songs, albums, members, awards, and concerts from one desk. Use exact terms, mood chips, or suggested queries."
-        meta={
-          <>
-            <span>{songs.length.toLocaleString()} songs</span>
-            <span>{albums.length.toLocaleString()} releases</span>
-            <span>{awards.length.toLocaleString()} awards</span>
-            <span>{concerts.length.toLocaleString()} shows</span>
-          </>
-        }
-      />
-
-      <GallerySection
-        number="01"
-        label="Query Desk"
-        title="Find records across the archive"
-        claim="Type a known object, choose a mood chip, or start from the suggested searches."
-        caption="Results keep their routing into song, album, member, award, and concert records."
-      >
-      <div className="space-y-5">
-      {/* Search Bar */}
-      <div className="relative">
-        <div className="flex items-center gap-4 bg-[#111118] border border-white/[0.06] rounded-2xl px-6 py-4 focus-within:border-purple-500/30 transition-colors">
-          <Search size={20} className="text-white/40 shrink-0" aria-hidden="true" />
-          {isAiSearchConfigured() && (
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase tracking-wide shrink-0">
-              AI
-            </span>
-          )}
-          {!isAiSearchConfigured() && isCatalogSearchEnabled() && (
-            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wide shrink-0">
-              Cloudflare D1
-            </span>
-          )}
-          <input
-            ref={inputRef}
-            type="search"
-            inputMode="search"
-            autoComplete="off"
-            spellCheck={false}
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setShowSuggestions(true); }}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            onFocus={() => setShowSuggestions(true)}
-            placeholder="Search songs, albums, members…"
-            aria-label="Search BTS"
-            className="flex-1 bg-transparent text-base text-white/80 outline-none placeholder:text-white/40"
-          />
-          <button
-            onClick={handleSearch}
-            disabled={searching}
-            className="px-5 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full text-xs font-medium uppercase tracking-wide text-purple-300 hover:bg-purple-500/30 transition-all disabled:opacity-50"
-          >
-            {searching ? <RefreshCw size={14} className="animate-spin" /> : 'Search'}
-          </button>
+  return <div className="space-y-5">
+    <EditorialPageHeader eyebrow="" title="Search" note="Find a song, album, member, award, or live show." />
+    <div className="editorial-surface p-4 sm:p-6 space-y-5">
+      <form onSubmit={e => { e.preventDefault(); submit(query); }} className="flex items-center gap-3 rounded-lg border border-white/15 bg-[#111118] p-3 focus-within:border-purple-400/60">
+        <Search size={20} className="shrink-0 text-white/60" aria-hidden="true" />
+        <input type="search" inputMode="search" autoComplete="off" value={query}
+          onChange={e => { ++requestId.current; setQuery(e.target.value); setStatus('idle'); setResults([]); setSelectedRecord(null); }}
+          aria-label="Search BTS" placeholder="Songs, albums, members…" className="min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/60" />
+        <button type="submit" disabled={!query.trim() || status === 'searching'} className="min-h-11 rounded-md border border-purple-400/35 bg-purple-500/15 px-3 sm:px-5 text-sm text-purple-200 hover:bg-purple-500/25 disabled:opacity-50">Search</button>
+      </form>
+      <details open={Boolean(initialMood)} className="text-sm text-white/75">
+        <summary className="w-fit cursor-pointer py-2">{initialMood ? `Mood: ${MOOD_LABELS[initialMood] || initialMood}` : 'Explore songs by mood'}</summary>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {Object.entries(MOOD_LABELS).map(([mood, label]) => <button key={mood} aria-pressed={initialMood === mood} onClick={() => onSearchStateChange('', mood)} className={`min-h-11 rounded-full border px-4 py-2 text-sm ${initialMood === mood ? 'border-purple-400/50 bg-purple-500/15 text-purple-200' : 'border-white/15 text-white/75 hover:bg-white/5'}`}>{label}</button>)}
         </div>
-
-        {/* Suggestions dropdown */}
-        {showSuggestions && suggestions.length > 0 && (
-          <div ref={suggestionsRef} className="absolute top-full mt-2 left-0 right-0 bg-[#111118] border border-white/[0.06] rounded-xl overflow-hidden z-50">
-            {suggestions.map((s, i) => (
-              <button
-                key={i}
-                onClick={() => { setQuery(s); setShowSuggestions(false); runSearch(s); }}
-                className="w-full text-left px-6 py-3 text-sm text-white/60 hover:bg-white/[0.05] hover:text-white transition-colors"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Mood Filter Pills */}
-      <div className="space-y-3">
-        <h3 className="text-xs font-medium text-white/50 uppercase tracking-wide">Search by Mood</h3>
-        <div className="flex flex-wrap gap-2">
-          {Object.keys(MOOD_LABELS).map(mood => (
-            <button
-              key={mood}
-              onClick={() => handleMoodSearch(mood)}
-              className={`px-4 py-2 rounded-full text-xs font-medium border transition-all duration-300 flex items-center gap-2 ${
-                activeMood === mood
-                  ? 'bg-purple-500/15 border-purple-500/30 text-purple-300'
-                  : 'bg-white/[0.04] border-white/[0.08] text-white/50 hover:text-white/70 hover:border-white/15'
-              }`}
-            >
-              <Sparkles size={12} />
-              {MOOD_LABELS[mood]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Type Filter + Results Count */}
-      <div className="flex items-center gap-2">
-        {(['all', 'song', 'album', 'member', 'award', 'concert'] as const).map(t => (
-          <button
-            key={t}
-            onClick={() => setTypeFilter(t)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-300 ${
-              typeFilter === t ? 'bg-purple-500/15 border-purple-500/30 text-purple-300' : 'bg-white/[0.04] border-white/[0.08] text-white/50 hover:text-white/70'
-            }`}
-          >{t === 'all' ? 'All' : t + 's'}</button>
-        ))}
-        {results.length > 0 && (
-          <span className="ml-auto text-sm text-white/50">{filteredResults.length} results</span>
-        )}
-      </div>
-
-      {/* Results */}
-      {filteredResults.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-          {/* Results list */}
-          <div className="md:col-span-8 space-y-2">
-            {filteredResults.map(r => {
-              const Icon = resultIcon(r.type);
-              return (
-                <button
-                  key={`${r.type}-${r.id}`}
-                  onClick={() => handleResultClick(r)}
-                  onMouseEnter={() => setHoveredResult(r)}
-                  onMouseLeave={() => setHoveredResult(null)}
-                  className="w-full text-left flex items-center gap-4 p-4 bg-white/[0.02] border border-white/[0.06] rounded-xl hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-300 group"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center flex-shrink-0">
-                    <Icon size={16} className="text-white/50" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-white/80 group-hover:text-white transition-colors truncate">{r.title}</div>
-                    <div className="text-xs text-white/50 mt-0.5 truncate">{r.context}</div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="default" size="sm">{r.type}</Badge>
-                    <span className={`text-xs font-mono ${resultAccent(r.type)}`}>{r.score}%</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Preview Panel */}
-          <div className="hidden md:block md:col-span-4">
-            <div className="sticky top-6 p-5 bg-white/[0.02] border border-white/[0.06] rounded-2xl min-h-[200px]">
-              {hoveredResult ? (
-                <PreviewPanel result={hoveredResult} />
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                  <Search size={24} className="text-white/20 mb-3" />
-                  <p className="text-xs text-white/40">Hover a result to preview</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          <EmptyState
-            icon={query || activeMood ? Network : Search}
-            title={query || activeMood ? 'No results found' : 'Search BTS'}
-            description={
-              query || activeMood
-                ? 'Try different words or pick a mood above.'
-                : 'Songs, albums, members, moods.'
-            }
-          />
-          <div className="flex flex-wrap gap-2 justify-center max-w-md mx-auto">
-            <span className="text-[11px] text-white/50 uppercase tracking-wide w-full text-center">Try</span>
-            {['Dynamite', 'Yoongi', 'love yourself', 'Grammy', 'Wembley'].map((example) => (
-              <button
-                key={example}
-                onClick={() => { setQuery(example); runSearch(example); }}
-                className="px-3 py-1.5 text-xs rounded-full bg-white/[0.04] border border-white/[0.08] text-white/70 hover:text-white hover:border-purple-500/30 hover:bg-purple-500/10 transition-colors"
-              >
-                {example}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      </div>
-      </GallerySection>
+      </details>
+      {status === 'done' && results.length > 0 && <div className="flex flex-wrap items-center gap-2" aria-label="Filter search results">
+        {RESULT_TYPES.map(type => <button key={type} aria-pressed={typeFilter === type} onClick={() => setTypeFilter(type)} className={`min-h-10 rounded-full border px-3 py-2 text-sm ${typeFilter === type ? 'border-purple-400/40 bg-purple-500/15 text-purple-200' : 'border-white/10 text-white/70 hover:bg-white/5'}`}>{type === 'all' ? 'All' : type.charAt(0).toUpperCase() + type.slice(1) + 's'}</button>)}
+        <span role="status" className="ml-auto text-sm text-white/65">{filteredResults.length} results</span>
+      </div>}
+      {selectedRecord && <section aria-label="Selected record" className="rounded-lg border border-purple-400/25 p-5 space-y-4">
+        <div className="flex items-center justify-between"><h2 className="text-base font-semibold">Record details</h2><button aria-label="Close record details" onClick={() => setSelectedRecord(null)} className="grid h-11 w-11 place-items-center"><X size={18} /></button></div>
+        <PreviewPanel result={selectedRecord} />
+        <button className="min-h-11 text-sm text-purple-200 underline underline-offset-4" onClick={() => onNavigate(selectedRecord.type === 'award' ? 'awards' : 'tours')}>Browse all {selectedRecord.type === 'award' ? 'awards' : 'tours'}</button>
+      </section>}
+      {status === 'searching' && <p role="status" className="py-8 text-center text-sm text-white/70">Searching the archive…</p>}
+      {status === 'error' && <div role="alert" className="py-6 text-center text-sm text-white/75"><p>Search is temporarily unavailable.</p><button onClick={() => submit(query)} className="mt-3 min-h-11 text-purple-200">Try again</button></div>}
+      {status === 'done' && filteredResults.length === 0 && <div role="status" className="py-6 text-center text-sm text-white/70"><p>No matching records.</p><p className="mt-2">{results.length ? 'Try another category or show all results.' : 'Try a different name, title, or mood.'}</p>{results.length > 0 && <button onClick={() => setTypeFilter('all')} className="min-h-11 mt-2 text-purple-200">Show all results</button>}</div>}
+      {status === 'idle' && <div className="flex flex-wrap items-center gap-2 text-sm text-white/65"><span>Try</span>{['Dynamite', 'Yoongi', 'Love Yourself'].map(example => <button key={example} onClick={() => submit(example)} className="min-h-11 rounded-full border border-white/10 px-4 py-2 text-white/80 hover:bg-white/5">{example}</button>)}</div>}
+      {status === 'done' && filteredResults.length > 0 && <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+        <div className="md:col-span-8 space-y-2">{filteredResults.map(result => {
+          const Icon = iconFor(result.type);
+          return <button key={`${result.type}-${result.id}`} onClick={() => openResult(result)} onMouseEnter={() => setPreview(result)} onFocus={() => setPreview(result)} aria-expanded={result.type === 'award' || result.type === 'concert' ? selectedRecord === result : undefined} className="w-full text-left flex items-center gap-3 rounded-lg border border-white/10 p-4 hover:border-purple-400/30 hover:bg-white/5">
+            <Icon size={18} className="shrink-0 text-white/65" aria-hidden="true" />
+            <span className="min-w-0 flex-1"><span className="block text-sm font-medium text-white/90">{result.title}</span><span className="mt-1 block text-xs text-white/65">{result.context}</span></span>
+            <Badge variant="default" size="sm">{result.type}</Badge>
+          </button>;
+        })}</div>
+        <aside className="hidden md:block md:col-span-4"><div className="sticky top-5 rounded-lg border border-white/10 p-5">{preview ? <PreviewPanel result={preview} /> : <p className="text-sm text-white/65">Focus or hover a result to preview it.</p>}</div></aside>
+      </div>}
     </div>
-  );
+  </div>;
 }
-
 function PreviewPanel({ result }: { result: SearchResult }) {
   if (result.type === 'song') {
     const song = result.item as Song;
@@ -379,7 +179,7 @@ function PreviewPanel({ result }: { result: SearchResult }) {
     return (
       <div className="space-y-4">
         {member.image_url && (
-          <img src={member.image_url} alt={member.stage_name} width={400} height={128} decoding="async" loading="lazy" className="w-full h-32 object-cover rounded-xl img-outline" />
+          <ArchiveImage src={member.image_url} alt={member.stage_name} width={400} height={128} decoding="async" loading="lazy" className="w-full h-32 object-cover rounded-xl img-outline" />
         )}
         <div>
           <h4 className="text-sm font-semibold text-white/90">{member.stage_name}</h4>

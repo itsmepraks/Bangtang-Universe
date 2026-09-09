@@ -18,6 +18,8 @@ interface HomeSectionProps {
   members: Member[];
   awards: Award[];
   concerts: Concert[];
+  awardsAvailable?: boolean;
+  concertsAvailable?: boolean;
   onNavigate: (section: DashboardSection, payload?: string | number) => void;
 }
 
@@ -52,6 +54,8 @@ export default function HomeSection({
   awards,
   concerts,
   onNavigate,
+  awardsAvailable = true,
+  concertsAvailable = true,
 }: HomeSectionProps) {
   const eras = useMemo(() => [...new Set(albums.map((a) => a.era).filter(Boolean))], [albums]);
   const latestAlbum = useMemo(
@@ -63,8 +67,6 @@ export default function HomeSection({
   const uniqueCountries = useMemo(() => new Set(concerts.map((c) => c.country)).size, [concerts]);
   const totalKomca = useMemo(() => members.reduce((sum, m) => sum + (m.komca_credits || 0), 0), [members]);
   const titleTracksCount = useMemo(() => songs.filter((s) => s.is_title_track).length, [songs]);
-  const musicVideosCount = useMemo(() => songs.filter((s) => s.has_mv).length, [songs]);
-  const soloSongsCount = useMemo(() => songs.filter((s) => s.is_solo).length, [songs]);
   const releaseYears = useMemo(
     () =>
       albums
@@ -119,11 +121,6 @@ export default function HomeSection({
 
   const contributions = useMemo(() => computeMemberContributions(members, songs), [members, songs]);
   const topContributor = contributions[0];
-  const namedEraStory = useMemo(
-    () => eraStory.filter((era) => era.era.toLowerCase() !== 'unknown' && era.year !== 'Undated'),
-    [eraStory],
-  );
-
   const winsByYear = useMemo(() => {
     const map: Record<number, number> = {};
     awards
@@ -135,14 +132,6 @@ export default function HomeSection({
       .sort(([a], [b]) => Number(a) - Number(b))
       .map(([year, count]) => ({ year: `'${year.slice(2)}`, count }));
   }, [awards]);
-  const mostDenseEra = useMemo(
-    () => namedEraStory.reduce((best, era) => (era.songs > (best?.songs ?? -1) ? era : best), namedEraStory[0]),
-    [namedEraStory],
-  );
-  const highestEnergyEra = useMemo(
-    () => namedEraStory.reduce((best, era) => (era.energy > (best?.energy ?? -1) ? era : best), namedEraStory[0]),
-    [namedEraStory],
-  );
   const peakRecognitionYear = useMemo(
     () => winsByYear.reduce((best, year) => (year.count > best.count ? year : best), winsByYear[0] ?? { year: '--', count: 0 }),
     [winsByYear],
@@ -154,55 +143,13 @@ export default function HomeSection({
     });
     return [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
   }, [awards]);
-  const topTour = useMemo(() => {
-    const counts = new Map<string, number>();
-    concerts.forEach((concert) => counts.set(concert.tour_name, (counts.get(concert.tour_name) ?? 0) + 1));
-    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
-  }, [concerts]);
-  const topCountry = useMemo(() => {
-    const counts = new Map<string, number>();
-    concerts.forEach((concert) => counts.set(concert.country, (counts.get(concert.country) ?? 0) + 1));
-    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null;
-  }, [concerts]);
-  const focusSignals = [
-    {
-      label: 'Catalog span',
-      value: archiveSpan,
-      detail: `${eras.length} eras in the catalog`,
-      accent: SECTION_ACCENTS.discography,
-    },
-    {
-      label: 'Music objects',
-      value: formatNumber(songs.length),
-      detail: `${titleTracksCount} title tracks · ${musicVideosCount} MVs`,
-      accent: SECTION_ACCENTS.discography,
-    },
-    {
-      label: 'Authorship',
-      value: formatNumber(totalKomca),
-      detail: `${members.length} artist labels · ${soloSongsCount} solo tracks`,
-      accent: SECTION_ACCENTS.members,
-    },
-    {
-      label: 'Recognition peak',
-      value: `${peakRecognitionYear.count}`,
-      detail: `${peakRecognitionYear.year.replace("'", '20')} wins in one year`,
-      accent: SECTION_ACCENTS.awards,
-    },
-    {
-      label: 'Tour footprint',
-      value: formatNumber(concerts.length),
-      detail: `${uniqueCountries} countries · ${topCountry?.[0] ?? 'global'} leads`,
-      accent: SECTION_ACCENTS.tours,
-    },
-  ];
 
   return (
-    <main className="space-y-4">
+    <div className="space-y-6">
       <EditorialPageHeader
         eyebrow="Bangtan Universe / Permanent Collection"
         title="Overview"
-        note="Scan the collection by catalog span, sound, member credits, recognition, and tour reach. Use the summary rows to jump into the detailed pages."
+        note="Explore the music, meet the members, and follow each era."
         meta={
           <>
             <span>{archiveSpan}</span>
@@ -216,66 +163,23 @@ export default function HomeSection({
             items={[
               { label: 'Songs', value: songs.length, section: 'discography', note: `${titleTracksCount} title tracks`, accent: SECTION_ACCENTS.discography },
               { label: 'Members', value: members.length, section: 'members', note: `${totalKomca.toLocaleString()} KOMCA credits`, accent: SECTION_ACCENTS.members },
-              { label: 'Awards', value: awardsWon, section: 'awards', note: `${awards.length.toLocaleString()} nominations tracked`, accent: SECTION_ACCENTS.awards },
-              { label: 'Tours', value: uniqueTours, section: 'tours', note: `${uniqueCountries} countries in the archive`, accent: SECTION_ACCENTS.tours },
+              { label: 'Awards', value: awardsAvailable ? awardsWon : '—', section: 'awards', note: awardsAvailable ? `${awards.length.toLocaleString()} nominations tracked` : 'Data unavailable', accent: SECTION_ACCENTS.awards },
+              { label: 'Tours', value: concertsAvailable ? uniqueTours : '—', section: 'tours', note: concertsAvailable ? `${uniqueCountries} countries` : 'Data unavailable', accent: SECTION_ACCENTS.tours },
             ]}
           />
         }
       />
 
-      <section className="overview-signal-strip editorial-surface" aria-label="Archive summary">
-        {focusSignals.map((signal) => (
-          <button
-            type="button"
-            key={signal.label}
-            className="overview-signal"
-            style={{ '--signal-accent': signal.accent } as React.CSSProperties}
-            onClick={() => {
-              if (signal.label.includes('Music') || signal.label.includes('Catalog')) onNavigate('discography');
-              if (signal.label.includes('Authorship')) onNavigate('members');
-              if (signal.label.includes('Recognition')) onNavigate('awards');
-              if (signal.label.includes('Tour')) onNavigate('tours');
-            }}
-          >
-            <span className="overview-signal__label">{signal.label}</span>
-            <span className="overview-signal__value">{signal.value}</span>
-            <span className="overview-signal__detail">{signal.detail}</span>
-          </button>
-        ))}
-      </section>
-
       <div className="grid grid-cols-1 xl:grid-cols-[1.25fr_0.75fr] gap-6">
         <GallerySection
           number="01"
           label="Era Index"
-          title="Release chronology with sound markers"
-          claim="Each era shows its date range, anchor release, song count, and average sound profile."
+          title="Explore the eras"
+          claim="Follow the releases that shaped each chapter."
           caption="Use the timeline for sequence and the chart for energy and valence movement."
           source="Source: local song and album records."
           className="gallery-section--wide"
         >
-          <div className="overview-insight-strip" aria-label="Era highlights">
-            <div>
-              <span>Catalog-dense era</span>
-              <strong>{mostDenseEra?.era ?? 'No era data'}</strong>
-              <small>{mostDenseEra?.songs ?? 0} songs across {mostDenseEra?.releases ?? 0} releases</small>
-            </div>
-            <div>
-              <span>Highest energy era</span>
-              <strong>{highestEnergyEra?.era ?? 'No era data'}</strong>
-              <small>{Math.round((highestEnergyEra?.energy ?? 0) * 100)} average energy score</small>
-            </div>
-            <div>
-              <span>Recognition crest</span>
-              <strong>{peakRecognitionYear.year.replace("'", '20')}</strong>
-              <small>{peakRecognitionYear.count} wins recorded</small>
-            </div>
-            <div>
-              <span>Largest route</span>
-              <strong>{topTour?.[0] ?? 'No tour data'}</strong>
-              <small>{topTour?.[1] ?? 0} shows in the archive</small>
-            </div>
-          </div>
           <div className="story-wall">
             <div className="era-spine" aria-label="Era timeline">
               {eraStory.map((era) => (
@@ -338,8 +242,8 @@ export default function HomeSection({
         <GallerySection
           number="02"
           label="Shortcuts"
-          title="Open the main archive drawers"
-          claim="Jump to release records, member credits, tour routes, or award history from the current collection totals."
+          title="Explore more"
+          claim="Start with a release, an artist, or a live show."
         >
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
             <ObjectLabel
@@ -348,7 +252,7 @@ export default function HomeSection({
               detail={latestAlbum ? `${formatYear(latestAlbum.release_date)} · ${latestAlbum.era ?? latestAlbum.type}` : undefined}
               value={latestAlbum?.track_count ?? '—'}
               valueLabel="tracks"
-              description="The latest catalog object anchors the archive in present tense."
+
               accent={SECTION_ACCENTS.discography}
               actionLabel="Open catalog"
               onClick={() => latestAlbum && onNavigate('discography', latestAlbum.id)}
@@ -357,7 +261,7 @@ export default function HomeSection({
               ) : undefined}
             />
             <ObjectLabel
-              classification="Authorship"
+              classification="Songwriting"
               title={topContributor?.stageName ?? 'Member credits'}
               detail="KOMCA writing and production record"
               value={topContributor?.komcaCredits ?? totalKomca}
@@ -368,10 +272,10 @@ export default function HomeSection({
               onClick={() => onNavigate('members')}
             />
             <ObjectLabel
-              classification="Movement"
+              classification="Live shows"
               title="Tour footprint"
-              detail={`${uniqueTours} tours · ${uniqueCountries} countries`}
-              value={concerts.length}
+              detail={concertsAvailable ? `${uniqueTours} tours · ${uniqueCountries} countries` : 'Tour data is unavailable'}
+              value={concertsAvailable ? concerts.length : '—'}
               valueLabel="shows"
               description="The archive becomes geographic through venues, routes, and repeat cities."
               accent={SECTION_ACCENTS.tours}
@@ -381,8 +285,8 @@ export default function HomeSection({
             <ObjectLabel
               classification="Recognition"
               title="Awards chronology"
-              detail={`${awards.length.toLocaleString()} tracked nominations`}
-              value={awardsWon}
+              detail={awardsAvailable ? `${awards.length.toLocaleString()} tracked nominations` : 'Award data is unavailable'}
+              value={awardsAvailable ? awardsWon : '—'}
               valueLabel="wins"
               description="Recognition arrives in waves, across ceremonies, categories, group work, and solo work."
               accent={SECTION_ACCENTS.awards}
@@ -393,7 +297,7 @@ export default function HomeSection({
         </GallerySection>
       </div>
 
-      <GallerySection
+      {awardsAvailable && <GallerySection
         number="03"
         label="Recognition"
         title="Wins by year and ceremony"
@@ -439,7 +343,7 @@ export default function HomeSection({
             </button>
           </aside>
         </div>
-      </GallerySection>
-    </main>
+      </GallerySection>}
+    </div>
   );
 }

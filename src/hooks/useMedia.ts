@@ -7,8 +7,8 @@ interface UseMediaResult extends AsyncResource {
     media: Media[];
 }
 
-export function useMedia(): UseMediaResult {
-    const { data: media, loading, error, refetch } = useCatalogResource('media');
+export function useMedia(enabled = true): UseMediaResult {
+    const { data: media, loading, error, refetch } = useCatalogResource('media', enabled);
     return { media, loading, error, refetch };
 }
 

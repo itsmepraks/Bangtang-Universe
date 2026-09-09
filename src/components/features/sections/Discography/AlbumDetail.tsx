@@ -34,10 +34,10 @@ export default function AlbumDetail({ album, songs, onSelectSong, onBack }: Albu
       key: 'title',
       header: 'Title',
       render: (s: Song) => (
-        <div>
-          <div className="text-sm text-white/80">{s.title}</div>
-          {s.title_korean && <div className="text-xs text-white/40">{s.title_korean}</div>}
-        </div>
+        <button type="button" className="min-h-11 text-left" onClick={(event) => { event.stopPropagation(); onSelectSong(s.id); }}>
+          <span className="block text-sm text-white/80">{s.title}</span>
+          {s.title_korean && <span className="block text-xs text-white/60">{s.title_korean}</span>}
+        </button>
       ),
     },
     {

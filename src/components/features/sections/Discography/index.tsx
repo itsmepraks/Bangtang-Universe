@@ -1,3 +1,4 @@
+import type { DiscographyFilters } from '../../../../hooks/useArchiveNavigation';
 import { useMemo } from 'react';
 import type { Song, Album } from '../../../../types/database';
 import type { DiscographyState } from '../../../../types/index';
@@ -11,10 +12,11 @@ interface DiscographySectionProps {
   albums: Album[];
   discographyState: DiscographyState;
   onSetDiscographyState: (s: DiscographyState) => void;
-  eraFilter?: string | null;
+  filters: DiscographyFilters;
+  onFiltersChange: (filters: DiscographyFilters) => void;
 }
 
-export default function DiscographySection({ songs, albums, discographyState, onSetDiscographyState, eraFilter }: DiscographySectionProps) {
+export default function DiscographySection({ songs, albums, discographyState, onSetDiscographyState, filters, onFiltersChange }: DiscographySectionProps) {
   const selectedAlbum = useMemo(
     () => albums.find(a => a.id === discographyState.selectedAlbumId) || null,
     [albums, discographyState.selectedAlbumId]
@@ -52,7 +54,7 @@ export default function DiscographySection({ songs, albums, discographyState, on
       <EditorialPageHeader
         eyebrow="Collection Catalog / Discography"
         title="Discography"
-        note="Browse releases by era, format, group work, solo records, and collaborations. Open a release to inspect its tracklist and linked song records."
+        note="Find a release by era or format, then explore its songs."
         meta={
           <>
             <span>{albums.length.toLocaleString()} releases</span>
@@ -62,6 +64,7 @@ export default function DiscographySection({ songs, albums, discographyState, on
         }
       />
       <GallerySection
+        compact
         number="01"
         label="Release Shelf"
         title="Filterable release records"
@@ -71,7 +74,9 @@ export default function DiscographySection({ songs, albums, discographyState, on
         <AlbumGrid
           albums={albums}
           songs={songs}
-          eraFilter={eraFilter || null}
+          filters={filters}
+          onFiltersChange={onFiltersChange}
+          onSelectSong={(song) => onSetDiscographyState({ selectedAlbumId: song.album_id, selectedSongId: song.id, view: 'song' })}
           onSelectAlbum={(id) => onSetDiscographyState({ selectedAlbumId: id, selectedSongId: null, view: 'album' })}
         />
       </GallerySection>

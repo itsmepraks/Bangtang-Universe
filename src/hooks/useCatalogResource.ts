@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchCatalogSnapshot, fetchCatalogTable, type CatalogRows } from '../services/catalogService';
 import type { CatalogTable } from '../services/catalogSchema';
 import type { AsyncResource } from './types';
 
-export function useCatalogResource<K extends CatalogTable>(table: K): AsyncResource & { data: CatalogRows[K] } {
+export function useCatalogResource<K extends CatalogTable>(table: K, enabled = true): AsyncResource & { data: CatalogRows[K] } {
   const [data, setData] = useState<CatalogRows[K]>([] as unknown as CatalogRows[K]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -26,6 +26,11 @@ export function useCatalogResource<K extends CatalogTable>(table: K): AsyncResou
     }
   }, [table]);
 
-  useEffect(() => { void refetch(); }, [refetch]);
+  const started = useRef(false);
+  useEffect(() => {
+    if (!enabled || started.current) return;
+    started.current = true;
+    void refetch();
+  }, [enabled, refetch]);
   return { data, loading, error, refetch };
 }

@@ -9,7 +9,6 @@ interface EditorialPageHeaderProps {
 }
 
 export default function EditorialPageHeader({
-  eyebrow,
   title,
   note,
   meta,
@@ -18,7 +17,6 @@ export default function EditorialPageHeader({
   return (
     <header className={`editorial-surface editorial-page-header ${aside ? '' : 'editorial-page-header--solo'}`}>
       <div className="min-w-0">
-        <p className="editorial-kicker">{eyebrow}</p>
         <h1 className="editorial-title">{title}</h1>
         <p className="editorial-note">{note}</p>
         {meta && <div className="editorial-header-meta">{meta}</div>}
