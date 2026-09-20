@@ -83,7 +83,6 @@ export default function CommandPalette({
       // Intentional reset-on-open. setState in effect is the right pattern here.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('');
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveIndex(0);
       requestAnimationFrame(() => inputRef.current?.focus());
     } else if (previouslyFocusedRef.current) {
@@ -114,7 +113,7 @@ export default function CommandPalette({
       type: 'mood',
       label: `Search by mood: ${m}`,
       keywords: `mood ${m}`,
-      action: () => onNavigate('search'),
+      action: () => onNavigate('search', `mood:${m.toLowerCase()}`),
     }));
     const songItems: PaletteItem[] = songs.slice(0, 500).map((s) => {
       const album = albums.find((a) => a.id === s.album_id);
@@ -174,13 +173,13 @@ export default function CommandPalette({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
+    if (e.key === 'ArrowDown' && e.target === inputRef.current) {
       e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, results.length - 1));
-    } else if (e.key === 'ArrowUp') {
+      setActiveIndex((i) => Math.max(0, Math.min(i + 1, results.length - 1)));
+    } else if (e.key === 'ArrowUp' && e.target === inputRef.current) {
       e.preventDefault();
       setActiveIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === 'Enter') {
+    } else if (e.key === 'Enter' && e.target === inputRef.current) {
       e.preventDefault();
       const item = results[activeIndex];
       if (item) runItem(item);
@@ -265,6 +264,7 @@ export default function CommandPalette({
                   key={item.id}
                   data-palette-index={idx}
                   onMouseEnter={() => setActiveIndex(idx)}
+                  onFocus={() => setActiveIndex(idx)}
                   onClick={() => runItem(item)}
                   className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors ${
                     isActive
@@ -288,6 +288,8 @@ export default function CommandPalette({
           )}
         </div>
 
+        {query.trim() && <button onClick={() => { onNavigate('search', query.trim()); onClose(); }} className="w-full min-h-11 border-t border-white/10 px-4 py-3 text-left text-sm text-purple-200 hover:bg-white/5">Search all records for “{query.trim()}”</button>}
+        <p className="sr-only" aria-live="polite">{results[activeIndex]?.label}</p>
         {/* Footer hints */}
         <div className="flex items-center gap-4 px-4 py-2 border-t border-white/[0.06] text-[10px] text-white/40">
           <span className="flex items-center gap-1">

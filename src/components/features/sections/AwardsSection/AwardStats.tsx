@@ -69,7 +69,7 @@ export default function AwardStats({ awards }: AwardStatsProps) {
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <Trophy size={48} className="text-white/20 mb-4" />
         <h2 className="text-lg font-semibold text-white/60 mb-2">No awards data yet</h2>
-        <p className="text-sm text-white/40">Run the awards scraper to populate.</p>
+        <p className="text-sm text-white/40">No records are available yet. Try again later.</p>
       </div>
     );
   }

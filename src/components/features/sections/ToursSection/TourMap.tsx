@@ -5,9 +5,7 @@ import { MapPin, Plus, Minus, RotateCcw } from 'lucide-react';
 import type { Concert } from '../../../../types/database';
 import { resolveCoords } from '../../../../data/cityCoords';
 import { BORAHAE_COLORS, withAlpha } from '../../../../constants/colors';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore – world-atlas ships plain JSON with no type declarations
-import worldData from 'world-atlas/countries-50m.json';
+import worldData from 'world-atlas/countries-110m.json?url';
 
 interface TourMapProps {
   concerts: Concert[];
@@ -96,7 +94,7 @@ export default function TourMap({ concerts }: TourMapProps) {
       <div className="py-16 text-center">
         <MapPin className="w-12 h-12 text-white/20 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-white/60 mb-2">No concert data yet</h3>
-        <p className="text-sm text-white/40">Run the concerts scraper to populate.</p>
+        <p className="text-sm text-white/40">No records are available yet. Try again later.</p>
       </div>
     );
   }

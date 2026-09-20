@@ -23,7 +23,7 @@ export default function DataStatusBanner({ hasError, onRetry, retrying = false }
       <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" aria-hidden="true" />
       <div className="flex-1 min-w-0 text-xs">
         <span className="font-medium">Can't reach the server.</span>{' '}
-        <span className="text-amber-100/60">Showing saved data. Newest releases may not be here yet.</span>
+        <span className="text-amber-100/60">Some sections are unavailable. Saved records are shown where possible.</span>
       </div>
       <button
         onClick={onRetry}

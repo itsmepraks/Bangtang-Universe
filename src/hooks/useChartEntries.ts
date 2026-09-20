@@ -7,8 +7,8 @@ interface UseChartEntriesResult extends AsyncResource {
     chartEntries: ChartEntry[];
 }
 
-export function useChartEntries(): UseChartEntriesResult {
-    const { data: chartEntries, loading, error, refetch } = useCatalogResource('chart_entries');
+export function useChartEntries(enabled = true): UseChartEntriesResult {
+    const { data: chartEntries, loading, error, refetch } = useCatalogResource('chart_entries', enabled);
     return { chartEntries, loading, error, refetch };
 }
 

@@ -18,9 +18,9 @@ interface OnboardingFlowProps {
 }
 
 const SECTIONS = [
-  { icon: Disc, label: 'Catalog', desc: 'Albums, songs, eras, solo releases, and collaborations' },
+  { icon: Disc, label: 'Discography', desc: 'Albums, songs, eras, solo releases, and collaborations' },
   { icon: Users, label: 'Members', desc: 'Seven artist records with credits, timelines, and solo work' },
-  { icon: BarChart3, label: 'Research', desc: 'Sound, lyrics, authorship, milestones, and discovery tools' },
+  { icon: BarChart3, label: 'Analytics', desc: 'Sound, lyrics, authorship, milestones, and discovery tools' },
   { icon: Trophy, label: 'Awards', desc: 'Recognition tracked by ceremony, category, scope, and year' },
   { icon: MapPin, label: 'Tours', desc: 'Concert routes, cities, countries, venues, and scale' },
   { icon: Film, label: 'Media', desc: 'Documentaries, films, variety, reality, solo, and unit records' },
@@ -35,7 +35,7 @@ const STEPS = [
   {
     eyebrow: 'Sections / What You Can Open',
     title: 'Each section answers a different question.',
-    body: 'Use Catalog for releases, Members for artist records, Research for charts, Awards for recognition, Tours for routes, and Media for films and shows.',
+    body: 'Use Discography for releases, Members for artist records, Analytics for charts, Awards for recognition, Tours for routes, and Media for films and shows.',
   },
   {
     eyebrow: 'Ready / Begin The Walkthrough',

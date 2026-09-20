@@ -104,6 +104,7 @@ export default function ToursSection({ concerts }: ToursSectionProps) {
       </div>
 
       <GallerySection
+        compact
         number="01"
         label="Route Records"
         title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Tour records'}

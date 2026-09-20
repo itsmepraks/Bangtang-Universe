@@ -1,3 +1,4 @@
+import { useReducedMotion } from '../../hooks/useReducedMotion';
 import React, { useRef, useEffect, useMemo } from 'react';
 import { generateStars } from '../../utils/helpers';
 
@@ -15,6 +16,7 @@ interface Star3D {
 }
 
 export const StarFieldCanvas: React.FC<StarFieldCanvasProps> = ({ mode }) => {
+    const reducedMotion = useReducedMotion();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const angleRef = useRef(0);
     const lastTimeRef = useRef(0);
@@ -41,7 +43,7 @@ export const StarFieldCanvas: React.FC<StarFieldCanvasProps> = ({ mode }) => {
         if (!ctx) return;
 
         let w = 0, h = 0;
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
         const resize = () => {
             w = canvas.offsetWidth;
@@ -54,7 +56,7 @@ export const StarFieldCanvas: React.FC<StarFieldCanvasProps> = ({ mode }) => {
         let resizeTimer: number | undefined;
         const onResize = () => {
             if (resizeTimer) window.clearTimeout(resizeTimer);
-            resizeTimer = window.setTimeout(resize, 150);
+            resizeTimer = window.setTimeout(() => { resize(); if (reducedMotion) draw(0); }, 150);
         };
         window.addEventListener('resize', onResize);
 
@@ -129,7 +131,7 @@ export const StarFieldCanvas: React.FC<StarFieldCanvasProps> = ({ mode }) => {
             }
 
             ctx.globalAlpha = 1;
-            animId = requestAnimationFrame(draw);
+            if (!reducedMotion) animId = requestAnimationFrame(draw);
         };
         animId = requestAnimationFrame(draw);
 
@@ -138,7 +140,7 @@ export const StarFieldCanvas: React.FC<StarFieldCanvasProps> = ({ mode }) => {
             if (resizeTimer) window.clearTimeout(resizeTimer);
             window.removeEventListener('resize', onResize);
         };
-    }, [stars, mode]);
+    }, [stars, mode, reducedMotion]);
 
     return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />;
 };

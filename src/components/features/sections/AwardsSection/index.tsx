@@ -1,3 +1,4 @@
+import { handleTabKeyDown } from '../../../../utils/tabKeyboard';
 import { useState, Suspense, lazy } from 'react';
 import { Trophy, Calendar, BarChart3, LayoutList } from 'lucide-react';
 import type { Award, Member } from '../../../../types/database';
@@ -58,7 +59,7 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
         }
       />
 
-      <div className="archive-tab-row" role="tablist" aria-label="Awards views">
+      <div className="archive-tab-row" role="tablist" aria-label="Awards views" onKeyDown={(event) => handleTabKeyDown(event, TABS.map(tab => tab.id), activeTab, setActiveTab)}>
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -66,7 +67,10 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
             return (
               <button
                 key={tab.id}
+                id={`awards-tab-${tab.id}`}
                 role="tab"
+                aria-controls="awards-panel"
+                tabIndex={isActive ? 0 : -1}
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 className="archive-tab-btn"
@@ -80,13 +84,14 @@ export default function AwardsSection({ awards, members }: AwardsSectionProps) {
       </div>
 
       <GallerySection
+        compact
         number="01"
         label="Award Records"
         title={TABS.find((tab) => tab.id === activeTab)?.label ?? 'Award records'}
         claim="Switch between the trophy list, podium grouping, year timeline, and statistical summary."
         caption="Use the filters inside each view to narrow ceremony, year, category, scope, and result."
       >
-        <div role="tabpanel">
+        <div id="awards-panel" role="tabpanel" aria-labelledby={`awards-tab-${activeTab}`} tabIndex={0}>
           <Suspense
             fallback={
               <div className="flex items-center justify-center h-64">

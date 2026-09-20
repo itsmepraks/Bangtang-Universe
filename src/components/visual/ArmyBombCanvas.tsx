@@ -1,3 +1,4 @@
+import { useReducedMotion } from '../../hooks/useReducedMotion';
 /* eslint-disable react-hooks/purity */
 // Decorative ARMY bomb field — Math.random() inside the useMemo is intentional.
 // Bombs are generated once on mount (deps: []) and never re-randomize.
@@ -23,6 +24,7 @@ export interface ArmyBombCanvasProps {
 }
 
 export const ArmyBombCanvas: React.FC<ArmyBombCanvasProps> = ({ audioRef }) => {
+    const reducedMotion = useReducedMotion();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     // Smoothed band trackers — instantaneous FFT readings are jittery. EMAs
     // give a "sustained shine" response that follows the song's beat without
@@ -138,7 +140,7 @@ export const ArmyBombCanvas: React.FC<ArmyBombCanvasProps> = ({ audioRef }) => {
         if (!ctx) return;
 
         let w = 0, h = 0;
-        const dpr = window.devicePixelRatio || 1;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
         const resize = () => {
             w = canvas.offsetWidth;
@@ -151,7 +153,7 @@ export const ArmyBombCanvas: React.FC<ArmyBombCanvasProps> = ({ audioRef }) => {
         let resizeTimer: number | undefined;
         const onResize = () => {
             if (resizeTimer) window.clearTimeout(resizeTimer);
-            resizeTimer = window.setTimeout(resize, 150);
+            resizeTimer = window.setTimeout(() => { resize(); if (reducedMotion) draw(0); }, 150);
         };
         window.addEventListener('resize', onResize);
 
@@ -228,7 +230,7 @@ export const ArmyBombCanvas: React.FC<ArmyBombCanvasProps> = ({ audioRef }) => {
             }
 
             ctx.globalAlpha = 1;
-            animId = requestAnimationFrame(draw);
+            if (!reducedMotion) animId = requestAnimationFrame(draw);
         };
         animId = requestAnimationFrame(draw);
 
@@ -237,7 +239,7 @@ export const ArmyBombCanvas: React.FC<ArmyBombCanvasProps> = ({ audioRef }) => {
             if (resizeTimer) window.clearTimeout(resizeTimer);
             window.removeEventListener('resize', onResize);
         };
-    }, [bombs, audioRef]);
+    }, [bombs, audioRef, reducedMotion]);
 
     return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />;
 };

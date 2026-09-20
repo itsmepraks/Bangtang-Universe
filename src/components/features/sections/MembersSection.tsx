@@ -1,3 +1,4 @@
+import MemberPortrait from '../../ui/MemberPortrait';
 import { useState, useMemo } from 'react';
 import { ChevronLeft, PenTool, Disc, Award, Music, ExternalLink, User, GitCompare, Trophy, GitMerge, Calendar, Shield } from 'lucide-react';
 import type { Song, Member } from '../../../types/database';
@@ -29,29 +30,14 @@ function MemberGrid({ members, onSelect }: { members: Member[]; onSelect: (id: s
           style={{
             '--member-color': getMemberColor(m.id),
           } as React.CSSProperties}
-          onMouseEnter={(e) => {
-            const el = e.currentTarget;
-            el.style.borderColor = `${getMemberColor(m.id)}40`;
-            el.style.boxShadow = `0 0 20px ${getMemberColor(m.id)}15, 0 0 40px ${getMemberColor(m.id)}08`;
-          }}
-          onMouseLeave={(e) => {
-            const el = e.currentTarget;
-            el.style.borderColor = '';
-            el.style.boxShadow = '';
-          }}
+
         >
           {/* Photo */}
           <div className="aspect-[3/4] relative overflow-hidden">
-            {m.image_url ? (
-              <img src={m.image_url} alt={m.stage_name} width={300} height={420} decoding="async" loading="lazy" className="w-full h-full object-cover img-outline grayscale group-hover:grayscale-0 transition-[filter] duration-700" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${m.color || BORAHAE_COLORS.PRIMARY}30, transparent)` }}>
-                <User size={48} className="text-white/20" />
-              </div>
-            )}
+            <MemberPortrait member={m} className="w-full h-full object-cover" decorative />
             <div className="absolute inset-0 bg-gradient-to-t from-[#020005] via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 right-4">
-              <p className="text-[10px] uppercase tracking-[0.16em] text-white/50">Artist label</p>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-white/50">Member</p>
               <h3 className="text-lg font-semibold text-white/95">{m.stage_name}</h3>
               {m.full_name && <p className="text-xs text-white/60 mt-1">{m.full_name}</p>}
             </div>
@@ -152,13 +138,7 @@ function MemberProfile({ member, songs, onBack, onOpenFullProfile }: {
         <div className="relative flex flex-col md:flex-row gap-6 md:gap-10 p-6 md:p-8">
           {/* Photo */}
           <div className="w-32 h-40 md:w-44 md:h-56 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-white/[0.08] shadow-2xl">
-            {member.image_url ? (
-              <img src={member.image_url} alt={member.stage_name} width={300} height={420} decoding="async" loading="lazy" className="w-full h-full object-cover img-outline" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-[#111118]">
-                <User size={48} className="text-white/20" />
-              </div>
-            )}
+            <MemberPortrait member={member} className="w-full h-full object-cover" />
           </div>
 
           {/* Info */}
@@ -466,7 +446,7 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
       <EditorialPageHeader
         eyebrow="Career Gallery / Members"
         title="Members"
-        note="Compare the seven artist records by role, credits, solo work, collaborations, milestones, and linked songs."
+        note="Meet the seven members and explore their music, credits, and milestones."
         meta={
           <>
             <span>{members.length} artists</span>
@@ -476,6 +456,7 @@ export default function MembersSection({ members, songs, selectedMemberId, onSel
         }
       />
       <GallerySection
+        compact
         number="01"
         label="Artist Labels"
         title="Equal member records"

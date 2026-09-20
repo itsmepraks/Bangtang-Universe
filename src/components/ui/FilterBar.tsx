@@ -18,6 +18,7 @@ export default function FilterBar({ options, value, onChange, allLabel = 'All', 
     <div className={`flex flex-wrap gap-2 ${className}`}>
       {showAll && (
         <button
+          aria-pressed={value === null}
           onClick={() => onChange(null)}
           className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-[background-color,border-color,color] duration-300 ${
             value === null
@@ -31,6 +32,7 @@ export default function FilterBar({ options, value, onChange, allLabel = 'All', 
       {options.map(opt => (
         <button
           key={opt.value}
+          aria-pressed={value === opt.value}
           onClick={() => onChange(opt.value === value ? null : opt.value)}
           className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-[background-color,border-color,color] duration-300 ${
             value === opt.value

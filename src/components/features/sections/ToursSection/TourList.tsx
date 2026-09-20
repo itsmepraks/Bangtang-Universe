@@ -113,7 +113,7 @@ export default function TourList({ concerts }: TourListProps) {
       <div className="py-16 text-center">
         <MapPin className="w-12 h-12 text-white/20 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-white/60 mb-2">No concert data yet</h3>
-        <p className="text-sm text-white/40">Run the concerts scraper to populate.</p>
+        <p className="text-sm text-white/40">No records are available yet. Try again later.</p>
       </div>
     );
   }

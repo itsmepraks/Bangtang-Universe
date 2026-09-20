@@ -34,7 +34,7 @@ function cleanLyrics(raw: string): string {
 type LyricsMode = 'english' | 'korean' | 'romanized' | 'side-by-side';
 
 export default function LyricsViewer({ song }: LyricsViewerProps) {
-    const { lyric: lyrics } = useLyricsBySongId(song.id);
+    const { lyric: lyrics, loading, error } = useLyricsBySongId(song.id);
 
     const rawKo = lyrics?.lyrics_korean || song.lyrics_ko || null;
     const rawEn = lyrics?.lyrics_english || song.lyrics_en || null;
@@ -68,8 +68,8 @@ export default function LyricsViewer({ song }: LyricsViewerProps) {
         return (
             <div className="flex flex-col items-center justify-center py-16 text-center">
                 <BookOpen size={32} className="text-white/20 mb-3" />
-                <p className="text-sm text-white/50 mb-1">No lyrics available</p>
-                <p className="text-xs text-white/40">Lyrics for this song haven't been added yet</p>
+                <p role="status" className="text-sm text-white/70 mb-1">{loading ? 'Loading lyrics…' : error ? 'Lyrics are temporarily unavailable' : 'No lyrics available'}</p>
+                {!loading && <p className="text-xs text-white/60">{error ? 'Try opening this song again in a moment.' : "Lyrics for this song haven't been added yet."}</p>}
             </div>
         );
     }

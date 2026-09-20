@@ -1,9 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Music, Users } from 'lucide-react';
 import type { Song, Album } from '../../../../types/database';
 import FilterBar from '../../../ui/FilterBar';
 import Badge from '../../../ui/Badge';
-import BtsLogo from '../../../ui/BtsLogo';
+import AlbumArtwork from '../../../ui/AlbumArtwork';
 import { BORAHAE_COLORS } from '../../../../constants/colors';
 
 
@@ -15,7 +15,7 @@ const SELECT_CARET_STYLE = {
   backgroundPosition: 'right 10px center',
 };
 
-type Category = 'all' | 'group' | 'solo' | 'collab';
+import type { DiscographyFilters } from '../../../../hooks/useArchiveNavigation';
 
 const categoryOptions = [
   { value: 'group', label: 'Group' },
@@ -26,7 +26,9 @@ const categoryOptions = [
 interface AlbumGridProps {
   albums: Album[];
   songs: Song[];
-  eraFilter: string | null;
+  filters: DiscographyFilters;
+  onFiltersChange: (filters: DiscographyFilters) => void;
+  onSelectSong: (song: Song) => void;
   onSelectAlbum: (id: number) => void;
 }
 
@@ -37,11 +39,10 @@ function formatDuration(seconds: number | null): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: AlbumGridProps) {
-  const [typeFilter, setTypeFilter] = useState<string | null>(null);
-  const [activeEra, setActiveEra] = useState<string | null>(eraFilter);
-  const [category, setCategory] = useState<Category>('all');
-
+export default function AlbumGrid({ albums, songs, filters, onFiltersChange, onSelectAlbum, onSelectSong }: AlbumGridProps) {
+  const { type: typeFilter, era: activeEra, category } = filters;
+  const setTypeFilter = (type: string | null) => onFiltersChange({ ...filters, type });
+  const setActiveEra = (era: string | null) => onFiltersChange({ ...filters, era });
   const types = useMemo(() => [...new Set(albums.map(a => a.type).filter(Boolean))].map(t => ({ value: t!, label: t! })), [albums]);
   const eras = useMemo(() => [...new Set(albums.map(a => a.era).filter(Boolean))].sort().map(e => ({ value: e!, label: e! })), [albums]);
 
@@ -120,8 +121,7 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
           options={categoryOptions}
           value={category === 'all' ? null : category}
           onChange={(v) => {
-            setCategory((v as Category) || 'all');
-            setTypeFilter(null);
+            onFiltersChange({ ...filters, category: (v as DiscographyFilters['category']) || 'all' });
           }}
           allLabel="All"
         />
@@ -133,8 +133,8 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
           <select
             aria-label="Filter albums by type"
             value={typeFilter || ''}
-            onChange={(e) => { setTypeFilter(e.target.value || null); setActiveEra(null); }}
-            className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
+            onChange={(e) => { setTypeFilter(e.target.value || null); }}
+            className="bg-[#111118] border border-white/[0.08] rounded-xl min-h-11 text-sm text-white/80 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
             style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Types</option>
@@ -143,8 +143,8 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
           <select
             aria-label="Filter albums by era"
             value={activeEra || ''}
-            onChange={(e) => { setActiveEra(e.target.value || null); setTypeFilter(null); }}
-            className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
+            onChange={(e) => { setActiveEra(e.target.value || null); }}
+            className="bg-[#111118] border border-white/[0.08] rounded-xl min-h-11 text-sm text-white/80 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
             style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Eras</option>
@@ -152,10 +152,10 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
           </select>
           {(typeFilter || activeEra) && (
             <button
-              onClick={() => { setTypeFilter(null); setActiveEra(null); }}
-              className="text-xs text-purple-400/60 hover:text-purple-300 transition-colors"
+              onClick={() => onFiltersChange({ ...filters, type: null, era: null })}
+              className="min-h-11 text-sm text-purple-300 hover:text-purple-200 transition-colors"
             >
-              Clear
+              Clear filters
             </button>
           )}
         </div>
@@ -168,7 +168,7 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
             aria-label="Filter by era"
             value={activeEra || ''}
             onChange={(e) => setActiveEra(e.target.value || null)}
-            className="bg-[#111118] border border-white/[0.08] rounded-xl text-xs text-white/70 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
+            className="bg-[#111118] border border-white/[0.08] rounded-xl min-h-11 text-sm text-white/80 px-3 py-2 cursor-pointer hover:border-white/20 transition-colors focus:outline-none focus:border-purple-500/40 appearance-none pr-7"
             style={SELECT_CARET_STYLE}
           >
             <option value="" style={{ background: '#111118' }}>All Eras</option>
@@ -177,9 +177,9 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
           {activeEra && (
             <button
               onClick={() => setActiveEra(null)}
-              className="text-xs text-purple-400/60 hover:text-purple-300 transition-colors"
+              className="min-h-11 text-sm text-purple-300 hover:text-purple-200 transition-colors"
             >
-              Clear
+              Clear filters
             </button>
           )}
         </div>
@@ -193,32 +193,18 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
               <button
                 key={album.id}
                 onClick={() => onSelectAlbum(album.id)}
-                className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
+                className="universe-release text-left group overflow-hidden"
               >
                 <div
                   className="h-32 w-full relative overflow-hidden"
                   style={{ background: `linear-gradient(135deg, ${album.cover_color || BORAHAE_COLORS.PRIMARY}40, ${album.cover_color || BORAHAE_COLORS.PRIMARY}10)` }}
                 >
-                  {album.cover_art_url ? (
-                    <img
-                      src={album.cover_art_url}
-                      alt={album.title}
-                      width={400}
-                      height={400}
-                      decoding="async"
-                      className="w-full h-full object-cover img-outline group-hover:scale-105 transition-transform duration-700"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <BtsLogo size={40} className="text-white/[0.08] group-hover:text-white/[0.15] transition-colors" />
-                    </div>
-                  )}
+                  <AlbumArtwork album={album} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-4 space-y-2">
                   <h3 className="text-sm font-semibold text-white/85 group-hover:text-white transition-colors truncate">{album.title}</h3>
                   {album.title_korean && <p className="text-xs text-white/50 truncate">{album.title_korean}</p>}
-                  <div className="flex items-center gap-2 text-xs text-white/50">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-white/60">
                     <span>{album.release_date?.slice(0, 4)}</span>
                     <span className="text-white/20">·</span>
                     <span>{album.type}</span>
@@ -232,7 +218,11 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
               </button>
             ))}
           </div>
-          <p className="text-xs text-white/50 text-center">{filtered.length} albums</p>
+          {filtered.length === 0 && <div role="status" className="py-8 text-center text-sm text-white/70">
+            <p>No releases match these filters.</p>
+            <button className="mt-3 min-h-11 text-purple-300" onClick={() => onFiltersChange({ category: 'all', type: null, era: null })}>Clear all filters</button>
+          </div>}
+          <p className="text-xs text-white/60 text-center" role="status">{filtered.length} releases</p>
         </>
       )}
 
@@ -253,9 +243,11 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
                   {memberSongs.map(song => {
                     const album = song.album_id ? albumMap[song.album_id] : null;
                     return (
-                      <div
+                      <button
+                        onClick={() => onSelectSong(song)}
+                        type="button"
                         key={song.id}
-                        className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all"
+                        className="w-full text-left flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all"
                       >
                         <div className="min-w-0 flex-1">
                           <p className="text-sm text-white/80 truncate">{song.title}</p>
@@ -264,11 +256,11 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
                           )}
                         </div>
                         <div className="flex items-center gap-3 text-xs text-white/40 shrink-0 ml-4">
-                          {album && <span>{album.title}</span>}
+                          {album && <span className="hidden sm:inline">{album.title}</span>}
                           {song.release_date && <span>{song.release_date.slice(0, 4)}</span>}
                           {song.duration_seconds && <span>{formatDuration(song.duration_seconds)}</span>}
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -290,9 +282,11 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
             collabSongs.map(song => {
               const album = song.album_id ? albumMap[song.album_id] : null;
               return (
-                <div
+                <button
+                  onClick={() => onSelectSong(song)}
+                  type="button"
                   key={song.id}
-                  className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all"
+                  className="w-full text-left flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all"
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <Users size={16} className="text-purple-400 shrink-0" />
@@ -309,11 +303,11 @@ export default function AlbumGrid({ albums, songs, eraFilter, onSelectAlbum }: A
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-xs text-white/40 shrink-0 ml-4">
-                    {album && <span>{album.title}</span>}
+                    {album && <span className="hidden sm:inline">{album.title}</span>}
                     {song.release_date && <span>{song.release_date.slice(0, 4)}</span>}
                     {song.duration_seconds && <span>{formatDuration(song.duration_seconds)}</span>}
                   </div>
-                </div>
+                </button>
               );
             })
           )}
