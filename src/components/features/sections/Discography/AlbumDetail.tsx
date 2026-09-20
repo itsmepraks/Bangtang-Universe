@@ -3,7 +3,7 @@ import { ChevronLeft } from 'lucide-react';
 import type { Song, Album } from '../../../../types/database';
 import Badge from '../../../ui/Badge';
 import DataTable from '../../../ui/DataTable';
-import BtsLogo from '../../../ui/BtsLogo';
+import AlbumArtwork from '../../../ui/AlbumArtwork';
 import { getSentimentColor, BORAHAE_COLORS } from '../../../../constants/colors';
 
 interface AlbumDetailProps {
@@ -74,21 +74,7 @@ export default function AlbumDetail({ album, songs, onSelectSong, onBack }: Albu
           className="w-32 h-32 md:w-48 md:h-48 rounded-2xl flex-shrink-0 overflow-hidden"
           style={{ background: `linear-gradient(135deg, ${album.cover_color || BORAHAE_COLORS.PRIMARY}60, ${album.cover_color || BORAHAE_COLORS.PRIMARY}15)` }}
         >
-          {album.cover_art_url ? (
-            <img
-              src={album.cover_art_url}
-              alt={album.title}
-              width={400}
-              height={400}
-              decoding="async"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <BtsLogo size={56} className="text-white/[0.15]" />
-            </div>
-          )}
+          <AlbumArtwork album={album} className="w-full h-full object-cover" />
         </div>
         <div className="flex flex-col justify-center space-y-2">
           <Badge variant="purple" size="md">{album.type}</Badge>

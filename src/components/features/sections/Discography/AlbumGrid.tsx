@@ -3,7 +3,7 @@ import { Music, Users } from 'lucide-react';
 import type { Song, Album } from '../../../../types/database';
 import FilterBar from '../../../ui/FilterBar';
 import Badge from '../../../ui/Badge';
-import BtsLogo from '../../../ui/BtsLogo';
+import AlbumArtwork from '../../../ui/AlbumArtwork';
 import { BORAHAE_COLORS } from '../../../../constants/colors';
 
 
@@ -199,21 +199,7 @@ export default function AlbumGrid({ albums, songs, filters, onFiltersChange, onS
                   className="h-32 w-full relative overflow-hidden"
                   style={{ background: `linear-gradient(135deg, ${album.cover_color || BORAHAE_COLORS.PRIMARY}40, ${album.cover_color || BORAHAE_COLORS.PRIMARY}10)` }}
                 >
-                  {album.cover_art_url ? (
-                    <img
-                      src={album.cover_art_url}
-                      alt={album.title}
-                      width={400}
-                      height={400}
-                      decoding="async"
-                      className="w-full h-full object-cover img-outline"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <BtsLogo size={40} className="text-white/[0.08] group-hover:text-white/[0.15] transition-colors" />
-                    </div>
-                  )}
+                  <AlbumArtwork album={album} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-4 space-y-2">
                   <h3 className="text-sm font-semibold text-white/85 group-hover:text-white transition-colors truncate">{album.title}</h3>
