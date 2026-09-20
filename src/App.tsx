@@ -212,7 +212,7 @@ export default function App() {
   };
 
   return (
-    <div className="relative w-screen h-dvh bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white noise-texture">
+    <div className="relative w-screen h-dvh bg-[#0a0a0f] text-white font-sans overflow-hidden selection:bg-purple-500/30 selection:text-white">
 
       {/* Universe layer — landing/warp only */}
       {mode === 'warp' && (
@@ -278,13 +278,13 @@ export default function App() {
           {sidebarOpen && (
             <div className="fixed inset-0 z-40 xl:hidden">
               <div className="absolute inset-0 bg-black/65" onClick={() => setSidebarOpen(false)} />
-              <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="Site navigation" className="absolute inset-y-0 left-0 w-[min(88vw,360px)] bg-[#12100e] border-r border-[var(--editorial-border-soft)] px-5 py-5 shadow-2xl">
+              <aside ref={drawerRef} role="dialog" aria-modal="true" aria-label="Site navigation" className="absolute inset-y-0 left-0 w-[min(88vw,360px)] bg-[#100a1c] border-r border-[var(--editorial-border-soft)] px-5 py-5 shadow-2xl">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <BTSLogo className="w-7 h-7 text-white" />
                     <div>
                       <p className="text-sm font-semibold text-white/90 leading-tight">Bangtan Universe</p>
-                      <p className="text-[10px] uppercase tracking-[0.16em] text-white/40">Collection index</p>
+                      <p className="text-[10px] uppercase tracking-[0.16em] text-white/40">Explore the universe</p>
                     </div>
                   </div>
                   <button
@@ -346,9 +346,9 @@ export default function App() {
             </div>
           )}
 
-          <div inert={sidebarOpen || paletteOpen} className="flex-1 flex flex-col min-w-0 relative z-10">
+          <div inert={sidebarOpen || paletteOpen} className="universe-shell flex-1 flex flex-col min-w-0 relative z-10">
 
-            <header className="flex flex-col border-b border-[var(--editorial-border-soft)] bg-[#100f0d]/88 backdrop-blur-xl">
+            <header className="universe-header flex flex-col">
               <div className="min-h-16 flex items-center justify-between gap-4 px-4 md:px-8">
                 <div className="flex items-center gap-3 min-w-0">
                   <button
@@ -362,18 +362,18 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setMode('landing')}
-                    className="hidden sm:flex items-center gap-3 text-left group min-w-0"
+                    className="universe-brand flex items-center gap-3 text-left group min-w-0"
                     aria-label="Return to landing page"
                   >
                     <BTSLogo className="w-7 h-7 text-white group-hover:scale-105 transition-transform duration-300 flex-shrink-0" />
                     <span className="min-w-0">
-                      <span className="block text-sm font-semibold text-white/90 leading-tight truncate">Bangtan Universe</span>
-                      <span className="block text-[10px] uppercase tracking-[0.16em] text-white/42 leading-tight truncate">{getGreeting()}</span>
+                      <span className="universe-brand__name block text-white/90 leading-tight truncate">Bangtan Universe</span>
+                      <span className="universe-brand__greeting hidden sm:block text-[10px] text-white/60 leading-tight truncate">{getGreeting()}</span>
                     </span>
                   </button>
                 </div>
 
-                <nav aria-label="Collection navigation" className="hidden xl:flex items-center justify-center gap-1 flex-1">
+                <nav aria-label="Collection navigation" className="universe-nav hidden xl:flex items-center justify-center gap-1 flex-1">
                   {NAV_ITEMS.map((item) => {
                     const isActive = activeSection === item.id;
                     const accent = SECTION_ACCENTS[item.id];
@@ -383,7 +383,7 @@ export default function App() {
                         type="button"
                         onClick={() => navigateTo(item.id)}
                         aria-current={isActive ? 'page' : undefined}
-                        className={`group relative px-3 py-5 text-sm font-medium transition-colors ${
+                        className={`universe-nav__item group relative px-3 py-5 text-sm font-medium transition-colors ${
                           isActive ? 'text-white' : 'text-white/65 hover:text-white'
                         }`}
                       >
@@ -419,7 +419,7 @@ export default function App() {
                       <Settings2 size={15} />
                     </button>
                     {projectMenuOpen && (
-                      <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-md border border-[var(--editorial-border-soft)] bg-[#15120f] p-2 shadow-2xl">
+                      <div className="absolute right-0 top-full z-50 mt-2 w-56 rounded-md border border-[var(--editorial-border-soft)] bg-[#100a1c] p-2 shadow-2xl">
                         <button
                           type="button"
                           onClick={() => setConcertMode(c => !c)}
@@ -457,7 +457,7 @@ export default function App() {
               onScroll={(event) => scrollPositions.current.set(scrollKey, event.currentTarget.scrollTop)}
               id="main-content"
               tabIndex={-1}
-              className={`flex-1 p-4 md:p-8 pb-16 overflow-y-auto relative pretty-scrollbar focus:outline-none ${concertMode ? 'concert-intense' : 'concert-bg'}`}
+              className={`universe-main flex-1 overflow-y-auto relative pretty-scrollbar focus:outline-none ${concertMode ? 'concert-intense' : 'concert-bg'}`}
             >
               <Suspense fallback={<SectionSpinner />}>
                 <SectionTransition sectionKey={scrollKey} restoreScroll={() => { if (mainRef.current) mainRef.current.scrollTop = scrollPositions.current.get(scrollKey) ?? 0; }}>

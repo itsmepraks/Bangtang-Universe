@@ -193,7 +193,7 @@ export default function AlbumGrid({ albums, songs, filters, onFiltersChange, onS
               <button
                 key={album.id}
                 onClick={() => onSelectAlbum(album.id)}
-                className="text-left group rounded-2xl border border-white/[0.06] bg-[#111118] hover:border-purple-500/20 hover:bg-white/[0.05] transition-all duration-500 overflow-hidden hover:scale-[1.02] hover:shadow-lg"
+                className="universe-release text-left group overflow-hidden"
               >
                 <div
                   className="h-32 w-full relative overflow-hidden"
@@ -206,7 +206,7 @@ export default function AlbumGrid({ albums, songs, filters, onFiltersChange, onS
                       width={400}
                       height={400}
                       decoding="async"
-                      className="w-full h-full object-cover img-outline group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full object-cover img-outline"
                       loading="lazy"
                     />
                   ) : (
