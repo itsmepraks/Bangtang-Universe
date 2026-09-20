@@ -1,113 +1,75 @@
-# BTS Universe
+# Bangtan Universe
 
-A data-driven web dashboard exploring BTS's discography, tours, awards, member profiles, and analytics. Built as a single-page application with a Supabase backend and 17+ automated data scrapers.
+A data-driven React dashboard for BTS discography, tours, awards, member profiles, media, and analytics.
 
-## Stack
+## Architecture
 
-- **Frontend:** React 19, TypeScript 5.9, Tailwind CSS 4, Vite 7
-- **Backend:** Supabase (PostgreSQL)
-- **Data:** Recharts, React Simple Maps, Framer Motion, Fuse.js
-- **Scrapers:** cheerio, MusicBrainz API, Genius API, Setlist.fm API
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS
+- **Catalog API:** Cloudflare Worker at `/api/catalog/:table`
+- **Database:** Cloudflare D1 (SQLite)
+- **Offline fallback:** versioned JSON snapshots in `public/data/catalog`
+- **Search:** client-side Fuse.js over the loaded catalog
 
-## Dashboard Sections
+The Worker exposes read-only `GET` endpoints for the 11 catalog tables. Scraper and seed scripts write directly to D1 through Cloudflare's authenticated API. If the Worker cannot be reached, the app loads the complete static snapshot and displays a saved-data warning.
 
-| Section | Description |
-|---------|-------------|
-| **Landing** | Concert stage experience with animated spotlights, ARMY bomb crowd, and starfield |
-| **Overview** | Key stats, recent releases, and quick navigation |
-| **Discography** | Full album/single catalog with cover art, tracklists, and era filtering |
-| **Members** | Tabbed artist profiles — bio, career timeline, solo music, achievements, awards |
-| **Analytics** | Charts for album sales, streaming trends, chart positions over time |
-| **Awards** | Group and solo awards with collapsible podium tree (Grammy, MAMA, Billboard, etc.) |
-| **Tours** | Interactive world map with tour routes, setlists, venue stats, and timeline slider |
-| **Search** | Fuzzy search across songs, albums, lyrics, and members |
-| **Sonic Lab** | Audio waveform visualization and music metrics |
-
-## Data Pipeline
-
-Scrapers collect data from public sources and populate the Supabase database:
-
-```
-scripts/scrape-01 → MusicBrainz discography
-scripts/scrape-02 → Wikipedia album metadata
-scripts/scrape-03 → Genius song IDs
-scripts/scrape-04 → Upsert albums to Supabase
-scripts/scrape-05 → Upsert songs to Supabase
-scripts/scrape-06 → Genius lyrics
-scripts/scrape-07 → Verification pass
-scripts/scrape-08 → Expanded discography (Japanese, solo)
-scripts/scrape-09 → Cover art from Cover Art Archive
-scripts/scrape-10 → Korean lyrics translations
-scripts/scrape-11 → Group awards (Wikipedia)
-scripts/scrape-12 → Chart entries (Billboard, Gaon/Circle)
-scripts/scrape-13 → Concert/tour data
-scripts/scrape-14 → Collaborations and features
-scripts/scrape-15 → Member career events (Wikipedia)
-scripts/scrape-16 → Setlist.fm setlists
-scripts/scrape-17 → Solo member awards
-```
-
-Additional data scripts: `seed-member-events.ts`, `fix-member-data.ts`, `generate-city-coords.ts`
-
-## Getting Started
+## Local development
 
 ```bash
-git clone https://github.com/itsmepraks/BTS-universe.git
-cd BTS-universe
 npm install
+cp .env.example .env
+npm run catalog:migrate:local
+npm run catalog:dev
 ```
 
-Create a `.env` file with your Supabase credentials:
-
-```
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
-
-Run the dev server:
+In another terminal:
 
 ```bash
 npm run dev
 ```
 
-### Scripts
+The default `.env.example` points the app at the local Worker on port 8787. To use the deployed catalog, set:
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start dev server |
-| `npm run build` | Production build |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Lint with ESLint |
-
-## Project Structure
-
-```
-src/
-  components/
-    features/
-      LandingRitual.tsx        # Concert stage landing page
-      MemberDNA.tsx             # Full member profile overlay
-      sections/
-        HomeSection/            # Overview dashboard
-        Discography/            # Album browser
-        MembersSection.tsx      # Member grid + tabbed profiles
-        AnalyticsSection/       # Charts and trends
-        AwardsSection/          # Awards podium
-        ToursSection/           # Tour map + setlists
-        SearchSection.tsx       # Fuzzy search
-        Sonic/                  # Audio analysis
-    visual/                     # Reusable visual components (canvas, effects)
-    layout/                     # Navigation, sidebar, glass panels
-  hooks/                        # Supabase data hooks
-  types/                        # TypeScript interfaces
-  data/                         # Static fallback data
-scripts/                        # Data scrapers and seed scripts
+```dotenv
+VITE_CATALOG_API_URL=https://bangtan-universe-catalog.personal-domains-680.workers.dev/api/catalog
 ```
 
-## License
+## Catalog operations
 
-Personal portfolio project. Not licensed for commercial use.
+| Command | Purpose |
+| --- | --- |
+| `npm run catalog:prepare` | Generate D1 imports and complete fallback snapshots from an export |
+| `npm run catalog:photos` | Copy member portraits into static local assets |
+| `npm run catalog:migrate:local` | Apply the schema to local D1 |
+| `npm run catalog:migrate:cloud` | Apply the schema to the configured remote D1 database |
+| `npm run catalog:deploy` | Deploy the read-only Worker |
+| `npm run catalog:verify` | Compare every cloud row and field with the prepared source snapshot |
+| `npm run catalog:export` | Export all catalog tables through the Worker API |
 
-All BTS-related content belongs to BigHit Music / HYBE.
+Scraper and seed scripts require `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `CLOUDFLARE_D1_DATABASE_ID`. Keep the API token only in an ignored local environment file.
 
-Built by [Prakriti Bista](https://github.com/itsmepraks).
+## Data pipeline
+
+The numbered scripts gather discography, lyrics, chart, award, tour, collaboration, and member data. Their shared admin client writes parameterized SQL to D1. Cached source responses remain under `scripts/cache`.
+
+## Verification
+
+```bash
+npm test
+npm run lint
+npm run build
+npm run catalog:typecheck
+npm run catalog:verify
+```
+
+## Project structure
+
+```text
+src/hooks/                 Catalog resource hooks with snapshot fallback
+src/services/              Catalog schema and Worker client
+workers/catalog/           Worker source, D1 schema, and Wrangler configs
+public/data/catalog/       Complete offline catalog snapshots
+public/member-photos/      Migrated member portraits
+scripts/                   Scrapers, migration, export, and verification tools
+```
+
+Personal portfolio project. All BTS-related content belongs to BigHit Music / HYBE.

@@ -1,48 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { useMemo } from 'react';
 import type { Collaboration } from '../types/database';
 import type { AsyncResource } from './types';
+import { useCatalogResource } from './useCatalogResource';
 
 interface UseCollaborationsResult extends AsyncResource {
     collaborations: Collaboration[];
 }
 
 export function useCollaborations(): UseCollaborationsResult {
-    const [collaborations, setCollaborations] = useState<Collaboration[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
-
-    const fetchCollaborations = async () => {
-        if (!isSupabaseConfigured()) {
-            setCollaborations([]);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const { data, error: dbError } = await supabase
-                .from('collaborations')
-                .select('*')
-                .order('release_date', { ascending: false });
-
-            if (dbError) throw dbError;
-
-            setCollaborations(data || []);
-        } catch (err) {
-            console.error('Failed to fetch collaborations:', err);
-            setError(err as Error);
-            setCollaborations([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchCollaborations();
-    }, []);
-
-    return { collaborations, loading, error, refetch: fetchCollaborations };
+    const { data: collaborations, loading, error, refetch } = useCatalogResource('collaborations');
+    return { collaborations, loading, error, refetch };
 }
 
 export function useCollaborationsByMember(memberId: string) {

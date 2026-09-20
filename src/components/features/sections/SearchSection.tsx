@@ -39,7 +39,7 @@ export default function SearchSection({ songs, members, albums, awards, concerts
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [hoveredResult, setHoveredResult] = useState<SearchResult | null>(null);
 
-  const { searchAllAsync, searchByMood, getSuggestions, isAiSearchConfigured, isSupabaseSearchEnabled } = useSearch(songs, members, albums, awards, concerts);
+  const { searchAllAsync, searchByMood, getSuggestions, isAiSearchConfigured, isCatalogSearchEnabled } = useSearch(songs, members, albums, awards, concerts);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -164,9 +164,9 @@ export default function SearchSection({ songs, members, albums, awards, concerts
               AI
             </span>
           )}
-          {!isAiSearchConfigured() && isSupabaseSearchEnabled() && (
+          {!isAiSearchConfigured() && isCatalogSearchEnabled() && (
             <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wide shrink-0">
-              Supabase
+              Cloudflare D1
             </span>
           )}
           <input

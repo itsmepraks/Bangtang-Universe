@@ -1,83 +1,16 @@
-import { useState, useEffect, useMemo } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { useMemo } from 'react';
 import type { Member } from '../types/database';
-import { MEMBER_DATA } from '../data/members';
 import { BORAHAE_COLORS } from '../constants/colors';
 import type { AsyncResource } from './types';
+import { useCatalogResource } from './useCatalogResource';
 
 interface UseMembersResult extends AsyncResource {
     members: Member[];
 }
 
-function convertLocalMember(m: typeof MEMBER_DATA[0]): Member {
-    return {
-        id: m.id,
-        stage_name: m.name,
-        full_name: m.full,
-        color: m.color,
-        role: m.role,
-        mic_color: m.mic,
-        komca_credits: m.komca,
-        bio: m.bio,
-        birth_date: m.birthDate,
-        birth_place: m.birthPlace,
-        height: m.height,
-        mbti: m.mbti,
-        zodiac: m.zodiac,
-        instagram: m.instagram,
-        image_url: m.image,
-        solo_tracks: m.soloTracks,
-        achievements: m.achievements,
-        featured_tracks: m.featuredTracks,
-        producer_credits: m.producerCredits,
-        writer_credits: m.writerCredits,
-        created_at: new Date().toISOString(),
-        birth_name_ko: null,
-        education: null,
-        enlistment_start: m.enlistmentStart ?? null,
-        enlistment_end: m.enlistmentEnd ?? null,
-        solo_debut_date: null,
-        instagram_handle: m.instagram || null,
-        bio_long: null,
-    };
-}
-
 export function useMembers(): UseMembersResult {
-    const [members, setMembers] = useState<Member[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
-
-    const fetchMembers = async () => {
-        if (!isSupabaseConfigured()) {
-            setMembers(MEMBER_DATA.map(convertLocalMember));
-            setLoading(false);
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const { data, error: dbError } = await supabase
-                .from('members')
-                .select('*')
-                .order('komca_credits', { ascending: false });
-
-            if (dbError) throw dbError;
-
-            setMembers(data || []);
-        } catch (err) {
-            console.error('Failed to fetch members:', err);
-            setError(err as Error);
-            setMembers(MEMBER_DATA.map(convertLocalMember));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchMembers();
-    }, []);
-
-    return { members, loading, error, refetch: fetchMembers };
+    const { data: members, loading, error, refetch } = useCatalogResource('members');
+    return { members, loading, error, refetch };
 }
 
 export function useMemberById(id: string) {

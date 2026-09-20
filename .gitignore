@@ -26,3 +26,8 @@ dist-ssr
 
 # Scraping cache (intermediate JSON files)
 scripts/cache/
+
+# Local catalog exports and Cloudflare runtime state
+exports/
+.wrangler/
+.dev.vars*

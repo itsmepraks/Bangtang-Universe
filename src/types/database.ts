@@ -1,4 +1,4 @@
-// TypeScript types matching our Supabase/PostgreSQL schema.
+// TypeScript types returned by the Cloudflare D1 catalog Worker.
 
 export interface Album {
     id: number;

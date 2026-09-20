@@ -1,48 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { useMemo } from 'react';
 import type { MemberEvent } from '../types/database';
 import type { AsyncResource } from './types';
+import { useCatalogResource } from './useCatalogResource';
 
 interface UseMemberEventsResult extends AsyncResource {
     memberEvents: MemberEvent[];
 }
 
 export function useMemberEvents(): UseMemberEventsResult {
-    const [memberEvents, setMemberEvents] = useState<MemberEvent[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
-
-    const fetchMemberEvents = async () => {
-        if (!isSupabaseConfigured()) {
-            setMemberEvents([]);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const { data, error: dbError } = await supabase
-                .from('member_events')
-                .select('*')
-                .order('date', { ascending: false });
-
-            if (dbError) throw dbError;
-
-            setMemberEvents(data || []);
-        } catch (err) {
-            console.error('Failed to fetch member events:', err);
-            setError(err as Error);
-            setMemberEvents([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchMemberEvents();
-    }, []);
-
-    return { memberEvents, loading, error, refetch: fetchMemberEvents };
+    const { data: memberEvents, loading, error, refetch } = useCatalogResource('member_events');
+    return { memberEvents, loading, error, refetch };
 }
 
 export function useMemberEventsByMember(memberId: string) {

@@ -1,81 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { useMemo } from 'react';
 import type { Song } from '../types/database';
-import { SONGS, type Song as LocalSong } from '../data/songs';
 import type { AsyncResource } from './types';
+import { useCatalogResource } from './useCatalogResource';
 
 interface UseSongsResult extends AsyncResource {
     songs: Song[];
 }
 
-function convertLocalSong(s: LocalSong): Song {
-    return {
-        id: s.id,
-        title: s.title,
-        title_korean: s.titleKorean || null,
-        album_id: s.albumId,
-        release_date: s.releaseDate,
-        duration_seconds: s.duration,
-        bpm: s.bpm,
-        energy: s.energy,
-        valence: s.valence,
-        danceability: s.danceability,
-        acousticness: s.acousticness,
-        sentiment: s.sentiment,
-        keywords: s.keywords,
-        writers: s.writers,
-        producers: s.producers,
-        member_credits: s.memberCredits,
-        is_title_track: s.isTitle,
-        has_mv: s.hasMV,
-        spotify_id: null,
-        created_at: new Date().toISOString(),
-        lyrics_ko: null,
-        lyrics_en: null,
-        lyrics_romanized: null,
-        music_video_url: null,
-        is_solo: false,
-        is_collab: false,
-        featured_members: null,
-    };
-}
-
 export function useSongs(): UseSongsResult {
-    const [songs, setSongs] = useState<Song[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
-
-    const fetchSongs = async () => {
-        if (!isSupabaseConfigured()) {
-                setSongs(SONGS.map(convertLocalSong));
-            setLoading(false);
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const { data, error: dbError } = await supabase
-                .from('songs')
-                .select('*')
-                .order('release_date', { ascending: true });
-
-            if (dbError) throw dbError;
-
-            setSongs(data || []);
-        } catch (err) {
-            console.error('Failed to fetch songs:', err);
-            setError(err as Error);
-            setSongs(SONGS.map(convertLocalSong));
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchSongs();
-    }, []);
-
-    return { songs, loading, error, refetch: fetchSongs };
+    const { data: songs, loading, error, refetch } = useCatalogResource('songs');
+    return { songs, loading, error, refetch };
 }
 
 export function useSongsByAlbum(albumId: number) {
