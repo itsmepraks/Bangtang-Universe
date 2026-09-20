@@ -1,5 +1,5 @@
-// Data is passed in (already fetched in App) to avoid duplicate Supabase reads.
-// searchAllAsync uses the RAG API when configured, else Supabase, else local Fuse.
+// Data is passed in from the catalog hooks, so search never performs duplicate database reads.
+// searchAllAsync uses the RAG API when configured and local Fuse otherwise.
 
 import { useMemo, useCallback } from 'react';
 import Fuse from 'fuse.js';
@@ -19,8 +19,6 @@ import {
     type SearchResult,
 } from '../services/searchService';
 import { isAiSearchConfigured, searchWithAi } from '../services/aiSearchService';
-import { searchWithSupabase } from '../services/supabaseSearchService';
-import { isSupabaseConfigured } from '../lib/supabase';
 
 export { type SearchResult } from '../services/searchService';
 export { isAiSearchConfigured } from '../services/aiSearchService';
@@ -36,7 +34,7 @@ interface UseSearchResult {
     getSuggestions: (query: string, limit?: number) => string[];
     searchByMood: (mood: string) => Song[];
     isAiSearchConfigured: () => boolean;
-    isSupabaseSearchEnabled: () => boolean;
+    isCatalogSearchEnabled: () => boolean;
 }
 
 export function useSearch(
@@ -102,14 +100,6 @@ export function useSearch(
                 return searchAll(query, limit);
             }
         }
-        if (isSupabaseConfigured()) {
-            try {
-                const supabaseResults = await searchWithSupabase(query, limit);
-                if (supabaseResults.length > 0) return supabaseResults;
-            } catch {
-                // fall through to local
-            }
-        }
         return Promise.resolve(searchAll(query, limit));
     }, [searchAll]);
 
@@ -148,7 +138,7 @@ export function useSearch(
         getSuggestions,
         searchByMood,
         isAiSearchConfigured,
-        isSupabaseSearchEnabled: isSupabaseConfigured,
+        isCatalogSearchEnabled: () => songs.length + members.length + albums.length + awards.length + concerts.length > 0,
     };
 }
 

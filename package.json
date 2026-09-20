@@ -83,10 +83,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "echo \"Setting up git hooks...\"",
-    "db:migrate": "npx tsx scripts/migrate-to-supabase.ts",
-    "db:verify": "npx tsx scripts/verify-database.ts",
-    "db:update-photos": "npx tsx scripts/update-member-photos.ts",
-    "db:upload-photos": "npx tsx scripts/upload-member-photos.ts",
+    "db:migrate": "npm run catalog:migrate:cloud",
+    "db:verify": "npm run catalog:verify",
+    "db:update-photos": "npm run catalog:photos",
+    "db:upload-photos": "npm run catalog:photos",
     "scrape:musicbrainz": "npx tsx scripts/scrape-01-musicbrainz-discography.ts",
     "scrape:wiki": "npx tsx scripts/scrape-02-wiki-metadata.ts",
     "scrape:genius": "npx tsx scripts/scrape-03-genius-songs.ts",
@@ -106,10 +106,18 @@
     "scrape:solo-awards": "npx tsx scripts/scrape-17-solo-awards.ts",
     "seed:member-events": "npx tsx scripts/seed-member-events.ts",
     "fix:member-data": "npx tsx scripts/fix-member-data.ts",
-    "scrape:all": "npm run scrape:musicbrainz && npm run scrape:wiki && npm run scrape:genius && npm run scrape:albums && npm run scrape:songs && npm run scrape:lyrics && npm run scrape:verify && npm run scrape:expand-discography && npm run scrape:cover-art && npm run scrape:lyrics-translations && npm run scrape:awards && npm run scrape:chart-entries && npm run scrape:concerts && npm run scrape:collaborations && npm run scrape:member-events && npm run scrape:setlistfm"
+    "scrape:all": "npm run scrape:musicbrainz && npm run scrape:wiki && npm run scrape:genius && npm run scrape:albums && npm run scrape:songs && npm run scrape:lyrics && npm run scrape:verify && npm run scrape:expand-discography && npm run scrape:cover-art && npm run scrape:lyrics-translations && npm run scrape:awards && npm run scrape:chart-entries && npm run scrape:concerts && npm run scrape:collaborations && npm run scrape:member-events && npm run scrape:setlistfm",
+    "catalog:export": "node --import tsx scripts/export-catalog.ts",
+    "catalog:prepare": "node --import tsx scripts/prepare-catalog-d1.ts",
+    "catalog:photos": "node --import tsx scripts/migrate-member-photos.ts",
+    "catalog:dev": "WRANGLER_LOG_PATH=.wrangler/logs WRANGLER_SEND_METRICS=false wrangler dev --config workers/catalog/wrangler.jsonc --local --port 8787",
+    "catalog:migrate:local": "WRANGLER_LOG_PATH=.wrangler/logs WRANGLER_SEND_METRICS=false wrangler d1 migrations apply CATALOG_DB --config workers/catalog/wrangler.jsonc --local",
+    "catalog:migrate:cloud": "WRANGLER_LOG_PATH=.wrangler/logs WRANGLER_SEND_METRICS=false wrangler d1 migrations apply CATALOG_DB --config workers/catalog/wrangler.cloud.jsonc --remote",
+    "catalog:deploy": "WRANGLER_LOG_PATH=.wrangler/logs WRANGLER_SEND_METRICS=false wrangler deploy --config workers/catalog/wrangler.cloud.jsonc",
+    "catalog:typecheck": "tsc -p workers/catalog/tsconfig.json",
+    "catalog:verify": "node --import tsx scripts/verify-catalog-d1.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.93.3",
     "@vitalets/google-translate-api": "^9.2.1",
     "axios": "^1.13.5",
     "cheerio": "^1.2.0",
@@ -127,6 +135,7 @@
     "world-atlas": "^2.0.2"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "5.20260920.1",
     "@eslint/js": "^9.39.1",
     "@tailwindcss/vite": "^4.1.18",
     "@types/cheerio": "^0.22.35",
@@ -147,6 +156,7 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "wrangler": "4.135.0"
   }
 }

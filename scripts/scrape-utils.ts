@@ -2,25 +2,22 @@
  * Shared utilities for BTS Universe scraping pipeline
  */
 
-import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
+import { createD1Admin as createCloudflareD1Admin } from './d1-admin';
 
 // Load environment variables
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
-// ==================== SUPABASE ====================
+// ==================== CLOUDFLARE D1 ====================
 
-export function createSupabaseAdmin() {
-    const url = process.env.VITE_SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !key) {
-        console.error('❌ Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env');
-        process.exit(1);
-    }
-    return createClient(url, key);
+export function createD1Admin() {
+    return createCloudflareD1Admin();
 }
+
+/** Compatibility name retained for existing numbered scraper scripts. */
+export const createSupabaseAdmin = createD1Admin;
 
 // ==================== RATE LIMITING ====================
 

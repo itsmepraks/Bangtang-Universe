@@ -1,48 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { useMemo } from 'react';
 import type { Concert } from '../types/database';
 import type { AsyncResource } from './types';
+import { useCatalogResource } from './useCatalogResource';
 
 interface UseConcertsResult extends AsyncResource {
     concerts: Concert[];
 }
 
 export function useConcerts(): UseConcertsResult {
-    const [concerts, setConcerts] = useState<Concert[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<Error | null>(null);
-
-    const fetchConcerts = async () => {
-        if (!isSupabaseConfigured()) {
-            setConcerts([]);
-            setLoading(false);
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const { data, error: dbError } = await supabase
-                .from('concerts')
-                .select('*')
-                .order('date', { ascending: false });
-
-            if (dbError) throw dbError;
-
-            setConcerts(data || []);
-        } catch (err) {
-            console.error('Failed to fetch concerts:', err);
-            setError(err as Error);
-            setConcerts([]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchConcerts();
-    }, []);
-
-    return { concerts, loading, error, refetch: fetchConcerts };
+    const { data: concerts, loading, error, refetch } = useCatalogResource('concerts');
+    return { concerts, loading, error, refetch };
 }
 
 export function useConcertsByTour(tourName: string) {

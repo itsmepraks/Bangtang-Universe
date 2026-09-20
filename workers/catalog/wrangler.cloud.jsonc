@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "bangtan-universe-catalog",
+  "main": "index.ts",
+  "compatibility_date": "2026-09-20",
+  "account_id": "68048d98627e9a6d232fcc9403ed66ca",
+  "workers_dev": true,
+  "d1_databases": [{
+    "binding": "CATALOG_DB",
+    "database_name": "bangtan-universe-catalog",
+    "database_id": "956dcec4-85a0-4a31-acb9-19cd56b63932",
+    "migrations_dir": "migrations"
+  }]
+}
